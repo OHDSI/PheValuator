@@ -1,10 +1,3 @@
----
-title: "PheValuator"
-author: "Joel N. Swerdel"
-date: "December 4, 2018"
-output: html_document
----
-
 PheValuator
 ======================
 
@@ -17,7 +10,7 @@ Introduction
 The goal of PheValuator is to produce a large cohort of subjects each with a predicted probability for a specified health outcome of interest (HOI).  This is achieved by developing a diagnostic predictive model for the HOI using the PatientLevelPrediction (PLP) R package and applying the model to a large, randomly selected population.  These subjects can be used to test one or more phenotype algorithms.  
 
 Process Steps
-============
+=============
 The first step in the process, developing the evaluation cohort, is shown below:
 ![](vignettes/Figure1.png)
 
@@ -56,20 +49,18 @@ Installation
   install.packages("PheValuator")
   ```
 
-Getting Started
-===============
+User Documentation
+==================
 
 Please read the main vignette for the package:
 
-- [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
+* Vignette: [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
+* Package manual: [PheValuator manual](https://raw.githubusercontent.com/OHDSI/EvidenceSynthesis/master/extras/PheValuator.pdf) 
 
-Getting Involved
-===============
-We like to get involved in the development of this package through pull requests to our development branch.
-
-
+Support
+=======
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
-* We use the <a href="../../issues">GitHub issue tracker</a> for all bugs/issues/enhancements
+* We use the <a href="https://github.com/OHDSI/PheValuator">GitHub issue tracker</a> for all bugs/issues/enhancements
  
 License
 =======
