@@ -55,7 +55,7 @@ User Documentation
 Please read the main vignette for the package:
 
 * Vignette: [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
-* Package manual: [PheValuator manual](https://raw.githubusercontent.com/OHDSI/EvidenceSynthesis/master/extras/PheValuator.pdf) 
+* Package manual: [PheValuator manual](https://raw.githubusercontent.com/OHDSI/PheValuator/master/extras/PheValuator.pdf) 
 
 Support
 =======
