@@ -71,7 +71,7 @@ Development
 PheValuator is being developed in R Studio.
 
 ### Development status
-[![Build Status](https://travis-ci.org/OHDSI/Phevaluator.svg?branch=master)](https://travis-ci.org/OHDSI/PheValuator)
+[![Build Status](https://travis-ci.org/OHDSI/PheValuator.svg?branch=master)](https://travis-ci.org/OHDSI/PheValuator)
 [![codecov.io](https://codecov.io/github/OHDSI/PheValuator/coverage.svg?branch=master)](https://codecov.io/github/OHDSI/PheValuator?branch=master)
 
 Beta
