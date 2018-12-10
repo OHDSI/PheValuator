@@ -11,9 +11,9 @@ r_packages:
   - drat
 
 r_github_packages:
+  - OHDSI/OhdsiRTools
   - OHDSI/FeatureExtraction
   - OHDSI/BigKnn
-  - OHDSI/OhdsiRTools
   - OHDSI/OhdsiSharing
   - OHDSI/PatientLevelPrediction
 
