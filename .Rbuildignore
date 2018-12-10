@@ -1,0 +1,13 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+.travis.yml
+standalone
+^\.travis\.yml$
+man/CohortMethod.pdf
+man/balanceScatterPlot.png
+man/ps.png
+deploy.sh
+extras
+man-roxygen
+xgboost
+compare_versions
