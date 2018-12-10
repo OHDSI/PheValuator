@@ -62,6 +62,7 @@ Getting Started
 Please read the main vignette for the package:
 
 - [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
+- [PheValuator Manual](https://github.com/OHDSI/PheValuator/blob/master/extras/PheValuator.pdf)
 
 Getting Involved
 ===============
