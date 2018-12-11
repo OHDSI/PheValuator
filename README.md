@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: "PheValuator"
 author: "Joel N. Swerdel"
@@ -5,6 +6,8 @@ date: "December 11, 2018"
 output: html_document
 ---
 
+=======
+>>>>>>> ce24f84aaebe503c958196b98620b669e6d620bb
 PheValuator
 ======================
 
@@ -17,7 +20,7 @@ Introduction
 The goal of PheValuator is to produce a large cohort of subjects each with a predicted probability for a specified health outcome of interest (HOI).  This is achieved by developing a diagnostic predictive model for the HOI using the PatientLevelPrediction (PLP) R package and applying the model to a large, randomly selected population.  These subjects can be used to test one or more phenotype algorithms.  
 
 Process Steps
-============
+=============
 The first step in the process, developing the evaluation cohort, is shown below:
 ![](vignettes/Figure1.png)
 
@@ -56,11 +59,12 @@ Installation
   install.packages("PheValuator")
   ```
 
-Getting Started
-===============
+User Documentation
+==================
 
 Please read the main vignette for the package:
 
+<<<<<<< HEAD
 - [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
 - [PheValuator Manual](https://github.com/OHDSI/PheValuator/blob/master/extras/PheValuator.pdf)
 
@@ -68,9 +72,15 @@ Getting Involved
 ===============
 We like to get involved in the development of this package through pull requests to our development branch.
 
+=======
+* Vignette: [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
+* Package manual: [PheValuator manual](https://raw.githubusercontent.com/OHDSI/PheValuator/master/extras/PheValuator.pdf) 
+>>>>>>> ce24f84aaebe503c958196b98620b669e6d620bb
 
+Support
+=======
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
-* We use the <a href="../../issues">GitHub issue tracker</a> for all bugs/issues/enhancements
+* We use the <a href="https://github.com/OHDSI/PheValuator">GitHub issue tracker</a> for all bugs/issues/enhancements
  
 License
 =======
@@ -81,7 +91,7 @@ Development
 PheValuator is being developed in R Studio.
 
 ### Development status
-[![Build Status](https://travis-ci.org/OHDSI/Phevaluator.svg?branch=master)](https://travis-ci.org/OHDSI/PheValuator)
+[![Build Status](https://travis-ci.org/OHDSI/PheValuator.svg?branch=master)](https://travis-ci.org/OHDSI/PheValuator)
 [![codecov.io](https://codecov.io/github/OHDSI/PheValuator/coverage.svg?branch=master)](https://codecov.io/github/OHDSI/PheValuator?branch=master)
 
 Beta
