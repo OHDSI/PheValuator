@@ -1,6 +1,6 @@
 ---
 title: "PheValuator"
-author: "Joel N. Swerdel"
+author: "Joel Swerdel"
 date: "December 11, 2018"
 output: html_document
 ---
