@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ---
 title: "PheValuator"
 author: "Joel N. Swerdel"
@@ -6,8 +5,7 @@ date: "December 11, 2018"
 output: html_document
 ---
 
-=======
->>>>>>> ce24f84aaebe503c958196b98620b669e6d620bb
+======================
 PheValuator
 ======================
 
