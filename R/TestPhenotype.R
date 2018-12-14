@@ -29,7 +29,8 @@
 #'                               in the DatabaseConnector package.
 #' @param cutPoints              A list of threshold predictions for the evaluations.  Include "EV" for
 #'                               the expected value
-#' @param resultsFileName        The full file name with path for the evalution file
+#' @param resultsFileName        The full file name with path for the evaluation file
+#' @param modelFileName          The full file name with path for the model file
 #' @param cohortPheno            The number of the cohort of the phenotype algorithm to test
 #' @param phenText               A string to identify the phenotype algorithm in the outpuit file
 #' @param order                  The order of this algorithm for sorting in the output file (used when
@@ -54,6 +55,7 @@
 testPhenotype <- function(connectionDetails = list(),
                           cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
                           resultsFileName = "",
+                          modelFileName = "",
                           cohortPheno = "",
                           phenText = "Test Pheno",
                           order = 1,
@@ -79,7 +81,18 @@ testPhenotype <- function(connectionDetails = list(),
 
   results <- data.frame()
   misses <- data.frame()
+  xSpecP <- -1
   writeLines(paste("\t", Sys.time(), "pheno: ", cohortPheno))
+
+  if(modelFileName != "") { #if a model was supplied, add the value for the 0.005% xSpec cohort probability to the cut-points
+    if(!file.exists(modelFileName)){
+      writeLines(paste("...", modelFileName,"does not exist"))
+    } else {
+            model <- readRDS(modelFileName)
+            xSpecP <- round(as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.005)),2)
+            cutPoints <- append(cutPoints, xSpecP)
+            }
+  }
 
   # pull the subjects in the phentype
   sql <- paste("select distinct subject_id,  subject_id  subject_id2 from ",
@@ -92,12 +105,13 @@ testPhenotype <- function(connectionDetails = list(),
 
   sql <- SqlRender::translateSql(sql = sql, targetDialect = connectionDetails$dbms)$sql
 
-  conn <- DatabaseConnector::connect(connectionDetails)
+  #conn <- DatabaseConnector::connect(connectionDetails)
+  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file='NUL')
 
   PhenoPop <- data.table::data.table(DatabaseConnector::querySql(conn = conn, sql))
 
-  if (nrow(PhenoPop) == 0)
-    stop(".....phenotype cohort did not return any rows")
+  #if (nrow(PhenoPop) == 0)
+   # stop(".....phenotype cohort did not return any rows")
 
   if (!file.exists(resultsFileName))
     stop(paste(".....Results file (", resultsFileName, ") does not exist"))
@@ -127,13 +141,7 @@ testPhenotype <- function(connectionDetails = list(),
       # for numeric cutpoints determine the cut point to use
       cutPt <- as.numeric(cutPoints[[cpUp]])
       fullTable <- fullTable[, `:=`(value, ifelse(value >= cutPt, 1, 0))]
-    } else {
-      fullTable <- fullTable[, `:=`(value, ifelse(value < 0.05,
-                                                  0,
-                                                  value))]  #set the very low predicted values to 0
-      fullTable <- fullTable[, `:=`(value, ifelse(value > 0.95, 1, value))]
-    }  #set the very high predicted values to 1
-
+    }
 
     # set the intial values
     fullTable <- fullTable[, `:=`(c("TP", "TN", "FP", "FN"),
@@ -157,8 +165,9 @@ testPhenotype <- function(connectionDetails = list(),
     falsePos <- sum(fullTable$FP)
     falseNeg <- sum(fullTable$FN)
 
-    # capture subject id's of mistakes if requested - only for the 0.5 cutpoint
-    if (cutPoints[[cpUp]] == "0.5") {
+    # capture subject id's of mistakes if requested - only for the 0.5 or xSpecP cutpoint
+    if(!is.null(xSpecP)) {missesCP <- xSpecP} else {missesCP <- 0.5}
+    if (cutPoints[[cpUp]] == missesCP) {
       subjectDF <- fullTable[fullTable$TP == 1]
       subjectDF <- subjectDF[order(-subjectDF$valueOrig), ]
       subjectList <- c(subjectDF$subjectId)
@@ -221,7 +230,11 @@ testPhenotype <- function(connectionDetails = list(),
       }
     }
 
-    newRow$Cut_Point <- cutPoints[[cpUp]]
+    if(cutPoints[[cpUp]] == xSpecP) {
+      newRow$Cut_Point <- paste("EmpirCP (", xSpecP, ")", sep="")
+    } else {
+        newRow$Cut_Point <- cutPoints[[cpUp]]
+    }
 
     if (truePos + falsePos == 0)
       {

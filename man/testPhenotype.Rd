@@ -6,8 +6,8 @@
 \usage{
 testPhenotype(connectionDetails = list(), cutPoints = c(0.1, 0.2, 0.3,
   0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9), resultsFileName = "",
-  cohortPheno = "", phenText = "Test Pheno", order = 1,
-  testText = "Phenotype", cohortDatabaseSchema = "",
+  modelFileName = "", cohortPheno = "", phenText = "Test Pheno",
+  order = 1, testText = "Phenotype", cohortDatabaseSchema = "",
   cohortTable = "", estPPV = 1, cdmShortName = "CDM")
 }
 \arguments{
@@ -17,7 +17,9 @@ in the DatabaseConnector package.}
 \item{cutPoints}{A list of threshold predictions for the evaluations.  Include "EV" for
 the expected value}
 
-\item{resultsFileName}{The full file name with path for the evalution file}
+\item{resultsFileName}{The full file name with path for the evaluation file}
+
+\item{modelFileName}{The full file name with path for the model file}
 
 \item{cohortPheno}{The number of the cohort of the phenotype algorithm to test}
 
