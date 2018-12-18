@@ -14,6 +14,7 @@
 {DEFAULT @endDate = '21000101' }
 {DEFAULT @baseSampleSize = 150000 }
 {DEFAULT @xSpecSampleSize = 1500 }
+{DEFAULT @noise = 150 }
 {DEFAULT @mainPopnCohort = 0 }
 {DEFAULT @exclCohort = 0 }
 {DEFAULT @lookback = 0 }
@@ -65,7 +66,7 @@ CREATE TABLE @tempDB.@test_cohort (
   cohort_definition_id bigint NOT NULL,
   subject_id bigint NOT NULL,
   cohort_start_date date,
-  cohort_end_date date)
+  cohort_end_date date);
 
 insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE)
  (select 0 as COHORT_DEFINITION_ID, person_id as SUBJECT_ID, dateadd(day, 0, visit_start_date) COHORT_START_DATE,
@@ -122,7 +123,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 	  union
 	  select 0 as COHORT_DEFINITION_ID, SUBJECT_ID, dateadd(day, 0, COHORT_START_DATE) COHORT_START_DATE,
 	      dateadd(day, 1, COHORT_START_DATE) COHORT_END_DATE
-      from (select top (@xSpecSampleSize/10) *
+      from (select top @noise *
 			from @cohort_database_schema.@cohort_database_table
 			where COHORT_DEFINITION_ID = @exclCohort
 				and COHORT_START_DATE between cast(@startDate as varchar) and cast(@endDate as varchar)) noise -- add a little noise to the base cohort

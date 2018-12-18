@@ -244,6 +244,7 @@ createPhenoModel <- function(connectionDetails = list(),
                                 endDate = endDate,
                                 baseSampleSize = baseSample,
                                 xSpecSampleSize = xspecSize,
+                                noise = xspecSize/10,
                                 mainPopnCohort = mainPopnCohort,
                                 lookback = -1095)
     # for the xSpec model include 1095 days before first dx

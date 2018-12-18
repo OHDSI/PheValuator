@@ -143,6 +143,7 @@ createEvalCohort <- function(connectionDetails = list(),
                               endDate = endDate,
                               baseSampleSize = 1e+06,
                               xSpecSampleSize = 1,
+                              noise = 0,
                               mainPopnCohort = mainPopnCohort,
                               lookback = 0)  #when applying the model start from the first visit for all subjects
 

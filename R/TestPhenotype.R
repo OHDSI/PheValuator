@@ -81,7 +81,7 @@ testPhenotype <- function(connectionDetails = list(),
 
   results <- data.frame()
   misses <- data.frame()
-  xSpecP <- -1
+  xSpecP <- -1; xSpecP2 <- -1; xSpecP3 <- -1
   writeLines(paste("\t", Sys.time(), "pheno: ", cohortPheno))
 
   if(modelFileName != "") { #if a model was supplied, add the value for the 0.005% xSpec cohort probability to the cut-points
@@ -89,8 +89,10 @@ testPhenotype <- function(connectionDetails = list(),
       writeLines(paste("...", modelFileName,"does not exist"))
     } else {
             model <- readRDS(modelFileName)
-            xSpecP <- round(as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.005)),2)
-            cutPoints <- append(cutPoints, xSpecP)
+            xSpecP <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.005))
+            xSpecP2 <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.01))
+            xSpecP3 <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.015))
+            cutPoints <- append(cutPoints, c(xSpecP, xSpecP2, xSpecP3))
             }
   }
 
@@ -231,7 +233,11 @@ testPhenotype <- function(connectionDetails = list(),
     }
 
     if(cutPoints[[cpUp]] == xSpecP) {
-      newRow$Cut_Point <- paste("EmpirCP (", xSpecP, ")", sep="")
+      newRow$Cut_Point <- paste("EmpirCP0.5 (", round(xSpecP,2), ")", sep="")
+    } else if(cutPoints[[cpUp]] == xSpecP2) {
+      newRow$Cut_Point <- paste("EmpirCP1.0 (", round(xSpecP2,2), ")", sep="")
+    } else if(cutPoints[[cpUp]] == xSpecP3) {
+      newRow$Cut_Point <- paste("EmpirCP1.5 (", round(xSpecP3,2), ")", sep="")
     } else {
         newRow$Cut_Point <- cutPoints[[cpUp]]
     }
