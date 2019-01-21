@@ -54,6 +54,7 @@
 #'                               (default=NULL)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
+#' @param gender                 The gender(s) to be included (default c(8507, 8532))
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
 #'
@@ -75,6 +76,7 @@ createEvalCohort <- function(connectionDetails = list(),
                              mainPopnCohort = 0,
                              lowerAgeLimit = 0,
                              upperAgeLimit = 120,
+                             gender = c(8507, 8532),
                              startDate = "19001010",
                              endDate = "21000101") {
 
@@ -112,6 +114,7 @@ createEvalCohort <- function(connectionDetails = list(),
   writeLines(paste("mainPopnCohort ", mainPopnCohort))
   writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
   writeLines(paste("upperAgeLimit ", upperAgeLimit))
+  writeLines(paste("gender ", gender))
   writeLines(paste("startDate ", startDate))
   writeLines(paste("endDate ", endDate))
 
@@ -139,9 +142,10 @@ createEvalCohort <- function(connectionDetails = list(),
                               exclCohort = 0,
                               ageLimit = lowerAgeLimit,
                               upperAgeLimit = upperAgeLimit,
+                              gender = gender,
                               startDate = startDate,
                               endDate = endDate,
-                              baseSampleSize = 1e+06,
+                              baseSampleSize = 2e+06,
                               xSpecSampleSize = 1,
                               noise = 0,
                               mainPopnCohort = mainPopnCohort,

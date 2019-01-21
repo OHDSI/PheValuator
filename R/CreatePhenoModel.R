@@ -55,6 +55,7 @@
 #'                               (default=NULL)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
+#' @param gender                 The gender(s) to be included (default c(8507, 8532))
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
 #'
@@ -76,6 +77,7 @@ createPhenoModel <- function(connectionDetails = list(),
                              mainPopnCohort = 0,
                              lowerAgeLimit = 0,
                              upperAgeLimit = 120,
+                             gender = c(8507, 8532),
                              startDate = "19000101",
                              endDate = "21000101") {
 
@@ -113,6 +115,7 @@ createPhenoModel <- function(connectionDetails = list(),
   writeLines(paste("mainPopnCohort ", mainPopnCohort))
   writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
   writeLines(paste("upperAgeLimit ", upperAgeLimit))
+  writeLines(paste("gender ", gender))
   writeLines(paste("startDate ", startDate))
   writeLines(paste("endDate ", endDate))
 
@@ -130,6 +133,9 @@ createPhenoModel <- function(connectionDetails = list(),
                               cohort_database_schema = cohortDatabaseSchema,
                               lowerAgeLimit = lowerAgeLimit,
                               upperAgeLimit = upperAgeLimit,
+                              gender = gender,
+                              startDate = startDate,
+                              endDate = endDate,
                               exclCohort = exclCohort)
 
   sql <- SqlRender::translateSql(sql$sql, targetDialect = connectionDetails$dbms)
@@ -240,6 +246,7 @@ createPhenoModel <- function(connectionDetails = list(),
                                 exclCohort = exclCohort,
                                 ageLimit = lowerAgeLimit,
                                 upperAgeLimit = upperAgeLimit,
+                                gender = gender,
                                 startDate = startDate,
                                 endDate = endDate,
                                 baseSampleSize = baseSample,

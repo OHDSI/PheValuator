@@ -9,8 +9,8 @@ createEvalCohort(connectionDetails = list(), xSpecCohort = "",
   cohortDatabaseTable = "", outDatabaseSchema = "", testOutFile = "",
   trainOutFile = "", estPPV = 1, modelAnalysisId = "",
   evalAnalysisId = "1", cdmShortName = "CDM", mainPopnCohort = 0,
-  lowerAgeLimit = 0, upperAgeLimit = 120, startDate = "19001010",
-  endDate = "21000101")
+  lowerAgeLimit = 0, upperAgeLimit = 120, gender = c(8507, 8532),
+  startDate = "19001010", endDate = "21000101")
 }
 \arguments{
 \item{connectionDetails}{connectionDetails created using the function createConnectionDetails
@@ -56,6 +56,8 @@ files}
 \item{lowerAgeLimit}{The lower age for subjects in the model (default=NULL)}
 
 \item{upperAgeLimit}{The upper age for subjects in the model (default=NULL)}
+
+\item{gender}{The gender(s) to be included (default c(8507, 8532))}
 
 \item{startDate}{The starting date for including subjects in the model (default=NULL)}
 

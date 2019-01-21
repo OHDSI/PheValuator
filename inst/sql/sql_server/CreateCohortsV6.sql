@@ -10,6 +10,7 @@
 {DEFAULT @test_cohort = "test_cohort" }
 {DEFAULT @ageLimit = 20}
 {DEFAULT @upperAgeLimit = 120}
+{DEFAULT @gender = c(8507, 8532)}
 {DEFAULT @startDate = '19000101' }
 {DEFAULT @endDate = '21000101' }
 {DEFAULT @baseSampleSize = 150000 }
@@ -31,6 +32,7 @@ from (select co.*, p.*,
 	join @cdm_database_schema.person p
 	  on co.subject_id = p.person_id
 		and  year(COHORT_START_DATE) - year_of_birth >= @ageLimit and year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
+		and gender_concept_id in (@gender)
 	join @cdm_database_schema.observation_period o
 	  on co.subject_id = o.person_id
 	    and co.COHORT_START_DATE between o.observation_period_start_date and o.observation_period_end_date
@@ -79,6 +81,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					join @cdm_database_schema.person p
 					  on v.person_id = p.person_id
 						and  year(visit_start_date) - year_of_birth >= @ageLimit and year(visit_start_date) - year_of_birth <= @upperAgeLimit
+						and gender_concept_id in (@gender)
 					join #eligibles v5 --include only subjects with at least 5 visits in their record and within date range
 						on v.person_id = v5.person_id
 					where 1 = 1
@@ -94,6 +97,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					join @cdm_database_schema.person p
 					  on co.subject_id = p.person_id
 						and  year(co.COHORT_START_DATE) - year_of_birth >= @ageLimit and year(co.COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
+						and gender_concept_id in (@gender)
 					join #eligibles v5 --include only subjects with at least 5 visits in their record and within date range
 						on co.subject_id = v5.person_id
 					where co.cohort_definition_id = @mainPopnCohort

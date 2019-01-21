@@ -61,18 +61,16 @@ User Documentation
 
 Please read the main vignette for the package:
 
-<<<<<<< HEAD
 - [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
 - [PheValuator Manual](https://github.com/OHDSI/PheValuator/blob/master/extras/PheValuator.pdf)
 
 Getting Involved
 ===============
-We like to get involved in the development of this package through pull requests to our development branch.
+We would like you to get involved in the development of this package through pull requests to our development branch.
 
 =======
 * Vignette: [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
 * Package manual: [PheValuator manual](https://raw.githubusercontent.com/OHDSI/PheValuator/master/extras/PheValuator.pdf) 
->>>>>>> ce24f84aaebe503c958196b98620b669e6d620bb
 
 Support
 =======

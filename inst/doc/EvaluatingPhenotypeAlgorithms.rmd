@@ -153,7 +153,8 @@ connectionDetails <- createConnectionDetails(dbms = "postgresql",
 
 phenoResult <- PheValuator::testPhenotype(connectionDetails = connectionDetails,
                cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
-               resultsFileName = "c:/phenotyping/lr_results_PheVal_10X_DM_eval_myCDM_ePPV0.75_20181206V1.rds",
+               resultsFileName = 
+                 "c:/phenotyping/lr_results_PheVal_10X_DM_eval_myCDM_ePPV0.75_20181206V1.rds",
                cohortPheno = 1769702,
                phenText = "All Diabetes by Phenotype 1 X In-patient, 1st Position",
                order = 1,
