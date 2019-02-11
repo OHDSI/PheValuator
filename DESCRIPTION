@@ -17,10 +17,12 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 3.2.2),
-    DatabaseConnector (>= 2.1.4)
+    DatabaseConnector (>= 2.1.4),
+    dplyr (>= 0.7.8)
 Imports:
     PatientLevelPrediction (>= 2.0.4),
     FeatureExtraction (>= 2.1.5),
     SqlRender (>= 1.5.2),
-    data.table (>= 1.11.8)
+    data.table (>= 1.11.8),
+    dplyr (>= 0.7.8)
 RoxygenNote: 6.1.1
