@@ -1,4 +1,4 @@
-# @file CreatePhenoModel.R
+# @file createPhenoModel.R
 #
 # Copyright 2018 Observational Health Data Sciences and Informatics
 #
