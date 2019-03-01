@@ -1,4 +1,4 @@
-# @file createPhenoModel.R
+# @file TestConcepts.R
 #
 # Copyright 2018 Observational Health Data Sciences and Informatics
 #
@@ -16,15 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#' createPhenoModel
+#' testConcepts
 #'
 #' @description
-#' Create the phenotype model
+#' Test the concept sets used in the models
 #'
 #' @details
-#' Function to create a diagnostic prediction model for a health outcome of interest using the xSpec
-#' cohort.  The model may be applied to the evaluation cohort to determine probabilities for each
-#' subject for the health outcome of interest.
+#' Function to examine the concepts in the xSpec cohort compared to the noisy negative cohort.
+#' This will give a sense of the comrrectnes/completeness of the concept set used for the model
 #'
 #' @param connectionDetails      connectionDetails created using the function createConnectionDetails
 #'                               in the DatabaseConnector package.
@@ -42,16 +41,12 @@
 #'                               COHORT_START_DATE, COHORT_END_DATE.
 #' @param outDatabaseSchema      The name of a database schema where the user has write capability.  A
 #'                               temporary cohort table will be created here.
-#' @param trainOutFile           A string designation for the training model file
-#' @param exclCohort             The number of the cohort definition id
-#'                               in the cohort table (used to exclude subjects from the base population)
-#' @param prevCohort             The number of the cohort definition id to determine the disease prevalence,
-#'                               usually a super-set of the exclCohort
-#' @param estPPV                 A value between 0 and 1 as an estimate for the positive predictive
-#'                               value for the exclCohort
+#' @param testOutFile            A string designation for the test model file
+#' @param exclCohort             The number of the "extremely sensitive (xSens)" cohort definition id
+#'                               in the cohort table (used to estimate population prevalence and to
+#'                               exclude subjects from the noisy positives)
+#' @param inclConcepts           A list of concepts that were included in the definition
 #' @param modelAnalysisId        Another string for designating the name for the model files
-#' @param excludedConcepts       A list of conceptIds to exclude from featureExtraction  these should include all
-#'                               concept_ids that were used to produce the xSpec model
 #' @param cdmShortName           A short name for the current database (CDM)
 #' @param mainPopnCohort         The number of the cohort to be used as a base population for the model
 #'                               (default=NULL)
@@ -62,20 +57,19 @@
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
 #'
 #' @importFrom stats runif
+#' @importFrom dplyr summarize
 #'
 #' @export
-createPhenoModel <- function(connectionDetails = list(),
+testConcepts <- function(connectionDetails = list(),
                              xSpecCohort = "",
                              cdmDatabaseSchema = "",
                              cohortDatabaseSchema = "",
                              cohortDatabaseTable = "",
                              outDatabaseSchema = "",
-                             trainOutFile = "",
+                             testOutFile = "",
                              exclCohort = "",
-                             prevCohort = "",
-                             estPPV = 1,
                              modelAnalysisId = "1",
-                             excludedConcepts = c(),
+                             inclConcepts = c(),
                              cdmShortName = "CDM",
                              mainPopnCohort = 0,
                              lowerAgeLimit = 0,
@@ -93,8 +87,6 @@ createPhenoModel <- function(connectionDetails = list(),
     stop("...must have an xSpec cohort id (e.g., 1234)")
   if (exclCohort == "")
     stop("...must have an exclusion cohort (exclCohort) (e.g., 1235)")
-  if (prevCohort == "")
-    stop("...must have an prevalence cohort (prevCohort) (e.g., 1235)")
   if (cdmDatabaseSchema == "")
     stop("....must have a defined CDM schema (e.g., \"YourCDM.YourCDMSchema\")")
   if (cohortDatabaseSchema == "")
@@ -103,20 +95,18 @@ createPhenoModel <- function(connectionDetails = list(),
     stop("....must have a defined Cohort table (e.g., \"cohort\")")
   if (outDatabaseSchema == "")
     stop("....must have a defined Out Database schema (e.g., \"scratch.dbo\")")
-  if (trainOutFile == "")
-    stop("....must have a defined training file name (e.g., \"train_10XDiabetes\")")
+  if (testOutFile == "")
+    stop("....must have a defined test file name (e.g., \"test_10XDiabetes\")")
 
   writeLines(paste("xSpecCohort ", xSpecCohort))
   writeLines(paste("cdmDatabaseSchema ", cdmDatabaseSchema))
   writeLines(paste("cohortDatabaseSchema ", cohortDatabaseSchema))
   writeLines(paste("cohortDatabaseTable ", cohortDatabaseTable))
   writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
-  writeLines(paste("trainOutFile ", trainOutFile))
+  writeLines(paste("testOutFile ", testOutFile))
   writeLines(paste("exclCohort ", exclCohort))
-  writeLines(paste("prevCohort ", prevCohort))
-  writeLines(paste("estPPV ", estPPV))
   writeLines(paste("modelAnalysisId ", modelAnalysisId))
-  writeLines(paste("excludedConcepts ", c(excludedConcepts)))
+  writeLines(paste("inclConcepts ", c(inclConcepts)))
   writeLines(paste("cdmShortName ", cdmShortName))
   writeLines(paste("mainPopnCohort ", mainPopnCohort))
   writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
@@ -129,111 +119,33 @@ createPhenoModel <- function(connectionDetails = list(),
 
   conn <- DatabaseConnector::connect(connectionDetails)
 
-  # determine population prevalence for correct xSpec/noisy negative popn ratio
-  sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
-                                              "getPopnPrev.sql",
-                                              package = "PheValuator"))
-
-  sql <- SqlRender::renderSql(sqlScript,
-                              cdm_database_schema = cdmDatabaseSchema,
-                              cohort_database_schema = cohortDatabaseSchema,
-                              cohort_database_table = cohortDatabaseTable,
-                              lowerAgeLimit = lowerAgeLimit,
-                              upperAgeLimit = upperAgeLimit,
-                              gender = gender,
-                              startDate = startDate,
-                              endDate = endDate,
-                              prevCohort = prevCohort)
-
-  sql <- SqlRender::translateSql(sql$sql, targetDialect = connectionDetails$dbms)
-
-  popPrev <- DatabaseConnector::querySql(conn = conn, sql$sql)
-  popPrev <- popPrev * as.numeric(estPPV)
-
-  if (popPrev == 0)
-    stop(".....unable to calculate the expected prevalence, possibly an error with exclusion cohort id")
-
-  writeLines(paste("\nEstimated Population Prevalence: ", popPrev, sep = ""))
-
-  # set reasonable model populations - for fast, but accurate models
-  if (popPrev >= 0.3) {
-    xspecSize <- 4000  #use large xSpec size for higher prevalence values
-  } else if (popPrev >= 0.2) {
-    xspecSize <- 3000
-  } else if (popPrev >= 0.1) {
-    xspecSize <- 2000
-  } else {
-    xspecSize <- 1500  #use smaller xSpec size for lower prevalence values
-  }
+  xspecSize <- 1e+05  #use xSpec sample size
 
   # set the number of nosiy negatives in the model either from the prevalence or to 500K max
-  baseSampleSize <- min(as.integer(xspecSize/popPrev), 5e+05)  #use 500,000 as largest base sample
+  baseSampleSize <- 1e+05
 
   # sql script to create a temporary cohort table for predictive modeling
   sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
                                               "CreateCohortsV6.sql",
                                               package = "PheValuator"))
 
-  covariateSettings <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
-                                                                  useDemographicsAgeGroup = TRUE,
-                                                                  useDemographicsRace = TRUE,
-                                                                  useDemographicsEthnicity = TRUE,
-                                                                  useConditionOccurrenceLongTerm = TRUE,
-                                                                  useConditionOccurrencePrimaryInpatientLongTerm = TRUE,
-                                                                  useConditionGroupEraLongTerm = TRUE,
-                                                                  useDrugExposureLongTerm = TRUE,
-                                                                  useDrugEraLongTerm = TRUE,
-                                                                  useDrugEraStartLongTerm = TRUE,
-                                                                  useDrugGroupEraLongTerm = TRUE,
-                                                                  useDrugGroupEraStartLongTerm = TRUE,
-                                                                  useProcedureOccurrenceLongTerm = TRUE,
-                                                                  useDeviceExposureLongTerm = TRUE,
-                                                                  useMeasurementLongTerm = TRUE,
-                                                                  useMeasurementValueLongTerm = TRUE,
-                                                                  useMeasurementRangeGroupLongTerm = TRUE,
-                                                                  useObservationLongTerm = TRUE,
-                                                                  useDistinctConditionCountLongTerm = TRUE,
-                                                                  useDistinctIngredientCountLongTerm = TRUE,
-                                                                  useDistinctProcedureCountLongTerm = TRUE,
-                                                                  useDistinctMeasurementCountLongTerm = TRUE,
-                                                                  useVisitCountLongTerm = TRUE,
+  covariateSettings <- FeatureExtraction::createCovariateSettings(useConditionOccurrenceLongTerm = TRUE,
                                                                   longTermStartDays = -10000,
                                                                   endDays = 10000,
                                                                   includedCovariateConceptIds = c(),
                                                                   addDescendantsToInclude = TRUE,
-                                                                  excludedCovariateConceptIds = excludedConcepts,
-                                                                  addDescendantsToExclude = FALSE,
+                                                                  excludedCovariateConceptIds = c(),
+                                                                  addDescendantsToExclude = TRUE,
                                                                   includedCovariateIds = c())
 
   baseSample <- baseSampleSize
   plpDataFile <- file.path(workFolder, paste("plpData_",
-                                             trainOutFile,
+                                             testOutFile,
                                              "_",
                                              cdmShortName,
-                                             "_ePPV",
-                                             estPPV,
                                              "_",
                                              modelAnalysisId,
                                              sep = ""))
-  resultsFileName <- file.path(workFolder, paste("lr_results_",
-                                                 trainOutFile,
-                                                 "_",
-                                                 cdmShortName,
-                                                 "_ePPV",
-                                                 estPPV,
-                                                 "_",
-                                                 modelAnalysisId,
-                                                 ".rds",
-                                                 sep = ""))
-  resultsDirName <- file.path(workFolder, paste("lr_results_",
-                                                trainOutFile,
-                                                "_",
-                                                cdmShortName,
-                                                "_ePPV",
-                                                estPPV,
-                                                "_",
-                                                modelAnalysisId,
-                                                sep = ""))
 
   if (!file.exists(plpDataFile)) {
     # only pull the plp data if it doesn't already exist create a unique name for the temporary cohort
@@ -258,6 +170,7 @@ createPhenoModel <- function(connectionDetails = list(),
                                 endDate = endDate,
                                 baseSampleSize = baseSample,
                                 xSpecSampleSize = xspecSize,
+                                noise = 0,
                                 mainPopnCohort = mainPopnCohort,
                                 lookback = -1095)
     # for the xSpec model include 1095 days before first dx
@@ -297,41 +210,49 @@ createPhenoModel <- function(connectionDetails = list(),
     plpData <- PatientLevelPrediction::loadPlpData(plpDataFile)
   }
 
-  if (!file.exists(resultsFileName)) {
-    # only create the model if it doesn't exist
-    population <- PatientLevelPrediction::createStudyPopulation(plpData,
-                                                                population = NULL,
-                                                                outcomeId = xSpecCohort,
-                                                                firstExposureOnly = FALSE,
-                                                                washoutPeriod = 0,
-                                                                removeSubjectsWithPriorOutcome = TRUE,
-                                                                priorOutcomeLookback = 1,
-                                                                riskWindowStart = 0,
-                                                                requireTimeAtRisk = FALSE,
-                                                                minTimeAtRisk = 0,
-                                                                addExposureDaysToStart = FALSE,
-                                                                riskWindowEnd = 1,
-                                                                addExposureDaysToEnd = T)
+  #produce the output for analyzing the concept set
+  covDataRef <- data.frame(plpData$covariateRef)
+  covDataAll <- merge(data.frame(plpData$covariates), covDataRef, by = "covariateId")
+  covDataAll <- merge(covDataAll, data.frame(plpData$cohorts), by = "rowId")
 
-    modelSettings <- PatientLevelPrediction::setLassoLogisticRegression(variance = 0.01, seed = 5)
+  subjAll <- c(plpData$cohorts$subjectId)
+  subjOut <- c(plpData$cohorts$subjectId[plpData$cohorts$rowId %in% plpData$outcomes$rowId])
+  subjNoOut <- c(plpData$cohorts$subjectId[!(plpData$cohorts$rowId %in% plpData$outcomes$rowId)])
 
-    lr_results <- PatientLevelPrediction::runPlp(population,
-                                                 plpData,
-                                                 modelSettings = modelSettings,
-                                                 testSplit = "person",
-                                                 testFraction = 0.25,
-                                                 splitSeed = 5,
-                                                 nfold = 10)
+  data0 <- covDataAll[covDataAll$subjectId %in% c(subjNoOut),]
+  data1 <- covDataAll[covDataAll$subjectId %in% c(subjOut),]
+  cov0 <- dplyr::summarize(group_by(data0, as.character(covariateId)), n())
+  cov1 <- dplyr::summarize(group_by(data1, as.character(covariateId)), n())
 
-    print(resultsFileName)
-    saveRDS(lr_results, resultsFileName)
+  names(cov0)[1] <- "covariateId"
+  names(cov0)[2] <- "n"
+  cov0$prop <- cov0$n/length(subjNoOut)
 
-    print(resultsDirName)
-    PatientLevelPrediction::savePlpResult(lr_results, resultsDirName)
-  } else {
-    writeLines(paste("\n...Loading ", resultsFileName, " from existing file", sep = ""))
-    lr_results <- readRDS(resultsFileName)
-  }
+  names(cov1)[1] <- "covariateId"
+  names(cov1)[2] <- "n"
+  cov1$prop <- cov1$n/length(subjOut)
+
+  conceptCompare <- merge(cov1, cov0, by="covariateId", all.x=TRUE)
+  conceptCompare$prop.y[is.na(conceptCompare$prop.y)] <- 1e-15
+  conceptCompare$n.y[is.na(conceptCompare$n.y)] <- 0
+  conceptCompare$pr <- conceptCompare$prop.x/conceptCompare$prop.y
+  conceptCompare <- conceptCompare[conceptCompare$n.x >= 10,]
+  conceptCompare <- merge(conceptCompare, covDataRef, by="covariateId")
+  conceptCompare$inConceptList <- !is.na(stringr::str_locate(paste(inclConcepts, collapse=", "),
+                                                             as.character(conceptCompare$conceptId))[1])
+  conceptCompare$name <- substr(conceptCompare$covariateName, stringr::str_locate(conceptCompare$covariateName, ':')[1] + 2,
+                                length(conceptCompare$covariateName))
+  names(conceptCompare)[names(conceptCompare)=="n.x"] <- "countxSpec"
+  names(conceptCompare)[names(conceptCompare)=="prop.x"] <- "proportionxSpec"
+  names(conceptCompare)[names(conceptCompare)=="n.y"] <- "countNeg"
+  names(conceptCompare)[names(conceptCompare)=="prop.y"] <- "proportionNeg"
+  conceptCompare <- conceptCompare[,c(9,11,10,6,2,3,4,5)]
+  conceptCompare <- conceptCompare[with(conceptCompare, order(-pr)),]
+
+  outFile <- file.path(getwd(), paste("conceptCompare_", testOutFile, "_", cdmShortName,"_",
+                                                               modelAnalysisId, ".csv", sep = ""))
+  write.csv(conceptCompare, outFile, row.names = FALSE)
+  writeLines(paste("\nConcept Comparison File: ", outFile, sep = ""))
 
   DatabaseConnector::disconnect(conn)
 }

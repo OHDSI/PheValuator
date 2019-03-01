@@ -28,7 +28,7 @@ This vignette describes how to run the PheValuator process from start to end in 
 # Overview of Process 
 
 There are several steps in performing a PA evaluation:
-1. Creating the extremely specific (xSpec) and extremely sensitive (xSens) cohorts
+1. Creating the extremely specific (xSpec), extremely sensitive (xSens), and prevalence cohorts
 2. Creating the Diagnostic Predictive Model using the PatientLevelPrediction (PLP) package
 3. Creating the Evaluation Cohort
 4. Creating the Phenotype Algorithms for evaluation
@@ -37,11 +37,13 @@ There are several steps in performing a PA evaluation:
 
 Each of these steps is described in detail below.  For this vignette we will describe the evaluation of PAs for diabetes mellitus (DM).
 
-## Creating the Extremely Specific (xSpec) and Extremely Sensitive (xSens) Cohorts
+## Creating the Extremely Specific (xSpec), Extremely Sensitive (xSens), and Prevalence Cohorts
 
-The extremely specific (xSpec) and extremely sensitive (xSens) cohorts are developed using the ATLAS tool.  The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability.  This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record.  An [example](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1769699) of this for DM is included in the OHDSI ATLAS repository.  In this example each subject has an initial condition code for DM.  The cohort definition further specifies that each subject also has a second code for DM between 1 and 30 days after the initial DM code and 10 additional DM codes in the rest of the patient record.  This very specific algorithm for DM ensures that the subjects in this cohort have a very high probability for having the condition of DM.  This PA also specifies that subjects are required to have at least 365 days of observation in their patient record.
+The extremely specific (xSpec), extremely sensitive (xSens), and prevalence cohorts are developed using the ATLAS tool.  The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability.  This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record.  An [example](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1769699) of this for DM is included in the OHDSI ATLAS repository.  In this example each subject has an initial condition code for DM.  The cohort definition further specifies that each subject also has a second code for DM between 1 and 30 days after the initial DM code and 10 additional DM codes in the rest of the patient record.  This very specific algorithm for DM ensures that the subjects in this cohort have a very high probability for having the condition of DM.  This PA also specifies that subjects are required to have at least 365 days of observation in their patient record.
 
-An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI.  The system uses the xSens cohort for two purposes. First, it uses the xSens cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model.  The system also uses the xSens cohort to create a set of "noisy" negative subjects, i.e., subjects with a high likelihood of not having the HOI.  This group of subjects will be used in the model building process and is described in detail below.  An [example](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1769700) of an xSens cohort for DM is also in the OHDSI ATLAS repository.
+An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI.  The system uses the xSens cohort to create a set of "noisy" negative subjects, i.e., subjects with a high likelihood of not having the HOI.  This group of subjects will be used in the model building process and is described in detail below.  An [example](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770120) of an xSens cohort for DM is also in the OHDSI ATLAS repository.
+
+An example of an prevalence cohort is created by developing a PA that is very sensitive for the HOI.  The system uses the prevalence cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model.  This group of subjects will be used in the model building process and is described in detail below.  An [example](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770119) of an prevalence cohort for DM is also in the OHDSI ATLAS repository.
 
 ## Creating the Diagnostic Predictive Model
 
@@ -57,9 +59,10 @@ CreatePhenoModel should have as inputs:
  * outDatabaseSchema \- The name of a database schema where the user has write capability.  A temporary cohort table will be created here.
  * trainOutFile \- A string designation for the training model file
  * exclCohort \- The number of the "extremely sensitive (xSens)" cohort definition id in the cohort table (used to estimate population prevalence and to exclude subjects from the noisy positives)
+ * prevCohort \- The number of the cohort definition id to determine the disease prevalence, usually a super-set of the exclCohort
  * estPPV \- A value between 0 and 1 as an estimate for the positive predictive value for the exclCohort
  * modelAnalysisId \- Another string for designating the name for the model files
- * excludedConcepts \- A list of conceptIds to exclude from featureExtraction
+ * excludedConcepts \- A list of conceptIds to exclude from featureExtraction which should include all concept_ids used to create the xSpec and xSens cohorts
  * cdmShortName \- A short name for the current database (CDM)
  * mainPopnCohort \- The number of the cohort to be used as a base population for the model (default=NULL)
  * lowerAgeLimit \- The lower age for subjects in the model (default=NULL)
@@ -84,12 +87,13 @@ phenoTest <- PheValuator::createPhenoModel(connectionDetails = connectionDetails
                            cdmDatabaseSchema = "my_cdm_data",
                            cohortDatabaseSchema = "my_results",
                            cohortDatabaseTable = "cohort",
-                           outDatabaseSchema = "scratch.dbo", #a databsse schema with write access
+                           outDatabaseSchema = "scratch.dbo", #a database schema with write access
                            trainOutFile = "PheVal_10X_DM_train",
-                           exclCohort = 1769700, #the xSens cohort
+                           exclCohort = 1770120, #the xSens cohort
+                           prevCohort = 1770119, #the cohort for prevalence determination
                            estPPV = 0.75,
                            modelAnalysisId = "20181206V1", 
-                           excludedConcepts = c(438480), 
+                           excludedConcepts = c(201820), 
                            cdmShortName = "myCDM", 
                            mainPopnCohort = 0, #use the entire subject population
                            lowerAgeLimit = 18, 
@@ -97,7 +101,7 @@ phenoTest <- PheValuator::createPhenoModel(connectionDetails = connectionDetails
                            startDate = "20100101",
                            endDate = "20171231")
 ```
-In this example, we used the cohorts developed in the "my_results" cdm, specifying the location of the cohort table (cohortDatabaseSchema, cohortDatabaseTable - "my_results.cohort") and where the model will find the conditions, drug exposures, etc. to inform the model (cdmDatabaseSchema - "my_cdm_data").  The subjects included in the model will be those whose first visit in the CDM is between January 1, 2010 and December 31, 2017.  We are also specifically excluding the concept ID 438480 (and its descendants), "Abnormal glucose tolerance in mother complicating pregnancy, childbirth AND/OR puerperium".  Their ages at the time of first visit will be between 18 and 90. With the parameters above, the name of the predictive model output from this step will be: "c:/phenotyping/lr_results_PheVal_10X_DM_train_myCDM_ePPV0.75_20181206V1.rds"
+In this example, we used the cohorts developed in the "my_results" cdm, specifying the location of the cohort table (cohortDatabaseSchema, cohortDatabaseTable - "my_results.cohort") and where the model will find the conditions, drug exposures, etc. to inform the model (cdmDatabaseSchema - "my_cdm_data").  The subjects included in the model will be those whose first visit in the CDM is between January 1, 2010 and December 31, 2017.  We are also specifically excluding the concept ID 201826, "Type 2 diabetes mellitus" which was used to create the xSpec cohort.  Their ages at the time of first visit will be between 18 and 90. With the parameters above, the name of the predictive model output from this step will be: "c:/phenotyping/lr_results_PheVal_10X_DM_train_myCDM_ePPV0.75_20181206V1.rds"
 
 ## Creating the Evaluation Cohort
 

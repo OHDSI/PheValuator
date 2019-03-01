@@ -15,6 +15,7 @@
 {DEFAULT @endDate = '21000101' }
 {DEFAULT @baseSampleSize = 150000 }
 {DEFAULT @xSpecSampleSize = 1500 }
+{DEFAULT @noise = 150 }
 {DEFAULT @mainPopnCohort = 0 }
 {DEFAULT @exclCohort = 0 }
 {DEFAULT @lookback = 0 }
@@ -26,7 +27,7 @@ IF OBJECT_ID('tempdb..#cohort_person', 'U') IS NOT NULL
 select *
 into #cohort_person
 from (select co.*, p.*,
-	  row_number() over (order by ABS(CHECKSUM(NewId())) % 123456789) rn
+	  row_number() over (order by ((co.subject_id*month(COHORT_START_DATE)) % 123)*((year(COHORT_START_DATE)*day(COHORT_START_DATE)) % 123)) rn
 	from @cohort_database_schema.@cohort_database_table co
 	join @cdm_database_schema.person p
 	  on co.subject_id = p.person_id
@@ -75,7 +76,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
       from (select
 				{@mainPopnCohort == 0} ? {
 					v.person_id, min(visit_start_date) as visit_start_date,
-						row_number() over (order by ABS(CHECKSUM(NewId())) % 123456789) rn
+						row_number() over (order by ((v.person_id*month(min(visit_start_date))) % 123)*((year(min(visit_start_date))*day(min(visit_start_date))) % 123)) rn
 					from @cdm_database_schema.visit_occurrence v
 					join @cdm_database_schema.person p
 					  on v.person_id = p.person_id
@@ -91,7 +92,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					group by v.person_id)}
 				{@mainPopnCohort != 0} ? {
 					co.subject_id as person_id, co.COHORT_START_DATE as visit_start_date,
-						row_number() over (order by ABS(CHECKSUM(NewId())) % 123456789) rn
+						row_number() over (order by ((co.subject_id*month(co.COHORT_START_DATE)) % 123)*((year(co.COHORT_START_DATE)*day(co.COHORT_START_DATE)) % 123)) rn
 					from @cohort_database_schema.@cohort_database_table co
 					join @cdm_database_schema.person p
 					  on co.subject_id = p.person_id
@@ -123,4 +124,11 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
         on cp.SUBJECT_ID = o.person_id
           and cp.COHORT_START_DATE between o.observation_period_start_date and o.observation_period_end_date
       where rn <= @xSpecSampleSize
+	  union
+	  select 0 as COHORT_DEFINITION_ID, SUBJECT_ID, dateadd(day, 0, COHORT_START_DATE) COHORT_START_DATE,
+	      dateadd(day, 1, COHORT_START_DATE) COHORT_END_DATE
+      from (select top @noise *
+			from @cohort_database_schema.@cohort_database_table
+			where COHORT_DEFINITION_ID = @exclCohort
+				and COHORT_START_DATE between cast(@startDate as varchar) and cast(@endDate as varchar)) noise -- add a little noise to the base cohort
       );

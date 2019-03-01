@@ -4,12 +4,13 @@
 
 {DEFAULT @cdm_database_schema = 'CDM_SIM' }
 {DEFAULT @cohort_database_schema = 'CDM_SIM' }
+{DEFAULT @cohort_database_table = 'cohort' }
 {DEFAULT @lowerAgeLimit = 20}
 {DEFAULT @upperAgeLimit = 120}
 {DEFAULT @gender = c(8507, 8532)}
 {DEFAULT @startDate = '19000101' }
 {DEFAULT @endDate = '21000101' }
-{DEFAULT @exclCohort = 0 }
+{DEFAULT @prevCohort = 0 }
 
 with init_popn as (
 select p.person_id, p.gender_concept_id, p.year_of_birth, min(year(o.observation_period_start_date)) startYear,
@@ -37,6 +38,6 @@ from (
                 from popn) totCount,
               (select count(person_id)
                 from popn p
-                join @cohort_database_schema.cohort co
+                join @cohort_database_schema.@cohort_database_table co
                   on p.person_id = co.subject_id
-                    and cohort_definition_id = @exclCohort) cohCount) a
+                    and cohort_definition_id = @prevCohort) cohCount) a

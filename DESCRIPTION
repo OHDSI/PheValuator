@@ -1,7 +1,7 @@
 Package: PheValuator
 Type: Package
 Title: Rapid Phenotype Evaluation
-Version: 0.1.3
+Version: 0.1.4
 Author: Joel N. Swerdel
 Maintainer: Joel N. Swerdel <jswerdel@its.jnj.com>
 Description: A package for evaluating phenotype algorithms.  The package
@@ -11,18 +11,18 @@ Description: A package for evaluating phenotype algorithms.  The package
     health outcome of interest.  This cohort can then be used to evaluate
     phenotype algorithms through the calculation of the necessary performance
     characteristics - sensitivity, specificity, and positive and negative
-    preditiver value.
+    preditive value.
 License: Apache License 2.0
 Encoding: UTF-8
 LazyData: true
 Depends:
-    R (>= 3.2.2),
-    DatabaseConnector (>= 2.1.4),
-    dplyr (>= 0.7.8)
+    R (>= 3.2.2)
 Imports:
     PatientLevelPrediction (>= 2.0.4),
     FeatureExtraction (>= 2.1.5),
     SqlRender (>= 1.5.2),
     data.table (>= 1.11.8),
-    dplyr (>= 0.7.8)
+    dplyr (>= 0.7.8),
+    stringr (>= 1.3.1),
+    DatabaseConnector (>= 2.1.4)
 RoxygenNote: 6.1.1
