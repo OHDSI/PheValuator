@@ -92,7 +92,7 @@ testPhenotype <- function(connectionDetails = list(),
             xSpecP <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.005))
             xSpecP2 <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.01))
             xSpecP3 <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.015))
-            cutPoints <- append(cutPoints, c(xSpecP, xSpecP2, xSpecP3))
+            #cutPoints <- append(cutPoints, c(xSpecP, xSpecP2, xSpecP3))
             }
   }
 
