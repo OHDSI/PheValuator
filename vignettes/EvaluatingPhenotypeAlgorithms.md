@@ -1,7 +1,7 @@
 ---
 title: "EvaluatingPhenotypeAlgorithms"
 author: "Joel N. Swerdel"
-date: "`r Sys.Date()`"
+date: "2019-07-16"
 output:
   pdf_document:
     number_sections: yes
@@ -17,9 +17,7 @@ vignette: >
 ---
 
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-library(PheValuator)
-```
+
 \newpage
 # Introduction
 
@@ -76,7 +74,8 @@ The CreatePhenoModel function creates a PLP model to be used for determining the
 
 For example:
 
-```{r tidy=FALSE,eval=FALSE}
+
+```r
 setwd("c:/phenotyping")
 
 connectionDetails <- createConnectionDetails(dbms = "postgresql",
@@ -111,7 +110,8 @@ The function CreateEvalCohort uses the PLP function applyModel to produce a larg
 
 For example:
 
-```{r tidy=FALSE,eval=FALSE}
+
+```r
 setwd("c:/phenotyping")
 
 connectionDetails <- createConnectionDetails(dbms = "postgresql",
@@ -149,7 +149,8 @@ The next step is to create the PAs o be evaluated.  These are specific to the re
 
 For example:
 
-```{r tidy=FALSE,eval=FALSE}
+
+```r
 setwd("c:/phenotyping")
 
 connectionDetails <- createConnectionDetails(dbms = "postgresql",
