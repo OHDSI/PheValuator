@@ -2,6 +2,7 @@
 
 export(createEvalCohort)
 export(createPhenoModel)
+export(getPerformanceCharacteristics)
 export(testConcepts)
 export(testPhenotype)
 importFrom(data.table,":=")

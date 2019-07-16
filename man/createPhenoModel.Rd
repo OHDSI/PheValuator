@@ -9,9 +9,10 @@ createPhenoModel(connectionDetails = list(), xSpecCohort = "",
   cohortDatabaseTable = "", outDatabaseSchema = "",
   trainOutFile = "", exclCohort = "", prevCohort = "", estPPV = 1,
   modelAnalysisId = "1", excludedConcepts = c(),
-  cdmShortName = "CDM", mainPopnCohort = 0, lowerAgeLimit = 0,
-  upperAgeLimit = 120, gender = c(8507, 8532),
-  startDate = "19000101", endDate = "21000101")
+  addDescendantsToExclude = FALSE, cdmShortName = "CDM",
+  mainPopnCohort = 0, lowerAgeLimit = 0, upperAgeLimit = 120,
+  gender = c(8507, 8532), startDate = "19000101",
+  endDate = "21000101")
 }
 \arguments{
 \item{connectionDetails}{connectionDetails created using the function createConnectionDetails
@@ -51,6 +52,8 @@ value for the exclCohort}
 
 \item{excludedConcepts}{A list of conceptIds to exclude from featureExtraction  these should include all
 concept_ids that were used to produce the xSpec model}
+
+\item{addDescendantsToExclude}{Should descendants of excluded concepts also be excluded? (default=FALSE)}
 
 \item{cdmShortName}{A short name for the current database (CDM)}
 
