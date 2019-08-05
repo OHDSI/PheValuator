@@ -1,0 +1,426 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={EvaluatingPhenotypeAlgorithms},
+            pdfauthor={Joel N. Swerdel},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{EvaluatingPhenotypeAlgorithms}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Joel N. Swerdel}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{2019-08-05}
+
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\newpage
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+The \texttt{Phevaluator} package enables evaluating the performance
+characteristics of phenotype algorithms (PAs) using data from databases
+that are translated into the Observational Medical Outcomes Partnership
+Common Data Model (OMOP CDM).
+
+This vignette describes how to run the PheValuator process from start to
+end in the \texttt{Phevaluator} package.
+
+\hypertarget{overview-of-process}{%
+\section{Overview of Process}\label{overview-of-process}}
+
+There are several steps in performing a PA evaluation: 1. Creating the
+extremely specific (xSpec), extremely sensitive (xSens), and prevalence
+cohorts 2. Creating the Diagnostic Predictive Model using the
+PatientLevelPrediction (PLP) package 3. Creating the Evaluation Cohort
+4. Creating the Phenotype Algorithms for evaluation 5. Evaluating the
+PAs 6. Examining the results of the evaluation
+
+Each of these steps is described in detail below. For this vignette we
+will describe the evaluation of PAs for diabetes mellitus (DM).
+
+\hypertarget{creating-the-extremely-specific-xspec-extremely-sensitive-xsens-and-prevalence-cohorts}{%
+\subsection{Creating the Extremely Specific (xSpec), Extremely Sensitive
+(xSens), and Prevalence
+Cohorts}\label{creating-the-extremely-specific-xspec-extremely-sensitive-xsens-and-prevalence-cohorts}}
+
+The extremely specific (xSpec), extremely sensitive (xSens), and
+prevalence cohorts are developed using the ATLAS tool. The xSpec is a
+cohort where the subjects in the cohort are likely to be positive for
+the health outcome of interest (HOI) with a very high probability. This
+may be achieved by requiring that subjects have multiple condition codes
+for the HOI in their patient record. An
+\href{http://www.ohdsi.org/web/atlas/\#/cohortdefinition/1769699}{example}
+of this for DM is included in the OHDSI ATLAS repository. In this
+example each subject has an initial condition code for DM. The cohort
+definition further specifies that each subject also has a second code
+for DM between 1 and 30 days after the initial DM code and 10 additional
+DM codes in the rest of the patient record. This very specific algorithm
+for DM ensures that the subjects in this cohort have a very high
+probability for having the condition of DM. This PA also specifies that
+subjects are required to have at least 365 days of observation in their
+patient record.
+
+An example of an xSens cohort is created by developing a PA that is very
+sensitive for the HOI. The system uses the xSens cohort to create a set
+of ``noisy'' negative subjects, i.e., subjects with a high likelihood of
+not having the HOI. This group of subjects will be used in the model
+building process and is described in detail below. An
+\href{http://www.ohdsi.org/web/atlas/\#/cohortdefinition/1770120}{example}
+of an xSens cohort for DM is also in the OHDSI ATLAS repository.
+
+An example of an prevalence cohort is created by developing a PA that is
+very sensitive for the HOI. The system uses the prevalence cohort to
+provide a reasonable approximation of the prevalence of the HOI in the
+population. This improves the calibration of the predictive model. This
+group of subjects will be used in the model building process and is
+described in detail below. An
+\href{http://www.ohdsi.org/web/atlas/\#/cohortdefinition/1770119}{example}
+of an prevalence cohort for DM is also in the OHDSI ATLAS repository.
+
+\hypertarget{creating-the-diagnostic-predictive-model}{%
+\subsection{Creating the Diagnostic Predictive
+Model}\label{creating-the-diagnostic-predictive-model}}
+
+The function CreatePhenoModel develops the diagnostic predictive model
+for assessing the probability of having the HOI in the evaluation
+cohort.
+
+CreatePhenoModel should have as inputs:
+
+\begin{itemize}
+\tightlist
+\item
+  connectionDetails - connectionDetails created using the function
+  createConnectionDetails in the DatabaseConnector package.
+\item
+  xSpecCohort - The number of the ``extremely specific (xSpec)'' cohort
+  definition id in the cohort table (for noisy positives)
+\item
+  cdmDatabaseSchema - The name of the database schema that contains the
+  OMOP CDM instance. Requires read permissions to this database. On SQL
+  Server, this should specify both the database and the schema, so for
+  example `cdm\_instance.dbo'.
+\item
+  cohortDatabaseSchema - The name of the database schema that is the
+  location where the cohort data used to define the at risk cohort is
+  available. If cohortTable = DRUG\_ERA, cohortDatabaseSchema is not
+  used by assumed to be cdmSchema. Requires read permissions to this
+  database.
+\item
+  cohortDatabaseTable - The tablename that contains the at risk cohort.
+  If cohortTable \textless{}\textgreater{} DRUG\_ERA, then expectation
+  is cohortTable has format of COHORT table: cohort\_concept\_id,
+  SUBJECT\_ID, COHORT\_START\_DATE, COHORT\_END\_DATE.
+\item
+  outDatabaseSchema - The name of a database schema where the user has
+  write capability. A temporary cohort table will be created here.
+\item
+  trainOutFile - A string designation for the training model file
+\item
+  exclCohort - The number of the ``extremely sensitive (xSens)'' cohort
+  definition id in the cohort table (used to estimate population
+  prevalence and to exclude subjects from the noisy positives)
+\item
+  prevCohort - The number of the cohort definition id to determine the
+  disease prevalence, usually a super-set of the exclCohort
+\item
+  estPPV - A value between 0 and 1 as an estimate for the positive
+  predictive value for the exclCohort
+\item
+  modelAnalysisId - Another string for designating the name for the
+  model files
+\item
+  excludedConcepts - A list of conceptIds to exclude from
+  featureExtraction which should include all concept\_ids used to create
+  the xSpec and xSens cohorts
+\item
+  cdmShortName - A short name for the current database (CDM)
+\item
+  mainPopnCohort - The number of the cohort to be used as a base
+  population for the model (default=NULL)
+\item
+  lowerAgeLimit - The lower age for subjects in the model (default=NULL)
+\item
+  upperAgeLimit - The upper age for subjects in the model (default=NULL)
+\item
+  startDate - The starting date for including subjects in the model
+  (default=NULL)
+\item
+  endDate - The ending date for including subjects in the model
+  (default=NULL)
+\end{itemize}
+
+The CreatePhenoModel function creates a PLP model to be used for
+determining the probability of the HOI in the evaluation cohort.
+
+For example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{setwd}\NormalTok{(}\StringTok{"c:/phenotyping"}\NormalTok{)}
+
+\NormalTok{connectionDetails <-}\StringTok{ }\KeywordTok{createConnectionDetails}\NormalTok{(}\DataTypeTok{dbms =} \StringTok{"postgresql"}\NormalTok{,}
+                                              \DataTypeTok{server =} \StringTok{"localhost/ohdsi"}\NormalTok{,}
+                                              \DataTypeTok{user =} \StringTok{"joe"}\NormalTok{,}
+                                              \DataTypeTok{password =} \StringTok{"supersecret"}\NormalTok{)}
+
+\NormalTok{phenoTest <-}\StringTok{ }\NormalTok{PheValuator}\OperatorTok{::}\KeywordTok{createPhenoModel}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
+                           \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{,}
+                           \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
+                           \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
+                           \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
+                           \DataTypeTok{outDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{, }\CommentTok{#a database schema with write access}
+                           \DataTypeTok{trainOutFile =} \StringTok{"PheVal_10X_DM_train"}\NormalTok{,}
+                           \DataTypeTok{exclCohort =} \DecValTok{1770120}\NormalTok{, }\CommentTok{#the xSens cohort}
+                           \DataTypeTok{prevCohort =} \DecValTok{1770119}\NormalTok{, }\CommentTok{#the cohort for prevalence determination}
+                           \DataTypeTok{estPPV =} \FloatTok{0.75}\NormalTok{,}
+                           \DataTypeTok{modelAnalysisId =} \StringTok{"20181206V1"}\NormalTok{, }
+                           \DataTypeTok{excludedConcepts =} \KeywordTok{c}\NormalTok{(}\DecValTok{201820}\NormalTok{), }
+                           \DataTypeTok{cdmShortName =} \StringTok{"myCDM"}\NormalTok{, }
+                           \DataTypeTok{mainPopnCohort =} \DecValTok{0}\NormalTok{, }\CommentTok{#use the entire subject population}
+                           \DataTypeTok{lowerAgeLimit =} \DecValTok{18}\NormalTok{, }
+                           \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
+                           \DataTypeTok{startDate =} \StringTok{"20100101"}\NormalTok{,}
+                           \DataTypeTok{endDate =} \StringTok{"20171231"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+In this example, we used the cohorts developed in the ``my\_results''
+cdm, specifying the location of the cohort table (cohortDatabaseSchema,
+cohortDatabaseTable - ``my\_results.cohort'') and where the model will
+find the conditions, drug exposures, etc. to inform the model
+(cdmDatabaseSchema - ``my\_cdm\_data''). The subjects included in the
+model will be those whose first visit in the CDM is between January 1,
+2010 and December 31, 2017. We are also specifically excluding the
+concept ID 201826, ``Type 2 diabetes mellitus'' which was used to create
+the xSpec cohort. Their ages at the time of first visit will be between
+18 and 90. With the parameters above, the name of the predictive model
+output from this step will be:
+``c:/phenotyping/lr\_results\_PheVal\_10X\_DM\_train\_myCDM\_ePPV0.75\_20181206V1.rds''
+
+\hypertarget{creating-the-evaluation-cohort}{%
+\subsection{Creating the Evaluation
+Cohort}\label{creating-the-evaluation-cohort}}
+
+The function CreateEvalCohort uses the PLP function applyModel to
+produce a large cohort of subjects, each with a predicted probability
+for the HOI.
+
+For example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{setwd}\NormalTok{(}\StringTok{"c:/phenotyping"}\NormalTok{)}
+
+\NormalTok{connectionDetails <-}\StringTok{ }\KeywordTok{createConnectionDetails}\NormalTok{(}\DataTypeTok{dbms =} \StringTok{"postgresql"}\NormalTok{,}
+                                              \DataTypeTok{server =} \StringTok{"localhost/ohdsi"}\NormalTok{,}
+                                              \DataTypeTok{user =} \StringTok{"joe"}\NormalTok{,}
+                                              \DataTypeTok{password =} \StringTok{"supersecret"}\NormalTok{)}
+
+\NormalTok{evalCohort <-}\StringTok{ }\NormalTok{PheValuator}\OperatorTok{::}\KeywordTok{createEvalCohort}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
+                              \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{, }
+                              \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
+                              \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
+                              \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
+                              \DataTypeTok{outDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{,}
+                              \DataTypeTok{testOutFile =} \StringTok{"PheVal_10X_DM_eval"}\NormalTok{,}
+                              \DataTypeTok{trainOutFile =} \StringTok{"PheVal_10X_DM_train"}\NormalTok{,}
+                              \DataTypeTok{estPPV =} \FloatTok{0.75}\NormalTok{,}
+                              \DataTypeTok{modelAnalysisId =} \StringTok{"20181206V1"}\NormalTok{, }
+                              \DataTypeTok{evalAnalysisId =} \StringTok{"20181206V1"}\NormalTok{,}
+                              \DataTypeTok{cdmShortName =} \StringTok{"myCDM"}\NormalTok{, }
+                              \DataTypeTok{mainPopnCohort =} \DecValTok{0}\NormalTok{, }
+                              \DataTypeTok{lowerAgeLimit =} \DecValTok{18}\NormalTok{, }
+                              \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
+                              \DataTypeTok{startDate =} \StringTok{"20100101"}\NormalTok{,}
+                              \DataTypeTok{endDate =} \StringTok{"20171231"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+In this example, the parameters specify that the function should use the
+model file:
+``c:/phenotyping/lr\_results\_PheVal\_10X\_DM\_train\_myCDM\_ePPV0.75\_20181206V1.rds''
+to produce the evaluation cohort file:
+``c:/phenotyping/lr\_results\_PheVal\_10X\_DM\_eval\_myCDM\_ePPV0.75\_20181206V1.rds''
+The evaluation cohort file above will be used the evaluation of the PAs
+provided in the next step.
+
+\hypertarget{creating-the-phenotype-algorithms-for-evaluation}{%
+\subsection{Creating the Phenotype Algorithms for
+evaluation}\label{creating-the-phenotype-algorithms-for-evaluation}}
+
+The next step is to create the PAs o be evaluated. These are specific to
+the research question of interest. For certain questions, a very
+sensitive algorithm may be required; others may require a very specific
+algorithm. For this example, we will test an algorithm which requires
+that the subject have a diagnosis code for DM from an in-patient setting
+where the code was specified as the primary reason for discharge. An
+\href{http://www.ohdsi.org/web/atlas/\#/cohortdefinition/1769702}{example}
+of this algorithm is in the OHDSI ATLAS repository. The output of this
+function is a list containing 2 data frames, one with the results of the
+PA evaluation and a second with a set of subject IDs that were
+determined to be true positives, false positives, or false negatives
+based on prediction threshold of 50\%. A true positive, with this
+criteria, would be a subject that was included in the PA and also had a
+predicted value for the HOI of 0.5 or greater. A false positive would be
+a subject who was included in the PA and whose predicted probability was
+less than 0.5. A false negative would be a subject who was not included
+in the PA but had a predicted probability of the HOI or 0.5 or greater.
+
+For example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{setwd}\NormalTok{(}\StringTok{"c:/phenotyping"}\NormalTok{)}
+
+\NormalTok{connectionDetails <-}\StringTok{ }\KeywordTok{createConnectionDetails}\NormalTok{(}\DataTypeTok{dbms =} \StringTok{"postgresql"}\NormalTok{,}
+                                              \DataTypeTok{server =} \StringTok{"localhost/ohdsi"}\NormalTok{,}
+                                              \DataTypeTok{user =} \StringTok{"joe"}\NormalTok{,}
+                                              \DataTypeTok{password =} \StringTok{"supersecret"}\NormalTok{)}
+
+\NormalTok{phenoResult <-}\StringTok{ }\NormalTok{PheValuator}\OperatorTok{::}\KeywordTok{testPhenotype}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
+               \DataTypeTok{cutPoints =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.1}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\FloatTok{0.3}\NormalTok{, }\FloatTok{0.4}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\StringTok{"EV"}\NormalTok{, }\FloatTok{0.6}\NormalTok{, }\FloatTok{0.7}\NormalTok{, }\FloatTok{0.8}\NormalTok{, }\FloatTok{0.9}\NormalTok{),}
+               \DataTypeTok{resultsFileName =} \StringTok{"c:/phenotyping/lr_results_PheVal_10X_DM_eval_myCDM_ePPV0.75_20181206V1.rds"}\NormalTok{,}
+               \DataTypeTok{cohortPheno =} \DecValTok{1769702}\NormalTok{,}
+               \DataTypeTok{phenText =} \StringTok{"All Diabetes by Phenotype 1 X In-patient, 1st Position"}\NormalTok{,}
+               \DataTypeTok{order =} \DecValTok{1}\NormalTok{,}
+               \DataTypeTok{testText =} \StringTok{"Diabetes Mellitus xSpec Model - 10 X T2DM"}\NormalTok{,}
+               \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
+               \DataTypeTok{cohortTable =} \StringTok{"cohort"}\NormalTok{,}
+               \DataTypeTok{estPPV =} \FloatTok{0.75}\NormalTok{, }
+               \DataTypeTok{cdmShortName =} \StringTok{"myCDM"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+In this example, a wide range of prediction thresholds are provided
+(cutPoints) including the expected value (``EV''). Given that parameter
+setting, the output from this step will provide performance
+characteristics (i.e, sensitivity, specificity, etc.) at each prediction
+threshold as well as those using the expected value calculations as
+described in the \href{vignettes/Figure2.png}{Step 2 diagram}. The
+evaluation uses the prediction information for the evaluation cohort
+developed in the prior step. The data frames produced from this step may
+be saved to a csv file for detailed examination.
+
+
+\end{document}
