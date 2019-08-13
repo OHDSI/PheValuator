@@ -283,7 +283,8 @@ testPhenotype <- function(connectionDetails = list(),
     newRow$Est_Prev <- round(((newRow$True_Pos + newRow$False_Neg)/(newRow$True_Pos + newRow$False_Neg + newRow$False_Pos + newRow$True_Neg)) * 100,
                              2)
 
-    newRow$LR_Pos <- round(((as.numeric(newRow$Sens))/(1 - as.numeric(newRow$Spec))), 1)
+    #newRow$LR_Pos <- round(((as.numeric(newRow$Sens))/(1 - as.numeric(newRow$Spec))), 1)
+    newRow$F1 <- round(1/((1/as.numeric(newRow$Sens) + 1/as.numeric(newRow$PPV))/2), 3)
 
     newRow$Pheno_Cohort <- as.character(cohortPheno)
 
