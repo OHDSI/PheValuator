@@ -1,4 +1,4 @@
-# @file createEvalCohort.R
+# @file createEvaluationCohort.R
 #
 # Copyright 2018 Observational Health Data Sciences and Informatics
 #
@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#' createEvalCohort
+#' createEvaluationCohort
 #'
 #' @description
 #' Create the evaluation cohort
@@ -42,15 +42,9 @@
 #' @param outDatabaseSchema      The name of the database schema that is the location where the data
 #'                               used to define the outcome cohorts is available. Requires read
 #'                               permissions to this database.
-#' @param testOutFile            A string designation for the evaluation cohort file
-#' @param trainOutFile           A string designation for the training model file
-#' @param estPPV                 A value between 0 and 1 as an estimate for the positive predictive
-#'                               value for the exclCohort
-#' @param modelAnalysisId        The string previously used for designating the name for the model
-#'                               files
-#' @param evalAnalysisId         Another string for designating the name for the evaluation files
-#' @param cdmShortName           A short name for the current database (CDM)
-#' @param mainPopnCohort         The number of the cohort to be used as a base population for the model
+#' @param evaluationOutputFileName  A string designation for the evaluation cohort file
+#' @param modelOutputFileName    A string designation for the training model file
+#' @param mainPopulationCohort   The number of the cohort to be used as a base population for the model
 #'                               (default=NULL)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
@@ -59,30 +53,30 @@
 #' @param gender                 The gender(s) to be included (default c(8507, 8532))
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
+#' @param cdmVersion             The CDM version of the database (default=5)
+#' @param outFolder              The folder where the output files will be written (default=working directory)
 #'
 #' @importFrom stats runif
 #'
 #' @export
-createEvalCohort <- function(connectionDetails = list(),
-                             xSpecCohort = "",
-                             cdmDatabaseSchema = "",
-                             cohortDatabaseSchema = "",
-                             cohortDatabaseTable = "",
-                             outDatabaseSchema = "",
-                             testOutFile = "",
-                             trainOutFile = "",
-                             estPPV = 1,
-                             modelAnalysisId = "",
-                             evalAnalysisId = "1",
-                             cdmShortName = "CDM",
-                             mainPopnCohort = 0,
+createEvaluationCohort <- function(connectionDetails,
+                             xSpecCohort,
+                             cdmDatabaseSchema,
+                             cohortDatabaseSchema,
+                             cohortDatabaseTable,
+                             outDatabaseSchema,
+                             evaluationOutputFileName,
+                             modelOutputFileName,
+                             mainPopulationCohort = 0,
                              lowerAgeLimit = 0,
                              upperAgeLimit = 120,
                              startDays = -10000,
                              endDays = 10000,
                              gender = c(8507, 8532),
                              startDate = "19001010",
-                             endDate = "21000101") {
+                             endDate = "21000101",
+                             cdmVersion = "5",
+                             outFolder = getwd()) {
 
   options(error = NULL)
 
@@ -99,23 +93,21 @@ createEvalCohort <- function(connectionDetails = list(),
     stop("....must have a defined Cohort table (e.g., \"cohort\")")
   if (outDatabaseSchema == "")
     stop("....must have a defined Out Database schema (e.g., \"scratch.dbo\")")
-  if (testOutFile == "")
-    stop("....must have a defined training file name (e.g., \"test_10XDiabetes\")")
-  if (trainOutFile == "")
-    stop("....must have a defined training file name (e.g., \"train_10XDiabetes\")")
+  if (evaluationOutputFileName == "")
+    stop("....must have a defined model file name (e.g., \"test_10XDiabetes\")")
+  if (modelOutputFileName == "")
+    stop("....must have a defined evaluation cohort file name (e.g., \"train_10XDiabetes\")")
+  if (modelOutputFileName == evaluationOutputFileName)
+    stop("....evaluationOutputFileName cannot be the same as the modelOutputFileName")
 
   writeLines(paste("xSpecCohort ", xSpecCohort))
   writeLines(paste("cdmDatabaseSchema ", cdmDatabaseSchema))
   writeLines(paste("cohortDatabaseSchema ", cohortDatabaseSchema))
   writeLines(paste("cohortDatabaseTable ", cohortDatabaseTable))
   writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
-  writeLines(paste("testOutFile ", testOutFile))
-  writeLines(paste("trainOutFile ", trainOutFile))
-  writeLines(paste("modelAnalysisId ", modelAnalysisId))
-  writeLines(paste("evalAnalysisId ", evalAnalysisId))
-  writeLines(paste("cdmShortName ", cdmShortName))
-  writeLines(paste("estPPV ", estPPV))
-  writeLines(paste("mainPopnCohort ", mainPopnCohort))
+  writeLines(paste("evaluationOutputFileName ", evaluationOutputFileName))
+  writeLines(paste("modelOutputFileName ", modelOutputFileName))
+  writeLines(paste("mainPopulationCohort ", mainPopulationCohort))
   writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
   writeLines(paste("upperAgeLimit ", upperAgeLimit))
   writeLines(paste("startDays ", startDays))
@@ -123,8 +115,10 @@ createEvalCohort <- function(connectionDetails = list(),
   writeLines(paste("gender ", gender))
   writeLines(paste("startDate ", startDate))
   writeLines(paste("endDate ", endDate))
+  writeLines(paste("cdmVersion ", cdmVersion))
+  writeLines(paste("outFolder ", outFolder))
 
-  workFolder <- getwd()
+  workFolder <- outFolder
 
   conn <- DatabaseConnector::connect(connectionDetails)
 
@@ -138,7 +132,7 @@ createEvalCohort <- function(connectionDetails = list(),
                       (paste("test_cohort", runif(1, min = 0, max = 1), sep = "")),
                       fixed = TRUE)  #unique new cohort name to use
 
-  sql <- SqlRender::renderSql(sqlScript,
+  sql <- SqlRender::render(sqlScript,
                               cdm_database_schema = cdmDatabaseSchema,
                               cohort_database_schema = cohortDatabaseSchema,
                               cohort_database_table = cohortDatabaseTable,
@@ -153,28 +147,21 @@ createEvalCohort <- function(connectionDetails = list(),
                               endDate = endDate,
                               baseSampleSize = 2e+06,
                               xSpecSampleSize = 100,
-                              mainPopnCohort = mainPopnCohort,
+                              mainPopnCohort = mainPopulationCohort,
                               lookback = 0)  #when applying the model start from the first visit for all subjects
 
-  sql <- SqlRender::translateSql(sql$sql, targetDialect = connectionDetails$dbms)
+  sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
-  DatabaseConnector::executeSql(conn = conn, sql$sql)
+  DatabaseConnector::executeSql(conn = conn, sql)
 
   # determine the model file to use to apply to the evaluation cohort
-  resultsFileName <- file.path(workFolder, paste("lr_results_",
-                                                 trainOutFile,
-                                                 "_",
-                                                 cdmShortName,
-                                                 "_ePPV",
-                                                 estPPV,
-                                                 "_",
-                                                 modelAnalysisId,
+  resultsFileName <- file.path(workFolder, paste(modelOutputFileName,
                                                  ".rds",
                                                  sep = ""))
   writeLines(paste("\n...reading ", resultsFileName, sep = ""))
 
   if (!file.exists(resultsFileName))
-    stop(paste(".....Results file (", resultsFileName, ") does not exist"))
+    stop(paste(".....Model Output file (", resultsFileName, ") does not exist"))
 
   lr_results <- readRDS(resultsFileName)
 
@@ -191,9 +178,7 @@ createEvalCohort <- function(connectionDetails = list(),
                                                                   useConditionGroupEraLongTerm = TRUE,
                                                                   useDrugExposureLongTerm = TRUE,
                                                                   useDrugEraLongTerm = TRUE,
-                                                                  useDrugEraStartLongTerm = TRUE,
                                                                   useDrugGroupEraLongTerm = TRUE,
-                                                                  useDrugGroupEraStartLongTerm = TRUE,
                                                                   useProcedureOccurrenceLongTerm = TRUE,
                                                                   useDeviceExposureLongTerm = TRUE,
                                                                   useMeasurementLongTerm = TRUE,
@@ -205,6 +190,7 @@ createEvalCohort <- function(connectionDetails = list(),
                                                                   useDistinctProcedureCountLongTerm = TRUE,
                                                                   useDistinctMeasurementCountLongTerm = TRUE,
                                                                   useVisitCountLongTerm = TRUE,
+                                                                  useVisitConceptCountLongTerm = TRUE,
                                                                   longTermStartDays = startDays,
                                                                   endDays = endDays,
                                                                   includedCovariateConceptIds = c(),
@@ -224,7 +210,7 @@ createEvalCohort <- function(connectionDetails = list(),
                                                 outcomeTable = test_cohort,
                                                 cohortDatabaseSchema = outDatabaseSchema,
                                                 cohortTable = test_cohort,
-                                                cdmVersion = 5,
+                                                cdmVersion = cdmVersion,
                                                 washoutPeriod = 0,
                                                 covariateSettings = covariateSettings)
 
@@ -246,17 +232,12 @@ createEvalCohort <- function(connectionDetails = list(),
 
   # apply the model to the evaluation cohort
   appResults <- PatientLevelPrediction::applyModel(population, plpData, lr_results$model)
-  resultsFileName <- file.path(workFolder, paste("lr_results_",
-                                                 testOutFile,
-                                                 "_",
-                                                 cdmShortName,
-                                                 "_ePPV",
-                                                 estPPV,
-                                                 "_",
-                                                 evalAnalysisId,
+  resultsFileName <- file.path(workFolder, paste(evaluationOutputFileName,
                                                  ".rds",
                                                  sep = ""))
-  print(resultsFileName)
+
+  writeLines(paste0("\nSaving PLP Evaluation Results to: ",resultsFileName))
+
 
   # save the plp data - to be used for phenotype evaluation
   saveRDS(appResults, resultsFileName)
@@ -265,10 +246,10 @@ createEvalCohort <- function(connectionDetails = list(),
   sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
                                               "DropTempTable.sql",
                                               package = "PheValuator"))
-  sql <- SqlRender::renderSql(sqlScript, tempDB = outDatabaseSchema, test_cohort = test_cohort)
-  sql <- SqlRender::translateSql(sql$sql, targetDialect = connectionDetails$dbms)
+  sql <- SqlRender::render(sqlScript, tempDB = outDatabaseSchema, test_cohort = test_cohort)
+  sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
-  DatabaseConnector::executeSql(conn = conn, sql$sql)
+  DatabaseConnector::executeSql(conn = conn, sql)
 
   DatabaseConnector::disconnect(conn)
 }

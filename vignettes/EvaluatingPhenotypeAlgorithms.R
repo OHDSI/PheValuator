@@ -3,6 +3,7 @@ library(PheValuator)
 
 ## ----tidy=FALSE,eval=FALSE-----------------------------------------------
 #  setwd("c:/phenotyping")
+#  options(fftempdir = "c:/temp/ff") #place to store large temporary files
 #  
 #  connectionDetails <- createConnectionDetails(dbms = "postgresql",
 #                                                server = "localhost/ohdsi",
@@ -15,14 +16,12 @@ library(PheValuator)
 #                             cohortDatabaseSchema = "my_results",
 #                             cohortDatabaseTable = "cohort",
 #                             outDatabaseSchema = "scratch.dbo", #a database schema with write access
-#                             trainOutFile = "PheVal_10X_DM_train",
-#                             exclCohort = 1770120, #the xSens cohort
-#                             prevCohort = 1770119, #the cohort for prevalence determination
-#                             estPPV = 0.75,
-#                             modelAnalysisId = "20181206V1",
+#                             modelOutputFileName = "Train_10XDM_MyCDM_18-62_20190101",
+#                             xSensCohort = 1770120, #the xSens cohort
+#                             prevalenceCohort = 1770119, #the cohort for prevalence determination
 #                             excludedConcepts = c(201820),
-#                             cdmShortName = "myCDM",
-#                             mainPopnCohort = 0, #use the entire subject population
+#                             addDescendantsToExclude = TRUE,
+#                             mainPopulationCohort = 0, #use the entire subject population
 #                             lowerAgeLimit = 18,
 #                             upperAgeLimit = 90,
 #                             startDate = "20100101",
@@ -30,25 +29,23 @@ library(PheValuator)
 
 ## ----tidy=FALSE,eval=FALSE-----------------------------------------------
 #  setwd("c:/phenotyping")
+#  options(fftempdir = "c:/temp/ff") #place to store large temporary files
+#  
 #  
 #  connectionDetails <- createConnectionDetails(dbms = "postgresql",
 #                                                server = "localhost/ohdsi",
 #                                                user = "joe",
 #                                                password = "supersecret")
 #  
-#  evalCohort <- PheValuator::createEvalCohort(connectionDetails = connectionDetails,
+#  evalCohort <- PheValuator::createEvaluationCohort(connectionDetails = connectionDetails,
 #                                xSpecCohort = 1769699,
 #                                cdmDatabaseSchema = "my_cdm_data",
 #                                cohortDatabaseSchema = "my_results",
 #                                cohortDatabaseTable = "cohort",
 #                                outDatabaseSchema = "scratch.dbo",
-#                                testOutFile = "PheVal_10X_DM_eval",
-#                                trainOutFile = "PheVal_10X_DM_train",
-#                                estPPV = 0.75,
-#                                modelAnalysisId = "20181206V1",
-#                                evalAnalysisId = "20181206V1",
-#                                cdmShortName = "myCDM",
-#                                mainPopnCohort = 0,
+#                                evaluationOutputFileName = "Eval_10XDM_MyCDM_18-62_20190101",
+#                                modelOutputFileName = "Train_10XDM_MyCDM_18-62_20190101",
+#                                mainPopulationCohort = 0,
 #                                lowerAgeLimit = 18,
 #                                upperAgeLimit = 90,
 #                                startDate = "20100101",
@@ -56,21 +53,24 @@ library(PheValuator)
 
 ## ----tidy=FALSE,eval=FALSE-----------------------------------------------
 #  setwd("c:/phenotyping")
+#  options(fftempdir = "c:/temp/ff") #place to store large temporary files
 #  
 #  connectionDetails <- createConnectionDetails(dbms = "postgresql",
 #                                                server = "localhost/ohdsi",
 #                                                user = "joe",
 #                                                password = "supersecret")
 #  
-#  phenoResult <- PheValuator::testPhenotype(connectionDetails = connectionDetails,
-#                 cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
-#                 resultsFileName = "c:/phenotyping/lr_results_PheVal_10X_DM_eval_myCDM_ePPV0.75_20181206V1.rds",
-#                 cohortPheno = 1769702,
-#                 phenText = "All Diabetes by Phenotype 1 X In-patient, 1st Position",
+#  phenoResult <- PheValuator::testPhenotypeAlgorithm(connectionDetails = connectionDetails,
+#                 cutPoints = c("EV"),
+#                 evaluationOutputFileName = "c:/phenotyping/lr_results_Eval_10X_DM_MyCDM.rds",
+#                 phenotypeCohortId = 1769702,
+#                 cdmShortName = "myCDM",
+#                 phenotypeText = "All Diabetes by Phenotype 1 X In-patient, 1st Position",
 #                 order = 1,
-#                 testText = "Diabetes Mellitus xSpec Model - 10 X T2DM",
+#                 modelText = "Diabetes Mellitus xSpec Model - 10 X T2DM",
+#                 xSpecCohort = 1769699,
+#                 xSensCohort = 1770120,
+#                 prevalenceCohort = 1770119,
 #                 cohortDatabaseSchema = "my_results",
-#                 cohortTable = "cohort",
-#                 estPPV = 0.75,
-#                 cdmShortName = "myCDM")
+#                 cohortTable = "cohort")
 

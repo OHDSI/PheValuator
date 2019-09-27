@@ -1,4 +1,4 @@
-  # @file createPhenoModel.R
+  # @file createPhenotypeModel.R
   #
   # Copyright 2018 Observational Health Data Sciences and Informatics
   #
@@ -16,7 +16,7 @@
   # See the License for the specific language governing permissions and
   # limitations under the License.
 
-  #' createPhenoModel
+  #' createPhenotypeModel
   #'
   #' @description
   #' Create the phenotype model
@@ -42,49 +42,46 @@
   #'                               COHORT_START_DATE, COHORT_END_DATE.
   #' @param outDatabaseSchema      The name of a database schema where the user has write capability.  A
   #'                               temporary cohort table will be created here.
-  #' @param trainOutFile           A string designation for the training model file
-  #' @param exclCohort             The number of the cohort definition id
+  #' @param modelOutputFileName    A string designation for the training model file
+  #' @param xSensCohort            The number of the "extremely sensitive (xSens)" cohort definition id
   #'                               in the cohort table (used to exclude subjects from the base population)
-  #' @param prevCohort             The number of the cohort definition id to determine the disease prevalence,
-  #'                               usually a super-set of the exclCohort
-  #' @param estPPV                 A value between 0 and 1 as an estimate for the positive predictive
-  #'                               value for the exclCohort
-  #' @param modelAnalysisId        Another string for designating the name for the model files
-  #' @param excludedConcepts       A list of conceptIds to exclude from featureExtraction  these should include all
-  #'                               concept_ids that were used to produce the xSpec model
+  #' @param prevalenceCohort       The number of the cohort definition id to determine the disease prevalence,
+  #'                               (default=xSensCohort)
+  #' @param excludedConcepts       A list of conceptIds to exclude from featureExtraction.  These should include all
+  #'                               concept_ids that were used to define the xSpec model (default=NULL)
   #' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
-  #' @param cdmShortName           A short name for the current database (CDM)
-  #' @param mainPopnCohort         The number of the cohort to be used as a base population for the model
+  #' @param mainPopulationCohort   The number of the cohort ID to be used as a base population for the model
   #'                               (default=NULL)
   #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
   #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
   #' @param gender                 The gender(s) to be included (default c(8507, 8532))
   #' @param startDate              The starting date for including subjects in the model (default=NULL)
   #' @param endDate                The ending date for including subjects in the model (default=NULL)
+  #' @param cdmVersion             The CDM version of the database (default=5)
+  #' @param outFolder              The folder where the output files will be written (default=working directory)
   #'
   #' @importFrom stats runif
   #'
   #' @export
-  createPhenoModel <- function(connectionDetails = list(),
-                               xSpecCohort = "",
-                               cdmDatabaseSchema = "",
-                               cohortDatabaseSchema = "",
-                               cohortDatabaseTable = "",
-                               outDatabaseSchema = "",
-                               trainOutFile = "",
-                               exclCohort = "",
-                               prevCohort = "",
-                               estPPV = 1,
-                               modelAnalysisId = "1",
+  createPhenotypeModel <- function(connectionDetails,
+                               xSpecCohort,
+                               cdmDatabaseSchema,
+                               cohortDatabaseSchema,
+                               cohortDatabaseTable,
+                               outDatabaseSchema,
+                               modelOutputFileName = "train",
+                               xSensCohort,
+                               prevalenceCohort = xSensCohort,
                                excludedConcepts = c(),
                                addDescendantsToExclude = FALSE,
-                               cdmShortName = "CDM",
-                               mainPopnCohort = 0,
+                               mainPopulationCohort = 0,
                                lowerAgeLimit = 0,
                                upperAgeLimit = 120,
                                gender = c(8507, 8532),
                                startDate = "19000101",
-                               endDate = "21000101") {
+                               endDate = "21000101",
+                               cdmVersion = "5",
+                               outFolder = getwd()) {
 
     options(error = NULL)
 
@@ -93,9 +90,9 @@
       stop("...must supply a connection string")
     if (xSpecCohort == "")
       stop("...must have an xSpec cohort id (e.g., 1234)")
-    if (exclCohort == "")
-      stop("...must have an exclusion cohort (exclCohort) (e.g., 1235)")
-    if (prevCohort == "")
+    if (xSensCohort == "")
+      stop("...must have an xSens cohort id (e.g., 1235)")
+    if (prevalenceCohort == "")
       stop("...must have an prevalence cohort (prevCohort) (e.g., 1235)")
     if (cdmDatabaseSchema == "")
       stop("....must have a defined CDM schema (e.g., \"YourCDM.YourCDMSchema\")")
@@ -105,7 +102,7 @@
       stop("....must have a defined Cohort table (e.g., \"cohort\")")
     if (outDatabaseSchema == "")
       stop("....must have a defined Out Database schema (e.g., \"scratch.dbo\")")
-    if (trainOutFile == "")
+    if (modelOutputFileName == "")
       stop("....must have a defined training file name (e.g., \"train_10XDiabetes\")")
 
     writeLines(paste("xSpecCohort ", xSpecCohort))
@@ -113,22 +110,21 @@
     writeLines(paste("cohortDatabaseSchema ", cohortDatabaseSchema))
     writeLines(paste("cohortDatabaseTable ", cohortDatabaseTable))
     writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
-    writeLines(paste("trainOutFile ", trainOutFile))
-    writeLines(paste("exclCohort ", exclCohort))
-    writeLines(paste("prevCohort ", prevCohort))
-    writeLines(paste("estPPV ", estPPV))
-    writeLines(paste("modelAnalysisId ", modelAnalysisId))
+    writeLines(paste("modelOutputFileName ", modelOutputFileName))
+    writeLines(paste("xSensCohort ", xSensCohort))
+    writeLines(paste("prevalenceCohort ", prevalenceCohort))
     writeLines(paste("excludedConcepts ", c(excludedConcepts)))
     writeLines(paste("addDescendantsToExclude ", addDescendantsToExclude))
-    writeLines(paste("cdmShortName ", cdmShortName))
-    writeLines(paste("mainPopnCohort ", mainPopnCohort))
+    writeLines(paste("mainPopulationCohort ", mainPopulationCohort))
     writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
     writeLines(paste("upperAgeLimit ", upperAgeLimit))
     writeLines(paste("gender ", gender))
     writeLines(paste("startDate ", startDate))
     writeLines(paste("endDate ", endDate))
+    writeLines(paste("cdmVersion ", cdmVersion))
+    writeLines(paste("outFolder ", outFolder))
 
-    workFolder <- getwd()
+    workFolder <- outFolder
 
     conn <- DatabaseConnector::connect(connectionDetails)
 
@@ -137,7 +133,7 @@
                                                 "getPopnPrev.sql",
                                                 package = "PheValuator"))
 
-    sql <- SqlRender::renderSql(sqlScript,
+    sql <- SqlRender::render(sqlScript,
                                 cdm_database_schema = cdmDatabaseSchema,
                                 cohort_database_schema = cohortDatabaseSchema,
                                 cohort_database_table = cohortDatabaseTable,
@@ -146,12 +142,11 @@
                                 gender = gender,
                                 startDate = startDate,
                                 endDate = endDate,
-                                prevCohort = prevCohort)
+                                prevCohort = prevalenceCohort)
 
-    sql <- SqlRender::translateSql(sql$sql, targetDialect = connectionDetails$dbms)
+    sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
-    popPrev <- DatabaseConnector::querySql(conn = conn, sql$sql)
-    popPrev <- popPrev * as.numeric(estPPV)
+    popPrev <- DatabaseConnector::querySql(conn = conn, sql)
 
     if (popPrev == 0)
       stop("...unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
@@ -182,13 +177,11 @@
                                                                     useDemographicsRace = TRUE,
                                                                     useDemographicsEthnicity = TRUE,
                                                                     useConditionOccurrenceLongTerm = TRUE,
-                                                                    useConditionOccurrencePrimaryInpatientLongTerm = FALSE,
+                                                                    useConditionOccurrencePrimaryInpatientLongTerm = TRUE,
                                                                     useConditionGroupEraLongTerm = TRUE,
                                                                     useDrugExposureLongTerm = TRUE,
                                                                     useDrugEraLongTerm = TRUE,
-                                                                    useDrugEraStartLongTerm = TRUE,
                                                                     useDrugGroupEraLongTerm = TRUE,
-                                                                    useDrugGroupEraStartLongTerm = TRUE,
                                                                     useProcedureOccurrenceLongTerm = TRUE,
                                                                     useDeviceExposureLongTerm = TRUE,
                                                                     useMeasurementLongTerm = TRUE,
@@ -200,6 +193,7 @@
                                                                     useDistinctProcedureCountLongTerm = TRUE,
                                                                     useDistinctMeasurementCountLongTerm = TRUE,
                                                                     useVisitCountLongTerm = TRUE,
+                                                                    useVisitConceptCountLongTerm = TRUE,
                                                                     longTermStartDays = -10000,
                                                                     endDays = 10000,
                                                                     includedCovariateConceptIds = c(),
@@ -210,32 +204,13 @@
 
     baseSample <- baseSampleSize
     plpDataFile <- file.path(workFolder, paste("plpData_",
-                                               trainOutFile,
-                                               "_",
-                                               cdmShortName,
-                                               "_ePPV",
-                                               estPPV,
-                                               "_",
-                                               modelAnalysisId,
+                                               modelOutputFileName,
                                                sep = ""))
-    resultsFileName <- file.path(workFolder, paste("lr_results_",
-                                                   trainOutFile,
-                                                   "_",
-                                                   cdmShortName,
-                                                   "_ePPV",
-                                                   estPPV,
-                                                   "_",
-                                                   modelAnalysisId,
+    resultsFileName <- file.path(workFolder, paste(modelOutputFileName,
                                                    ".rds",
                                                    sep = ""))
     resultsDirName <- file.path(workFolder, paste("lr_results_",
-                                                  trainOutFile,
-                                                  "_",
-                                                  cdmShortName,
-                                                  "_ePPV",
-                                                  estPPV,
-                                                  "_",
-                                                  modelAnalysisId,
+                                                  modelOutputFileName,
                                                   sep = ""))
 
     if (!file.exists(plpDataFile)) {
@@ -246,14 +221,14 @@
                           fixed = TRUE)
 
       # create the temporary cohort
-      sql <- SqlRender::renderSql(sqlScript,
+      sql <- SqlRender::render(sqlScript,
                                   cdm_database_schema = cdmDatabaseSchema,
                                   cohort_database_schema = cohortDatabaseSchema,
                                   cohort_database_table = cohortDatabaseTable,
                                   x_spec_cohort = xSpecCohort,
                                   tempDB = outDatabaseSchema,
                                   test_cohort = test_cohort,
-                                  exclCohort = exclCohort,
+                                  exclCohort = xSensCohort,
                                   ageLimit = lowerAgeLimit,
                                   upperAgeLimit = upperAgeLimit,
                                   gender = gender,
@@ -261,13 +236,13 @@
                                   endDate = endDate,
                                   baseSampleSize = baseSample,
                                   xSpecSampleSize = xspecSize,
-                                  mainPopnCohort = mainPopnCohort,
+                                  mainPopnCohort = mainPopulationCohort,
                                   lookback = -1095)
       # for the xSpec model include 1095 days before first dx
 
-      sql <- SqlRender::translateSql(sql$sql, targetDialect = connectionDetails$dbms)
+      sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
-      DatabaseConnector::executeSql(conn = conn, sql$sql)
+      DatabaseConnector::executeSql(conn = conn, sql)
 
       # pull the features for the model
       plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
@@ -279,22 +254,22 @@
                                                     outcomeTable = test_cohort,
                                                     cohortDatabaseSchema = outDatabaseSchema,
                                                     cohortTable = test_cohort,
-                                                    cdmVersion = 5,
+                                                    cdmVersion = cdmVersion,
                                                     washoutPeriod = 0,
                                                     covariateSettings = covariateSettings)
 
       summary(plpData)
-      print(plpDataFile)
+      writeLines(paste0("\nSaving PLP Data to: ",plpDataFile))
       PatientLevelPrediction::savePlpData(plpData, plpDataFile)
 
       # remove temp cohort table
       sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
                                                   "DropTempTable.sql",
                                                   package = "PheValuator"))
-      sql <- SqlRender::renderSql(sqlScript, tempDB = outDatabaseSchema, test_cohort = test_cohort)
-      sql <- SqlRender::translateSql(sql$sql, targetDialect = connectionDetails$dbms)
+      sql <- SqlRender::render(sqlScript, tempDB = outDatabaseSchema, test_cohort = test_cohort)
+      sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
-      DatabaseConnector::executeSql(conn = conn, sql$sql)
+      DatabaseConnector::executeSql(conn = conn, sql)
     } else {
       writeLines(paste("...Loading ", plpDataFile, " from existing directory", sep = ""))
       plpData <- PatientLevelPrediction::loadPlpData(plpDataFile)
@@ -324,7 +299,9 @@
                                                    testSplit = "person",
                                                    testFraction = 0.25,
                                                    splitSeed = 5,
-                                                   nfold = 10)
+                                                   nfold = 3,
+                                                   savePlpData = F, savePlpResult = F,
+                                                   savePlpPlots = F, saveEvaluation = F, )
 
       print(resultsFileName)
       saveRDS(lr_results, resultsFileName)
