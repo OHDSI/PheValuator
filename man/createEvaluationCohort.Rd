@@ -2,7 +2,7 @@
 % Please edit documentation in R/CreateEvalCohort.R
 \name{createEvaluationCohort}
 \alias{createEvaluationCohort}
-\title{createEvaluationCohort}
+\title{Create the evaluation cohort}
 \usage{
 createEvaluationCohort(connectionDetails, xSpecCohort, cdmDatabaseSchema,
   cohortDatabaseSchema, cohortDatabaseTable, outDatabaseSchema,

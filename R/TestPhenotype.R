@@ -16,8 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#' testPhenotypeAlgorithm
-
+#' Test phenotype algorithms
 #' @description
 #' Test phenotype algorithms
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/TestPhenotype.R
 \name{testPhenotypeAlgorithm}
 \alias{testPhenotypeAlgorithm}
-\title{testPhenotypeAlgorithm}
+\title{Test phenotype algorithms}
 \usage{
 testPhenotypeAlgorithm(connectionDetails, cutPoints = c(0.1, 0.2, 0.3,
   0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9), evaluationOutputFileName,

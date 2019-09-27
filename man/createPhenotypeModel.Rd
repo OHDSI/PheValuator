@@ -2,7 +2,7 @@
 % Please edit documentation in R/CreatePhenoModel.R
 \name{createPhenotypeModel}
 \alias{createPhenotypeModel}
-\title{createPhenotypeModel}
+\title{Create the phenotype model}
 \usage{
 createPhenotypeModel(connectionDetails, xSpecCohort, cdmDatabaseSchema,
   cohortDatabaseSchema, cohortDatabaseTable, outDatabaseSchema,

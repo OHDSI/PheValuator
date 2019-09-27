@@ -79,7 +79,6 @@ The createPhenotypeModel function creates a PLP model to be used for determining
 For example:
 
 ```{r tidy=FALSE,eval=FALSE}
-setwd("c:/phenotyping")
 options(fftempdir = "c:/temp/ff") #place to store large temporary files
 
 connectionDetails <- createConnectionDetails(dbms = "postgresql",
@@ -102,7 +101,8 @@ phenoTest <- PheValuator::createPhenoModel(connectionDetails = connectionDetails
                            lowerAgeLimit = 18, 
                            upperAgeLimit = 90,
                            startDate = "20100101",
-                           endDate = "20171231")
+                           endDate = "20171231",
+                           outFolder = "c:/phenotyping")
 ```
 In this example, we used the cohorts developed in the "my_results" cdm, specifying the location of the cohort table (cohortDatabaseSchema, cohortDatabaseTable - "my_results.cohort") and where the model will find the conditions, drug exposures, etc. to inform the model (cdmDatabaseSchema - "my_cdm_data").  The subjects included in the model will be those whose first visit in the CDM is between January 1, 2010 and December 31, 2017.  We are also specifically excluding the concept ID 201826, "Type 2 diabetes mellitus", which was used to create the xSpec cohort as well as all of the descendants of that concept ID.  Their ages at the time of first visit will be between 18 and 90. With the parameters above, the name of the predictive model output from this step will be: "c:/phenotyping/Train_10XDM_MyCDM_18-62_20190101.rds"
 
@@ -135,7 +135,6 @@ createEvaluationCohort should have as inputs:
 For example:
 
 ```{r tidy=FALSE,eval=FALSE}
-setwd("c:/phenotyping")
 options(fftempdir = "c:/temp/ff") #place to store large temporary files
 
 
@@ -156,7 +155,8 @@ evalCohort <- PheValuator::createEvaluationCohort(connectionDetails = connection
                               lowerAgeLimit = 18, 
                               upperAgeLimit = 90,
                               startDate = "20100101",
-                              endDate = "20171231")
+                              endDate = "20171231"
+                              outFolder = "c:/phenotyping")
 ```
 In this example, the parameters specify that the function should use the model file:
   "c:/phenotyping/Train_10XDM_MyCDM_18-62_20190101.rds"
@@ -187,7 +187,6 @@ testPhenotypeAlgorithm should have as inputs:
 For example:
 
 ```{r tidy=FALSE,eval=FALSE}
-setwd("c:/phenotyping")
 options(fftempdir = "c:/temp/ff") #place to store large temporary files
 
 connectionDetails <- createConnectionDetails(dbms = "postgresql",
