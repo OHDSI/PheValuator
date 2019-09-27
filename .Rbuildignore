@@ -11,3 +11,5 @@ extras
 man-roxygen
 xgboost
 compare_versions
+_pkgdown.yml
+docs

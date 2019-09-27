@@ -1,6 +1,6 @@
 # @file PackageMaintenance
 #
-# Copyright 2018 Observational Health Data Sciences and Informatics
+# Copyright 2019 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -22,8 +22,8 @@ OhdsiRTools::checkUsagePackage("PheValuator")
 OhdsiRTools::updateCopyrightYearFolder()
 
 # Create manual and vignettes
-system("rm extras/PheValuator.pdf")
-system("R CMD Rd2pdf ./ --output=extras/PheValuator.pdf")
+shell("rm extras/PheValuator.pdf")
+shell("R CMD Rd2pdf ./ --output=extras/PheValuator.pdf")
 
 rmarkdown::render("vignettes/EvaluatingPhenotypeAlgorithms.rmd",
                   output_file = "../inst/doc/EvaluatingPhenotypeAlgorithms.pdf",
@@ -31,3 +31,6 @@ rmarkdown::render("vignettes/EvaluatingPhenotypeAlgorithms.rmd",
                                           toc = TRUE,
                                           toc_depth = 3,
                                           number_sections = TRUE))
+
+pkgdown::build_site()
+

@@ -1,6 +1,6 @@
-# @file TestPhenotype.R
+# @file TestPhenotypeAlgorithm.R
 #
-# Copyright 2018 Observational Health Data Sciences and Informatics
+# Copyright 2019 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -16,8 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#' testPhenotype
-
+#' Test phenotype algorithms
 #' @description
 #' Test phenotype algorithms
 #'
@@ -29,21 +28,25 @@
 #'                               in the DatabaseConnector package.
 #' @param cutPoints              A list of threshold predictions for the evaluations.  Include "EV" for
 #'                               the expected value
-#' @param resultsFileName        The full file name with path for the evaluation file
-#' @param modelFileName          The full file name with path for the model file
-#' @param cohortPheno            The number of the cohort of the phenotype algorithm to test
-#' @param phenText               A string to identify the phenotype algorithm in the outpuit file
+#' @param evaluationOutputFileName        The full file name with path for the evaluation file
+#' @param phenotypeCohortId      The number of the cohort of the phenotype algorithm to test
+#' @param phenotypeText          A string to identify the phenotype algorithm in the output file
+#' @param cdmShortName           A string to identify the CDM tested (Default = NULL)
 #' @param order                  The order of this algorithm for sorting in the output file (used when
-#'                               there are multiple phenotypes to test)
-#' @param testText               Descriptive name for the model
+#'                               there are multiple phenotypes to test)  (Default = 1)
+#' @param modelText              Descriptive name for the model (Default = NULL)
+#' @param xSpecCohort            The number of the "extremely specific (xSpec)" cohort definition id in
+#'                               the cohort table (for noisy positives) (Default = NULL)
+#' @param xSensCohort            The number of the "extremely sensitive (xSens)" cohort definition id
+#'                               in the cohort table (used to exclude subjects from the base population) (Default = NULL)
+#' @param prevalenceCohort       The number of the cohort definition id to determine the disease prevalence,
+#'                               (default=xSensCohort)
 #' @param cohortDatabaseSchema   The name of the database schema that is the location where the cohort
 #'                               data used to define the at risk cohort is available. Requires read
 #'                               permissions to this database.
 #' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
 #'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 #'                               COHORT_START_DATE, COHORT_END_DATE.
-#' @param estPPV                 The positive predictive value estimate used in developing the model
-#' @param cdmShortName           A short name for the current database (CDM)
 #'
 #' @return
 #' A list containg 2 dataframes: 1) results - a dataframe with the results from the phenotype
@@ -52,73 +55,82 @@
 #'
 #' @importFrom data.table :=
 #' @export
-testPhenotype <- function(connectionDetails = list(),
+testPhenotypeAlgorithm <- function(connectionDetails,
                           cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
-                          resultsFileName = "",
-                          modelFileName = "",
-                          cohortPheno = "",
-                          phenText = "Test Pheno",
+                          evaluationOutputFileName,
+                          phenotypeCohortId,
+                          cdmShortName = "",
+                          phenotypeText = "",
                           order = 1,
-                          testText = "Phenotype",
-                          cohortDatabaseSchema = "",
-                          cohortTable = "",
-                          estPPV = 1,
-                          cdmShortName = "CDM") {
+                          modelText = "",
+                          xSpecCohort = "",
+                          xSensCohort = "",
+                          prevalenceCohort = "",
+                          cohortDatabaseSchema,
+                          cohortTable) {
 
   options(error = NULL)
+
+  getStandardError <- function(probValue, popnSize) {
+    return(sqrt(((probValue*(1-probValue))/(popnSize + 0.01)))) #ensure no division by 0
+  }
+  createCI <- function(probValue, stdErr) {
+    return(paste0("(", sprintf("%.3f", round(probValue-(1.96*stdErr),3)),", ",sprintf("%.3f", round(probValue+(1.96*stdErr),3)),")"))
+  }
 
   # error checking for input
   if (length(connectionDetails) == 0)
     stop("...must supply a connection string")
-  if (resultsFileName == "")
-    stop("....must have a defined Result File Name (e.g., \"c:/phenotypes/lr_results_10XDiabetes_dod_ePPV1_1.rds\")")
+  if (evaluationOutputFileName == "")
+    stop("....must have a defined Evaluation Output File Name (e.g., \"c:/phenotypes/lr_results_10XDiabetes_dod_ePPV1_1.rds\")")
   if (cohortDatabaseSchema == "")
     stop("...must have a defined Cohort schema (e.g., \"YourCDM.YourSchema\")")
   if (cohortTable == "")
     stop("....must have a defined Cohort table (e.g., \"cohort\")")
-  if (cohortPheno == "")
+  if (phenotypeCohortId == "")
     stop(".....must have a defined Phenotype Cohort ID to test (e.g., 1234)")
 
   results <- data.frame()
   misses <- data.frame()
   xSpecP <- -1; xSpecP2 <- -1; xSpecP3 <- -1
-  writeLines(paste("\t", Sys.time(), "pheno: ", cohortPheno))
+  writeLines(paste("\t", Sys.time(), "pheno: ", phenotypeCohortId))
 
+  modelFileName <- "" #set this for now to be null - allows to add it back in later if needed
   if(modelFileName != "") { #if a model was supplied, add the value for the 0.005% xSpec cohort probability to the cut-points
     if(!file.exists(modelFileName)){
       writeLines(paste("...", modelFileName,"does not exist"))
     } else {
-            model <- readRDS(modelFileName)
-            xSpecP <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.005))
-            xSpecP2 <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.01))
-            xSpecP3 <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.015))
-            #cutPoints <- append(cutPoints, c(xSpecP, xSpecP2, xSpecP3))
-            }
+      model <- readRDS(modelFileName)
+      xSpecP <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.005))
+      xSpecP2 <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.01))
+      xSpecP3 <- as.numeric(quantile(model$prediction$value[model$prediction$outcomeCount == 1], 0.015))
+      #cutPoints <- append(cutPoints, c(xSpecP, xSpecP2, xSpecP3))
+    }
   }
 
   # pull the subjects in the phentype
   sql <- paste("select distinct subject_id,  subject_id  subject_id2 from ",
                paste(cohortDatabaseSchema, ".", cohortTable, sep = ""),
                " where cohort_definition_id = ",
-               as.character(cohortPheno),
+               as.character(phenotypeCohortId),
                sep = "")
 
-  sql <- SqlRender::renderSql(sql = sql)$sql
+  sql <- SqlRender::render(sql = sql)
 
-  sql <- SqlRender::translateSql(sql = sql, targetDialect = connectionDetails$dbms)$sql
+  sql <- SqlRender::translate(sql = sql, targetDialect = connectionDetails$dbms)
 
   #conn <- DatabaseConnector::connect(connectionDetails)
-  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file='NUL')
+  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file='NULL')
 
   PhenoPop <- data.table::data.table(DatabaseConnector::querySql(conn = conn, sql))
 
   #if (nrow(PhenoPop) == 0)
-   # stop(".....phenotype cohort did not return any rows")
+  # stop(".....phenotype cohort did not return any rows")
 
-  if (!file.exists(resultsFileName))
-    stop(paste(".....Results file (", resultsFileName, ") does not exist"))
+  if (!file.exists(evaluationOutputFileName))
+    stop(paste(".....Evaluation Output file (", evaluationOutputFileName, ") does not exist"))
 
-  resultsFile <- readRDS(resultsFileName)
+  resultsFile <- readRDS(evaluationOutputFileName)
   modelAll <- data.table::data.table(resultsFile$prediction[resultsFile$prediction$outcomeCount == 0,])
   modelAll <- modelAll[order(modelAll$value), ]
   modelAll$rownum <- 1:nrow(modelAll)
@@ -158,7 +170,7 @@ testPhenotype <- function(connectionDetails = list(),
 
     newRow <- NULL
     newRow$CDM <- as.character(cdmShortName)
-    newRow$Pheno_Cohort_Name <- as.character(phenText)
+    newRow$`Phenotype Algorithm` <- as.character(phenotypeText)
 
     # the values ('counts') for true and false positives and negatives will be the sum of the respective
     # columns
@@ -178,15 +190,15 @@ testPhenotype <- function(connectionDetails = list(),
         for (subj in 1:min(5, length(subjectList))) {
           tempMisses <- NULL
           tempMisses$CDM <- as.character(cohortDatabaseSchema)
-          tempMisses$cohort <- as.character(cohortPheno)
+          tempMisses$cohort <- as.character(phenotypeCohortId)
           tempMisses$miss <- "TP"
           tempMisses$subjectId <- subjectList[[subj]]
           tempMisses$predValue <- subjectDF$valueOrig[[subj]]
-          tempMisses$Test_File <- resultsFileName
+          tempMisses$Test_File <- evaluationOutputFileName
           if (nrow(misses) == 0) {
-          misses <- as.data.frame(tempMisses)
+            misses <- as.data.frame(tempMisses)
           } else {
-          misses <- rbind(misses, as.data.frame(tempMisses))
+            misses <- rbind(misses, as.data.frame(tempMisses))
           }
         }
       }
@@ -198,15 +210,15 @@ testPhenotype <- function(connectionDetails = list(),
         for (subj in 1:min(50, length(subjectList))) {
           tempMisses <- NULL
           tempMisses$CDM <- as.character(cohortDatabaseSchema)
-          tempMisses$cohort <- as.character(cohortPheno)
+          tempMisses$cohort <- as.character(phenotypeCohortId)
           tempMisses$miss <- "FP"
           tempMisses$subjectId <- subjectList[[subj]]
           tempMisses$predValue <- subjectDF$valueOrig[[subj]]
-          tempMisses$Test_File <- resultsFileName
+          tempMisses$Test_File <- evaluationOutputFileName
           if (nrow(misses) == 0) {
-          misses <- as.data.frame(tempMisses)
+            misses <- as.data.frame(tempMisses)
           } else {
-          misses <- rbind(misses, as.data.frame(tempMisses))
+            misses <- rbind(misses, as.data.frame(tempMisses))
           }
         }
       }
@@ -218,83 +230,100 @@ testPhenotype <- function(connectionDetails = list(),
         for (subj in 1:min(50, length(subjectList))) {
           tempMisses <- NULL
           tempMisses$CDM <- as.character(cohortDatabaseSchema)
-          tempMisses$cohort <- as.character(cohortPheno)
+          tempMisses$cohort <- as.character(phenotypeCohortId)
           tempMisses$miss <- "FN"
           tempMisses$subjectId <- subjectList[[subj]]
           tempMisses$predValue <- subjectDF$valueOrig[[subj]]
-          tempMisses$Test_File <- resultsFileName
+          tempMisses$Test_File <- evaluationOutputFileName
           if (nrow(misses) == 0) {
-          misses <- as.data.frame(tempMisses)
+            misses <- as.data.frame(tempMisses)
           } else {
-          misses <- rbind(misses, as.data.frame(tempMisses))
+            misses <- rbind(misses, as.data.frame(tempMisses))
           }
         }
       }
     }
 
     if(cutPoints[[cpUp]] == xSpecP) {
-      newRow$Cut_Point <- paste("EmpirCP0.5 (", round(xSpecP,2), ")", sep="")
+      newRow$`Cut Point` <- paste("EmpirCP0.5 (", round(xSpecP,2), ")", sep="")
     } else if(cutPoints[[cpUp]] == xSpecP2) {
-      newRow$Cut_Point <- paste("EmpirCP1.0 (", round(xSpecP2,2), ")", sep="")
+      newRow$`Cut Point` <- paste("EmpirCP1.0 (", round(xSpecP2,2), ")", sep="")
     } else if(cutPoints[[cpUp]] == xSpecP3) {
-      newRow$Cut_Point <- paste("EmpirCP1.5 (", round(xSpecP3,2), ")", sep="")
+      newRow$`Cut Point` <- paste("EmpirCP1.5 (", round(xSpecP3,2), ")", sep="")
+    } else if(cutPoints[[cpUp]] == "EV") {
+      newRow$`Cut Point` <- paste("Expected Value", sep="")
     } else {
-        newRow$Cut_Point <- cutPoints[[cpUp]]
+      newRow$`Cut Point` <- cutPoints[[cpUp]]
     }
 
     if (truePos + falsePos == 0)
-      {
-        falsePos <- 1
-      }  #for cohorts lacking any members - eliminates division by 0 for PPV
-    newRow$Sens <- round(truePos/(truePos + falseNeg + 0.5),
-                         3)  #add 0.5 to all denominators to avoid division by 0
-    if (newRow$Sens > 0.999) {
-      newRow$Sens <- as.character(0.999)
+    {
+      falsePos <- 1
+    }  #for cohorts lacking any members - eliminates division by 0 for PPV
+    newRow$Sensitivity <- sprintf("%.3f", round(truePos/(truePos + falseNeg + 0.5),
+                         3))  #add 0.5 to all denominators to avoid division by 0
+    if (newRow$Sensitivity > 0.999) {
+      newRow$Sensitivity <- as.character(0.999)
     } else {
-      newRow$Sens <- as.character(newRow$Sens)
+      newRow$Sensitivity <- as.character(newRow$Sensitivity)
     }
 
-    newRow$PPV <- round((truePos/(truePos + falsePos + 0.5)), 3)
+    newRow$`Sensitivity (95% CI)` <- paste0(newRow$Sensitivity, " ",
+                                            createCI(as.numeric(newRow$Sensitivity),
+                                                     getStandardError(as.numeric(newRow$Sensitivity), truePos+falseNeg)))
+
+    newRow$PPV <- sprintf("%.3f", round((truePos/(truePos + falsePos + 0.5)), 3))
     if (newRow$PPV > 0.999) {
       newRow$PPV <- as.character(0.999)
     } else {
       newRow$PPV <- as.character(newRow$PPV)
     }
 
-    newRow$Spec <- round((trueNeg/(trueNeg + falsePos + 0.5)), 3)
-    if (newRow$Spec > 0.999) {
-      newRow$Spec <- as.character(0.999)
+    newRow$`PPV (95% CI)` <- paste0(newRow$PPV, " ", createCI(as.numeric(newRow$PPV), getStandardError(as.numeric(newRow$PPV), truePos+falsePos)))
+
+    newRow$Specificity <- sprintf("%.3f", round((trueNeg/(trueNeg + falsePos + 0.5)), 3))
+    if (newRow$Specificity > 0.999) {
+      newRow$Specificity <- as.character(0.999)
     } else {
-      newRow$Spec <- as.character(newRow$Spec)
+      newRow$Specificity <- as.character(newRow$Spec)
     }
 
-    newRow$NPV <- round((trueNeg/(trueNeg + falseNeg + 0.5)), 3)
+    newRow$`Specificity (95% CI)` <- paste0(newRow$Specificity, " ", createCI(as.numeric(newRow$Specificity),
+                                                                            getStandardError(as.numeric(newRow$Specificity), trueNeg+falsePos)))
+
+    newRow$NPV <- sprintf("%.3f", round((trueNeg/(trueNeg + falseNeg + 0.5)), 3))
     if (newRow$NPV > 0.999) {
       newRow$NPV <- as.character(0.999)
     } else {
       newRow$NPV <- as.character(newRow$NPV)
     }
 
-    newRow$True_Pos <- round(truePos, 0)
-    newRow$False_Pos <- round(falsePos, 0)
-    newRow$True_Neg <- round(trueNeg, 0)
-    newRow$False_Neg <- round(falseNeg, 0)
+    newRow$`NPV (95% CI)` <- paste0(newRow$NPV, " ", createCI(as.numeric(newRow$NPV), getStandardError(as.numeric(newRow$NPV), trueNeg+falseNeg)))
 
-    newRow$Est_Prev <- round(((newRow$True_Pos + newRow$False_Neg)/(newRow$True_Pos + newRow$False_Neg + newRow$False_Pos + newRow$True_Neg)) * 100,
-                             2)
+    newRow$`True Pos.` <- round(truePos, 0)
+    newRow$`False Pos.` <- round(falsePos, 0)
+    newRow$`True Neg.` <- round(trueNeg, 0)
+    newRow$`False Neg.` <- round(falseNeg, 0)
+
+    newRow$`Estimated Prevalence` <- round(((newRow$`True Pos.` + newRow$`False Neg.`)/(newRow$`True Pos.` +
+                                          newRow$`False Neg.` + newRow$`False Pos.` + newRow$`True Neg.`)) * 100, 2)
 
     #newRow$LR_Pos <- round(((as.numeric(newRow$Sens))/(1 - as.numeric(newRow$Spec))), 1)
-    newRow$F1 <- round(1/((1/as.numeric(newRow$Sens) + 1/as.numeric(newRow$PPV))/2), 3)
+    newRow$`F1 Score` <- round(1/((1/as.numeric(newRow$Sensitivity) + 1/as.numeric(newRow$PPV))/2), 3)
 
-    newRow$Pheno_Cohort <- as.character(cohortPheno)
+    newRow$`Phenotype Cohort Id` <- as.character(phenotypeCohortId)
 
-    newRow$Prev_PPV <- as.character(estPPV)
-    newRow$Pheno_Order <- as.numeric(order)
-    newRow$Test_Cohort_Name <- as.character(testText)
-    newRow$Test_File <- resultsFileName
+    newRow$`Phenotype Order` <- as.numeric(order)
+    newRow$`Model Name` <- as.character(modelText)
+
+    newRow$`xSpec Cohort` <- as.character(xSpecCohort)
+    newRow$`xSens Cohort` <- as.character(xSensCohort)
+    newRow$`Prevalence Cohort` <- as.character(prevalenceCohort)
+
+    newRow$`Evaluation Output File Name` <- evaluationOutputFileName
 
     if (nrow(results) == 0) {
-      results <- as.data.frame(newRow, stringsAsFactors = FALSE)
+      results <- as.data.frame(newRow, stringsAsFactors = FALSE, check.names = FALSE)
     } else {
       results <- rbind(results, as.data.frame(newRow))
     }
