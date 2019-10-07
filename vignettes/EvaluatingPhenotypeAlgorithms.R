@@ -2,7 +2,6 @@
 library(PheValuator)
 
 ## ----tidy=FALSE,eval=FALSE-----------------------------------------------
-#  setwd("c:/phenotyping")
 #  options(fftempdir = "c:/temp/ff") #place to store large temporary files
 #  
 #  connectionDetails <- createConnectionDetails(dbms = "postgresql",
@@ -25,10 +24,10 @@ library(PheValuator)
 #                             lowerAgeLimit = 18,
 #                             upperAgeLimit = 90,
 #                             startDate = "20100101",
-#                             endDate = "20171231")
+#                             endDate = "20171231",
+#                             outFolder = "c:/phenotyping")
 
 ## ----tidy=FALSE,eval=FALSE-----------------------------------------------
-#  setwd("c:/phenotyping")
 #  options(fftempdir = "c:/temp/ff") #place to store large temporary files
 #  
 #  
@@ -49,10 +48,10 @@ library(PheValuator)
 #                                lowerAgeLimit = 18,
 #                                upperAgeLimit = 90,
 #                                startDate = "20100101",
-#                                endDate = "20171231")
+#                                endDate = "20171231"
+#                                outFolder = "c:/phenotyping")
 
 ## ----tidy=FALSE,eval=FALSE-----------------------------------------------
-#  setwd("c:/phenotyping")
 #  options(fftempdir = "c:/temp/ff") #place to store large temporary files
 #  
 #  connectionDetails <- createConnectionDetails(dbms = "postgresql",
