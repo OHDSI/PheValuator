@@ -325,7 +325,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     if (nrow(results) == 0) {
       results <- as.data.frame(newRow, stringsAsFactors = FALSE, check.names = FALSE)
     } else {
-      results <- rbind(results, as.data.frame(newRow))
+      results <- rbind(results, as.data.frame(newRow, stringsAsFactors = FALSE, check.names = FALSE))
     }
   }
   DatabaseConnector::disconnect(conn)
