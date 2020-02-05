@@ -4,13 +4,13 @@
 \alias{createEvaluationCohort}
 \title{Create the evaluation cohort}
 \usage{
-createEvaluationCohort(connectionDetails, xSpecCohort, cdmDatabaseSchema,
-  cohortDatabaseSchema, cohortDatabaseTable, outDatabaseSchema,
-  evaluationOutputFileName, modelOutputFileName,
+createEvaluationCohort(connectionDetails, xSpecCohort, xSensCohort,
+  cdmDatabaseSchema, cohortDatabaseSchema, cohortDatabaseTable,
+  outDatabaseSchema, evaluationOutputFileName, modelOutputFileName,
   mainPopulationCohort = 0, lowerAgeLimit = 0, upperAgeLimit = 120,
-  startDays = -10000, endDays = 10000, gender = c(8507, 8532),
+  startDays = 0, endDays = 10000, gender = c(8507, 8532),
   startDate = "19001010", endDate = "21000101", cdmVersion = "5",
-  outFolder = getwd())
+  outFolder = getwd(), savePlpData = FALSE)
 }
 \arguments{
 \item{connectionDetails}{connectionDetails created using the function createConnectionDetails
@@ -18,6 +18,9 @@ in the DatabaseConnector package.}
 
 \item{xSpecCohort}{The number of the "extremely specific (xSpec)" cohort definition id in
 the cohort table (for noisy positives)}
+
+\item{xSensCohort}{The number of the "extremely sensitive (xSens)" cohort definition id in
+the cohort table (for noisy negatives)}
 
 \item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM instance.
 Requires read permissions to this database. On SQL Server, this should

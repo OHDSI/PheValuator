@@ -29,6 +29,8 @@
 #'                               in the DatabaseConnector package.
 #' @param xSpecCohort            The number of the "extremely specific (xSpec)" cohort definition id in
 #'                               the cohort table (for noisy positives)
+#' @param xSensCohort            The number of the "extremely sensitive (xSens)" cohort definition id in
+#'                               the cohort table (for noisy negatives)
 #' @param cdmDatabaseSchema      The name of the database schema that contains the OMOP CDM instance.
 #'                               Requires read permissions to this database. On SQL Server, this should
 #'                               specifiy both the database and the schema, so for example
@@ -60,23 +62,25 @@
 #'
 #' @export
 createEvaluationCohort <- function(connectionDetails,
-                             xSpecCohort,
-                             cdmDatabaseSchema,
-                             cohortDatabaseSchema,
-                             cohortDatabaseTable,
-                             outDatabaseSchema,
-                             evaluationOutputFileName,
-                             modelOutputFileName,
-                             mainPopulationCohort = 0,
-                             lowerAgeLimit = 0,
-                             upperAgeLimit = 120,
-                             startDays = -10000,
-                             endDays = 10000,
-                             gender = c(8507, 8532),
-                             startDate = "19001010",
-                             endDate = "21000101",
-                             cdmVersion = "5",
-                             outFolder = getwd()) {
+                                   xSpecCohort,
+                                   xSensCohort,
+                                   cdmDatabaseSchema,
+                                   cohortDatabaseSchema,
+                                   cohortDatabaseTable,
+                                   outDatabaseSchema,
+                                   evaluationOutputFileName,
+                                   modelOutputFileName,
+                                   mainPopulationCohort = 0,
+                                   lowerAgeLimit = 0,
+                                   upperAgeLimit = 120,
+                                   startDays = 0,
+                                   endDays = 10000,
+                                   gender = c(8507, 8532),
+                                   startDate = "19001010",
+                                   endDate = "21000101",
+                                   cdmVersion = "5",
+                                   outFolder = getwd(),
+                                   savePlpData = FALSE) {
 
   options(error = NULL)
 
@@ -85,6 +89,8 @@ createEvaluationCohort <- function(connectionDetails,
     stop("...must supply a connection string")
   if (xSpecCohort == "")
     stop("...must have an xSpec cohort id (e.g., 1234)")
+  if (xSensCohort == "")
+    stop("...must have an xSens cohort id (e.g., 1234)")
   if (cdmDatabaseSchema == "")
     stop("....must have a defined CDM schema (e.g., \"YourCDM.YourCDMSchema\")")
   if (cohortDatabaseSchema == "")
@@ -101,6 +107,7 @@ createEvaluationCohort <- function(connectionDetails,
     stop("....evaluationOutputFileName cannot be the same as the modelOutputFileName")
 
   writeLines(paste("xSpecCohort ", xSpecCohort))
+  writeLines(paste("xSensCohort ", xSensCohort))
   writeLines(paste("cdmDatabaseSchema ", cdmDatabaseSchema))
   writeLines(paste("cohortDatabaseSchema ", cohortDatabaseSchema))
   writeLines(paste("cohortDatabaseTable ", cohortDatabaseTable))
@@ -122,37 +129,6 @@ createEvaluationCohort <- function(connectionDetails,
 
   conn <- DatabaseConnector::connect(connectionDetails)
 
-  # create the evaluation cohort
-  sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
-                                              "CreateCohortsV6.sql",
-                                              package = "PheValuator"))
-
-  test_cohort <- gsub(".",
-                      "",
-                      (paste("test_cohort", runif(1, min = 0, max = 1), sep = "")),
-                      fixed = TRUE)  #unique new cohort name to use
-
-  sql <- SqlRender::render(sqlScript,
-                              cdm_database_schema = cdmDatabaseSchema,
-                              cohort_database_schema = cohortDatabaseSchema,
-                              cohort_database_table = cohortDatabaseTable,
-                              x_spec_cohort = xSpecCohort,
-                              tempDB = outDatabaseSchema,
-                              test_cohort = test_cohort,
-                              exclCohort = 0,
-                              ageLimit = lowerAgeLimit,
-                              upperAgeLimit = upperAgeLimit,
-                              gender = gender,
-                              startDate = startDate,
-                              endDate = endDate,
-                              baseSampleSize = 2e+06,
-                              xSpecSampleSize = 100,
-                              mainPopnCohort = mainPopulationCohort,
-                              lookback = 0)  #when applying the model start from the first visit for all subjects
-
-  sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
-
-  DatabaseConnector::executeSql(conn = conn, sql)
 
   # determine the model file to use to apply to the evaluation cohort
   resultsFileName <- file.path(workFolder, paste(modelOutputFileName,
@@ -165,9 +141,44 @@ createEvaluationCohort <- function(connectionDetails,
 
   lr_results <- readRDS(resultsFileName)
 
+  #get subjects used in model file to exclude from evaluation cohort
+  exclSubjectList <- c(lr_results$prediction$subjectId)
+
+  # create the evaluation cohort
+  sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
+                                              "CreateCohortsV6.sql",
+                                              package = "PheValuator"))
+
+  test_cohort <- gsub(".",
+                      "",
+                      (paste("test_cohort", runif(1, min = 0, max = 1), sep = "")),
+                      fixed = TRUE)  #unique new cohort name to use
+
+  sql <- SqlRender::render(sqlScript,
+                           cdm_database_schema = cdmDatabaseSchema,
+                           cohort_database_schema = cohortDatabaseSchema,
+                           cohort_database_table = cohortDatabaseTable,
+                           x_spec_cohort = xSpecCohort,
+                           tempDB = outDatabaseSchema,
+                           test_cohort = test_cohort,
+                           exclCohort = 0,
+                           ageLimit = lowerAgeLimit,
+                           upperAgeLimit = upperAgeLimit,
+                           gender = gender,
+                           startDate = startDate,
+                           endDate = endDate,
+                           baseSampleSize = 2e+06,
+                           xSpecSampleSize = 100,
+                           mainPopnCohort = mainPopulationCohort,
+                           lookback = 0)  #when applying the model start from the first visit for all subjects
+
+  sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
+
+  DatabaseConnector::executeSql(conn = conn, sql)
+
   # will only use the covariates with non-zero betas
   lrNonZeroCovs <- c(lr_results$model$varImp$covariateId[lr_results$model$varImp$covariateValue !=
-    0])
+                                                           0])
   covariateSettings <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
                                                                   useDemographicsAgeGroup = TRUE,
                                                                   useDemographicsRace = TRUE,
@@ -216,6 +227,13 @@ createEvaluationCohort <- function(connectionDetails,
 
   summary(plpData)
 
+  #remove subjects in evaluation cohort that were in model cohort
+  excl <- data.frame(plpData$cohorts$rowId[plpData$cohorts$subjectId %in% c(exclSubjectList)])
+  xSpec <- c(plpData$outcomes$rowId) #those with outcome need to be left in
+  excl <- subset(excl, !(excl[,1] %in% c(xSpec)))
+
+  plpData$cohorts <- plpData$cohorts[!(plpData$cohorts$rowId %in% c(excl[,1])),]
+
   population <- PatientLevelPrediction::createStudyPopulation(plpData,
                                                               population = NULL,
                                                               outcomeId = xSpecCohort,
@@ -232,6 +250,27 @@ createEvaluationCohort <- function(connectionDetails,
 
   # apply the model to the evaluation cohort
   appResults <- PatientLevelPrediction::applyModel(population, plpData, lr_results$model)
+
+  pred <- appResults$prediction
+
+  #pull in the xSens cohort
+  sql <- paste0("select subject_id, cohort_start_date, observation_period_start_date ",
+                "from ", cohortDatabaseSchema, ".", cohortDatabaseTable," co ",
+                "join ", cdmDatabaseSchema, ".observation_period op ",
+                "on co.subject_id = op.person_id ",
+                "and cohort_start_date between observation_period_start_date and observation_period_end_date ",
+                "where cohort_definition_id = ", xSensCohort)
+
+  sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
+
+  #add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout criteria during evaluation
+  xSensPopn <- DatabaseConnector::querySql(conn = conn, sql)
+  finalPopn <- merge(pred, xSensPopn, by.x = "subjectId", by.y = "SUBJECT_ID", all.x = TRUE)
+  finalPopn$daysToXSens <- as.integer(finalPopn$COHORT_START_DATE - finalPopn$OBSERVATION_PERIOD_START_DATE)
+
+  #save the full data set to the model
+  appResults$prediction <- finalPopn
+
   resultsFileName <- file.path(workFolder, paste(evaluationOutputFileName,
                                                  ".rds",
                                                  sep = ""))
@@ -241,6 +280,14 @@ createEvaluationCohort <- function(connectionDetails,
 
   # save the plp data - to be used for phenotype evaluation
   saveRDS(appResults, resultsFileName)
+
+  if(savePlpData == TRUE) {
+    plpDataFileName <- file.path(workFolder, paste(evaluationOutputFileName,
+                                                   sep = ""))
+
+    writeLines(paste0("\nSaving PLP Data to: ",plpDataFileName))
+    savePlpData(plpData, plpDataFileName)
+  }
 
   # remove temp cohort table
   sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
