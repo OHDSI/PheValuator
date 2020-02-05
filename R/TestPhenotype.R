@@ -47,27 +47,31 @@
 #' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
 #'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 #'                               COHORT_START_DATE, COHORT_END_DATE.
+#' @param washoutPeriod          The mininum required continuous observation time prior to index date
+#'                               for subjects within the cohort to test (phenotypeCohortId).
 #'
 #' @return
 #' A list containg 2 dataframes: 1) results - a dataframe with the results from the phenotype
 #' algorithm evaluation 2) misses - a dataframe with a sample of subject ids for TPs, FPs, TNs, and FNs
-#' for the 50 percent and over prediction threshold
+#' for the 50 percent and over prediction threshold (must include 0.5 in cutPoints list)
 #'
 #' @importFrom data.table :=
 #' @export
 testPhenotypeAlgorithm <- function(connectionDetails,
-                          cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
-                          evaluationOutputFileName,
-                          phenotypeCohortId,
-                          cdmShortName = "",
-                          phenotypeText = "",
-                          order = 1,
-                          modelText = "",
-                          xSpecCohort = "",
-                          xSensCohort = "",
-                          prevalenceCohort = "",
-                          cohortDatabaseSchema,
-                          cohortTable) {
+                                   cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
+                                   evaluationOutputFileName,
+                                   phenotypeCohortId,
+                                   cdmShortName = "",
+                                   phenotypeText = "",
+                                   order = 1,
+                                   modelText = "",
+                                   xSpecCohort = "",
+                                   xSensCohort = "",
+                                   incidenceCohort = "",
+                                   prevalenceCohort = "",
+                                   cohortDatabaseSchema,
+                                   cohortTable,
+                                   washoutPeriod = 0) {
 
   options(error = NULL)
 
@@ -92,7 +96,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
   results <- data.frame()
   misses <- data.frame()
-  xSpecP <- -1; xSpecP2 <- -1; xSpecP3 <- -1
+  xSpecP <- 0.5; xSpecP2 <- -1; xSpecP3 <- -1
   writeLines(paste("\t", Sys.time(), "pheno: ", phenotypeCohortId))
 
   modelFileName <- "" #set this for now to be null - allows to add it back in later if needed
@@ -132,6 +136,12 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
   resultsFile <- readRDS(evaluationOutputFileName)
   modelAll <- data.table::data.table(resultsFile$prediction[resultsFile$prediction$outcomeCount == 0,])
+
+  #enforce a washout period if specified
+  if(washoutPeriod > 0) {
+    modelAll <- modelAll[(modelAll$daysToXSens > washoutPeriod | is.na(modelAll$daysToXSens)),]
+  }
+
   modelAll <- modelAll[order(modelAll$value), ]
   modelAll$rownum <- 1:nrow(modelAll)
 
@@ -261,7 +271,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
       falsePos <- 1
     }  #for cohorts lacking any members - eliminates division by 0 for PPV
     newRow$Sensitivity <- sprintf("%.3f", round(truePos/(truePos + falseNeg + 0.5),
-                         3))  #add 0.5 to all denominators to avoid division by 0
+                                                3))  #add 0.5 to all denominators to avoid division by 0
     if (newRow$Sensitivity > 0.999) {
       newRow$Sensitivity <- as.character(0.999)
     } else {
@@ -289,7 +299,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     }
 
     newRow$`Specificity (95% CI)` <- paste0(newRow$Specificity, " ", createCI(as.numeric(newRow$Specificity),
-                                                                            getStandardError(as.numeric(newRow$Specificity), trueNeg+falsePos)))
+                                                                              getStandardError(as.numeric(newRow$Specificity), trueNeg+falsePos)))
 
     newRow$NPV <- sprintf("%.3f", round((trueNeg/(trueNeg + falseNeg + 0.5)), 3))
     if (newRow$NPV > 0.999) {
@@ -306,10 +316,12 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     newRow$`False Neg.` <- round(falseNeg, 0)
 
     newRow$`Estimated Prevalence` <- round(((newRow$`True Pos.` + newRow$`False Neg.`)/(newRow$`True Pos.` +
-                                          newRow$`False Neg.` + newRow$`False Pos.` + newRow$`True Neg.`)) * 100, 2)
+                                                                                          newRow$`False Neg.` + newRow$`False Pos.` + newRow$`True Neg.`)) * 100, 2)
 
     #newRow$LR_Pos <- round(((as.numeric(newRow$Sens))/(1 - as.numeric(newRow$Spec))), 1)
     newRow$`F1 Score` <- round(1/((1/as.numeric(newRow$Sensitivity) + 1/as.numeric(newRow$PPV))/2), 3)
+
+    newRow$`Washout Period` <- as.character(washoutPeriod)
 
     newRow$`Phenotype Cohort Id` <- as.character(phenotypeCohortId)
 

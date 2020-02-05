@@ -9,7 +9,7 @@ library(PheValuator)
 #                                                user = "joe",
 #                                                password = "supersecret")
 #  
-#  phenoTest <- PheValuator::createPhenoModel(connectionDetails = connectionDetails,
+#  phenoTest <- PheValuator::createPhenotypeModel(connectionDetails = connectionDetails,
 #                             xSpecCohort = 1769699,
 #                             cdmDatabaseSchema = "my_cdm_data",
 #                             cohortDatabaseSchema = "my_results",

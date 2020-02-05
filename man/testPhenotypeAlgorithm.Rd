@@ -8,7 +8,8 @@ testPhenotypeAlgorithm(connectionDetails, cutPoints = c(0.1, 0.2, 0.3,
   0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9), evaluationOutputFileName,
   phenotypeCohortId, cdmShortName = "", phenotypeText = "",
   order = 1, modelText = "", xSpecCohort = "", xSensCohort = "",
-  prevalenceCohort = "", cohortDatabaseSchema, cohortTable)
+  incidenceCohort = "", prevalenceCohort = "", cohortDatabaseSchema,
+  cohortTable, washoutPeriod = 0)
 }
 \arguments{
 \item{connectionDetails}{ConnectionDetails created using the function createConnectionDetails
@@ -46,11 +47,14 @@ permissions to this database.}
 \item{cohortTable}{The tablename that contains the at risk cohort. The expectation is
 cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 COHORT_START_DATE, COHORT_END_DATE.}
+
+\item{washoutPeriod}{The mininum required continuous observation time prior to index date
+for subjects within the cohort to test (phenotypeCohortId).}
 }
 \value{
 A list containg 2 dataframes: 1) results - a dataframe with the results from the phenotype
 algorithm evaluation 2) misses - a dataframe with a sample of subject ids for TPs, FPs, TNs, and FNs
-for the 50 percent and over prediction threshold
+for the 50 percent and over prediction threshold (must include 0.5 in cutPoints list)
 }
 \description{
 Test phenotype algorithms
