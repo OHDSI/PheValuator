@@ -3,7 +3,6 @@
 \docType{package}
 \name{PheValuator}
 \alias{PheValuator}
-\alias{PheValuator-package}
 \title{PheValuator}
 \description{
 PheValuator

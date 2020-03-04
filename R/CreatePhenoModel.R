@@ -57,6 +57,7 @@
 #' @param gender                 The gender(s) to be included (default c(8507, 8532))
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
+#' @param checkDates             Should dates be checked to remove future dates (default=TRUE)
 #' @param cdmVersion             The CDM version of the database (default=5)
 #' @param outFolder              The folder where the output files will be written (default=working directory)
 #'
@@ -80,6 +81,7 @@ createPhenotypeModel <- function(connectionDetails,
                                  gender = c(8507, 8532),
                                  startDate = "19000101",
                                  endDate = "21000101",
+                                 checkDates = TRUE,
                                  cdmVersion = "5",
                                  outFolder = getwd()) {
 
@@ -121,6 +123,7 @@ createPhenotypeModel <- function(connectionDetails,
   writeLines(paste("gender ", gender))
   writeLines(paste("startDate ", startDate))
   writeLines(paste("endDate ", endDate))
+  writeLines(paste("checkDates ", checkDates))
   writeLines(paste("cdmVersion ", cdmVersion))
   writeLines(paste("outFolder ", outFolder))
 
@@ -142,7 +145,8 @@ createPhenotypeModel <- function(connectionDetails,
                            gender = gender,
                            startDate = startDate,
                            endDate = endDate,
-                           prevCohort = prevalenceCohort)
+                           prevCohort = prevalenceCohort,
+                           checkDates = checkDates)
 
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 

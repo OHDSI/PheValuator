@@ -4,12 +4,22 @@
 \alias{testPhenotypeAlgorithm}
 \title{Test phenotype algorithms}
 \usage{
-testPhenotypeAlgorithm(connectionDetails, cutPoints = c(0.1, 0.2, 0.3,
-  0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9), evaluationOutputFileName,
-  phenotypeCohortId, cdmShortName = "", phenotypeText = "",
-  order = 1, modelText = "", xSpecCohort = "", xSensCohort = "",
-  incidenceCohort = "", prevalenceCohort = "", cohortDatabaseSchema,
-  cohortTable, washoutPeriod = 0)
+testPhenotypeAlgorithm(
+  connectionDetails,
+  cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
+  evaluationOutputFileName,
+  phenotypeCohortId,
+  cdmShortName = "",
+  phenotypeText = "",
+  order = 1,
+  modelText = "",
+  xSpecCohort = "",
+  xSensCohort = "",
+  prevalenceCohort = "",
+  cohortDatabaseSchema,
+  cohortTable,
+  washoutPeriod = 0
+)
 }
 \arguments{
 \item{connectionDetails}{ConnectionDetails created using the function createConnectionDetails

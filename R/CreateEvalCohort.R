@@ -26,7 +26,7 @@
 #' probability for the health outcome of interest
 #'
 #' @param connectionDetails      connectionDetails created using the function createConnectionDetails
-#'                               in the DatabaseConnector package.
+#'                               in the DatabaseConnector package
 #' @param xSpecCohort            The number of the "extremely specific (xSpec)" cohort definition id in
 #'                               the cohort table (for noisy positives)
 #' @param xSensCohort            The number of the "extremely sensitive (xSens)" cohort definition id in
@@ -57,6 +57,7 @@
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
 #' @param cdmVersion             The CDM version of the database (default=5)
 #' @param outFolder              The folder where the output files will be written (default=working directory)
+#' @param savePlpData            Should large PLP data file be saved (default=FALSE)
 #'
 #' @importFrom stats runif
 #'

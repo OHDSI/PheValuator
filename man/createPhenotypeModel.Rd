@@ -4,14 +4,28 @@
 \alias{createPhenotypeModel}
 \title{Create the phenotype model}
 \usage{
-createPhenotypeModel(connectionDetails, xSpecCohort, cdmDatabaseSchema,
-  cohortDatabaseSchema, cohortDatabaseTable, outDatabaseSchema,
-  modelOutputFileName = "train", xSensCohort,
-  prevalenceCohort = xSensCohort, excludedConcepts = c(),
-  addDescendantsToExclude = FALSE, mainPopulationCohort = 0,
-  lowerAgeLimit = 0, upperAgeLimit = 120, gender = c(8507, 8532),
-  startDate = "19000101", endDate = "21000101", cdmVersion = "5",
-  outFolder = getwd())
+createPhenotypeModel(
+  connectionDetails,
+  xSpecCohort,
+  cdmDatabaseSchema,
+  cohortDatabaseSchema,
+  cohortDatabaseTable,
+  outDatabaseSchema,
+  modelOutputFileName = "train",
+  xSensCohort,
+  prevalenceCohort = xSensCohort,
+  excludedConcepts = c(),
+  addDescendantsToExclude = FALSE,
+  mainPopulationCohort = 0,
+  lowerAgeLimit = 0,
+  upperAgeLimit = 120,
+  gender = c(8507, 8532),
+  startDate = "19000101",
+  endDate = "21000101",
+  checkDates = TRUE,
+  cdmVersion = "5",
+  outFolder = getwd()
+)
 }
 \arguments{
 \item{connectionDetails}{connectionDetails created using the function createConnectionDetails
@@ -61,6 +75,8 @@ concept_ids that were used to define the xSpec model (default=NULL)}
 \item{startDate}{The starting date for including subjects in the model (default=NULL)}
 
 \item{endDate}{The ending date for including subjects in the model (default=NULL)}
+
+\item{checkDates}{Should dates be checked to remove future dates (default=TRUE)}
 
 \item{cdmVersion}{The CDM version of the database (default=5)}
 
