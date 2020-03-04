@@ -25,7 +25,7 @@ IF OBJECT_ID('tempdb..#cohort_person', 'U') IS NOT NULL
 select *
 into #cohort_person
 from (select co.*, p.*,
-	  row_number() over (order by ABS(CHECKSUM(NewId())) % 123456789) rn
+	  row_number() over (order by NewId()) rn
 	from @cohort_database_schema.@cohort_database_table co
 	join @cdm_database_schema.person p
 	  on co.subject_id = p.person_id
@@ -74,7 +74,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
       from (select
 				{@mainPopnCohort == 0} ? {
 					v.person_id, minObsStart as visit_start_date,
-						row_number() over (order by ABS(CHECKSUM(NewId())) % 123456789) rn
+						row_number() over (order by NewId()) rn
 					from @cdm_database_schema.visit_occurrence v
 					join @cdm_database_schema.person p
 					  on v.person_id = p.person_id
@@ -90,7 +90,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					group by v.person_id, minObsStart)}
 				{@mainPopnCohort != 0} ? {
 					co.subject_id as person_id, co.COHORT_START_DATE as visit_start_date,
-						row_number() over (order by ABS(CHECKSUM(NewId())) % 123456789) rn
+						row_number() over (order by NewId()) rn
 					from @cohort_database_schema.@cohort_database_table co
 					join @cdm_database_schema.person p
 					  on co.subject_id = p.person_id

@@ -1,7 +1,7 @@
-## ---- echo = FALSE, message = FALSE, warning = FALSE---------------------
+## ---- echo = FALSE, message = FALSE, warning = FALSE--------------------------
 library(PheValuator)
 
-## ----tidy=FALSE,eval=FALSE-----------------------------------------------
+## ----tidy=FALSE,eval=FALSE----------------------------------------------------
 #  options(fftempdir = "c:/temp/ff") #place to store large temporary files
 #  
 #  connectionDetails <- createConnectionDetails(dbms = "postgresql",
@@ -27,7 +27,7 @@ library(PheValuator)
 #                             endDate = "20171231",
 #                             outFolder = "c:/phenotyping")
 
-## ----tidy=FALSE,eval=FALSE-----------------------------------------------
+## ----tidy=FALSE,eval=FALSE----------------------------------------------------
 #  options(fftempdir = "c:/temp/ff") #place to store large temporary files
 #  
 #  
@@ -51,7 +51,7 @@ library(PheValuator)
 #                                endDate = "20171231"
 #                                outFolder = "c:/phenotyping")
 
-## ----tidy=FALSE,eval=FALSE-----------------------------------------------
+## ----tidy=FALSE,eval=FALSE----------------------------------------------------
 #  options(fftempdir = "c:/temp/ff") #place to store large temporary files
 #  
 #  connectionDetails <- createConnectionDetails(dbms = "postgresql",

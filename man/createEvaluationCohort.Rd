@@ -4,17 +4,32 @@
 \alias{createEvaluationCohort}
 \title{Create the evaluation cohort}
 \usage{
-createEvaluationCohort(connectionDetails, xSpecCohort, xSensCohort,
-  cdmDatabaseSchema, cohortDatabaseSchema, cohortDatabaseTable,
-  outDatabaseSchema, evaluationOutputFileName, modelOutputFileName,
-  mainPopulationCohort = 0, lowerAgeLimit = 0, upperAgeLimit = 120,
-  startDays = 0, endDays = 10000, gender = c(8507, 8532),
-  startDate = "19001010", endDate = "21000101", cdmVersion = "5",
-  outFolder = getwd(), savePlpData = FALSE)
+createEvaluationCohort(
+  connectionDetails,
+  xSpecCohort,
+  xSensCohort,
+  cdmDatabaseSchema,
+  cohortDatabaseSchema,
+  cohortDatabaseTable,
+  outDatabaseSchema,
+  evaluationOutputFileName,
+  modelOutputFileName,
+  mainPopulationCohort = 0,
+  lowerAgeLimit = 0,
+  upperAgeLimit = 120,
+  startDays = 0,
+  endDays = 10000,
+  gender = c(8507, 8532),
+  startDate = "19001010",
+  endDate = "21000101",
+  cdmVersion = "5",
+  outFolder = getwd(),
+  savePlpData = FALSE
+)
 }
 \arguments{
 \item{connectionDetails}{connectionDetails created using the function createConnectionDetails
-in the DatabaseConnector package.}
+in the DatabaseConnector package}
 
 \item{xSpecCohort}{The number of the "extremely specific (xSpec)" cohort definition id in
 the cohort table (for noisy positives)}
@@ -63,6 +78,8 @@ permissions to this database.}
 \item{cdmVersion}{The CDM version of the database (default=5)}
 
 \item{outFolder}{The folder where the output files will be written (default=working directory)}
+
+\item{savePlpData}{Should large PLP data file be saved (default=FALSE)}
 }
 \description{
 Create the evaluation cohort
