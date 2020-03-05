@@ -29,14 +29,17 @@ from (select co.*, p.*,
 	from @cohort_database_schema.@cohort_database_table co
 	join @cdm_database_schema.person p
 	  on co.subject_id = p.person_id
-		and  year(COHORT_START_DATE) - year_of_birth >= @ageLimit and year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
+		and  year(COHORT_START_DATE) - year_of_birth >= @ageLimit
+		and year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
 		and gender_concept_id in (@gender)
 	join @cdm_database_schema.observation_period o
 	  on co.subject_id = o.person_id
-	    and co.COHORT_START_DATE between o.observation_period_start_date and o.observation_period_end_date
+	    and co.COHORT_START_DATE >= o.observation_period_start_date
+		and co.COHORT_START_DATE <= o.observation_period_end_date
 	    and datediff(day, o.observation_period_start_date, co.COHORT_START_DATE) >= 365
 	where cohort_definition_id = @x_spec_cohort
-	  and o.observation_period_start_date between cast(@startDate as varchar) and cast(@endDate as varchar)) pos
+	  and o.observation_period_start_date >= cast('@startDate' AS DATE)
+	  and o.observation_period_start_date <= cast('@endDate' AS DATE)) pos
 ;
 
 IF OBJECT_ID('tempdb..#eligibles', 'U') IS NOT NULL
@@ -57,7 +60,8 @@ join (
     and cntPd = 1
     and lenPd >= 730
 group by visit_occurrence.person_id, minObsStart
-having minObsStart between cast(@startDate as varchar) and cast(@endDate as varchar);
+having minObsStart >= cast('@startDate' AS DATE)
+		and minObsStart <= cast('@endDate' AS DATE);
 
 IF OBJECT_ID('@tempDB.@test_cohort', 'U') IS NOT NULL
 	DROP TABLE @tempDB.@test_cohort;
@@ -78,7 +82,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					from @cdm_database_schema.visit_occurrence v
 					join @cdm_database_schema.person p
 					  on v.person_id = p.person_id
-						and  year(visit_start_date) - year_of_birth >= @ageLimit and year(visit_start_date) - year_of_birth <= @upperAgeLimit
+						and  year(visit_start_date) - year_of_birth >= @ageLimit
+						and year(visit_start_date) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
 					join #eligibles v5 --include only subjects with a visit in their record and within date range
 						on v.person_id = v5.person_id
@@ -94,7 +99,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					from @cohort_database_schema.@cohort_database_table co
 					join @cdm_database_schema.person p
 					  on co.subject_id = p.person_id
-						and  year(co.COHORT_START_DATE) - year_of_birth >= @ageLimit and year(co.COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
+						and  year(co.COHORT_START_DATE) - year_of_birth >= @ageLimit
+						and year(co.COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
 					join #eligibles v5 --include only subjects with a visit in their record and within date range
 						on co.subject_id = v5.person_id
@@ -104,14 +110,15 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 													from @cohort_database_schema.@cohort_database_table
 													where COHORT_DEFINITION_ID = @exclCohort)}
 						)} negs
-      where rn <= cast(@baseSampleSize as bigint)
+      where rn <= cast('@baseSampleSize' as bigint)
     union
       select 0 as COHORT_DEFINITION_ID, SUBJECT_ID, o.observation_period_start_date COHORT_START_DATE,
         dateadd(day, 1, o.observation_period_start_date) COHORT_END_DATE
       from #cohort_person cp
       join @cdm_database_schema.observation_period o
         on cp.SUBJECT_ID = o.person_id
-          and cp.COHORT_START_DATE between o.observation_period_start_date and o.observation_period_end_date
+          and cp.COHORT_START_DATE >= o.observation_period_start_date
+          and cp.COHORT_START_DATE <= o.observation_period_end_date
       where rn <= @xSpecSampleSize
       union
       select @x_spec_cohort as COHORT_DEFINITION_ID, SUBJECT_ID, o.observation_period_start_date COHORT_START_DATE,
@@ -119,6 +126,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
       from #cohort_person cp
       join @cdm_database_schema.observation_period o
         on cp.SUBJECT_ID = o.person_id
-          and cp.COHORT_START_DATE between o.observation_period_start_date and o.observation_period_end_date
+          and cp.COHORT_START_DATE >= o.observation_period_start_date
+          and cp.COHORT_START_DATE <= o.observation_period_end_date
       where rn <= @xSpecSampleSize
       );
