@@ -112,7 +112,7 @@
 
 \title{EvaluatingPhenotypeAlgorithms}
 \author{Joel N. Swerdel}
-\date{2020-03-05}
+\date{2020-03-06}
 
 \begin{document}
 \maketitle
@@ -261,6 +261,9 @@ createPhenotypeModel should have as inputs:
   endDate - The ending date for including subjects in the model
   (default=NULL)
 \item
+  checkDates - Should observation period dates be checked to guard
+  against errors such as dates in the future? (default=TRUE)
+\item
   cdmVersion - The CDM version of the database (default=5)
 \item
   outFolder - The folder where the output files will be written
@@ -283,12 +286,12 @@ For example:
 
 \NormalTok{phenoTest <-}\StringTok{ }\NormalTok{PheValuator}\OperatorTok{::}\KeywordTok{createPhenotypeModel}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
                            \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{,}
+                           \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{, }
                            \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
                            \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
                            \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
                            \DataTypeTok{outDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{, }\CommentTok{#a database schema with write access}
                            \DataTypeTok{modelOutputFileName =} \StringTok{"Train_10XDM_MyCDM_18-62_20190101"}\NormalTok{,}
-                           \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{, }\CommentTok{#the xSens cohort}
                            \DataTypeTok{prevalenceCohort =} \DecValTok{1770119}\NormalTok{, }\CommentTok{#the cohort for prevalence determination}
                            \DataTypeTok{excludedConcepts =} \KeywordTok{c}\NormalTok{(}\DecValTok{201820}\NormalTok{), }
                            \DataTypeTok{addDescendantsToExclude =} \OtherTok{TRUE}\NormalTok{,}
@@ -297,6 +300,7 @@ For example:
                            \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
                            \DataTypeTok{startDate =} \StringTok{"20100101"}\NormalTok{,}
                            \DataTypeTok{endDate =} \StringTok{"20171231"}\NormalTok{,}
+                           \DataTypeTok{checkDates =} \OtherTok{TRUE}\NormalTok{,}
                            \DataTypeTok{outFolder =} \StringTok{"c:/phenotyping"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -333,6 +337,10 @@ createEvaluationCohort should have as inputs:
 \item
   xSpecCohort - The number of the ``extremely specific (xSpec)'' cohort
   definition id in the cohort table (for noisy positives)
+\item
+  xSensCohort - The number of the ``extremely sensitive (xSens)'' cohort
+  definition id in the cohort table (used to estimate population
+  prevalence and to exclude subjects from the noisy positives)
 \item
   cdmDatabaseSchema - The name of the database schema that contains the
   OMOP CDM instance. Requires read permissions to this database. On SQL
@@ -388,6 +396,10 @@ createEvaluationCohort should have as inputs:
 \item
   outFolder - The folder where the output files will be written
   (default=working directory)
+\item
+  savePlpData - Determines whether the large PLP data file is saved.
+  Setting this to FALSE will reduce the use of disk space
+  (default=FALSE)
 \end{itemize}
 
 For example:
@@ -404,6 +416,7 @@ For example:
 
 \NormalTok{evalCohort <-}\StringTok{ }\NormalTok{PheValuator}\OperatorTok{::}\KeywordTok{createEvaluationCohort}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
                               \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{, }
+                              \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{, }
                               \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
                               \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
                               \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
@@ -415,7 +428,8 @@ For example:
                               \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
                               \DataTypeTok{startDate =} \StringTok{"20100101"}\NormalTok{,}
                               \DataTypeTok{endDate =} \StringTok{"20171231"}
-                              \DataTypeTok{outFolder =} \StringTok{"c:/phenotyping"}\NormalTok{)}
+                              \DataTypeTok{outFolder =} \StringTok{"c:/phenotyping"}\NormalTok{,}
+                              \DataTypeTok{savePlpData =} \OtherTok{FALSE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -494,6 +508,10 @@ testPhenotypeAlgorithm should have as inputs:
   expectation is cohortTable has format of COHORT table:
   cohort\_concept\_id, SUBJECT\_ID, COHORT\_START\_DATE,
   COHORT\_END\_DATE.
+\item
+  washoutPeriod - The washoutPeriod is used when testing algorithms
+  where there is an enforced prior observation period before the index
+  date
 \end{itemize}
 
 For example:
@@ -519,7 +537,8 @@ For example:
                \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{,}
                \DataTypeTok{prevalenceCohort =} \DecValTok{1770119}\NormalTok{,}
                \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
-               \DataTypeTok{cohortTable =} \StringTok{"cohort"}\NormalTok{)}
+               \DataTypeTok{cohortTable =} \StringTok{"cohort"}\NormalTok{,}
+               \DataTypeTok{washoutPeriod =} \DecValTok{0}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 

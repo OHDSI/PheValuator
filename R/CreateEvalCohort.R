@@ -168,7 +168,7 @@ createEvaluationCohort <- function(connectionDetails,
                            gender = gender,
                            startDate = startDate,
                            endDate = endDate,
-                           baseSampleSize = 2e+06,
+                           baseSampleSize = 2000000,
                            xSpecSampleSize = 100,
                            mainPopnCohort = mainPopulationCohort,
                            lookback = 0)  #when applying the model start from the first visit for all subjects
