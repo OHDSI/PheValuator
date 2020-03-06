@@ -71,6 +71,7 @@ createPhenotypeModel should have as inputs:
  * gender \- The gender(s) to be included (default c(8507, 8532))
  * startDate \- The starting date for including subjects in the model (default=NULL)
  * endDate \- The ending date for including subjects in the model (default=NULL)
+ * checkDates \- Should observation period dates be checked to guard against errors such as dates in the future? (default=TRUE)
  * cdmVersion \- The CDM version of the database (default=5)
  * outFolder \- The folder where the output files will be written (default=working directory)
  
@@ -88,12 +89,12 @@ connectionDetails <- createConnectionDetails(dbms = "postgresql",
 
 phenoTest <- PheValuator::createPhenotypeModel(connectionDetails = connectionDetails,
                            xSpecCohort = 1769699,
+                           xSensCohort = 1770120, 
                            cdmDatabaseSchema = "my_cdm_data",
                            cohortDatabaseSchema = "my_results",
                            cohortDatabaseTable = "cohort",
                            outDatabaseSchema = "scratch.dbo", #a database schema with write access
                            modelOutputFileName = "Train_10XDM_MyCDM_18-62_20190101",
-                           xSensCohort = 1770120, #the xSens cohort
                            prevalenceCohort = 1770119, #the cohort for prevalence determination
                            excludedConcepts = c(201820), 
                            addDescendantsToExclude = TRUE,
@@ -102,6 +103,7 @@ phenoTest <- PheValuator::createPhenotypeModel(connectionDetails = connectionDet
                            upperAgeLimit = 90,
                            startDate = "20100101",
                            endDate = "20171231",
+                           checkDates = TRUE,
                            outFolder = "c:/phenotyping")
 ```
 In this example, we used the cohorts developed in the "my_results" cdm, specifying the location of the cohort table (cohortDatabaseSchema, cohortDatabaseTable - "my_results.cohort") and where the model will find the conditions, drug exposures, etc. to inform the model (cdmDatabaseSchema - "my_cdm_data").  The subjects included in the model will be those whose first visit in the CDM is between January 1, 2010 and December 31, 2017.  We are also specifically excluding the concept ID 201826, "Type 2 diabetes mellitus", which was used to create the xSpec cohort as well as all of the descendants of that concept ID.  Their ages at the time of first visit will be between 18 and 90. With the parameters above, the name of the predictive model output from this step will be: "c:/phenotyping/Train_10XDM_MyCDM_18-62_20190101.rds"
@@ -114,7 +116,8 @@ createEvaluationCohort should have as inputs:
 
  * connectionDetails \- connectionDetails created using the function createConnectionDetails in the DatabaseConnector package.
  * xSpecCohort \- The number of the "extremely specific (xSpec)" cohort definition id in the cohort table (for noisy positives)
- * cdmDatabaseSchema \- The name of the database schema that contains the OMOP CDM instance. Requires read permissions to this database. On SQL Server, this should specifiy both the database and the schema, so for example 'cdm_instance.dbo'.
+  * xSensCohort \- The number of the "extremely sensitive (xSens)" cohort definition id in the cohort table (used to estimate population prevalence and to exclude subjects from the noisy positives)
+* cdmDatabaseSchema \- The name of the database schema that contains the OMOP CDM instance. Requires read permissions to this database. On SQL Server, this should specifiy both the database and the schema, so for example 'cdm_instance.dbo'.
  * cohortDatabaseSchema \- The name of the database schema that is the location where the cohort data used to define the at risk cohort is available. Requires read permissions to this database.
  * cohortDatabaseTable \- The tablename that contains the at risk cohort. The expectation is cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.
  * outDatabaseSchema \- The name of the database schema that is the location where the data used to define the outcome cohorts is available. Requires read permissions to this database.
@@ -131,6 +134,7 @@ createEvaluationCohort should have as inputs:
  * endDate \- The ending date for including subjects in the model (default=NULL)
  * cdmVersion \- The CDM version of the database (default=5)
  * outFolder \- The folder where the output files will be written (default=working directory)
+ * savePlpData \- Determines whether the large PLP data file is saved.  Setting this to FALSE will reduce the use of disk space (default=FALSE)
 
 For example:
 
@@ -145,6 +149,7 @@ connectionDetails <- createConnectionDetails(dbms = "postgresql",
 
 evalCohort <- PheValuator::createEvaluationCohort(connectionDetails = connectionDetails,
                               xSpecCohort = 1769699, 
+                              xSensCohort = 1770120, 
                               cdmDatabaseSchema = "my_cdm_data",
                               cohortDatabaseSchema = "my_results",
                               cohortDatabaseTable = "cohort",
@@ -156,7 +161,8 @@ evalCohort <- PheValuator::createEvaluationCohort(connectionDetails = connection
                               upperAgeLimit = 90,
                               startDate = "20100101",
                               endDate = "20171231"
-                              outFolder = "c:/phenotyping")
+                              outFolder = "c:/phenotyping",
+                              savePlpData = FALSE)
 ```
 In this example, the parameters specify that the function should use the model file:
   "c:/phenotyping/Train_10XDM_MyCDM_18-62_20190101.rds"
@@ -183,6 +189,7 @@ testPhenotypeAlgorithm should have as inputs:
  * prevalenceCohort \- The number of the cohort definition id to determine the disease prevalence, (default=xSensCohort)
  * cohortDatabaseSchema \- The name of the database schema that is the location where the cohort data used to define the at risk cohort is available. Requires read permissions to this database.
  * cohortTable \- The tablename that contains the at risk cohort. The expectation is cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.
+ * washoutPeriod \- The washoutPeriod is used when testing algorithms where there is an enforced prior observation period before the index date 
 
 For example:
 
@@ -206,7 +213,8 @@ phenoResult <- PheValuator::testPhenotypeAlgorithm(connectionDetails = connectio
                xSensCohort = 1770120,
                prevalenceCohort = 1770119,
                cohortDatabaseSchema = "my_results",
-               cohortTable = "cohort")
+               cohortTable = "cohort",
+               washoutPeriod = 0)
 ```
 In this example, we are using only the expected value ("EV").  Given that parameter setting, the output from this step will provide performance characteristics (i.e, sensitivity, specificity, etc.) at each prediction threshold as well as those using the expected value calculations as described in the [Step 2 diagram](vignettes/Figure2.png).  The evaluation uses the prediction information for the evaluation cohort developed in the prior step.  The data frames produced from this step may be saved to a csv file for detailed examination.
 

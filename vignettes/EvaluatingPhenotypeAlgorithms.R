@@ -11,12 +11,12 @@ library(PheValuator)
 #  
 #  phenoTest <- PheValuator::createPhenotypeModel(connectionDetails = connectionDetails,
 #                             xSpecCohort = 1769699,
+#                             xSensCohort = 1770120,
 #                             cdmDatabaseSchema = "my_cdm_data",
 #                             cohortDatabaseSchema = "my_results",
 #                             cohortDatabaseTable = "cohort",
 #                             outDatabaseSchema = "scratch.dbo", #a database schema with write access
 #                             modelOutputFileName = "Train_10XDM_MyCDM_18-62_20190101",
-#                             xSensCohort = 1770120, #the xSens cohort
 #                             prevalenceCohort = 1770119, #the cohort for prevalence determination
 #                             excludedConcepts = c(201820),
 #                             addDescendantsToExclude = TRUE,
@@ -25,6 +25,7 @@ library(PheValuator)
 #                             upperAgeLimit = 90,
 #                             startDate = "20100101",
 #                             endDate = "20171231",
+#                             checkDates = TRUE,
 #                             outFolder = "c:/phenotyping")
 
 ## ----tidy=FALSE,eval=FALSE----------------------------------------------------
@@ -38,6 +39,7 @@ library(PheValuator)
 #  
 #  evalCohort <- PheValuator::createEvaluationCohort(connectionDetails = connectionDetails,
 #                                xSpecCohort = 1769699,
+#                                xSensCohort = 1770120,
 #                                cdmDatabaseSchema = "my_cdm_data",
 #                                cohortDatabaseSchema = "my_results",
 #                                cohortDatabaseTable = "cohort",
@@ -49,7 +51,8 @@ library(PheValuator)
 #                                upperAgeLimit = 90,
 #                                startDate = "20100101",
 #                                endDate = "20171231"
-#                                outFolder = "c:/phenotyping")
+#                                outFolder = "c:/phenotyping",
+#                                savePlpData = FALSE)
 
 ## ----tidy=FALSE,eval=FALSE----------------------------------------------------
 #  options(fftempdir = "c:/temp/ff") #place to store large temporary files
@@ -71,5 +74,6 @@ library(PheValuator)
 #                 xSensCohort = 1770120,
 #                 prevalenceCohort = 1770119,
 #                 cohortDatabaseSchema = "my_results",
-#                 cohortTable = "cohort")
+#                 cohortTable = "cohort",
+#                 washoutPeriod = 0)
 
