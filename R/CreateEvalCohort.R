@@ -84,6 +84,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    savePlpData = FALSE) {
 
   options(error = NULL)
+  options(scipen=999)
 
   # error checking for input
   if (length(connectionDetails) == 0)

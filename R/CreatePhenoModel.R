@@ -86,6 +86,7 @@ createPhenotypeModel <- function(connectionDetails,
                                  outFolder = getwd()) {
 
   options(error = NULL)
+  options(scipen=999)
 
   # error checking for input
   if (length(connectionDetails) == 0)
@@ -169,7 +170,7 @@ createPhenotypeModel <- function(connectionDetails,
   }
 
   # set the number of nosiy negatives in the model either from the prevalence or to 500K max
-  baseSampleSize <- min(as.integer(xspecSize/popPrev), 5e+05)  #use 500,000 as largest base sample
+  baseSampleSize <- min(as.integer(xspecSize/popPrev), 500000)  #use 500,000 as largest base sample
 
   # sql script to create a temporary cohort table for predictive modeling
   sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
