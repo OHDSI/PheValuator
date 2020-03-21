@@ -135,7 +135,8 @@ errorCheck <- function(callingProgram,
     }
 
     if(file.exists(file.path(outFolder, paste0(modelOutputFileName, ".rds")))) {
-      stop(paste0("Error: ", file.path(outFolder, modelOutputFileName), " exists. \n Select a new name for modelOutputFileName"))
+      stop(paste0("Error: ", file.path(outFolder, modelOutputFileName),
+                  " exists. \n Select a new name for modelOutputFileName or set createModel = FALSE"))
     }
 
   }
@@ -143,7 +144,7 @@ errorCheck <- function(callingProgram,
   if(callingProgram == "createEvaluationCohort") {
     if(file.exists(file.path(outFolder, paste0(evaluationOutputFileName)))) {
       stop(paste0("Error: ", file.path(outFolder, evaluationOutputFileName),
-                  " exists. \n Select an evaluationOutputFileName that does not exist or set createEvaluationCohort = FALSE"))
+                  " exists. \n Select a new name for evaluationOutputFileName or set createEvaluationCohort = FALSE"))
     }
   }
 

@@ -20,11 +20,13 @@ createEvaluationCohort(
   upperAgeLimit = 120,
   startDays = 0,
   endDays = 10000,
+  visitLength = 3,
   gender = c(8507, 8532),
   startDate = "19001010",
   endDate = "21000101",
   cdmVersion = "5",
   outFolder = getwd(),
+  excludeModelFromEvaluation = TRUE,
   savePlpData = FALSE,
   modelType = "chronic"
 )
@@ -73,6 +75,8 @@ permissions to this database.}
 
 \item{endDays}{The days to include after the cohort start date (default=10000)}
 
+\item{visitLength}{The minimum length of index visit (default=3)}
+
 \item{gender}{The gender(s) to be included (default c(8507, 8532))}
 
 \item{startDate}{The starting date for including subjects in the model (default=NULL)}
@@ -82,6 +86,8 @@ permissions to this database.}
 \item{cdmVersion}{The CDM version of the database (default=5)}
 
 \item{outFolder}{The folder where the output files will be written (default=working directory)}
+
+\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort (default = TRUE)}
 
 \item{savePlpData}{Should large PLP data file be saved (default=FALSE)}
 

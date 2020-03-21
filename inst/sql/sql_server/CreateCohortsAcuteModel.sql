@@ -79,7 +79,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					from @cdm_database_schema.visit_occurrence v
 					join @cdm_database_schema.person p
 					  on v.person_id = p.person_id
-						and  year(visit_start_date) - year_of_birth >= @ageLimit
+						and year(visit_start_date) - year_of_birth >= @ageLimit
 						and year(visit_start_date) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
 					join #eligibles v5 --include only subjects with a visit in their record and within date range

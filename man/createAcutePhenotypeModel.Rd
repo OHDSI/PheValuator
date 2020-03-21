@@ -33,7 +33,8 @@ createAcutePhenotypeModel(
   checkDates = TRUE,
   cdmVersion = "5",
   outFolder = getwd(),
-  savePlpData = F,
+  excludeModelFromEvaluation = TRUE,
+  savePlpData = FALSE,
   createModel = TRUE,
   createEvaluationCohort = TRUE,
   cohortDefinitionsToTest = NULL
@@ -109,6 +110,8 @@ concept_ids that were used to define the xSpec model (default=NULL)}
 \item{cdmVersion}{The CDM version of the database (default=5)}
 
 \item{outFolder}{The folder where the output files will be written (default=working directory)}
+
+\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort (default = TRUE)}
 
 \item{savePlpData}{Should large PLP data file be saved (default=FALSE)}
 

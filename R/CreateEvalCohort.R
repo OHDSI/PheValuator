@@ -53,11 +53,13 @@
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
 #' @param startDays              The days to include prior to the cohort start date (default=0)
 #' @param endDays                The days to include after the cohort start date (default=10000)
+#' @param visitLength            The minimum length of index visit (default=3)
 #' @param gender                 The gender(s) to be included (default c(8507, 8532))
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
 #' @param cdmVersion             The CDM version of the database (default=5)
 #' @param outFolder              The folder where the output files will be written (default=working directory)
+#' @param excludeModelFromEvaluation Should subjects used in the model be excluded from the evaluation cohort (default = TRUE)
 #' @param savePlpData            Should large PLP data file be saved (default=FALSE)
 #' @param modelType              The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")
 #'
@@ -79,11 +81,13 @@ createEvaluationCohort <- function(connectionDetails,
                                    upperAgeLimit = 120,
                                    startDays = 0,
                                    endDays = 10000,
+                                   visitLength = 3,
                                    gender = c(8507, 8532),
                                    startDate = "19001010",
                                    endDate = "21000101",
                                    cdmVersion = "5",
                                    outFolder = getwd(),
+                                   excludeModelFromEvaluation = TRUE,
                                    savePlpData = FALSE,
                                    modelType = "chronic") {
 
@@ -128,6 +132,7 @@ createEvaluationCohort <- function(connectionDetails,
   writeLines(paste("upperAgeLimit ", upperAgeLimit))
   writeLines(paste("startDays ", startDays))
   writeLines(paste("endDays ", endDays))
+  writeLines(paste("visitLength ", visitLength))
   writeLines(paste("gender ", gender))
   writeLines(paste("startDate ", startDate))
   writeLines(paste("endDate ", endDate))
@@ -184,7 +189,8 @@ createEvaluationCohort <- function(connectionDetails,
                            endDate = endDate,
                            baseSampleSize = baseSampleSize,
                            xSpecSampleSize = 100,
-                           mainPopnCohort = mainPopulationCohort)
+                           mainPopnCohort = mainPopulationCohort,
+                           visitLength = visitLength)
 
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
@@ -241,12 +247,14 @@ createEvaluationCohort <- function(connectionDetails,
 
   summary(plpData)
 
-  #remove subjects in evaluation cohort that were in model cohort
-  excl <- data.frame(plpData$cohorts$rowId[plpData$cohorts$subjectId %in% c(exclSubjectList)])
-  xSpec <- c(plpData$outcomes$rowId) #those with outcome need to be left in
-  excl <- subset(excl, !(excl[,1] %in% c(xSpec)))
+  if(excludeModelFromEvaluation == TRUE) {
+    #remove subjects in evaluation cohort that were in model cohort
+    excl <- data.frame(plpData$cohorts$rowId[plpData$cohorts$subjectId %in% c(exclSubjectList)])
+    xSpec <- c(plpData$outcomes$rowId) #those with outcome need to be left in
+    excl <- subset(excl, !(excl[,1] %in% c(xSpec)))
 
-  plpData$cohorts <- plpData$cohorts[!(plpData$cohorts$rowId %in% c(excl[,1])),]
+    plpData$cohorts <- plpData$cohorts[!(plpData$cohorts$rowId %in% c(excl[,1])),]
+  }
 
   population <- PatientLevelPrediction::createStudyPopulation(plpData,
                                                               population = NULL,
@@ -285,6 +293,7 @@ createEvaluationCohort <- function(connectionDetails,
   #add other parameters to the input settings list
   appResults$PheValuator$inputSetting$startDays <- startDays
   appResults$PheValuator$inputSetting$endDays <- endDays
+  appResults$PheValuator$inputSetting$visitLength <- visitLength
   appResults$PheValuator$inputSetting$xSpecCohort <- xSpecCohort
   appResults$PheValuator$inputSetting$xSensCohort <- xSensCohort
   appResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
@@ -295,6 +304,7 @@ createEvaluationCohort <- function(connectionDetails,
   appResults$PheValuator$inputSetting$modelOutputFileName <- modelOutputFileName
   appResults$PheValuator$inputSetting$mainPopulationCohort <- mainPopulationCohort
   appResults$PheValuator$inputSetting$modelType <- modelType
+  appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
 
   appResults$PheValuator$modelperformanceEvaluation <- lr_results$performanceEvaluation
 

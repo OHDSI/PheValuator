@@ -69,6 +69,7 @@
 #' @param checkDates             Should dates be checked to remove future dates (default=TRUE)
 #' @param cdmVersion             The CDM version of the database (default=5)
 #' @param outFolder              The folder where the output files will be written (default=working directory)
+#' @param excludeModelFromEvaluation Should subjects used in the model be excluded from the evaluation cohort (default = TRUE)
 #' @param savePlpData            Should large PLP data file be saved (default=FALSE)
 #' @param createModel            Run the function to create the diagnostic predictive model (default=TRUE)
 #' @param createEvaluationCohort Run the function to create the evaluation cohort (default=TRUE)
@@ -107,7 +108,8 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                       checkDates = TRUE,
                                       cdmVersion = "5",
                                       outFolder = getwd(),
-                                      savePlpData = F,
+                                      excludeModelFromEvaluation = TRUE,
+                                      savePlpData = FALSE,
                                       createModel = TRUE,
                                       createEvaluationCohort = TRUE,
                                       cohortDefinitionsToTest = NULL) {
@@ -192,11 +194,13 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                          upperAgeLimit = upperAgeLimit,
                                          startDays = startDays,
                                          endDays = endDays,
+                                         visitLength = visitLength,
                                          gender = c(gender),
                                          startDate = startDate,
                                          endDate = endDate,
                                          cdmVersion = cdmVersion,
                                          outFolder = outFolder,
+                                         excludeModelFromEvaluation = excludeModelFromEvaluation,
                                          savePlpData = savePlpData,
                                          modelType = 'acute')
   }
