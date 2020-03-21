@@ -201,7 +201,7 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                          modelType = 'acute')
   }
 
-  if(cohortDefinitionsToTest != "") {
+  if(!is.null(cohortDefinitionsToTest)) {
     errorCheck(callingProgram = "testPhenosFromFile",
                connectionDetails = connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
