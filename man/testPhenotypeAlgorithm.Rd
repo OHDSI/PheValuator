@@ -17,8 +17,9 @@ testPhenotypeAlgorithm(
   xSensCohort = "",
   prevalenceCohort = "",
   cohortDatabaseSchema,
-  cohortTable,
-  washoutPeriod = 0
+  cohortDatabaseTable,
+  washoutPeriod = 0,
+  modelType = "chronic"
 )
 }
 \arguments{
@@ -54,12 +55,14 @@ in the cohort table (used to exclude subjects from the base population) (Default
 data used to define the at risk cohort is available. Requires read
 permissions to this database.}
 
-\item{cohortTable}{The tablename that contains the at risk cohort. The expectation is
-cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
+\item{cohortDatabaseTable}{The tablename that contains the at risk cohort. The expectation is
+cohortDatabaseTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 COHORT_START_DATE, COHORT_END_DATE.}
 
 \item{washoutPeriod}{The mininum required continuous observation time prior to index date
-for subjects within the cohort to test (phenotypeCohortId).}
+for subjects within the cohort to test (Default = 0).}
+
+\item{modelType}{The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")}
 }
 \value{
 A list containg 2 dataframes: 1) results - a dataframe with the results from the phenotype

@@ -48,9 +48,10 @@
 #' @param modelOutputFileName    A string designation for the training model file
 #' @param mainPopulationCohort   The number of the cohort to be used as a base population for the model
 #'                               (default=NULL)
+#' @param baseSampleSize         The maximum number of subjects in the evaluation cohort (default=2M)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
-#' @param startDays              The days to include prior to the cohort start date (default=-10000)
+#' @param startDays              The days to include prior to the cohort start date (default=0)
 #' @param endDays                The days to include after the cohort start date (default=10000)
 #' @param gender                 The gender(s) to be included (default c(8507, 8532))
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
@@ -58,6 +59,7 @@
 #' @param cdmVersion             The CDM version of the database (default=5)
 #' @param outFolder              The folder where the output files will be written (default=working directory)
 #' @param savePlpData            Should large PLP data file be saved (default=FALSE)
+#' @param modelType              The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")
 #'
 #' @importFrom stats runif
 #'
@@ -72,6 +74,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    evaluationOutputFileName,
                                    modelOutputFileName,
                                    mainPopulationCohort = 0,
+                                   baseSampleSize = 2000000,
                                    lowerAgeLimit = 0,
                                    upperAgeLimit = 120,
                                    startDays = 0,
@@ -81,12 +84,15 @@ createEvaluationCohort <- function(connectionDetails,
                                    endDate = "21000101",
                                    cdmVersion = "5",
                                    outFolder = getwd(),
-                                   savePlpData = FALSE) {
+                                   savePlpData = FALSE,
+                                   modelType = "chronic") {
 
   options(error = NULL)
   options(scipen=999)
 
   # error checking for input
+  if (modelType != "chronic" & modelType != "acute")
+    stop("...modelType must be acute or chronic")
   if (length(connectionDetails) == 0)
     stop("...must supply a connection string")
   if (xSpecCohort == "")
@@ -117,6 +123,7 @@ createEvaluationCohort <- function(connectionDetails,
   writeLines(paste("evaluationOutputFileName ", evaluationOutputFileName))
   writeLines(paste("modelOutputFileName ", modelOutputFileName))
   writeLines(paste("mainPopulationCohort ", mainPopulationCohort))
+  writeLines(paste("baseSampleSize ", baseSampleSize))
   writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
   writeLines(paste("upperAgeLimit ", upperAgeLimit))
   writeLines(paste("startDays ", startDays))
@@ -130,7 +137,6 @@ createEvaluationCohort <- function(connectionDetails,
   workFolder <- outFolder
 
   conn <- DatabaseConnector::connect(connectionDetails)
-
 
   # determine the model file to use to apply to the evaluation cohort
   resultsFileName <- file.path(workFolder, paste(modelOutputFileName,
@@ -146,10 +152,17 @@ createEvaluationCohort <- function(connectionDetails,
   #get subjects used in model file to exclude from evaluation cohort
   exclSubjectList <- c(lr_results$prediction$subjectId)
 
-  # create the evaluation cohort
-  sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
-                                              "CreateCohortsV6.sql",
-                                              package = "PheValuator"))
+  if(modelType == "acute") {
+    # create the evaluation cohort
+    sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
+                                                "CreateCohortsAcuteEvaluation.sql",
+                                                package = "PheValuator"))
+  } else {
+    # create the evaluation cohort
+    sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
+                                                "CreateCohortsV6.sql",
+                                                package = "PheValuator"))
+  }
 
   test_cohort <- gsub(".",
                       "",
@@ -169,10 +182,9 @@ createEvaluationCohort <- function(connectionDetails,
                            gender = gender,
                            startDate = startDate,
                            endDate = endDate,
-                           baseSampleSize = 2000000,
+                           baseSampleSize = baseSampleSize,
                            xSpecSampleSize = 100,
-                           mainPopnCohort = mainPopulationCohort,
-                           lookback = 0)  #when applying the model start from the first visit for all subjects
+                           mainPopnCohort = mainPopulationCohort)
 
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
@@ -270,6 +282,22 @@ createEvaluationCohort <- function(connectionDetails,
   finalPopn <- merge(pred, xSensPopn, by.x = "subjectId", by.y = "SUBJECT_ID", all.x = TRUE)
   finalPopn$daysToXSens <- as.integer(finalPopn$COHORT_START_DATE - finalPopn$OBSERVATION_PERIOD_START_DATE)
 
+  #add other parameters to the input settings list
+  appResults$PheValuator$inputSetting$startDays <- startDays
+  appResults$PheValuator$inputSetting$endDays <- endDays
+  appResults$PheValuator$inputSetting$xSpecCohort <- xSpecCohort
+  appResults$PheValuator$inputSetting$xSensCohort <- xSensCohort
+  appResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
+  appResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
+  appResults$PheValuator$inputSetting$gender <-  paste(unlist(gender), collapse=', ')
+  appResults$PheValuator$inputSetting$startDate <- startDate
+  appResults$PheValuator$inputSetting$endDate <- endDate
+  appResults$PheValuator$inputSetting$modelOutputFileName <- modelOutputFileName
+  appResults$PheValuator$inputSetting$mainPopulationCohort <- mainPopulationCohort
+  appResults$PheValuator$inputSetting$modelType <- modelType
+
+  appResults$PheValuator$modelperformanceEvaluation <- lr_results$performanceEvaluation
+
   #save the full data set to the model
   appResults$prediction <- finalPopn
 
@@ -298,6 +326,7 @@ createEvaluationCohort <- function(connectionDetails,
   sql <- SqlRender::render(sqlScript, tempDB = outDatabaseSchema, test_cohort = test_cohort)
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
+  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file=NULL)
   DatabaseConnector::executeSql(conn = conn, sql)
 
   DatabaseConnector::disconnect(conn)

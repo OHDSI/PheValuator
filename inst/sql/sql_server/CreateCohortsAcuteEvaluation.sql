@@ -1,5 +1,5 @@
 /************************************************************************
-@file CreateCohorts.sql
+@file CreateCohortsAcuteEvaluation.sql
 ************************************************************************/
 
 {DEFAULT @cdm_database_schema = 'CDM_SIM' }
@@ -19,7 +19,6 @@
 {DEFAULT @exclCohort = 0 }
 {DEFAULT @visitLength = 1 }
 
-
 IF OBJECT_ID('tempdb..#cohort_person', 'U') IS NOT NULL
 	DROP TABLE #cohort_person;
 
@@ -37,7 +36,6 @@ from (select co.*, p.*,
 	  on co.subject_id = o.person_id
 	    and co.COHORT_START_DATE >= o.observation_period_start_date
 		and co.COHORT_START_DATE <= o.observation_period_end_date
-	    and datediff(day, o.observation_period_start_date, co.COHORT_START_DATE) >= 365
 	where cohort_definition_id = @x_spec_cohort
 	  and o.observation_period_start_date >= cast('@startDate' AS DATE)
 	  and o.observation_period_start_date <= cast('@endDate' AS DATE)) pos
@@ -58,8 +56,6 @@ join (
   from @cdm_database_schema.observation_period
   group by person_id) obs
   on visit_occurrence.person_id = obs.person_id
-    and cntPd = 1
-    and lenPd >= 730
 group by visit_occurrence.person_id, minObsStart
 having minObsStart >= cast('@startDate' AS DATE)
 		and minObsStart <= cast('@endDate' AS DATE);
@@ -78,22 +74,23 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
             dateadd(day, 1, visit_start_date) COHORT_END_DATE
       from (select
 				{@mainPopnCohort == 0} ? {
-					v.person_id, minObsStart as visit_start_date,
+					v.person_id, visit_start_date,
 						row_number() over (order by NewId()) rn
 					from @cdm_database_schema.visit_occurrence v
 					join @cdm_database_schema.person p
 					  on v.person_id = p.person_id
-						and  year(visit_start_date) - year_of_birth >= @ageLimit
+						and year(visit_start_date) - year_of_birth >= @ageLimit
 						and year(visit_start_date) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
 					join #eligibles v5 --include only subjects with a visit in their record and within date range
 						on v.person_id = v5.person_id
 					where 1 = 1
+					  and v.visit_concept_id in (9201) --in-patient only
+					  and datediff(day, visit_start_date, visit_end_date) >= @visitLength
 						{@exclCohort != 0} ? {and v.person_id not in (
 													select subject_id
 													from @cohort_database_schema.@cohort_database_table
-													where COHORT_DEFINITION_ID = @exclCohort)}
-					group by v.person_id, minObsStart)}
+													where COHORT_DEFINITION_ID = @exclCohort)})}
 				{@mainPopnCohort != 0} ? {
 					co.subject_id as person_id, co.COHORT_START_DATE as visit_start_date,
 						row_number() over (order by NewId()) rn
@@ -113,8 +110,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						)} negs
       where rn <= cast('@baseSampleSize' as bigint)
     union
-      select 0 as COHORT_DEFINITION_ID, SUBJECT_ID, o.observation_period_start_date COHORT_START_DATE,
-        dateadd(day, 1, o.observation_period_start_date) COHORT_END_DATE
+      select 0 as COHORT_DEFINITION_ID, SUBJECT_ID, cp.COHORT_START_DATE COHORT_START_DATE,
+        dateadd(day, 1, cp.COHORT_START_DATE) COHORT_END_DATE
       from #cohort_person cp
       join @cdm_database_schema.observation_period o
         on cp.SUBJECT_ID = o.person_id
@@ -122,8 +119,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
           and cp.COHORT_START_DATE <= o.observation_period_end_date
       where rn <= @xSpecSampleSize
       union
-      select @x_spec_cohort as COHORT_DEFINITION_ID, SUBJECT_ID, o.observation_period_start_date COHORT_START_DATE,
-        dateadd(day, 1, o.observation_period_start_date) COHORT_END_DATE
+      select @x_spec_cohort as COHORT_DEFINITION_ID, SUBJECT_ID, cp.COHORT_START_DATE COHORT_START_DATE,
+        dateadd(day, 1, cp.COHORT_START_DATE) COHORT_END_DATE
       from #cohort_person cp
       join @cdm_database_schema.observation_period o
         on cp.SUBJECT_ID = o.person_id

@@ -15,6 +15,7 @@ createEvaluationCohort(
   evaluationOutputFileName,
   modelOutputFileName,
   mainPopulationCohort = 0,
+  baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
   startDays = 0,
@@ -24,7 +25,8 @@ createEvaluationCohort(
   endDate = "21000101",
   cdmVersion = "5",
   outFolder = getwd(),
-  savePlpData = FALSE
+  savePlpData = FALSE,
+  modelType = "chronic"
 )
 }
 \arguments{
@@ -61,11 +63,13 @@ permissions to this database.}
 \item{mainPopulationCohort}{The number of the cohort to be used as a base population for the model
 (default=NULL)}
 
+\item{baseSampleSize}{The maximum number of subjects in the evaluation cohort (default=2M)}
+
 \item{lowerAgeLimit}{The lower age for subjects in the model (default=NULL)}
 
 \item{upperAgeLimit}{The upper age for subjects in the model (default=NULL)}
 
-\item{startDays}{The days to include prior to the cohort start date (default=-10000)}
+\item{startDays}{The days to include prior to the cohort start date (default=0)}
 
 \item{endDays}{The days to include after the cohort start date (default=10000)}
 
@@ -80,6 +84,8 @@ permissions to this database.}
 \item{outFolder}{The folder where the output files will be written (default=working directory)}
 
 \item{savePlpData}{Should large PLP data file be saved (default=FALSE)}
+
+\item{modelType}{The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")}
 }
 \description{
 Create the evaluation cohort

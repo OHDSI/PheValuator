@@ -28,8 +28,6 @@
 #'
 #' @param connectionDetails      connectionDetails created using the function createConnectionDetails
 #'                               in the DatabaseConnector package.
-#' @param xSpecCohort            The number of the "extremely specific (xSpec)" cohort definition id in
-#'                               the cohort table (for noisy positives)
 #' @param cdmDatabaseSchema      The name of the database schema that contains the OMOP CDM instance.
 #'                               Requires read permissions to this database. On SQL Server, this should
 #'                               specifiy both the database and the schema, so for example
@@ -43,52 +41,66 @@
 #' @param outDatabaseSchema      The name of a database schema where the user has write capability.  A
 #'                               temporary cohort table will be created here.
 #' @param modelOutputFileName    A string designation for the training model file
+#' @param xSpecCohort            The number of the "extremely specific (xSpec)" cohort definition id in
+#'                               the cohort table (for noisy positives)
 #' @param xSensCohort            The number of the "extremely sensitive (xSens)" cohort definition id
 #'                               in the cohort table (used to exclude subjects from the base population)
 #' @param prevalenceCohort       The number of the cohort definition id to determine the disease prevalence,
 #'                               (default=xSensCohort)
 #' @param excludedConcepts       A list of conceptIds to exclude from featureExtraction.  These should include all
 #'                               concept_ids that were used to define the xSpec model (default=NULL)
+#' @param includedCovariateIds   A list of covariate IDs that should be restricted to.
 #' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
 #' @param mainPopulationCohort   The number of the cohort ID to be used as a base population for the model
 #'                               (default=NULL)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
+#' @param startDays              The days to include prior to the cohort start date (default=0)
+#' @param endDays                The days to include after the cohort start date (default=10000)
+#' @param visitLength            The minimum length of index visit for noisy negative comparison (default=3)
 #' @param gender                 The gender(s) to be included (default c(8507, 8532))
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
 #' @param checkDates             Should dates be checked to remove future dates (default=TRUE)
 #' @param cdmVersion             The CDM version of the database (default=5)
 #' @param outFolder              The folder where the output files will be written (default=working directory)
+#' @param modelType              The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")
 #'
 #' @importFrom stats runif
 #'
 #' @export
 createPhenotypeModel <- function(connectionDetails,
-                                 xSpecCohort,
                                  cdmDatabaseSchema,
                                  cohortDatabaseSchema,
                                  cohortDatabaseTable,
                                  outDatabaseSchema,
                                  modelOutputFileName = "train",
+                                 xSpecCohort,
                                  xSensCohort,
                                  prevalenceCohort = xSensCohort,
                                  excludedConcepts = c(),
+                                 includedCovariateIds = c(),
                                  addDescendantsToExclude = FALSE,
                                  mainPopulationCohort = 0,
                                  lowerAgeLimit = 0,
                                  upperAgeLimit = 120,
+                                 startDays = 0,
+                                 endDays = 10000,
+                                 visitLength = 3,
                                  gender = c(8507, 8532),
                                  startDate = "19000101",
                                  endDate = "21000101",
                                  checkDates = TRUE,
                                  cdmVersion = "5",
-                                 outFolder = getwd()) {
+                                 outFolder = getwd(),
+                                 modelType = "chronic") {
 
   options(error = NULL)
   options(scipen=999)
 
   # error checking for input
+  if (modelType != "chronic" & modelType != "acute")
+    stop("...modelType must be acute or chronic")
   if (length(connectionDetails) == 0)
     stop("...must supply a connection string")
   if (xSpecCohort == "")
@@ -121,6 +133,9 @@ createPhenotypeModel <- function(connectionDetails,
   writeLines(paste("mainPopulationCohort ", mainPopulationCohort))
   writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
   writeLines(paste("upperAgeLimit ", upperAgeLimit))
+  writeLines(paste("startDays ", startDays))
+  writeLines(paste("endDays ", endDays))
+  writeLines(paste("visitLength ", visitLength))
   writeLines(paste("gender ", gender))
   writeLines(paste("startDate ", startDate))
   writeLines(paste("endDate ", endDate))
@@ -153,6 +168,7 @@ createPhenotypeModel <- function(connectionDetails,
 
   popPrev <- DatabaseConnector::querySql(conn = conn, sql)
 
+
   if (popPrev == 0)
     stop("...unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
 
@@ -172,40 +188,78 @@ createPhenotypeModel <- function(connectionDetails,
   # set the number of nosiy negatives in the model either from the prevalence or to 500K max
   baseSampleSize <- min(as.integer(xspecSize/popPrev), 500000)  #use 500,000 as largest base sample
 
-  # sql script to create a temporary cohort table for predictive modeling
-  sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
-                                              "CreateCohortsV6.sql",
-                                              package = "PheValuator"))
 
-  covariateSettings <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
-                                                                  useDemographicsAgeGroup = TRUE,
-                                                                  useDemographicsRace = TRUE,
-                                                                  useDemographicsEthnicity = TRUE,
-                                                                  useConditionOccurrenceLongTerm = TRUE,
-                                                                  useConditionOccurrencePrimaryInpatientLongTerm = TRUE,
-                                                                  useConditionGroupEraLongTerm = TRUE,
-                                                                  useDrugExposureLongTerm = TRUE,
-                                                                  useDrugEraLongTerm = TRUE,
-                                                                  useDrugGroupEraLongTerm = TRUE,
-                                                                  useProcedureOccurrenceLongTerm = TRUE,
-                                                                  useDeviceExposureLongTerm = TRUE,
-                                                                  useMeasurementLongTerm = TRUE,
-                                                                  useMeasurementValueLongTerm = TRUE,
-                                                                  useMeasurementRangeGroupLongTerm = TRUE,
-                                                                  useObservationLongTerm = TRUE,
-                                                                  useDistinctConditionCountLongTerm = TRUE,
-                                                                  useDistinctIngredientCountLongTerm = TRUE,
-                                                                  useDistinctProcedureCountLongTerm = TRUE,
-                                                                  useDistinctMeasurementCountLongTerm = TRUE,
-                                                                  useVisitCountLongTerm = TRUE,
-                                                                  useVisitConceptCountLongTerm = TRUE,
-                                                                  longTermStartDays = 0,
-                                                                  endDays = 10000,
-                                                                  includedCovariateConceptIds = c(),
-                                                                  addDescendantsToInclude = TRUE,
-                                                                  excludedCovariateConceptIds = excludedConcepts,
-                                                                  addDescendantsToExclude = addDescendantsToExclude,
-                                                                  includedCovariateIds = c())
+  if(modelType == "acute") {
+    # sql script to create a temporary cohort table for predictive modeling
+    sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
+                                                "CreateCohortsAcuteModel.sql",
+                                                package = "PheValuator"))
+
+    covariateSettings <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
+                                                                    useDemographicsAgeGroup = TRUE,
+                                                                    useDemographicsRace = TRUE,
+                                                                    useDemographicsEthnicity = TRUE,
+                                                                    useConditionOccurrenceLongTerm = TRUE,
+                                                                    #useConditionOccurrencePrimaryInpatientLongTerm = TRUE,
+                                                                    #useConditionGroupEraLongTerm = TRUE,
+                                                                    useDrugExposureLongTerm = TRUE,
+                                                                    useDrugEraLongTerm = TRUE,
+                                                                    useDrugGroupEraLongTerm = TRUE,
+                                                                    useProcedureOccurrenceLongTerm = TRUE,
+                                                                    useDeviceExposureLongTerm = TRUE,
+                                                                    useMeasurementLongTerm = TRUE,
+                                                                    useMeasurementValueLongTerm = TRUE,
+                                                                    useMeasurementRangeGroupLongTerm = TRUE,
+                                                                    useObservationLongTerm = TRUE,
+                                                                    #useDistinctConditionCountLongTerm = TRUE,
+                                                                    #useDistinctIngredientCountLongTerm = TRUE,
+                                                                    #useDistinctProcedureCountLongTerm = TRUE,
+                                                                    #useDistinctMeasurementCountLongTerm = TRUE,
+                                                                    #useVisitCountLongTerm = TRUE,
+                                                                    #useVisitConceptCountLongTerm = TRUE,
+                                                                    longTermStartDays = startDays,
+                                                                    endDays = endDays,
+                                                                    includedCovariateConceptIds = c(),
+                                                                    addDescendantsToInclude = TRUE,
+                                                                    excludedCovariateConceptIds = excludedConcepts,
+                                                                    addDescendantsToExclude = addDescendantsToExclude,
+                                                                    includedCovariateIds = c(includedCovariateIds))
+  } else {
+    # sql script to create a temporary cohort table for predictive modeling
+    sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
+                                                "CreateCohortsV6.sql",
+                                                package = "PheValuator"))
+
+    covariateSettings <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
+                                                                    useDemographicsAgeGroup = TRUE,
+                                                                    useDemographicsRace = TRUE,
+                                                                    useDemographicsEthnicity = TRUE,
+                                                                    useConditionOccurrenceLongTerm = TRUE,
+                                                                    useConditionOccurrencePrimaryInpatientLongTerm = TRUE,
+                                                                    useConditionGroupEraLongTerm = TRUE,
+                                                                    useDrugExposureLongTerm = TRUE,
+                                                                    useDrugEraLongTerm = TRUE,
+                                                                    useDrugGroupEraLongTerm = TRUE,
+                                                                    useProcedureOccurrenceLongTerm = TRUE,
+                                                                    useDeviceExposureLongTerm = TRUE,
+                                                                    useMeasurementLongTerm = TRUE,
+                                                                    useMeasurementValueLongTerm = TRUE,
+                                                                    useMeasurementRangeGroupLongTerm = TRUE,
+                                                                    useObservationLongTerm = TRUE,
+                                                                    useDistinctConditionCountLongTerm = TRUE,
+                                                                    useDistinctIngredientCountLongTerm = TRUE,
+                                                                    useDistinctProcedureCountLongTerm = TRUE,
+                                                                    useDistinctMeasurementCountLongTerm = TRUE,
+                                                                    useVisitCountLongTerm = TRUE,
+                                                                    useVisitConceptCountLongTerm = TRUE,
+                                                                    longTermStartDays = startDays,
+                                                                    endDays = endDays,
+                                                                    includedCovariateConceptIds = c(),
+                                                                    addDescendantsToInclude = TRUE,
+                                                                    excludedCovariateConceptIds = excludedConcepts,
+                                                                    addDescendantsToExclude = addDescendantsToExclude,
+                                                                    includedCovariateIds = c(includedCovariateIds))
+  }
 
   baseSample <- baseSampleSize
   plpDataFile <- file.path(workFolder, paste("plpData_",
@@ -242,7 +296,7 @@ createPhenotypeModel <- function(connectionDetails,
                              baseSampleSize = baseSample,
                              xSpecSampleSize = xspecSize,
                              mainPopnCohort = mainPopulationCohort,
-                             lookback = 0)
+                             visitLength = visitLength)
 
     sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
@@ -307,6 +361,20 @@ createPhenotypeModel <- function(connectionDetails,
                                                  savePlpData = F, savePlpResult = F,
                                                  savePlpPlots = F, saveEvaluation = F, )
 
+    lr_results$PheValuator$inputSetting$xSpecCohort <- xSpecCohort
+    lr_results$PheValuator$inputSetting$xSensCohort <- xSensCohort
+    lr_results$PheValuator$inputSetting$prevalenceCohort <- prevalenceCohort
+    lr_results$PheValuator$inputSetting$mainPopulationCohort <- mainPopulationCohort
+    lr_results$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
+    lr_results$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
+    lr_results$PheValuator$inputSetting$startDays <- startDays
+    lr_results$PheValuator$inputSetting$endDays <- endDays
+    lr_results$PheValuator$inputSetting$visitLength <- visitLength
+    lr_results$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse=', ')
+    lr_results$PheValuator$inputSetting$startDate <- startDate
+    lr_results$PheValuator$inputSetting$endDate <- endDate
+    lr_results$PheValuator$inputSetting$modelType <- modelType
+
     print(resultsFileName)
     saveRDS(lr_results, resultsFileName)
 
@@ -317,6 +385,7 @@ createPhenotypeModel <- function(connectionDetails,
     lr_results <- readRDS(resultsFileName)
   }
 
+  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file=NULL)
   DatabaseConnector::disconnect(conn)
 }
 

@@ -44,11 +44,12 @@
 #' @param cohortDatabaseSchema   The name of the database schema that is the location where the cohort
 #'                               data used to define the at risk cohort is available. Requires read
 #'                               permissions to this database.
-#' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
-#'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
+#' @param cohortDatabaseTable    The tablename that contains the at risk cohort. The expectation is
+#'                               cohortDatabaseTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 #'                               COHORT_START_DATE, COHORT_END_DATE.
 #' @param washoutPeriod          The mininum required continuous observation time prior to index date
-#'                               for subjects within the cohort to test (phenotypeCohortId).
+#'                               for subjects within the cohort to test (Default = 0).
+#' @param modelType              The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")
 #'
 #' @return
 #' A list containg 2 dataframes: 1) results - a dataframe with the results from the phenotype
@@ -69,8 +70,9 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                                    xSensCohort = "",
                                    prevalenceCohort = "",
                                    cohortDatabaseSchema,
-                                   cohortTable,
-                                   washoutPeriod = 0) {
+                                   cohortDatabaseTable,
+                                   washoutPeriod = 0,
+                                   modelType = "chronic") {
 
   options(error = NULL)
 
@@ -82,13 +84,15 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   }
 
   # error checking for input
+  if (modelType != "chronic" & modelType != "acute")
+    stop("...modelType must be acute or chronic")
   if (length(connectionDetails) == 0)
     stop("...must supply a connection string")
   if (evaluationOutputFileName == "")
     stop("....must have a defined Evaluation Output File Name (e.g., \"c:/phenotypes/lr_results_10XDiabetes_dod_ePPV1_1.rds\")")
   if (cohortDatabaseSchema == "")
     stop("...must have a defined Cohort schema (e.g., \"YourCDM.YourSchema\")")
-  if (cohortTable == "")
+  if (cohortDatabaseTable == "")
     stop("....must have a defined Cohort table (e.g., \"cohort\")")
   if (phenotypeCohortId == "")
     stop(".....must have a defined Phenotype Cohort ID to test (e.g., 1234)")
@@ -112,8 +116,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   }
 
   # pull the subjects in the phentype
-  sql <- paste("select distinct subject_id,  subject_id  subject_id2 from ",
-               paste(cohortDatabaseSchema, ".", cohortTable, sep = ""),
+  sql <- paste("select distinct subject_id,  cohort_start_date, subject_id  subject_id2 from ",
+               paste(cohortDatabaseSchema, ".", cohortDatabaseTable, sep = ""),
                " where cohort_definition_id = ",
                as.character(phenotypeCohortId),
                sep = "")
@@ -123,7 +127,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   sql <- SqlRender::translate(sql = sql, targetDialect = connectionDetails$dbms)
 
   #conn <- DatabaseConnector::connect(connectionDetails)
-  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file='NULL')
+  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file=NULL)
 
   PhenoPop <- data.table::data.table(DatabaseConnector::querySql(conn = conn, sql))
 
@@ -146,12 +150,21 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
   for (cpUp in 1:length(cutPoints)) {
     # join the phenotype table with the prediction table
-    fullTable <- data.table::data.table(merge(modelAll,
-                                              PhenoPop,
-                                              by.x = "subjectId",
-                                              by.y = "SUBJECT_ID2",
-                                              sort = FALSE,
-                                              all.x = T))
+    if(modelType == "acute") {
+      fullTable <- data.table::data.table(merge(modelAll,
+                                                PhenoPop,
+                                                by.x = c("subjectId", "cohortStartDate"),
+                                                by.y = c("SUBJECT_ID2", "COHORT_START_DATE"),
+                                                sort = FALSE,
+                                                all.x = T))
+    } else {
+      fullTable <- data.table::data.table(merge(modelAll,
+                                                PhenoPop,
+                                                by.x = "subjectId",
+                                                by.y = "SUBJECT_ID2",
+                                                sort = FALSE,
+                                                all.x = T))
+    }
 
     fullTable <- fullTable[, `:=`(PN, ifelse(!is.na(SUBJECT_ID),
                                              1,
@@ -202,6 +215,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
           tempMisses$cohort <- as.character(phenotypeCohortId)
           tempMisses$miss <- "TP"
           tempMisses$subjectId <- subjectList[[subj]]
+          tempMisses$cohortStartDate <- subjectDF$cohortStartDate[[subj]]
+          tempMisses$daysFromObsStart <- subjectDF$daysFromObsStart[[subj]]
           tempMisses$predValue <- subjectDF$valueOrig[[subj]]
           tempMisses$Test_File <- evaluationOutputFileName
           if (nrow(misses) == 0) {
@@ -222,6 +237,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
           tempMisses$cohort <- as.character(phenotypeCohortId)
           tempMisses$miss <- "FP"
           tempMisses$subjectId <- subjectList[[subj]]
+          tempMisses$cohortStartDate <- subjectDF$cohortStartDate[[subj]]
+          tempMisses$daysFromObsStart <- subjectDF$daysFromObsStart[[subj]]
           tempMisses$predValue <- subjectDF$valueOrig[[subj]]
           tempMisses$Test_File <- evaluationOutputFileName
           if (nrow(misses) == 0) {
@@ -242,6 +259,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
           tempMisses$cohort <- as.character(phenotypeCohortId)
           tempMisses$miss <- "FN"
           tempMisses$subjectId <- subjectList[[subj]]
+          tempMisses$cohortStartDate <- subjectDF$cohortStartDate[[subj]]
+          tempMisses$daysFromObsStart <- subjectDF$daysFromObsStart[[subj]]
           tempMisses$predValue <- subjectDF$valueOrig[[subj]]
           tempMisses$Test_File <- evaluationOutputFileName
           if (nrow(misses) == 0) {
@@ -322,6 +341,9 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
     newRow$`Washout Period` <- as.character(washoutPeriod)
 
+    newRow$`Start Days` <- paste0(resultsFile$PheValuator$inputSetting$startDays, " ")
+    newRow$`End Days` <- paste0(resultsFile$PheValuator$inputSetting$endDays, " ")
+
     newRow$`Phenotype Cohort Id` <- as.character(phenotypeCohortId)
 
     newRow$`Phenotype Order` <- as.numeric(order)
@@ -339,6 +361,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
       results <- rbind(results, as.data.frame(newRow, stringsAsFactors = FALSE, check.names = FALSE))
     }
   }
+  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file=NULL)
   DatabaseConnector::disconnect(conn)
   return(list(results, misses))
 }
