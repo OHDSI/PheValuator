@@ -53,6 +53,10 @@
 #' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
 #' @param mainPopulationCohort   The number of the cohort ID to be used as a base population for the model
 #'                               (default=NULL)
+#' @param mainPopulationCohortStartDay The number of days relative to the mainPopulationCohort cohort start date
+#'                              to begin including visits (default=0)
+#' @param mainPopulationCohortEndDay   The number of days relative to the mainPopulationCohort cohort start date
+#'                              to end including visits (default=0)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
 #' @param startDays              The days to include prior to the cohort start date (default=0)
@@ -82,6 +86,8 @@ createPhenotypeModel <- function(connectionDetails,
                                  includedCovariateIds = c(),
                                  addDescendantsToExclude = FALSE,
                                  mainPopulationCohort = 0,
+                                 mainPopulationCohortStartDay = 0,
+                                 mainPopulationCohortEndDay = 0,
                                  lowerAgeLimit = 0,
                                  upperAgeLimit = 120,
                                  startDays = 0,
@@ -131,6 +137,8 @@ createPhenotypeModel <- function(connectionDetails,
   writeLines(paste("excludedConcepts ", c(excludedConcepts)))
   writeLines(paste("addDescendantsToExclude ", addDescendantsToExclude))
   writeLines(paste("mainPopulationCohort ", mainPopulationCohort))
+  writeLines(paste("mainPopulationCohortStartDay ", mainPopulationCohortStartDay))
+  writeLines(paste("mainPopulationCohortEndDay ", mainPopulationCohortEndDay))
   writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
   writeLines(paste("upperAgeLimit ", upperAgeLimit))
   writeLines(paste("startDays ", startDays))
@@ -296,6 +304,8 @@ createPhenotypeModel <- function(connectionDetails,
                              baseSampleSize = baseSample,
                              xSpecSampleSize = xspecSize,
                              mainPopnCohort = mainPopulationCohort,
+                             mainPopnCohortStartDay = mainPopulationCohortStartDay,
+                             mainPopnCohortEndDay = mainPopulationCohortEndDay,
                              visitLength = visitLength)
 
     sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)

@@ -74,10 +74,10 @@ The system uses the prevalence cohort to provide a reasonable approximation of t
 
 ## Evaluating phenotype algorithms for chronic health conditions
 
-The function createChronicPhenotypeModel allows the user to perform a complete analysis for determining the performance characteristics for one or more phenotype algorithms (cohort defintions) for chronic health conditions. This function initiates the process for the three major steps in PheValuator, namely:
- * 1) Develop a diagnostic predictive model for the health condition.
- * 2) Select a large, random set of subjects from the dataset and use the model to determine the probability of each of the subjects having the health condition. 
- * 3) Determine the performance characteristics for one or more phenotype algorithms to be used in studies.
+The function createChronicPhenotypeModel allows the user to perform a complete analysis for determining the performance characteristics for one or more phenotype algorithms (cohort defintions) for chronic health conditions. This function initiates the process for the three major steps in PheValuator, namely:   
+  1) Develop a diagnostic predictive model for the health condition.   
+  2) Select a large, random set of subjects from the dataset and use the model to determine the probability of each of the subjects having the health condition.    
+  3) Determine the performance characteristics for one or more phenotype algorithms to be used in studies.   
   
 createChronicPhenotypeModel should have as inputs:
 
@@ -179,14 +179,17 @@ and produce the phenotype algorithm performance characteristics result file:
 
 ## Evaluating phenotype algorithms for acute health conditions (those requiring an in-patient hospital visit)
 
-The function createAcutePhenotypeModel allows the user to perform a complete analysis for determining the performance characteristics for one or more phenotype algorithms (cohort defintions) for acute health conditions. This function initiates the process for the three major steps in PheValuator, namely:
- * 1) Develop a diagnostic predictive model for the health condition.
- * 2) Select a large, random set of subjects from the dataset and use the model to determine the probability of each of the subjects having the health condition. 
- * 3) Determine the performance characteristics for one or more phenotype algorithms to be used in studies.
+The function createAcutePhenotypeModel allows the user to perform a complete analysis for determining the performance characteristics for one or more phenotype algorithms (cohort defintions) for acute health conditions. This function initiates the process for the three major steps in PheValuator, namely:   
+  1) Develop a diagnostic predictive model for the health condition.   
+  2) Select a large, random set of subjects from the dataset and use the model to determine the probability of each of the subjects having the health condition.    
+  3) Determine the performance characteristics for one or more phenotype algorithms to be used in studies.   
   
-createAcutePhenotypeModel should have the same inputs as described for createAcutePhenotypeModel above but with more attention paid to the following parameters:
+createAcutePhenotypeModel should have the same inputs as described for createAcutePhenotypeModel above but with more attention paid to the following parameters:   
+
  * startDays \- The days to include prior to the cohort start date. For acute health conditions, this will be the number of days preceding the in-patient hospital visit. (default=0)
  * endDays \- The days to include after the cohort start date. (default=7, i.e., 7 days after the start of the hospital visit)
+ * mainPopulationCohortStartDay \- When specifying a mainPopulationCohort, the number of days relative to the mainPopulationCohort cohort start date to begin including visits. (default=0, i.e., 0 days before the start of the mainPopulationCohort cohort start date)
+ * mainPopulationCohortEndtDay \- When specifying a mainPopulationCohort, the number of days relative to the mainPopulationCohort cohort start date to end including visits. (default=0, i.e., 0 days after the start of the mainPopulationCohort cohort start date)
  * visitLength \- The minimum length of index visit for noisy negative comparison (default=3 days).  As a guideline, use the average length of a hospital visit for those with the health condition.
  
 For example:
@@ -215,6 +218,8 @@ phenoTest <- createAcutePhenotypeModel(connectionDetails = connectionDetails,
                 includedCovariateIds = c(),
                 addDescendantsToExclude = TRUE,
                 mainPopulationCohort = 0, #use the entire subject population
+                mainPopulationCohortStartDay = 0,
+                mainPopulationCohortEndDay = 0,
                 baseSampleSize = 2000000,
                 lowerAgeLimit = 18, 
                 upperAgeLimit = 90,

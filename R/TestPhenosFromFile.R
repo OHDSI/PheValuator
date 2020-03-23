@@ -43,7 +43,8 @@ testPhenosFromFile <- function(connectionDetails,
     write.csv(results[with(results, order(`Phenotype Order`, xtfrm(CDM))),],
               file.path(outFolder, paste("PerformanceResults", conditionName, "_", databaseId, ".csv", sep = "")), row.names = FALSE)
 
-    writeLines(paste0("\nOutput file saved as: ", file.path(outFolder, paste("PerformanceResults", conditionName, "_", databaseId, ".csv", sep = ""))))
+    writeLines(paste0("\nOutput file saved as: ", file.path(outFolder, paste("PerformanceResults_", modelType, "_",
+                                                                             conditionName, "_", databaseId, ".csv", sep = ""))))
 
   } else {
     writeLines(paste0("Missing file: ", file.path(outFolder,evaluationOutputFileName,".rds")))

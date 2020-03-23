@@ -57,6 +57,10 @@
 #' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
 #' @param mainPopulationCohort   The number of the cohort ID to be used as a base population for the model
 #'                               (default=NULL)
+#' @param mainPopulationCohortStartDay The number of days relative to the mainPopulationCohort cohort start date
+#'                              to begin including visits (default=0)
+#' @param mainPopulationCohortEndDay   The number of days relative to the mainPopulationCohort cohort start date
+#'                              to end including visits (default=0)
 #' @param baseSampleSize         The maximum number of subjects in the evaluation cohort (default=2M)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
@@ -96,6 +100,8 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                       includedCovariateIds = c(),
                                       addDescendantsToExclude = FALSE,
                                       mainPopulationCohort = 0,
+                                      mainPopulationCohortStartDay = 0,
+                                      mainPopulationCohortEndDay = 0,
                                       baseSampleSize = 2000000,
                                       lowerAgeLimit = 0,
                                       upperAgeLimit = 120,
@@ -148,6 +154,8 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                   includedCovariateIds = c(includedCovariateIds),
                                   addDescendantsToExclude = addDescendantsToExclude,
                                   mainPopulationCohort = mainPopulationCohort,
+                                  mainPopulationCohortStartDay = mainPopulationCohortStartDay,
+                                  mainPopulationCohortEndDay = mainPopulationCohortEndDay,
                                   lowerAgeLimit = lowerAgeLimit,
                                   upperAgeLimit = upperAgeLimit,
                                   startDays = startDays,
@@ -189,6 +197,8 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                          evaluationOutputFileName = evaluationOutputFileName,
                                          modelOutputFileName = modelOutputFileName,
                                          mainPopulationCohort = mainPopulationCohort,
+                                         mainPopulationCohortStartDay = mainPopulationCohortStartDay,
+                                         mainPopulationCohortEndDay = mainPopulationCohortEndDay,
                                          baseSampleSize = baseSampleSize,
                                          lowerAgeLimit = lowerAgeLimit,
                                          upperAgeLimit = upperAgeLimit,

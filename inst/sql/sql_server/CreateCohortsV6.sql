@@ -16,6 +16,8 @@
 {DEFAULT @baseSampleSize = 150000 }
 {DEFAULT @xSpecSampleSize = 1500 }
 {DEFAULT @mainPopnCohort = 0 }
+{DEFAULT @mainPopnCohortStartDay = 0 }
+{DEFAULT @mainPopnCohortEndDay = 0 }
 {DEFAULT @exclCohort = 0 }
 {DEFAULT @visitLength = 1 }
 

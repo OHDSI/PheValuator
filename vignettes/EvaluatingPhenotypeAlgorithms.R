@@ -69,6 +69,8 @@ library(PheValuator)
 #                  includedCovariateIds = c(),
 #                  addDescendantsToExclude = TRUE,
 #                  mainPopulationCohort = 0, #use the entire subject population
+#                  mainPopulationCohortStartDay = 0,
+#                  mainPopulationCohortEndDay = 0,
 #                  baseSampleSize = 2000000,
 #                  lowerAgeLimit = 18,
 #                  upperAgeLimit = 90,

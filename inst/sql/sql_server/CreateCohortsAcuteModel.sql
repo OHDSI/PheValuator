@@ -16,6 +16,8 @@
 {DEFAULT @baseSampleSize = 150000 }
 {DEFAULT @xSpecSampleSize = 1500 }
 {DEFAULT @mainPopnCohort = 0 }
+{DEFAULT @mainPopnCohortStartDay = 0 }
+{DEFAULT @mainPopnCohortEndDay = 0 }
 {DEFAULT @exclCohort = 0 }
 {DEFAULT @visitLength = 1 }
 
@@ -93,9 +95,16 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 													where COHORT_DEFINITION_ID = @exclCohort)}
 					group by v.person_id, minDate)}
 				{@mainPopnCohort != 0} ? {
-					co.subject_id as person_id, co.COHORT_START_DATE as visit_start_date,
+					co.subject_id as person_id, v.visit_start_date,
 						row_number() over (order by NewId()) rn
 					from @cohort_database_schema.@cohort_database_table co
+					join @cdm_database_schema.visit_occurrence v
+					  on v.person_id = co.subject_id
+					    and v.visit_concept_id in (9201) --in-patient only
+					    and v.visit_start_date >= dateadd(day, @mainPopnCohortStartDay, co.COHORT_START_DATE)
+					    and v.visit_start_date <= dateadd(day, @mainPopnCohortEndDay, co.COHORT_START_DATE)
+					    and v.visit_start_date >= cast('@startDate' AS DATE)
+		          and v.visit_start_date <= cast('@endDate' AS DATE)
 					join @cdm_database_schema.person p
 					  on co.subject_id = p.person_id
 						and  year(co.COHORT_START_DATE) - year_of_birth >= @ageLimit

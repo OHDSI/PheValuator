@@ -21,6 +21,8 @@ createAcutePhenotypeModel(
   includedCovariateIds = c(),
   addDescendantsToExclude = FALSE,
   mainPopulationCohort = 0,
+  mainPopulationCohortStartDay = 0,
+  mainPopulationCohortEndDay = 0,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
@@ -86,6 +88,12 @@ concept_ids that were used to define the xSpec model (default=NULL)}
 
 \item{mainPopulationCohort}{The number of the cohort ID to be used as a base population for the model
 (default=NULL)}
+
+\item{mainPopulationCohortStartDay}{The number of days relative to the mainPopulationCohort cohort start date
+to begin including visits (default=0)}
+
+\item{mainPopulationCohortEndDay}{The number of days relative to the mainPopulationCohort cohort start date
+to end including visits (default=0)}
 
 \item{baseSampleSize}{The maximum number of subjects in the evaluation cohort (default=2M)}
 

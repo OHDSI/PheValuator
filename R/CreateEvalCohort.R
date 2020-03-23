@@ -48,6 +48,10 @@
 #' @param modelOutputFileName    A string designation for the training model file
 #' @param mainPopulationCohort   The number of the cohort to be used as a base population for the model
 #'                               (default=NULL)
+#' @param mainPopulationCohortStartDay The number of days relative to the mainPopulationCohort cohort start date
+#'                              to begin including visits (default=0)
+#' @param mainPopulationCohortEndDay   The number of days relative to the mainPopulationCohort cohort start date
+#'                              to end including visits (default=0)
 #' @param baseSampleSize         The maximum number of subjects in the evaluation cohort (default=2M)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
@@ -76,6 +80,8 @@ createEvaluationCohort <- function(connectionDetails,
                                    evaluationOutputFileName,
                                    modelOutputFileName,
                                    mainPopulationCohort = 0,
+                                   mainPopulationCohortStartDay = 0,
+                                   mainPopulationCohortEndDay = 0,
                                    baseSampleSize = 2000000,
                                    lowerAgeLimit = 0,
                                    upperAgeLimit = 120,
@@ -127,6 +133,8 @@ createEvaluationCohort <- function(connectionDetails,
   writeLines(paste("evaluationOutputFileName ", evaluationOutputFileName))
   writeLines(paste("modelOutputFileName ", modelOutputFileName))
   writeLines(paste("mainPopulationCohort ", mainPopulationCohort))
+  writeLines(paste("mainPopulationCohortStartDay ", mainPopulationCohortStartDay))
+  writeLines(paste("mainPopulationCohortEndDay ", mainPopulationCohortEndDay))
   writeLines(paste("baseSampleSize ", baseSampleSize))
   writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
   writeLines(paste("upperAgeLimit ", upperAgeLimit))
@@ -190,6 +198,8 @@ createEvaluationCohort <- function(connectionDetails,
                            baseSampleSize = baseSampleSize,
                            xSpecSampleSize = 100,
                            mainPopnCohort = mainPopulationCohort,
+                           mainPopnCohortStartDay = mainPopulationCohortStartDay,
+                           mainPopnCohortEndDay = mainPopulationCohortEndDay,
                            visitLength = visitLength)
 
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)

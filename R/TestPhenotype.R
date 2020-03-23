@@ -116,11 +116,19 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   }
 
   # pull the subjects in the phentype
-  sql <- paste("select distinct subject_id,  cohort_start_date, subject_id  subject_id2 from ",
+  if(modelType == "acute") {
+    sql <- paste("select distinct subject_id,  cohort_start_date, subject_id  subject_id2 from ",
                paste(cohortDatabaseSchema, ".", cohortDatabaseTable, sep = ""),
                " where cohort_definition_id = ",
                as.character(phenotypeCohortId),
                sep = "")
+  } else {
+    sql <- paste("select distinct subject_id, subject_id  subject_id2 from ",
+                 paste(cohortDatabaseSchema, ".", cohortDatabaseTable, sep = ""),
+                 " where cohort_definition_id = ",
+                 as.character(phenotypeCohortId),
+                 sep = "")
+  }
 
   sql <- SqlRender::render(sql = sql)
 
