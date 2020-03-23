@@ -2,15 +2,15 @@ errorCheck <- function(callingProgram,
                        connectionDetails,
                        cdmDatabaseSchema,
                        cohortDatabaseSchema,
-                       cohortDatabaseTable,
+                       cohortTable,
                        outDatabaseSchema,
                        modelOutputFileName,
                        evaluationOutputFileName,
-                       xSpecCohort,
-                       xSensCohort,
-                       prevalenceCohort,
-                       excludedConcepts,
-                       mainPopulationCohort,
+                       xSpecCohortId,
+                       xSensCohortId,
+                       prevalenceCohortId,
+                       excludedCovariateConceptIds,
+                       mainPopulationCohortId,
                        outFolder,
                        cohortDefinitionsToTest) {
 
@@ -39,23 +39,23 @@ errorCheck <- function(callingProgram,
 
     # get the count of subjects in the phenotype
     sql <- paste("select count(*) from ",
-                 paste(cohortDatabaseSchema, ".", cohortDatabaseTable, sep = ""),
+                 paste(cohortDatabaseSchema, ".", cohortTable, sep = ""),
                  " where cohort_definition_id = ",
-                 as.character(xSpecCohort),
+                 as.character(xSpecCohortId),
                  sep = "")
     cohortCount <- checkCohortCounts(connectionDetails = connectionDetails,
                                      sql = sql,
                                      action = "q")
 
     if(cohortCount == 0) {
-      stop(paste0("Error: there are no subjects in your xSpec cohort (", xSpecCohort, ")"))
+      stop(paste0("Error: there are no subjects in your xSpec cohort (", xSpecCohortId, ")"))
     }
 
     # get the count of subjects in the phenotype
     sql <- paste("select count(*) from ",
-                 paste(cohortDatabaseSchema, ".", cohortDatabaseTable, sep = ""),
+                 paste(cohortDatabaseSchema, ".", cohortTable, sep = ""),
                  " where cohort_definition_id = ",
-                 as.character(xSensCohort),
+                 as.character(xSensCohortId),
                  sep = "")
 
     cohortCount <- checkCohortCounts(connectionDetails = connectionDetails,
@@ -63,7 +63,7 @@ errorCheck <- function(callingProgram,
                                      action = "q")
 
     if(cohortCount == 0) {
-      stop(paste0("Error: there are no subjects in your xSens cohort (", xSensCohort, ")"))
+      stop(paste0("Error: there are no subjects in your xSens cohort (", xSensCohortId, ")"))
     }
 
 
@@ -99,18 +99,18 @@ errorCheck <- function(callingProgram,
 
   if(callingProgram == "createPhenotypeModel" | callingProgram == "createEvaluationCohort") {
 
-    if(mainPopulationCohort != 0) {
+    if(mainPopulationCohortId != 0) {
       # get the count of subjects in the phenotype
       sql <- paste("select count(*) from ",
-                   paste(cohortDatabaseSchema, ".", cohortDatabaseTable, sep = ""),
+                   paste(cohortDatabaseSchema, ".", cohortTable, sep = ""),
                    " where cohort_definition_id = ",
-                   as.character(mainPopulationCohort),
+                   as.character(mainPopulationCohortId),
                    sep = "")
       cohortCount <- checkCohortCounts(connectionDetails = connectionDetails,
                                        sql = sql,
                                        action = "q")
       if(cohortCount == 0) {
-        stop(paste0("Error: there are no subjects in your mainPopulationCohort cohort (", mainPopulationCohort, ")"))
+        stop(paste0("Error: there are no subjects in your mainPopulationCohortId cohort (", mainPopulationCohortId, ")"))
       }
     }
   }
@@ -119,18 +119,18 @@ errorCheck <- function(callingProgram,
   if(callingProgram == "createPhenotypeModel") {
     # get the count of subjects in the phenotype
     sql <- paste("select count(*) from ",
-                 paste(cohortDatabaseSchema, ".", cohortDatabaseTable, sep = ""),
+                 paste(cohortDatabaseSchema, ".", cohortTable, sep = ""),
                  " where cohort_definition_id = ",
-                 as.character(prevalenceCohort),
+                 as.character(prevalenceCohortId),
                  sep = "")
     cohortCount <- checkCohortCounts(connectionDetails = connectionDetails,
                                      sql = sql,
                                      action = "q")
     if(cohortCount == 0) {
-      stop(paste0("Error: there are no subjects in your prevalence cohort (", prevalenceCohort, ")"))
+      stop(paste0("Error: there are no subjects in your prevalence cohort (", prevalenceCohortId, ")"))
     }
 
-    if(length(excludedConcepts) == 0){
+    if(length(excludedCovariateConceptIds) == 0){
       stop(paste0("Error: there are no concepts to exclude from your model."))
     }
 

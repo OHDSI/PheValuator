@@ -36,25 +36,25 @@
 #' @param cohortDatabaseSchema   The name of the database schema that is the location where the cohort
 #'                               data used to define the at risk cohort is available. Requires read
 #'                               permissions to this database.
-#' @param cohortDatabaseTable    The tablename that contains the at risk cohort. The expectation is
+#' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
 #'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 #'                               COHORT_START_DATE, COHORT_END_DATE.
 #' @param outDatabaseSchema      The name of a database schema where the user has write capability.  A
 #'                               temporary cohort table will be created here.
 #' @param modelOutputFileName    A string designation for the training model file
 #' @param evaluationOutputFileName  A string designation for the evaluation cohort file
-#' @param conditionName          A short name for the health outcome of interest, e.g., "Hypertension" (default = "HOI")
-#' @param xSpecCohort            The number of the "extremely specific (xSpec)" cohort definition id in
+#' @param phenotypeEvaluationFileName A string designation for the .csv file with the results for the phenotype alogrithm evaluation
+#' @param xSpecCohortId            The number of the "extremely specific (xSpec)" cohort definition id in
 #'                               the cohort table (for noisy positives)
-#' @param xSensCohort            The number of the "extremely sensitive (xSens)" cohort definition id
+#' @param xSensCohortId            The number of the "extremely sensitive (xSens)" cohort definition id
 #'                               in the cohort table (used to exclude subjects from the base population)
-#' @param prevalenceCohort       The number of the cohort definition id to determine the disease prevalence,
-#'                               (default=xSensCohort)
-#' @param excludedConcepts       A list of conceptIds to exclude from featureExtraction.  These should include all
+#' @param prevalenceCohortId       The number of the cohort definition id to determine the disease prevalence,
+#'                               (default=xSensCohortId)
+#' @param excludedCovariateConceptIds       A list of conceptIds to exclude from featureExtraction.  These should include all
 #'                               concept_ids that were used to define the xSpec model (default=NULL)
 #' @param includedCovariateIds   A list of covariate IDs that should be restricted to.
 #' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
-#' @param mainPopulationCohort   The number of the cohort ID to be used as a base population for the model
+#' @param mainPopulationCohortId   The number of the cohort ID to be used as a base population for the model
 #'                               (default=NULL)
 #' @param baseSampleSize         The maximum number of subjects in the evaluation cohort (default=2M)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
@@ -65,7 +65,7 @@
 #' @param gender                 The gender(s) to be included (default c(8507, 8532))
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
-#' @param checkDates             Should dates be checked to remove future dates (default=TRUE)
+#' @param removeSubjectsWithFutureDates             Should dates be checked to remove future dates (default=TRUE)
 #' @param cdmVersion             The CDM version of the database (default=5)
 #' @param outFolder              The folder where the output files will be written (default=working directory)
 #' @param savePlpData            Should large PLP data file be saved (default=FALSE)
@@ -82,18 +82,18 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         cdmDatabaseSchema,
                                         databaseId = "TestDB",
                                         cohortDatabaseSchema,
-                                        cohortDatabaseTable,
+                                        cohortTable,
                                         outDatabaseSchema,
                                         modelOutputFileName = "train",
                                         evaluationOutputFileName = "eval",
-                                        conditionName = "HOI",
-                                        xSpecCohort,
-                                        xSensCohort,
-                                        prevalenceCohort = xSensCohort,
-                                        excludedConcepts = c(),
+                                        phenotypeEvaluationFileName = "results",
+                                        xSpecCohortId,
+                                        xSensCohortId,
+                                        prevalenceCohortId = xSensCohortId,
+                                        excludedCovariateConceptIds = c(),
                                         includedCovariateIds = c(),
                                         addDescendantsToExclude = FALSE,
-                                        mainPopulationCohort = 0,
+                                        mainPopulationCohortId = 0,
                                         baseSampleSize = 2000000,
                                         lowerAgeLimit = 0,
                                         upperAgeLimit = 120,
@@ -103,7 +103,7 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         gender = c(8507, 8532),
                                         startDate = "19000101",
                                         endDate = "21000101",
-                                        checkDates = TRUE,
+                                        removeSubjectsWithFutureDates = TRUE,
                                         cdmVersion = "5",
                                         outFolder = getwd(),
                                         savePlpData = F,
@@ -120,40 +120,66 @@ createChronicPhenotypeModel <- function(connectionDetails,
                connectionDetails = connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
                cohortDatabaseSchema = cohortDatabaseSchema,
-               cohortDatabaseTable = cohortDatabaseTable,
+               cohortTable = cohortTable,
                outDatabaseSchema = outDatabaseSchema,
                modelOutputFileName = modelOutputFileName,
                evaluationOutputFileName = evaluationOutputFileName,
-               xSpecCohort = xSpecCohort,
-               xSensCohort = xSensCohort,
-               prevalenceCohort = prevalenceCohort,
-               excludedConcepts = excludedConcepts,
-               mainPopulationCohort = mainPopulationCohort,
+               xSpecCohortId = xSpecCohortId,
+               xSensCohortId = xSensCohortId,
+               prevalenceCohortId = prevalenceCohortId,
+               excludedCovariateConceptIds = excludedCovariateConceptIds,
+               mainPopulationCohortId = mainPopulationCohortId,
                outFolder = outFolder,
                cohortDefinitionsToTest = cohortDefinitionsToTest)
+
+    writeLines(paste("xSpecCohortId ", xSpecCohortId))
+    writeLines(paste("cdmDatabaseSchema ", cdmDatabaseSchema))
+    writeLines(paste("cohortDatabaseSchema ", cohortDatabaseSchema))
+    writeLines(paste("cohortTable ", cohortTable))
+    writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
+    writeLines(paste("modelOutputFileName ", modelOutputFileName))
+    writeLines(paste("xSensCohortId ", xSensCohortId))
+    writeLines(paste("prevalenceCohortId ", prevalenceCohortId))
+    writeLines(paste("excludedCovariateConceptIds ", c(excludedCovariateConceptIds)))
+    writeLines(paste("addDescendantsToExclude ", addDescendantsToExclude))
+    writeLines(paste("mainPopulationCohortId ", mainPopulationCohortId))
+    writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
+    writeLines(paste("upperAgeLimit ", upperAgeLimit))
+    writeLines(paste("startDays ", startDays))
+    writeLines(paste("endDays ", endDays))
+    writeLines(paste("visitLength ", visitLength))
+    writeLines(paste("gender ", gender))
+    writeLines(paste("startDate ", startDate))
+    writeLines(paste("endDate ", endDate))
+    writeLines(paste("removeSubjectsWithFutureDates ", removeSubjectsWithFutureDates))
+    writeLines(paste("cdmVersion ", cdmVersion))
+    writeLines(paste("outFolder ", outFolder))
+
+    covariateSettings <- createDefaultChronicCovariateSettings(
+      excludedCovariateConceptIds = excludedCovariateConceptIds,
+      includedCovariateIds = includedCovariateIds,
+      addDescendantsToExclude = addDescendantsToExclude,
+      startDays = startDays,
+      endDays = endDays)
 
     model <- createPhenotypeModel(connectionDetails = connectionDetails,
                                   cdmDatabaseSchema = cdmDatabaseSchema,
                                   cohortDatabaseSchema = cohortDatabaseSchema,
-                                  cohortDatabaseTable = cohortDatabaseTable,
+                                  cohortTable = cohortTable,
                                   outDatabaseSchema = outDatabaseSchema,
                                   modelOutputFileName = modelOutputFileName,
-                                  xSpecCohort = xSpecCohort,
-                                  xSensCohort = xSensCohort,
-                                  prevalenceCohort = prevalenceCohort,
-                                  excludedConcepts = c(excludedConcepts),
-                                  includedCovariateIds = c(includedCovariateIds),
-                                  addDescendantsToExclude = addDescendantsToExclude,
-                                  mainPopulationCohort = mainPopulationCohort,
+                                  xSpecCohortId = xSpecCohortId,
+                                  xSensCohortId = xSensCohortId,
+                                  prevalenceCohortId = prevalenceCohortId,
+                                  covariateSettings = covariateSettings,
+                                  mainPopulationCohortId = mainPopulationCohortId,
                                   lowerAgeLimit = lowerAgeLimit,
                                   upperAgeLimit = upperAgeLimit,
-                                  startDays = startDays,
-                                  endDays = endDays,
                                   visitLength = visitLength,
                                   gender = c(gender),
                                   startDate = startDate ,
                                   endDate = endDate,
-                                  checkDates = checkDates,
+                                  removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
                                   cdmVersion = cdmVersion,
                                   outFolder = outFolder,
                                   modelType = 'chronic')
@@ -164,33 +190,60 @@ createChronicPhenotypeModel <- function(connectionDetails,
                connectionDetails = connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
                cohortDatabaseSchema = cohortDatabaseSchema,
-               cohortDatabaseTable = cohortDatabaseTable,
+               cohortTable = cohortTable,
                outDatabaseSchema = outDatabaseSchema,
                modelOutputFileName = modelOutputFileName,
                evaluationOutputFileName = evaluationOutputFileName,
-               xSpecCohort = xSpecCohort,
-               xSensCohort = xSensCohort,
-               prevalenceCohort = prevalenceCohort,
-               excludedConcepts = excludedConcepts,
-               mainPopulationCohort = mainPopulationCohort,
+               xSpecCohortId = xSpecCohortId,
+               xSensCohortId = xSensCohortId,
+               prevalenceCohortId = prevalenceCohortId,
+               excludedCovariateConceptIds = excludedCovariateConceptIds,
+               mainPopulationCohortId = mainPopulationCohortId,
                outFolder = outFolder,
                cohortDefinitionsToTest = cohortDefinitionsToTest)
 
+    writeLines(paste("xSpecCohortId ", xSpecCohortId))
+    writeLines(paste("xSensCohortId ", xSensCohortId))
+    writeLines(paste("cdmDatabaseSchema ", cdmDatabaseSchema))
+    writeLines(paste("cohortDatabaseSchema ", cohortDatabaseSchema))
+    writeLines(paste("cohortTable ", cohortTable))
+    writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
+    writeLines(paste("evaluationOutputFileName ", evaluationOutputFileName))
+    writeLines(paste("modelOutputFileName ", modelOutputFileName))
+    writeLines(paste("mainPopulationCohortId ", mainPopulationCohortId))
+    writeLines(paste("baseSampleSize ", baseSampleSize))
+    writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
+    writeLines(paste("upperAgeLimit ", upperAgeLimit))
+    writeLines(paste("startDays ", startDays))
+    writeLines(paste("endDays ", endDays))
+    writeLines(paste("visitLength ", visitLength))
+    writeLines(paste("gender ", gender))
+    writeLines(paste("startDate ", startDate))
+    writeLines(paste("endDate ", endDate))
+    writeLines(paste("cdmVersion ", cdmVersion))
+    writeLines(paste("outFolder ", outFolder))
+
+    covariateSettings <- createDefaultChronicCovariateSettings(
+      excludedCovariateConceptIds = excludedCovariateConceptIds,
+      includedCovariateIds = includedCovariateIds,
+      addDescendantsToExclude = addDescendantsToExclude,
+      startDays = startDays,
+      endDays = endDays)
+
     evalCohort <- createEvaluationCohort(connectionDetails = connectionDetails,
-                                         xSpecCohort = xSpecCohort,
-                                         xSensCohort = xSensCohort,
+                                         xSpecCohortId = xSpecCohortId,
+                                         xSensCohortId = xSensCohortId,
                                          cdmDatabaseSchema = cdmDatabaseSchema,
                                          cohortDatabaseSchema = cohortDatabaseSchema,
-                                         cohortDatabaseTable = cohortDatabaseTable,
+                                         cohortTable = cohortTable,
                                          outDatabaseSchema = outDatabaseSchema,
                                          evaluationOutputFileName = evaluationOutputFileName,
+                                         covariateSettings = covariateSettings,
                                          modelOutputFileName = modelOutputFileName,
-                                         mainPopulationCohort = mainPopulationCohort,
+                                         mainPopulationCohortId = mainPopulationCohortId,
                                          baseSampleSize = baseSampleSize,
                                          lowerAgeLimit = lowerAgeLimit,
                                          upperAgeLimit = upperAgeLimit,
-                                         startDays = startDays,
-                                         endDays = endDays,
                                          gender = c(gender),
                                          startDate = startDate,
                                          endDate = endDate,
@@ -205,27 +258,27 @@ createChronicPhenotypeModel <- function(connectionDetails,
                connectionDetails = connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
                cohortDatabaseSchema = cohortDatabaseSchema,
-               cohortDatabaseTable = cohortDatabaseTable,
+               cohortTable = cohortTable,
                outDatabaseSchema = outDatabaseSchema,
                modelOutputFileName = modelOutputFileName,
                evaluationOutputFileName = evaluationOutputFileName,
-               xSpecCohort = xSpecCohort,
-               xSensCohort = xSensCohort,
-               prevalenceCohort = prevalenceCohort,
-               excludedConcepts = excludedConcepts,
-               mainPopulationCohort = mainPopulationCohort,
+               xSpecCohortId = xSpecCohortId,
+               xSensCohortId = xSensCohortId,
+               prevalenceCohortId = prevalenceCohortId,
+               excludedCovariateConceptIds = excludedCovariateConceptIds,
+               mainPopulationCohortId = mainPopulationCohortId,
                outFolder = outFolder,
                cohortDefinitionsToTest = cohortDefinitionsToTest)
 
     cohortsToTest <- testPhenosFromFile(connectionDetails = connectionDetails,
                                         evaluationOutputFileName = evaluationOutputFileName,
+                                        phenotypeEvaluationFileName = phenotypeEvaluationFileName,
                                         databaseId = databaseId,
-                                        conditionName = conditionName,
-                                        xSpecCohort = xSpecCohort,
-                                        xSensCohort = xSensCohort,
-                                        prevalenceCohort = prevalenceCohort,
+                                        xSpecCohortId = xSpecCohortId,
+                                        xSensCohortId = xSensCohortId,
+                                        prevalenceCohortId = prevalenceCohortId,
                                         cohortDatabaseSchema = cohortDatabaseSchema,
-                                        cohortDatabaseTable = cohortDatabaseTable,
+                                        cohortTable = cohortTable,
                                         cohortDefinitionsToTest = cohortDefinitionsToTest,
                                         outFolder = outFolder,
                                         modelType = 'chronic')

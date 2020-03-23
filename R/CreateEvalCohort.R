@@ -27,9 +27,9 @@
 #'
 #' @param connectionDetails      connectionDetails created using the function createConnectionDetails
 #'                               in the DatabaseConnector package
-#' @param xSpecCohort            The number of the "extremely specific (xSpec)" cohort definition id in
+#' @param xSpecCohortId            The number of the "extremely specific (xSpec)" cohort definition id in
 #'                               the cohort table (for noisy positives)
-#' @param xSensCohort            The number of the "extremely sensitive (xSens)" cohort definition id in
+#' @param xSensCohortId            The number of the "extremely sensitive (xSens)" cohort definition id in
 #'                               the cohort table (for noisy negatives)
 #' @param cdmDatabaseSchema      The name of the database schema that contains the OMOP CDM instance.
 #'                               Requires read permissions to this database. On SQL Server, this should
@@ -38,25 +38,24 @@
 #' @param cohortDatabaseSchema   The name of the database schema that is the location where the cohort
 #'                               data used to define the at risk cohort is available. Requires read
 #'                               permissions to this database.
-#' @param cohortDatabaseTable    The tablename that contains the at risk cohort. The expectation is
+#' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
 #'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 #'                               COHORT_START_DATE, COHORT_END_DATE.
 #' @param outDatabaseSchema      The name of the database schema that is the location where the data
 #'                               used to define the outcome cohorts is available. Requires read
 #'                               permissions to this database.
+#' @param covariateSettings       A covariateSettings object as generated using createCovariateSettings()
 #' @param evaluationOutputFileName  A string designation for the evaluation cohort file
 #' @param modelOutputFileName    A string designation for the training model file
-#' @param mainPopulationCohort   The number of the cohort to be used as a base population for the model
+#' @param mainPopulationCohortId   The number of the cohort to be used as a base population for the model
 #'                               (default=NULL)
-#' @param mainPopulationCohortStartDay The number of days relative to the mainPopulationCohort cohort start date
+#' @param mainPopulationCohortIdStartDay The number of days relative to the mainPopulationCohortId cohort start date
 #'                              to begin including visits (default=0)
-#' @param mainPopulationCohortEndDay   The number of days relative to the mainPopulationCohort cohort start date
+#' @param mainPopulationCohortIdEndDay   The number of days relative to the mainPopulationCohortId cohort start date
 #'                              to end including visits (default=0)
 #' @param baseSampleSize         The maximum number of subjects in the evaluation cohort (default=2M)
 #' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
 #' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
-#' @param startDays              The days to include prior to the cohort start date (default=0)
-#' @param endDays                The days to include after the cohort start date (default=10000)
 #' @param visitLength            The minimum length of index visit (default=3)
 #' @param gender                 The gender(s) to be included (default c(8507, 8532))
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
@@ -71,22 +70,21 @@
 #'
 #' @export
 createEvaluationCohort <- function(connectionDetails,
-                                   xSpecCohort,
-                                   xSensCohort,
+                                   xSpecCohortId,
+                                   xSensCohortId,
                                    cdmDatabaseSchema,
                                    cohortDatabaseSchema,
-                                   cohortDatabaseTable,
+                                   cohortTable,
                                    outDatabaseSchema,
+                                   covariateSettings = covariateSettings,
                                    evaluationOutputFileName,
                                    modelOutputFileName,
-                                   mainPopulationCohort = 0,
-                                   mainPopulationCohortStartDay = 0,
-                                   mainPopulationCohortEndDay = 0,
+                                   mainPopulationCohortId = 0,
+                                   mainPopulationCohortIdStartDay = 0,
+                                   mainPopulationCohortIdEndDay = 0,
                                    baseSampleSize = 2000000,
                                    lowerAgeLimit = 0,
                                    upperAgeLimit = 120,
-                                   startDays = 0,
-                                   endDays = 10000,
                                    visitLength = 3,
                                    gender = c(8507, 8532),
                                    startDate = "19001010",
@@ -105,15 +103,15 @@ createEvaluationCohort <- function(connectionDetails,
     stop("...modelType must be acute or chronic")
   if (length(connectionDetails) == 0)
     stop("...must supply a connection string")
-  if (xSpecCohort == "")
+  if (xSpecCohortId == "")
     stop("...must have an xSpec cohort id (e.g., 1234)")
-  if (xSensCohort == "")
+  if (xSensCohortId == "")
     stop("...must have an xSens cohort id (e.g., 1234)")
   if (cdmDatabaseSchema == "")
     stop("....must have a defined CDM schema (e.g., \"YourCDM.YourCDMSchema\")")
   if (cohortDatabaseSchema == "")
     stop("....must have a defined Cohort schema (e.g., \"YourCDM.YourCohortSchema\")")
-  if (cohortDatabaseTable == "")
+  if (cohortTable == "")
     stop("....must have a defined Cohort table (e.g., \"cohort\")")
   if (outDatabaseSchema == "")
     stop("....must have a defined Out Database schema (e.g., \"scratch.dbo\")")
@@ -124,28 +122,6 @@ createEvaluationCohort <- function(connectionDetails,
   if (modelOutputFileName == evaluationOutputFileName)
     stop("....evaluationOutputFileName cannot be the same as the modelOutputFileName")
 
-  writeLines(paste("xSpecCohort ", xSpecCohort))
-  writeLines(paste("xSensCohort ", xSensCohort))
-  writeLines(paste("cdmDatabaseSchema ", cdmDatabaseSchema))
-  writeLines(paste("cohortDatabaseSchema ", cohortDatabaseSchema))
-  writeLines(paste("cohortDatabaseTable ", cohortDatabaseTable))
-  writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
-  writeLines(paste("evaluationOutputFileName ", evaluationOutputFileName))
-  writeLines(paste("modelOutputFileName ", modelOutputFileName))
-  writeLines(paste("mainPopulationCohort ", mainPopulationCohort))
-  writeLines(paste("mainPopulationCohortStartDay ", mainPopulationCohortStartDay))
-  writeLines(paste("mainPopulationCohortEndDay ", mainPopulationCohortEndDay))
-  writeLines(paste("baseSampleSize ", baseSampleSize))
-  writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
-  writeLines(paste("upperAgeLimit ", upperAgeLimit))
-  writeLines(paste("startDays ", startDays))
-  writeLines(paste("endDays ", endDays))
-  writeLines(paste("visitLength ", visitLength))
-  writeLines(paste("gender ", gender))
-  writeLines(paste("startDate ", startDate))
-  writeLines(paste("endDate ", endDate))
-  writeLines(paste("cdmVersion ", cdmVersion))
-  writeLines(paste("outFolder ", outFolder))
 
   workFolder <- outFolder
 
@@ -185,8 +161,8 @@ createEvaluationCohort <- function(connectionDetails,
   sql <- SqlRender::render(sqlScript,
                            cdm_database_schema = cdmDatabaseSchema,
                            cohort_database_schema = cohortDatabaseSchema,
-                           cohort_database_table = cohortDatabaseTable,
-                           x_spec_cohort = xSpecCohort,
+                           cohort_database_table = cohortTable,
+                           x_spec_cohort = xSpecCohortId,
                            tempDB = outDatabaseSchema,
                            test_cohort = test_cohort,
                            exclCohort = 0,
@@ -197,9 +173,9 @@ createEvaluationCohort <- function(connectionDetails,
                            endDate = endDate,
                            baseSampleSize = baseSampleSize,
                            xSpecSampleSize = 100,
-                           mainPopnCohort = mainPopulationCohort,
-                           mainPopnCohortStartDay = mainPopulationCohortStartDay,
-                           mainPopnCohortEndDay = mainPopulationCohortEndDay,
+                           mainPopnCohort = mainPopulationCohortId,
+                           mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
+                           mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
                            visitLength = visitLength)
 
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
@@ -209,44 +185,13 @@ createEvaluationCohort <- function(connectionDetails,
   # will only use the covariates with non-zero betas
   lrNonZeroCovs <- c(lr_results$model$varImp$covariateId[lr_results$model$varImp$covariateValue !=
                                                            0])
-  covariateSettings <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
-                                                                  useDemographicsAgeGroup = TRUE,
-                                                                  useDemographicsRace = TRUE,
-                                                                  useDemographicsEthnicity = TRUE,
-                                                                  useDemographicsPostObservationTime = TRUE,
-                                                                  useConditionOccurrenceLongTerm = TRUE,
-                                                                  useConditionOccurrencePrimaryInpatientLongTerm = TRUE,
-                                                                  useConditionGroupEraLongTerm = TRUE,
-                                                                  useDrugExposureLongTerm = TRUE,
-                                                                  useDrugEraLongTerm = TRUE,
-                                                                  useDrugGroupEraLongTerm = TRUE,
-                                                                  useProcedureOccurrenceLongTerm = TRUE,
-                                                                  useDeviceExposureLongTerm = TRUE,
-                                                                  useMeasurementLongTerm = TRUE,
-                                                                  useMeasurementValueLongTerm = TRUE,
-                                                                  useMeasurementRangeGroupLongTerm = TRUE,
-                                                                  useObservationLongTerm = TRUE,
-                                                                  useDistinctConditionCountLongTerm = TRUE,
-                                                                  useDistinctIngredientCountLongTerm = TRUE,
-                                                                  useDistinctProcedureCountLongTerm = TRUE,
-                                                                  useDistinctMeasurementCountLongTerm = TRUE,
-                                                                  useVisitCountLongTerm = TRUE,
-                                                                  useVisitConceptCountLongTerm = TRUE,
-                                                                  longTermStartDays = startDays,
-                                                                  endDays = endDays,
-                                                                  includedCovariateConceptIds = c(),
-                                                                  addDescendantsToInclude = TRUE,
-                                                                  excludedCovariateConceptIds = c(),
-                                                                  addDescendantsToExclude = TRUE,
-                                                                  includedCovariateIds = c())
-
   covariateSettings$includedCovariateIds <- lrNonZeroCovs
 
   plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
                                                 cdmDatabaseSchema = paste(cdmDatabaseSchema,
                                                                           sep = ""),
                                                 cohortId = 0,
-                                                outcomeIds = xSpecCohort,
+                                                outcomeIds = xSpecCohortId,
                                                 outcomeDatabaseSchema = outDatabaseSchema,
                                                 outcomeTable = test_cohort,
                                                 cohortDatabaseSchema = outDatabaseSchema,
@@ -268,7 +213,7 @@ createEvaluationCohort <- function(connectionDetails,
 
   population <- PatientLevelPrediction::createStudyPopulation(plpData,
                                                               population = NULL,
-                                                              outcomeId = xSpecCohort,
+                                                              outcomeId = xSpecCohortId,
                                                               firstExposureOnly = FALSE,
                                                               washoutPeriod = 0,
                                                               removeSubjectsWithPriorOutcome = TRUE,
@@ -287,11 +232,11 @@ createEvaluationCohort <- function(connectionDetails,
 
   #pull in the xSens cohort
   sql <- paste0("select subject_id, cohort_start_date, observation_period_start_date ",
-                "from ", cohortDatabaseSchema, ".", cohortDatabaseTable," co ",
+                "from ", cohortDatabaseSchema, ".", cohortTable," co ",
                 "join ", cdmDatabaseSchema, ".observation_period op ",
                 "on co.subject_id = op.person_id ",
                 "and cohort_start_date between observation_period_start_date and observation_period_end_date ",
-                "where cohort_definition_id = ", xSensCohort)
+                "where cohort_definition_id = ", xSensCohortId)
 
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
@@ -301,18 +246,18 @@ createEvaluationCohort <- function(connectionDetails,
   finalPopn$daysToXSens <- as.integer(finalPopn$COHORT_START_DATE - finalPopn$OBSERVATION_PERIOD_START_DATE)
 
   #add other parameters to the input settings list
-  appResults$PheValuator$inputSetting$startDays <- startDays
-  appResults$PheValuator$inputSetting$endDays <- endDays
+  appResults$PheValuator$inputSetting$startDays <- covariateSettings$longTermStartDays
+  appResults$PheValuator$inputSetting$endDays <- covariateSettings$endDays
   appResults$PheValuator$inputSetting$visitLength <- visitLength
-  appResults$PheValuator$inputSetting$xSpecCohort <- xSpecCohort
-  appResults$PheValuator$inputSetting$xSensCohort <- xSensCohort
+  appResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
+  appResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
   appResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
   appResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
   appResults$PheValuator$inputSetting$gender <-  paste(unlist(gender), collapse=', ')
   appResults$PheValuator$inputSetting$startDate <- startDate
   appResults$PheValuator$inputSetting$endDate <- endDate
   appResults$PheValuator$inputSetting$modelOutputFileName <- modelOutputFileName
-  appResults$PheValuator$inputSetting$mainPopulationCohort <- mainPopulationCohort
+  appResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId
   appResults$PheValuator$inputSetting$modelType <- modelType
   appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
 

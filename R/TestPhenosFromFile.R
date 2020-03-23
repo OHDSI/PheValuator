@@ -1,12 +1,12 @@
 testPhenosFromFile <- function(connectionDetails,
                                evaluationOutputFileName,
+                               phenotypeEvaluationFileName,
                                databaseId,
-                               conditionName,
-                               xSpecCohort,
-                               xSensCohort,
-                               prevalenceCohort,
+                               xSpecCohortId,
+                               xSensCohortId,
+                               prevalenceCohortId,
                                cohortDatabaseSchema,
-                               cohortDatabaseTable,
+                               cohortTable,
                                cohortDefinitionsToTest,
                                outFolder,
                                modelType) {
@@ -24,13 +24,13 @@ testPhenosFromFile <- function(connectionDetails,
                                             phenotypeCohortId = phenoFile$atlasId[[phenos]],
                                             phenotypeText  = phenoFile$atlasName[[phenos]],
                                             order = phenos,
-                                            modelText = conditionName,
-                                            xSpecCohort = xSpecCohort,
-                                            xSensCohort = xSensCohort,
-                                            prevalenceCohort = prevalenceCohort,
+                                            modelText = phenoFile$name[[phenos]],
+                                            xSpecCohortId = xSpecCohortId,
+                                            xSensCohortId = xSensCohortId,
+                                            prevalenceCohortId = prevalenceCohortId,
                                             cohortDatabaseSchema = cohortDatabaseSchema,
-                                            cohortDatabaseTable = cohortDatabaseTable,
-                                            cdmShortName = databaseId,
+                                            cohortTable = cohortTable,
+                                            databaseId = databaseId,
                                             washoutPeriod = phenoFile$washoutPeriod[[phenos]],
                                             modelType = modelType)
 
@@ -41,10 +41,9 @@ testPhenosFromFile <- function(connectionDetails,
     }
 
     write.csv(results[with(results, order(`Phenotype Order`, xtfrm(CDM))),],
-              file.path(outFolder, paste("PerformanceResults", conditionName, "_", databaseId, ".csv", sep = "")), row.names = FALSE)
+              file.path(outFolder, paste0(phenotypeEvaluationFileName, ".csv")), row.names = FALSE)
 
-    writeLines(paste0("\nOutput file saved as: ", file.path(outFolder, paste("PerformanceResults_", modelType, "_",
-                                                                             conditionName, "_", databaseId, ".csv", sep = ""))))
+    writeLines(paste0("\nOutput file saved as: ", file.path(outFolder, paste0(phenotypeEvaluationFileName, ".csv")), sep = ""))
 
   } else {
     writeLines(paste0("Missing file: ", file.path(outFolder,evaluationOutputFileName,".rds")))

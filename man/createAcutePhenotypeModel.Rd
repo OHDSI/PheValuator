@@ -9,20 +9,20 @@ createAcutePhenotypeModel(
   cdmDatabaseSchema,
   databaseId = "TestDB",
   cohortDatabaseSchema,
-  cohortDatabaseTable,
+  cohortTable,
   outDatabaseSchema,
   modelOutputFileName = "train",
   evaluationOutputFileName = "eval",
-  conditionName = "HOI",
-  xSpecCohort,
-  xSensCohort,
-  prevalenceCohort = xSensCohort,
-  excludedConcepts = c(),
+  phenotypeEvaluationFileName = "results",
+  xSpecCohortId,
+  xSensCohortId,
+  prevalenceCohortId = xSensCohortId,
+  excludedCovariateConceptIds = c(),
   includedCovariateIds = c(),
   addDescendantsToExclude = FALSE,
-  mainPopulationCohort = 0,
-  mainPopulationCohortStartDay = 0,
-  mainPopulationCohortEndDay = 0,
+  mainPopulationCohortId = 0,
+  mainPopulationCohortIdStartDay = 0,
+  mainPopulationCohortIdEndDay = 0,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
@@ -32,7 +32,7 @@ createAcutePhenotypeModel(
   gender = c(8507, 8532),
   startDate = "19000101",
   endDate = "21000101",
-  checkDates = TRUE,
+  removeSubjectsWithFutureDates = TRUE,
   cdmVersion = "5",
   outFolder = getwd(),
   excludeModelFromEvaluation = TRUE,
@@ -57,7 +57,7 @@ specifiy both the database and the schema, so for example
 data used to define the at risk cohort is available. Requires read
 permissions to this database.}
 
-\item{cohortDatabaseTable}{The tablename that contains the at risk cohort. The expectation is
+\item{cohortTable}{The tablename that contains the at risk cohort. The expectation is
 cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 COHORT_START_DATE, COHORT_END_DATE.}
 
@@ -68,31 +68,31 @@ temporary cohort table will be created here.}
 
 \item{evaluationOutputFileName}{A string designation for the evaluation cohort file}
 
-\item{conditionName}{A short name for the health outcome of interest, e.g., "Hypertension" (default = "HOI")}
+\item{phenotypeEvaluationFileName}{A string designation for the .csv file with the results for the phenotype alogrithm evaluation}
 
-\item{xSpecCohort}{The number of the "extremely specific (xSpec)" cohort definition id in
+\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort definition id in
 the cohort table (for noisy positives)}
 
-\item{xSensCohort}{The number of the "extremely sensitive (xSens)" cohort definition id
+\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort definition id
 in the cohort table (used to exclude subjects from the base population)}
 
-\item{prevalenceCohort}{The number of the cohort definition id to determine the disease prevalence,
-(default=xSensCohort)}
+\item{prevalenceCohortId}{The number of the cohort definition id to determine the disease prevalence,
+(default=xSensCohortId)}
 
-\item{excludedConcepts}{A list of conceptIds to exclude from featureExtraction.  These should include all
+\item{excludedCovariateConceptIds}{A list of conceptIds to exclude from featureExtraction.  These should include all
 concept_ids that were used to define the xSpec model (default=NULL)}
 
 \item{includedCovariateIds}{A list of covariate IDs that should be restricted to.}
 
 \item{addDescendantsToExclude}{Should descendants of excluded concepts also be excluded? (default=FALSE)}
 
-\item{mainPopulationCohort}{The number of the cohort ID to be used as a base population for the model
+\item{mainPopulationCohortId}{The number of the cohort ID to be used as a base population for the model
 (default=NULL)}
 
-\item{mainPopulationCohortStartDay}{The number of days relative to the mainPopulationCohort cohort start date
+\item{mainPopulationCohortIdStartDay}{The number of days relative to the mainPopulationCohortId cohort start date
 to begin including visits (default=0)}
 
-\item{mainPopulationCohortEndDay}{The number of days relative to the mainPopulationCohort cohort start date
+\item{mainPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId cohort start date
 to end including visits (default=0)}
 
 \item{baseSampleSize}{The maximum number of subjects in the evaluation cohort (default=2M)}
@@ -113,7 +113,7 @@ to end including visits (default=0)}
 
 \item{endDate}{The ending date for including subjects in the model (default=NULL)}
 
-\item{checkDates}{Should dates be checked to remove future dates (default=TRUE)}
+\item{removeSubjectsWithFutureDates}{Should dates be checked to remove future dates (default=TRUE)}
 
 \item{cdmVersion}{The CDM version of the database (default=5)}
 

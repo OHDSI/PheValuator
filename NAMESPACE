@@ -2,6 +2,7 @@
 
 export(createAcutePhenotypeModel)
 export(createChronicPhenotypeModel)
+export(createDefaultAcuteCovariateSettings)
 export(createEvaluationCohort)
 export(createPhenotypeModel)
 export(testPhenotypeAlgorithm)

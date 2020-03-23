@@ -31,21 +31,21 @@
 #' @param evaluationOutputFileName        The full file name with path for the evaluation file
 #' @param phenotypeCohortId      The number of the cohort of the phenotype algorithm to test
 #' @param phenotypeText          A string to identify the phenotype algorithm in the output file
-#' @param cdmShortName           A string to identify the CDM tested (Default = NULL)
+#' @param databaseId             A string to identify the CDM tested (Default = NULL)
 #' @param order                  The order of this algorithm for sorting in the output file (used when
 #'                               there are multiple phenotypes to test)  (Default = 1)
 #' @param modelText              Descriptive name for the model (Default = NULL)
-#' @param xSpecCohort            The number of the "extremely specific (xSpec)" cohort definition id in
+#' @param xSpecCohortId            The number of the "extremely specific (xSpec)" cohort definition id in
 #'                               the cohort table (for noisy positives) (Default = NULL)
-#' @param xSensCohort            The number of the "extremely sensitive (xSens)" cohort definition id
+#' @param xSensCohortId            The number of the "extremely sensitive (xSens)" cohort definition id
 #'                               in the cohort table (used to exclude subjects from the base population) (Default = NULL)
-#' @param prevalenceCohort       The number of the cohort definition id to determine the disease prevalence,
-#'                               (default=xSensCohort)
+#' @param prevalenceCohortId       The number of the cohort definition id to determine the disease prevalence,
+#'                               (default=xSensCohortId)
 #' @param cohortDatabaseSchema   The name of the database schema that is the location where the cohort
 #'                               data used to define the at risk cohort is available. Requires read
 #'                               permissions to this database.
-#' @param cohortDatabaseTable    The tablename that contains the at risk cohort. The expectation is
-#'                               cohortDatabaseTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
+#' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
+#'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 #'                               COHORT_START_DATE, COHORT_END_DATE.
 #' @param washoutPeriod          The mininum required continuous observation time prior to index date
 #'                               for subjects within the cohort to test (Default = 0).
@@ -62,15 +62,15 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                                    cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
                                    evaluationOutputFileName,
                                    phenotypeCohortId,
-                                   cdmShortName = "",
+                                   databaseId = "",
                                    phenotypeText = "",
                                    order = 1,
                                    modelText = "",
-                                   xSpecCohort = "",
-                                   xSensCohort = "",
-                                   prevalenceCohort = "",
+                                   xSpecCohortId = "",
+                                   xSensCohortId = "",
+                                   prevalenceCohortId = "",
                                    cohortDatabaseSchema,
-                                   cohortDatabaseTable,
+                                   cohortTable,
                                    washoutPeriod = 0,
                                    modelType = "chronic") {
 
@@ -92,7 +92,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     stop("....must have a defined Evaluation Output File Name (e.g., \"c:/phenotypes/lr_results_10XDiabetes_dod_ePPV1_1.rds\")")
   if (cohortDatabaseSchema == "")
     stop("...must have a defined Cohort schema (e.g., \"YourCDM.YourSchema\")")
-  if (cohortDatabaseTable == "")
+  if (cohortTable == "")
     stop("....must have a defined Cohort table (e.g., \"cohort\")")
   if (phenotypeCohortId == "")
     stop(".....must have a defined Phenotype Cohort ID to test (e.g., 1234)")
@@ -118,13 +118,13 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   # pull the subjects in the phentype
   if(modelType == "acute") {
     sql <- paste("select distinct subject_id,  cohort_start_date, subject_id  subject_id2 from ",
-               paste(cohortDatabaseSchema, ".", cohortDatabaseTable, sep = ""),
+               paste(cohortDatabaseSchema, ".", cohortTable, sep = ""),
                " where cohort_definition_id = ",
                as.character(phenotypeCohortId),
                sep = "")
   } else {
     sql <- paste("select distinct subject_id, subject_id  subject_id2 from ",
-                 paste(cohortDatabaseSchema, ".", cohortDatabaseTable, sep = ""),
+                 paste(cohortDatabaseSchema, ".", cohortTable, sep = ""),
                  " where cohort_definition_id = ",
                  as.character(phenotypeCohortId),
                  sep = "")
@@ -199,7 +199,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     fullTable <- fullTable[PN == 1, `:=`(c("TN", "FN"), list(0, 0))]
 
     newRow <- NULL
-    newRow$CDM <- as.character(cdmShortName)
+    newRow$CDM <- as.character(databaseId)
     newRow$`Phenotype Algorithm` <- as.character(phenotypeText)
 
     # the values ('counts') for true and false positives and negatives will be the sum of the respective
@@ -357,9 +357,9 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     newRow$`Phenotype Order` <- as.numeric(order)
     newRow$`Model Name` <- as.character(modelText)
 
-    newRow$`xSpec Cohort` <- as.character(xSpecCohort)
-    newRow$`xSens Cohort` <- as.character(xSensCohort)
-    newRow$`Prevalence Cohort` <- as.character(prevalenceCohort)
+    newRow$`xSpec Cohort` <- as.character(xSpecCohortId)
+    newRow$`xSens Cohort` <- as.character(xSensCohortId)
+    newRow$`Prevalence Cohort` <- as.character(prevalenceCohortId)
 
     newRow$`Evaluation Output File Name` <- evaluationOutputFileName
 

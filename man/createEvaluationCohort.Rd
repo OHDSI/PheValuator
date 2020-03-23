@@ -6,22 +6,21 @@
 \usage{
 createEvaluationCohort(
   connectionDetails,
-  xSpecCohort,
-  xSensCohort,
+  xSpecCohortId,
+  xSensCohortId,
   cdmDatabaseSchema,
   cohortDatabaseSchema,
-  cohortDatabaseTable,
+  cohortTable,
   outDatabaseSchema,
+  covariateSettings = covariateSettings,
   evaluationOutputFileName,
   modelOutputFileName,
-  mainPopulationCohort = 0,
-  mainPopulationCohortStartDay = 0,
-  mainPopulationCohortEndDay = 0,
+  mainPopulationCohortId = 0,
+  mainPopulationCohortIdStartDay = 0,
+  mainPopulationCohortIdEndDay = 0,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
-  startDays = 0,
-  endDays = 10000,
   visitLength = 3,
   gender = c(8507, 8532),
   startDate = "19001010",
@@ -37,10 +36,10 @@ createEvaluationCohort(
 \item{connectionDetails}{connectionDetails created using the function createConnectionDetails
 in the DatabaseConnector package}
 
-\item{xSpecCohort}{The number of the "extremely specific (xSpec)" cohort definition id in
+\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort definition id in
 the cohort table (for noisy positives)}
 
-\item{xSensCohort}{The number of the "extremely sensitive (xSens)" cohort definition id in
+\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort definition id in
 the cohort table (for noisy negatives)}
 
 \item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM instance.
@@ -52,7 +51,7 @@ specifiy both the database and the schema, so for example
 data used to define the at risk cohort is available. Requires read
 permissions to this database.}
 
-\item{cohortDatabaseTable}{The tablename that contains the at risk cohort. The expectation is
+\item{cohortTable}{The tablename that contains the at risk cohort. The expectation is
 cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 COHORT_START_DATE, COHORT_END_DATE.}
 
@@ -60,17 +59,19 @@ COHORT_START_DATE, COHORT_END_DATE.}
 used to define the outcome cohorts is available. Requires read
 permissions to this database.}
 
+\item{covariateSettings}{A covariateSettings object as generated using createCovariateSettings()}
+
 \item{evaluationOutputFileName}{A string designation for the evaluation cohort file}
 
 \item{modelOutputFileName}{A string designation for the training model file}
 
-\item{mainPopulationCohort}{The number of the cohort to be used as a base population for the model
+\item{mainPopulationCohortId}{The number of the cohort to be used as a base population for the model
 (default=NULL)}
 
-\item{mainPopulationCohortStartDay}{The number of days relative to the mainPopulationCohort cohort start date
+\item{mainPopulationCohortIdStartDay}{The number of days relative to the mainPopulationCohortId cohort start date
 to begin including visits (default=0)}
 
-\item{mainPopulationCohortEndDay}{The number of days relative to the mainPopulationCohort cohort start date
+\item{mainPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId cohort start date
 to end including visits (default=0)}
 
 \item{baseSampleSize}{The maximum number of subjects in the evaluation cohort (default=2M)}
@@ -78,10 +79,6 @@ to end including visits (default=0)}
 \item{lowerAgeLimit}{The lower age for subjects in the model (default=NULL)}
 
 \item{upperAgeLimit}{The upper age for subjects in the model (default=NULL)}
-
-\item{startDays}{The days to include prior to the cohort start date (default=0)}
-
-\item{endDays}{The days to include after the cohort start date (default=10000)}
 
 \item{visitLength}{The minimum length of index visit (default=3)}
 
