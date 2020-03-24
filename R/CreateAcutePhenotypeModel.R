@@ -40,7 +40,7 @@
 #' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
 #'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 #'                               COHORT_START_DATE, COHORT_END_DATE.
-#' @param outDatabaseSchema      The name of a database schema where the user has write capability.  A
+#' @param workDatabaseSchema      The name of a database schema where the user has write capability.  A
 #'                               temporary cohort table will be created here.
 #' @param modelOutputFileName    A string designation for the training model file
 #' @param evaluationOutputFileName  A string designation for the evaluation cohort file
@@ -89,7 +89,7 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                       databaseId = "TestDB",
                                       cohortDatabaseSchema,
                                       cohortTable,
-                                      outDatabaseSchema,
+                                      workDatabaseSchema,
                                       modelOutputFileName = "train",
                                       evaluationOutputFileName = "eval",
                                       phenotypeEvaluationFileName = "results",
@@ -130,7 +130,7 @@ createAcutePhenotypeModel <- function(connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
                cohortDatabaseSchema = cohortDatabaseSchema,
                cohortTable = cohortTable,
-               outDatabaseSchema = outDatabaseSchema,
+               workDatabaseSchema = workDatabaseSchema,
                modelOutputFileName = modelOutputFileName,
                evaluationOutputFileName = evaluationOutputFileName,
                xSpecCohortId = xSpecCohortId,
@@ -145,7 +145,7 @@ createAcutePhenotypeModel <- function(connectionDetails,
     writeLines(paste("cdmDatabaseSchema ", cdmDatabaseSchema))
     writeLines(paste("cohortDatabaseSchema ", cohortDatabaseSchema))
     writeLines(paste("cohortTable ", cohortTable))
-    writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
+    writeLines(paste("workDatabaseSchema ", workDatabaseSchema))
     writeLines(paste("modelOutputFileName ", modelOutputFileName))
     writeLines(paste("xSensCohortId ", xSensCohortId))
     writeLines(paste("prevalenceCohortId ", prevalenceCohortId))
@@ -177,7 +177,7 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                   cdmDatabaseSchema = cdmDatabaseSchema,
                                   cohortDatabaseSchema = cohortDatabaseSchema,
                                   cohortTable = cohortTable,
-                                  outDatabaseSchema = outDatabaseSchema,
+                                  workDatabaseSchema = workDatabaseSchema,
                                   modelOutputFileName = modelOutputFileName,
                                   xSpecCohortId = xSpecCohortId,
                                   xSensCohortId = xSensCohortId,
@@ -204,7 +204,7 @@ createAcutePhenotypeModel <- function(connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
                cohortDatabaseSchema = cohortDatabaseSchema,
                cohortTable = cohortTable,
-               outDatabaseSchema = outDatabaseSchema,
+               workDatabaseSchema = workDatabaseSchema,
                modelOutputFileName = modelOutputFileName,
                evaluationOutputFileName = evaluationOutputFileName,
                xSpecCohortId = xSpecCohortId,
@@ -220,7 +220,7 @@ createAcutePhenotypeModel <- function(connectionDetails,
     writeLines(paste("cdmDatabaseSchema ", cdmDatabaseSchema))
     writeLines(paste("cohortDatabaseSchema ", cohortDatabaseSchema))
     writeLines(paste("cohortTable ", cohortTable))
-    writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
+    writeLines(paste("workDatabaseSchema ", workDatabaseSchema))
     writeLines(paste("evaluationOutputFileName ", evaluationOutputFileName))
     writeLines(paste("modelOutputFileName ", modelOutputFileName))
     writeLines(paste("mainPopulationCohortId ", mainPopulationCohortId))
@@ -251,7 +251,7 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                          cdmDatabaseSchema = cdmDatabaseSchema,
                                          cohortDatabaseSchema = cohortDatabaseSchema,
                                          cohortTable = cohortTable,
-                                         outDatabaseSchema = outDatabaseSchema,
+                                         workDatabaseSchema = workDatabaseSchema,
                                          covariateSettings = covariateSettings,
                                          evaluationOutputFileName = evaluationOutputFileName,
                                          modelOutputFileName = modelOutputFileName,
@@ -278,7 +278,7 @@ createAcutePhenotypeModel <- function(connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
                cohortDatabaseSchema = cohortDatabaseSchema,
                cohortTable = cohortTable,
-               outDatabaseSchema = outDatabaseSchema,
+               workDatabaseSchema = workDatabaseSchema,
                modelOutputFileName = modelOutputFileName,
                evaluationOutputFileName = evaluationOutputFileName,
                xSpecCohortId = xSpecCohortId,

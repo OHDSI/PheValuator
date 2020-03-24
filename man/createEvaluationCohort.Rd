@@ -11,7 +11,7 @@ createEvaluationCohort(
   cdmDatabaseSchema,
   cohortDatabaseSchema,
   cohortTable,
-  outDatabaseSchema,
+  workDatabaseSchema,
   covariateSettings = covariateSettings,
   evaluationOutputFileName,
   modelOutputFileName,
@@ -55,7 +55,7 @@ permissions to this database.}
 cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 COHORT_START_DATE, COHORT_END_DATE.}
 
-\item{outDatabaseSchema}{The name of the database schema that is the location where the data
+\item{workDatabaseSchema}{The name of the database schema that is the location where the data
 used to define the outcome cohorts is available. Requires read
 permissions to this database.}
 

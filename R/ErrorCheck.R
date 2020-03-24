@@ -3,7 +3,7 @@ errorCheck <- function(callingProgram,
                        cdmDatabaseSchema,
                        cohortDatabaseSchema,
                        cohortTable,
-                       outDatabaseSchema,
+                       workDatabaseSchema,
                        modelOutputFileName,
                        evaluationOutputFileName,
                        xSpecCohortId,
@@ -78,9 +78,9 @@ errorCheck <- function(callingProgram,
                                      action = "q")
 
 
-    #check write capability of outDatabaseSchema
+    #check write capability of workDatabaseSchema
     # sql <- paste("select top 10 * ",
-    #              "into ", outDatabaseSchema, ".jns_test12345 ",
+    #              "into ", workDatabaseSchema, ".jns_test12345 ",
     #              "from ", cdmDatabaseSchema, ".cdm_source",
     #              sep = "")
     #
@@ -88,7 +88,7 @@ errorCheck <- function(callingProgram,
     #                                  sql = sql,
     #                                  action = "e")
     #
-    # sql <- paste("drop table ", outDatabaseSchema, ".jns_test12345",
+    # sql <- paste("drop table ", workDatabaseSchema, ".jns_test12345",
     #              sep = "")
     #
     # cohortCount <- checkCohortCounts(connectionDetails = connectionDetails,

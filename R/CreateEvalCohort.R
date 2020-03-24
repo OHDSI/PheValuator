@@ -41,7 +41,7 @@
 #' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
 #'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 #'                               COHORT_START_DATE, COHORT_END_DATE.
-#' @param outDatabaseSchema      The name of the database schema that is the location where the data
+#' @param workDatabaseSchema      The name of the database schema that is the location where the data
 #'                               used to define the outcome cohorts is available. Requires read
 #'                               permissions to this database.
 #' @param covariateSettings       A covariateSettings object as generated using createCovariateSettings()
@@ -75,7 +75,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    cdmDatabaseSchema,
                                    cohortDatabaseSchema,
                                    cohortTable,
-                                   outDatabaseSchema,
+                                   workDatabaseSchema,
                                    covariateSettings = covariateSettings,
                                    evaluationOutputFileName,
                                    modelOutputFileName,
@@ -113,7 +113,7 @@ createEvaluationCohort <- function(connectionDetails,
     stop("....must have a defined Cohort schema (e.g., \"YourCDM.YourCohortSchema\")")
   if (cohortTable == "")
     stop("....must have a defined Cohort table (e.g., \"cohort\")")
-  if (outDatabaseSchema == "")
+  if (workDatabaseSchema == "")
     stop("....must have a defined Out Database schema (e.g., \"scratch.dbo\")")
   if (evaluationOutputFileName == "")
     stop("....must have a defined model file name (e.g., \"test_10XDiabetes\")")
@@ -163,7 +163,7 @@ createEvaluationCohort <- function(connectionDetails,
                            cohort_database_schema = cohortDatabaseSchema,
                            cohort_database_table = cohortTable,
                            x_spec_cohort = xSpecCohortId,
-                           tempDB = outDatabaseSchema,
+                           tempDB = workDatabaseSchema,
                            test_cohort = test_cohort,
                            exclCohort = 0,
                            ageLimit = lowerAgeLimit,
@@ -192,9 +192,9 @@ createEvaluationCohort <- function(connectionDetails,
                                                                           sep = ""),
                                                 cohortId = 0,
                                                 outcomeIds = xSpecCohortId,
-                                                outcomeDatabaseSchema = outDatabaseSchema,
+                                                outcomeDatabaseSchema = workDatabaseSchema,
                                                 outcomeTable = test_cohort,
-                                                cohortDatabaseSchema = outDatabaseSchema,
+                                                cohortDatabaseSchema = workDatabaseSchema,
                                                 cohortTable = test_cohort,
                                                 cdmVersion = cdmVersion,
                                                 washoutPeriod = 0,
@@ -288,7 +288,7 @@ createEvaluationCohort <- function(connectionDetails,
   sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
                                               "DropTempTable.sql",
                                               package = "PheValuator"))
-  sql <- SqlRender::render(sqlScript, tempDB = outDatabaseSchema, test_cohort = test_cohort)
+  sql <- SqlRender::render(sqlScript, tempDB = workDatabaseSchema, test_cohort = test_cohort)
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
   capture.output(conn <- DatabaseConnector::connect(connectionDetails), file=NULL)

@@ -38,7 +38,7 @@
 #' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
 #'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 #'                               COHORT_START_DATE, COHORT_END_DATE.
-#' @param outDatabaseSchema      The name of a database schema where the user has write capability.  A
+#' @param workDatabaseSchema      The name of a database schema where the user has write capability.  A
 #'                               temporary cohort table will be created here.
 #' @param modelOutputFileName    A string designation for the training model file
 #' @param xSpecCohortId            The number of the "extremely specific (xSpec)" cohort definition id in
@@ -72,7 +72,7 @@ createPhenotypeModel <- function(connectionDetails,
                                  cdmDatabaseSchema,
                                  cohortDatabaseSchema,
                                  cohortTable,
-                                 outDatabaseSchema,
+                                 workDatabaseSchema,
                                  modelOutputFileName = "train",
                                  xSpecCohortId,
                                  xSensCohortId,
@@ -112,7 +112,7 @@ createPhenotypeModel <- function(connectionDetails,
     stop("....must have a defined Cohort schema ((e.g., \"YourCDM.YourCohortSchema\")")
   if (cohortTable == "")
     stop("....must have a defined Cohort table (e.g., \"cohort\")")
-  if (outDatabaseSchema == "")
+  if (workDatabaseSchema == "")
     stop("....must have a defined Out Database schema (e.g., \"scratch.dbo\")")
   if (modelOutputFileName == "")
     stop("....must have a defined training file name (e.g., \"train_10XDiabetes\")")
@@ -200,7 +200,7 @@ createPhenotypeModel <- function(connectionDetails,
                              cohort_database_schema = cohortDatabaseSchema,
                              cohort_database_table = cohortTable,
                              x_spec_cohort = xSpecCohortId,
-                             tempDB = outDatabaseSchema,
+                             tempDB = workDatabaseSchema,
                              test_cohort = test_cohort,
                              exclCohort = xSensCohortId,
                              ageLimit = lowerAgeLimit,
@@ -225,9 +225,9 @@ createPhenotypeModel <- function(connectionDetails,
                                                                             sep = ""),
                                                   cohortId = 0,
                                                   outcomeIds = xSpecCohortId,
-                                                  outcomeDatabaseSchema = outDatabaseSchema,
+                                                  outcomeDatabaseSchema = workDatabaseSchema,
                                                   outcomeTable = test_cohort,
-                                                  cohortDatabaseSchema = outDatabaseSchema,
+                                                  cohortDatabaseSchema = workDatabaseSchema,
                                                   cohortTable = test_cohort,
                                                   cdmVersion = cdmVersion,
                                                   washoutPeriod = 0,
@@ -241,7 +241,7 @@ createPhenotypeModel <- function(connectionDetails,
     sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
                                                 "DropTempTable.sql",
                                                 package = "PheValuator"))
-    sql <- SqlRender::render(sqlScript, tempDB = outDatabaseSchema, test_cohort = test_cohort)
+    sql <- SqlRender::render(sqlScript, tempDB = workDatabaseSchema, test_cohort = test_cohort)
     sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
     DatabaseConnector::executeSql(conn = conn, sql)

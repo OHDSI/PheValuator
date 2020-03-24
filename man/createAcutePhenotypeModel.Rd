@@ -10,7 +10,7 @@ createAcutePhenotypeModel(
   databaseId = "TestDB",
   cohortDatabaseSchema,
   cohortTable,
-  outDatabaseSchema,
+  workDatabaseSchema,
   modelOutputFileName = "train",
   evaluationOutputFileName = "eval",
   phenotypeEvaluationFileName = "results",
@@ -61,7 +61,7 @@ permissions to this database.}
 cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 COHORT_START_DATE, COHORT_END_DATE.}
 
-\item{outDatabaseSchema}{The name of a database schema where the user has write capability.  A
+\item{workDatabaseSchema}{The name of a database schema where the user has write capability.  A
 temporary cohort table will be created here.}
 
 \item{modelOutputFileName}{A string designation for the training model file}
