@@ -267,12 +267,12 @@ createChronicPhenotypeModel should have as inputs:
   used by assumed to be cdmSchema. Requires read permissions to this
   database.
 \item
-  cohortDatabaseTable - The tablename that contains the at risk cohort.
-  If cohortTable \textless{}\textgreater{} DRUG\_ERA, then expectation
-  is cohortTable has format of COHORT table: cohort\_concept\_id,
+  cohortTable - The tablename that contains the at risk cohort. If
+  cohortTable \textless{}\textgreater{} DRUG\_ERA, then expectation is
+  cohortTable has format of COHORT table: cohort\_concept\_id,
   SUBJECT\_ID, COHORT\_START\_DATE, COHORT\_END\_DATE.
 \item
-  outDatabaseSchema - The name of a database schema where the user has
+  workDatabaseSchema - The name of a database schema where the user has
   write capability. A temporary cohort table will be created here.
 \item
   modelOutputFileName - A string designation for the training model file
@@ -292,20 +292,21 @@ createChronicPhenotypeModel should have as inputs:
   Stroke} xSpec, using the \textbf{MyCDM} database, including ages
   \textbf{18 to 62}, and analyzed on \textbf{20190101}
 \item
-  conditionName - A short name for the health outcome of interest, e.g.,
-  ``Hypertension'' (default = ``HOI'')
+  phenotypeEvaluationFileName - A string designation for the .csv file
+  with the results for the phenotype algorithm evaluation
 \item
-  xSpecCohort - The number of the ``extremely specific (xSpec)'' cohort
-  definition id in the cohort table (for noisy positives)
+  xSpecCohortId - The number of the ``extremely specific (xSpec)''
+  cohort definition id in the cohort table (for noisy positives)
 \item
-  xSensCohort - The number of the ``extremely sensitive (xSens)'' cohort
-  definition id in the cohort table (used to estimate population
+  xSensCohortId - The number of the ``extremely sensitive (xSens)''
+  cohort definition id in the cohort table (used to estimate population
   prevalence and to exclude subjects from the noisy positives)
 \item
-  prevalenceCohort - The number of the cohort definition id to determine
-  the disease prevalence, usually a super-set of the exclCohort
+  prevalenceCohortId - The number of the cohort definition id to
+  determine the disease prevalence, usually a super-set of the
+  exclCohort
 \item
-  excludedConcepts - A list of conceptIds to exclude from
+  excludedCovariateConceptIds - A list of conceptIds to exclude from
   featureExtraction which should include all concept\_ids used to create
   the xSpec and xSens cohorts
 \item
@@ -315,7 +316,7 @@ createChronicPhenotypeModel should have as inputs:
   addDescendantsToExclude - Should descendants of excluded concepts also
   be excluded? (default=FALSE)
 \item
-  mainPopulationCohort - The number of the cohort to be used as a base
+  mainPopulationCohortId - The number of the cohort to be used as a base
   population for the model (default=NULL)
 \item
   baseSampleSize - The maximum number of subjects in the evaluation
@@ -326,7 +327,7 @@ createChronicPhenotypeModel should have as inputs:
   upperAgeLimit - The upper age for subjects in the model (default=NULL)
 \item
   startDays - The days to include prior to the cohort start date. If the
-  mainPopulationCohort = 0, this should be 0 (default=0)
+  mainPopulationCohortId = 0, this should be 0 (default=0)
 \item
   endDays - The days to include after the cohort start date. By default
   this is set to include all the data in a subject's record
@@ -340,8 +341,8 @@ createChronicPhenotypeModel should have as inputs:
   endDate - The ending date for including subjects in the model
   (default=NULL)
 \item
-  checkDates - Should dates be checked to remove future dates
-  (default=TRUE)
+  removeSubjectsWithFutureDates - Should dates be checked to remove
+  future dates (default=TRUE)
 \item
   cdmVersion - The CDM version of the database (default=5)
 \item
@@ -405,18 +406,17 @@ For example:
                 \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
                 \DataTypeTok{databaseId =} \StringTok{"TestDB"}\NormalTok{,}
                 \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
-                \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
-                \DataTypeTok{outDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{, }\CommentTok{#a database schema with write access}
+                \DataTypeTok{cohortTable  =} \StringTok{"cohort"}\NormalTok{,}
+                \DataTypeTok{workDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{, }\CommentTok{#a database schema with write access}
                 \DataTypeTok{modelOutputFileName =} \StringTok{"Train_10XDM_MyCDM_18-62_20190101"}\NormalTok{,}
                 \DataTypeTok{evaluationOutputFileName =} \StringTok{"Eval_10XDM_MyCDM_18-62_20190101"}\NormalTok{,}
-                \DataTypeTok{conditionName =} \StringTok{"Diabetes"}\NormalTok{,}
-                \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{,}
-                \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{,}
-                \DataTypeTok{prevalenceCohort =} \DecValTok{1770120}\NormalTok{,}
-                \DataTypeTok{excludedConcepts =} \KeywordTok{c}\NormalTok{(}\DecValTok{201820}\NormalTok{), }
+                \DataTypeTok{xSpecCohortId =} \DecValTok{1769699}\NormalTok{,}
+                \DataTypeTok{xSensCohortId =} \DecValTok{1770120}\NormalTok{,}
+                \DataTypeTok{prevalenceCohortId =} \DecValTok{1770120}\NormalTok{,}
+                \DataTypeTok{excludedCovariateConceptIds =} \KeywordTok{c}\NormalTok{(}\DecValTok{201820}\NormalTok{), }
                 \DataTypeTok{includedCovariateIds =} \KeywordTok{c}\NormalTok{(),}
                 \DataTypeTok{addDescendantsToExclude =} \OtherTok{TRUE}\NormalTok{,}
-                \DataTypeTok{mainPopulationCohort =} \DecValTok{0}\NormalTok{, }\CommentTok{#use the entire subject population}
+                \DataTypeTok{mainPopulationCohortId =} \DecValTok{0}\NormalTok{, }\CommentTok{#use the entire subject population}
                 \DataTypeTok{baseSampleSize =} \DecValTok{2000000}\NormalTok{,}
                 \DataTypeTok{lowerAgeLimit =} \DecValTok{18}\NormalTok{, }
                 \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
@@ -425,7 +425,7 @@ For example:
                 \DataTypeTok{gender =} \KeywordTok{c}\NormalTok{(}\DecValTok{8507}\NormalTok{, }\DecValTok{8532}\NormalTok{),}
                 \DataTypeTok{startDate =} \StringTok{"19000101"}\NormalTok{,}
                 \DataTypeTok{endDate =} \StringTok{"21000101"}\NormalTok{,}
-                \DataTypeTok{checkDates =} \OtherTok{TRUE}\NormalTok{,}
+                \DataTypeTok{removeSubjectsWithFutureDates =} \OtherTok{TRUE}\NormalTok{,}
                 \DataTypeTok{outFolder =} \StringTok{"c:/phenotyping"}\NormalTok{,}
                 \DataTypeTok{savePlpData =} \OtherTok{FALSE}\NormalTok{, }\CommentTok{#will preserve disk space}
                 \DataTypeTok{createModel =} \OtherTok{TRUE}\NormalTok{, }\CommentTok{#will create a model}
@@ -436,17 +436,16 @@ For example:
 
 In this example, we used the cohorts developed in the ``my\_results''
 cdm, specifying the location of the cohort table (cohortDatabaseSchema,
-cohortDatabaseTable - ``my\_results.cohort'') and where the model will
-find the conditions, drug exposures, etc. to inform the model
-(cdmDatabaseSchema - ``my\_cdm\_data''). The subjects included in the
-model will be those whose first visit in the CDM is between January 1,
-2010 and December 31, 2017. We are also specifically excluding the
-concept ID 201826, ``Type 2 diabetes mellitus'', which was used to
-create the xSpec cohort as well as all of the descendants of that
-concept ID. Their ages at the time of first visit will be between 18 and
-90. The dataframe, cohortSetReference (see first section of this
-vignette), is now used to define the cohort definitions for which we
-want performance characteristics.
+cohortTable - ``my\_results.cohort'') and where the model will find the
+conditions, drug exposures, etc. to inform the model (cdmDatabaseSchema
+- ``my\_cdm\_data''). The subjects included in the model will be those
+whose first visit in the CDM is between January 1, 2010 and December 31,
+2017. We are also specifically excluding the concept ID 201826, ``Type 2
+diabetes mellitus'', which was used to create the xSpec cohort as well
+as all of the descendants of that concept ID. Their ages at the time of
+first visit will be between 18 and 90. The dataframe, cohortSetReference
+(see first section of this vignette), is now used to define the cohort
+definitions for which we want performance characteristics.
 
 In this example, the parameters specify that the function will create
 the model file:\\
@@ -490,15 +489,17 @@ following parameters:
   endDays - The days to include after the cohort start date. (default=7,
   i.e., 7 days after the start of the hospital visit)
 \item
-  mainPopulationCohortStartDay - When specifying a mainPopulationCohort,
-  the number of days relative to the mainPopulationCohort cohort start
-  date to begin including visits. (default=0, i.e., 0 days before the
-  start of the mainPopulationCohort cohort start date)
+  mainPopulationCohortIdStartDay - When specifying a
+  mainPopulationCohortId, the number of days relative to the
+  mainPopulationCohortId cohort start date to begin including visits.
+  (default=0, i.e., 0 days before the start of the
+  mainPopulationCohortId cohort start date)
 \item
-  mainPopulationCohortEndtDay - When specifying a mainPopulationCohort,
-  the number of days relative to the mainPopulationCohort cohort start
-  date to end including visits. (default=0, i.e., 0 days after the start
-  of the mainPopulationCohort cohort start date)
+  mainPopulationCohortIdEndtDay - When specifying a
+  mainPopulationCohortId, the number of days relative to the
+  mainPopulationCohortId cohort start date to end including visits.
+  (default=0, i.e., 0 days after the start of the mainPopulationCohortId
+  cohort start date)
 \item
   visitLength - The minimum length of index visit for noisy negative
   comparison (default=3 days). As a guideline, use the average length of
@@ -520,20 +521,19 @@ For example:
                 \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
                 \DataTypeTok{databaseId =} \StringTok{"TestDB"}\NormalTok{,}
                 \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
-                \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
-                \DataTypeTok{outDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{, }\CommentTok{#a database schema with write access}
+                \DataTypeTok{cohortTable  =} \StringTok{"cohort"}\NormalTok{,}
+                \DataTypeTok{workDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{, }\CommentTok{#a database schema with write access}
                 \DataTypeTok{modelOutputFileName =} \StringTok{"Train_Pneumonia_MyCDM_18-62_20190101"}\NormalTok{,}
                 \DataTypeTok{evaluationOutputFileName =} \StringTok{"Eval_Pneumonia_MyCDM_18-62_20190101"}\NormalTok{,}
-                \DataTypeTok{conditionName =} \StringTok{"Pneumonia"}\NormalTok{,}
-                \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{,}
-                \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{,}
-                \DataTypeTok{prevalenceCohort =} \DecValTok{1770120}\NormalTok{,}
-                \DataTypeTok{excludedConcepts =} \KeywordTok{c}\NormalTok{(}\DecValTok{255848}\NormalTok{), }
+                \DataTypeTok{xSpecCohortId =} \DecValTok{1769699}\NormalTok{,}
+                \DataTypeTok{xSensCohortId =} \DecValTok{1770120}\NormalTok{,}
+                \DataTypeTok{prevalenceCohortId =} \DecValTok{1770120}\NormalTok{,}
+                \DataTypeTok{excludedCovariateConceptIds =} \KeywordTok{c}\NormalTok{(}\DecValTok{255848}\NormalTok{), }
                 \DataTypeTok{includedCovariateIds =} \KeywordTok{c}\NormalTok{(),}
                 \DataTypeTok{addDescendantsToExclude =} \OtherTok{TRUE}\NormalTok{,}
-                \DataTypeTok{mainPopulationCohort =} \DecValTok{0}\NormalTok{, }\CommentTok{#use the entire subject population}
-                \DataTypeTok{mainPopulationCohortStartDay =} \DecValTok{0}\NormalTok{,}
-                \DataTypeTok{mainPopulationCohortEndDay =} \DecValTok{0}\NormalTok{,}
+                \DataTypeTok{mainPopulationCohortId =} \DecValTok{0}\NormalTok{, }\CommentTok{#use the entire subject population}
+                \DataTypeTok{mainPopulationCohortIdStartDay =} \DecValTok{0}\NormalTok{,}
+                \DataTypeTok{mainPopulationCohortIdEndDay =} \DecValTok{0}\NormalTok{,}
                 \DataTypeTok{baseSampleSize =} \DecValTok{2000000}\NormalTok{,}
                 \DataTypeTok{lowerAgeLimit =} \DecValTok{18}\NormalTok{, }
                 \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
@@ -543,7 +543,7 @@ For example:
                 \DataTypeTok{gender =} \KeywordTok{c}\NormalTok{(}\DecValTok{8507}\NormalTok{, }\DecValTok{8532}\NormalTok{),}
                 \DataTypeTok{startDate =} \StringTok{"19000101"}\NormalTok{,}
                 \DataTypeTok{endDate =} \StringTok{"21000101"}\NormalTok{,}
-                \DataTypeTok{checkDates =} \OtherTok{TRUE}\NormalTok{,}
+                \DataTypeTok{removeSubjectsWithFutureDates =} \OtherTok{TRUE}\NormalTok{,}
                 \DataTypeTok{outFolder =} \StringTok{"c:/phenotyping"}\NormalTok{,}
                 \DataTypeTok{savePlpData =} \OtherTok{FALSE}\NormalTok{, }\CommentTok{#will preserve disk space}
                 \DataTypeTok{createModel =} \OtherTok{TRUE}\NormalTok{, }\CommentTok{#will create a model}

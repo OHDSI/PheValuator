@@ -85,29 +85,29 @@ createChronicPhenotypeModel should have as inputs:
  * cdmDatabaseSchema \- The name of the database schema that contains the OMOP CDM instance. Requires read permissions to this database. On SQL Server, this should specify both the database and the schema, so for example 'cdm_instance.dbo'.
  * databaseId \- Short name for the database (default="TestDB")
  * cohortDatabaseSchema \- The name of the database schema that is the location where the cohort data used to define the at risk cohort is available. If cohortTable = DRUG_ERA, cohortDatabaseSchema is not used by assumed to be cdmSchema. Requires read permissions to this database.
- * cohortDatabaseTable \- The tablename that contains the at risk cohort. If cohortTable <> DRUG_ERA, then expectation is cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.
- * outDatabaseSchema \- The name of a database schema where the user has write capability.  A temporary cohort table will be created here.
+ * cohortTable  \- The tablename that contains the at risk cohort. If cohortTable <> DRUG_ERA, then expectation is cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.
+ * workDatabaseSchema \- The name of a database schema where the user has write capability.  A temporary cohort table will be created here.
  * modelOutputFileName \- A string designation for the training model file
  Recommended structure:  "Model_(xSpec Name)_(CDM)_(Qualifiers)_(Analysis Date)", e.g., "Model_10XStroke_MyCDM_Age18-62_20190101" to designate the file was from a **Model**, built on the **10 X Stroke** xSpec, using the **MyCDM** database, including ages **18 to 62**, and analyzed on **20190101**.
  * evaluationOutputFileName \- A string designation for the evaluation cohort file.  
  Recommended structure:  "Evaluation_(xSpec Name)_(CDM)_(Qualifiers)_(Analysis Date)", e.g., "Evaluation_10XStroke_MyCDM_Age18-62_20190101" to designate the file was from an **Evaluation**, built on the **10 X Stroke** xSpec, using the **MyCDM** database, including ages **18 to 62**, and analyzed on **20190101**
- * conditionName \- A short name for the health outcome of interest, e.g., "Hypertension" (default = "HOI")
- * xSpecCohort \- The number of the "extremely specific (xSpec)" cohort definition id in the cohort table (for noisy positives)
- * xSensCohort \- The number of the "extremely sensitive (xSens)" cohort definition id in the cohort table (used to estimate population prevalence and to exclude subjects from the noisy positives)
- * prevalenceCohort \- The number of the cohort definition id to determine the disease prevalence, usually a super-set of the exclCohort
- * excludedConcepts \- A list of conceptIds to exclude from featureExtraction which should include all concept_ids used to create the xSpec and xSens cohorts
+ * phenotypeEvaluationFileName \- A string designation for the .csv file with the results for the phenotype algorithm evaluation
+ * xSpecCohortId \- The number of the "extremely specific (xSpec)" cohort definition id in the cohort table (for noisy positives)
+ * xSensCohortId \- The number of the "extremely sensitive (xSens)" cohort definition id in the cohort table (used to estimate population prevalence and to exclude subjects from the noisy positives)
+ * prevalenceCohortId \- The number of the cohort definition id to determine the disease prevalence, usually a super-set of the exclCohort
+ * excludedCovariateConceptIds \- A list of conceptIds to exclude from featureExtraction which should include all concept_ids used to create the xSpec and xSens cohorts
  * includedCovariateIds \- A list of covariate IDs that should be restricted to (default=NULL)
  * addDescendantsToExclude \- Should descendants of excluded concepts also be excluded? (default=FALSE)
- * mainPopulationCohort \- The number of the cohort to be used as a base population for the model (default=NULL)
+ * mainPopulationCohortId \- The number of the cohort to be used as a base population for the model (default=NULL)
  * baseSampleSize \- The maximum number of subjects in the evaluation cohort (default=2M)
  * lowerAgeLimit \- The lower age for subjects in the model (default=NULL)
  * upperAgeLimit \- The upper age for subjects in the model (default=NULL)
- * startDays \- The days to include prior to the cohort start date.  If the mainPopulationCohort = 0, this should be 0 (default=0)
+ * startDays \- The days to include prior to the cohort start date.  If the mainPopulationCohortId = 0, this should be 0 (default=0)
  * endDays \- The days to include after the cohort start date.  By default this is set to include all the data in a subject's record (default=10000)
  * gender \- The gender(s) to be included (default c(8507, 8532))
  * startDate \- The starting date for including subjects in the model (default=NULL)
  * endDate \- The ending date for including subjects in the model (default=NULL)
- * checkDates \- Should dates be checked to remove future dates (default=TRUE)
+ * removeSubjectsWithFutureDates \- Should dates be checked to remove future dates (default=TRUE)
  * cdmVersion \- The CDM version of the database (default=5)
  * outFolder \- The folder where the output files will be written (default=working directory)
  * savePlpData \- Determines whether the large PLP data file is saved.  Setting this to FALSE will reduce the use of disk space (default=FALSE)
@@ -138,18 +138,17 @@ phenoTest <- createChronicPhenotypeModel(connectionDetails = connectionDetails,
                 cdmDatabaseSchema = "my_cdm_data",
                 databaseId = "TestDB",
                 cohortDatabaseSchema = "my_results",
-                cohortDatabaseTable = "cohort",
-                outDatabaseSchema = "scratch.dbo", #a database schema with write access
+                cohortTable  = "cohort",
+                workDatabaseSchema = "scratch.dbo", #a database schema with write access
                 modelOutputFileName = "Train_10XDM_MyCDM_18-62_20190101",
                 evaluationOutputFileName = "Eval_10XDM_MyCDM_18-62_20190101",
-                conditionName = "Diabetes",
-                xSpecCohort = 1769699,
-                xSensCohort = 1770120,
-                prevalenceCohort = 1770120,
-                excludedConcepts = c(201820), 
+                xSpecCohortId = 1769699,
+                xSensCohortId = 1770120,
+                prevalenceCohortId = 1770120,
+                excludedCovariateConceptIds = c(201820), 
                 includedCovariateIds = c(),
                 addDescendantsToExclude = TRUE,
-                mainPopulationCohort = 0, #use the entire subject population
+                mainPopulationCohortId = 0, #use the entire subject population
                 baseSampleSize = 2000000,
                 lowerAgeLimit = 18, 
                 upperAgeLimit = 90,
@@ -158,7 +157,7 @@ phenoTest <- createChronicPhenotypeModel(connectionDetails = connectionDetails,
                 gender = c(8507, 8532),
                 startDate = "19000101",
                 endDate = "21000101",
-                checkDates = TRUE,
+                removeSubjectsWithFutureDates = TRUE,
                 outFolder = "c:/phenotyping",
                 savePlpData = FALSE, #will preserve disk space
                 createModel = TRUE, #will create a model
@@ -166,7 +165,7 @@ phenoTest <- createChronicPhenotypeModel(connectionDetails = connectionDetails,
                 cohortDefinitionsToTest = cohortSetReference)
 
 ```
-In this example, we used the cohorts developed in the "my_results" cdm, specifying the location of the cohort table (cohortDatabaseSchema, cohortDatabaseTable - "my_results.cohort") and where the model will find the conditions, drug exposures, etc. to inform the model (cdmDatabaseSchema - "my_cdm_data").  The subjects included in the model will be those whose first visit in the CDM is between January 1, 2010 and December 31, 2017.  We are also specifically excluding the concept ID 201826, "Type 2 diabetes mellitus", which was used to create the xSpec cohort as well as all of the descendants of that concept ID.  Their ages at the time of first visit will be between 18 and 90. The dataframe, cohortSetReference (see first section of this vignette), is now used to define the cohort definitions for which we want performance characteristics.
+In this example, we used the cohorts developed in the "my_results" cdm, specifying the location of the cohort table (cohortDatabaseSchema, cohortTable  - "my_results.cohort") and where the model will find the conditions, drug exposures, etc. to inform the model (cdmDatabaseSchema - "my_cdm_data").  The subjects included in the model will be those whose first visit in the CDM is between January 1, 2010 and December 31, 2017.  We are also specifically excluding the concept ID 201826, "Type 2 diabetes mellitus", which was used to create the xSpec cohort as well as all of the descendants of that concept ID.  Their ages at the time of first visit will be between 18 and 90. The dataframe, cohortSetReference (see first section of this vignette), is now used to define the cohort definitions for which we want performance characteristics.
 
 In this example, the parameters specify that the function will create the model file:   
   "c:/phenotyping/Train_10XDM_MyCDM_18-62_20190101.rds",
@@ -188,8 +187,8 @@ createAcutePhenotypeModel should have the same inputs as described for createAcu
 
  * startDays \- The days to include prior to the cohort start date. For acute health conditions, this will be the number of days preceding the in-patient hospital visit. (default=0)
  * endDays \- The days to include after the cohort start date. (default=7, i.e., 7 days after the start of the hospital visit)
- * mainPopulationCohortStartDay \- When specifying a mainPopulationCohort, the number of days relative to the mainPopulationCohort cohort start date to begin including visits. (default=0, i.e., 0 days before the start of the mainPopulationCohort cohort start date)
- * mainPopulationCohortEndtDay \- When specifying a mainPopulationCohort, the number of days relative to the mainPopulationCohort cohort start date to end including visits. (default=0, i.e., 0 days after the start of the mainPopulationCohort cohort start date)
+ * mainPopulationCohortIdStartDay \- When specifying a mainPopulationCohortId, the number of days relative to the mainPopulationCohortId cohort start date to begin including visits. (default=0, i.e., 0 days before the start of the mainPopulationCohortId cohort start date)
+ * mainPopulationCohortIdEndtDay \- When specifying a mainPopulationCohortId, the number of days relative to the mainPopulationCohortId cohort start date to end including visits. (default=0, i.e., 0 days after the start of the mainPopulationCohortId cohort start date)
  * visitLength \- The minimum length of index visit for noisy negative comparison (default=3 days).  As a guideline, use the average length of a hospital visit for those with the health condition.
  
 For example:
@@ -206,20 +205,19 @@ phenoTest <- createAcutePhenotypeModel(connectionDetails = connectionDetails,
                 cdmDatabaseSchema = "my_cdm_data",
                 databaseId = "TestDB",
                 cohortDatabaseSchema = "my_results",
-                cohortDatabaseTable = "cohort",
-                outDatabaseSchema = "scratch.dbo", #a database schema with write access
+                cohortTable  = "cohort",
+                workDatabaseSchema = "scratch.dbo", #a database schema with write access
                 modelOutputFileName = "Train_Pneumonia_MyCDM_18-62_20190101",
                 evaluationOutputFileName = "Eval_Pneumonia_MyCDM_18-62_20190101",
-                conditionName = "Pneumonia",
-                xSpecCohort = 1769699,
-                xSensCohort = 1770120,
-                prevalenceCohort = 1770120,
-                excludedConcepts = c(255848), 
+                xSpecCohortId = 1769699,
+                xSensCohortId = 1770120,
+                prevalenceCohortId = 1770120,
+                excludedCovariateConceptIds = c(255848), 
                 includedCovariateIds = c(),
                 addDescendantsToExclude = TRUE,
-                mainPopulationCohort = 0, #use the entire subject population
-                mainPopulationCohortStartDay = 0,
-                mainPopulationCohortEndDay = 0,
+                mainPopulationCohortId = 0, #use the entire subject population
+                mainPopulationCohortIdStartDay = 0,
+                mainPopulationCohortIdEndDay = 0,
                 baseSampleSize = 2000000,
                 lowerAgeLimit = 18, 
                 upperAgeLimit = 90,
@@ -229,7 +227,7 @@ phenoTest <- createAcutePhenotypeModel(connectionDetails = connectionDetails,
                 gender = c(8507, 8532),
                 startDate = "19000101",
                 endDate = "21000101",
-                checkDates = TRUE,
+                removeSubjectsWithFutureDates = TRUE,
                 outFolder = "c:/phenotyping",
                 savePlpData = FALSE, #will preserve disk space
                 createModel = TRUE, #will create a model
