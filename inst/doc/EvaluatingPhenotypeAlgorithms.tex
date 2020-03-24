@@ -112,7 +112,7 @@
 
 \title{EvaluatingPhenotypeAlgorithms}
 \author{Joel N. Swerdel}
-\date{2020-03-09}
+\date{2020-03-24}
 
 \begin{document}
 \maketitle
@@ -146,6 +146,50 @@ PAs 6. Examining the results of the evaluation
 
 Each of these steps is described in detail below. For this vignette we
 will describe the evaluation of PAs for diabetes mellitus (DM).
+
+\hypertarget{defining-the-set-of-cohorts-to-evaluate}{%
+\subsection{Defining the set of cohorts to
+evaluate}\label{defining-the-set-of-cohorts-to-evaluate}}
+
+The first step is to define the set of cohorts for which we wish to
+determine performance characteristics. We do this by creating a data
+frame with five columns:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{atlasId}: The cohort ID in ATLAS.
+\item
+  \textbf{atlasName}: The full name of the cohort.
+\item
+  \textbf{cohortId}: The cohort ID to use in the package. Usually the
+  same as the cohort ID in ATLAS.
+\item
+  \textbf{name}: A short name for the cohort, to use to create file
+  names. do not use special characters.
+\item
+  \textbf{washoutPeriod}: washoutPeriod: The mininum required continuous
+  observation time prior to index date for subjects within the cohort to
+  test.
+\end{itemize}
+
+A convenient way to create such a data frame is to create a CSV file,
+and load it into R. Here is an example table we assume is stored in
+\texttt{c:/myCohortFile.csv}:
+
+atlasId,atlasName,cohortId,name,washoutPeriod\\
+7142,Type 2 Diabetes 2 X,7142,Type2Diabetes,0\\
+8339,Type 2 Diabetes 3 X,8339,Type2Diabetes,0\\
+7143,Type 2 Diabetes 1 X IP,7143,Type2Diabetes,0\\
+7144,Type 2 Diabetes 1 X IP 1st Position,7144,Type2Diabetes,0
+
+We can read the table using:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cohortSetReference <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"c:/myCohortFile.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{creating-the-extremely-specific-xspec-extremely-sensitive-xsens-and-prevalence-cohorts}{%
 \subsection{Creating the Extremely Specific (xSpec), Extremely Sensitive
@@ -186,15 +230,23 @@ described in detail below. An
 \href{http://www.ohdsi.org/web/atlas/\#/cohortdefinition/1770119}{example}
 of an prevalence cohort for DM is also in the OHDSI ATLAS repository.
 
-\hypertarget{creating-the-diagnostic-predictive-model}{%
-\subsection{Creating the Diagnostic Predictive
-Model}\label{creating-the-diagnostic-predictive-model}}
+\hypertarget{evaluating-phenotype-algorithms-for-chronic-health-conditions}{%
+\subsection{Evaluating phenotype algorithms for chronic health
+conditions}\label{evaluating-phenotype-algorithms-for-chronic-health-conditions}}
 
-The function createPhenotypeModel develops the diagnostic predictive
-model for assessing the probability of having the HOI in the evaluation
-cohort.
+The function createChronicPhenotypeModel allows the user to perform a
+complete analysis for determining the performance characteristics for
+one or more phenotype algorithms (cohort defintions) for chronic health
+conditions. This function initiates the process for the three major
+steps in PheValuator, namely:\\
+1) Develop a diagnostic predictive model for the health condition.\\
+2) Select a large, random set of subjects from the dataset and use the
+model to determine the probability of each of the subjects having the
+health condition.\\
+3) Determine the performance characteristics for one or more phenotype
+algorithms to be used in studies.
 
-createPhenotypeModel should have as inputs:
+createChronicPhenotypeModel should have as inputs:
 
 \begin{itemize}
 \tightlist
@@ -202,13 +254,12 @@ createPhenotypeModel should have as inputs:
   connectionDetails - connectionDetails created using the function
   createConnectionDetails in the DatabaseConnector package.
 \item
-  xSpecCohort - The number of the ``extremely specific (xSpec)'' cohort
-  definition id in the cohort table (for noisy positives)
-\item
   cdmDatabaseSchema - The name of the database schema that contains the
   OMOP CDM instance. Requires read permissions to this database. On SQL
   Server, this should specify both the database and the schema, so for
   example `cdm\_instance.dbo'.
+\item
+  databaseId - Short name for the database (default=``TestDB'')
 \item
   cohortDatabaseSchema - The name of the database schema that is the
   location where the cohort data used to define the at risk cohort is
@@ -232,6 +283,21 @@ createPhenotypeModel should have as inputs:
   xSpec, using the \textbf{MyCDM} database, including ages \textbf{18 to
   62}, and analyzed on \textbf{20190101}.
 \item
+  evaluationOutputFileName - A string designation for the evaluation
+  cohort file.\\
+  Recommended structure: "Evaluation\_(xSpec
+  Name)\emph{(CDM)}(Qualifiers)\_(Analysis Date)``,
+  e.g.,''Evaluation\_10XStroke\_MyCDM\_Age18-62\_20190101" to designate
+  the file was from an \textbf{Evaluation}, built on the \textbf{10 X
+  Stroke} xSpec, using the \textbf{MyCDM} database, including ages
+  \textbf{18 to 62}, and analyzed on \textbf{20190101}
+\item
+  conditionName - A short name for the health outcome of interest, e.g.,
+  ``Hypertension'' (default = ``HOI'')
+\item
+  xSpecCohort - The number of the ``extremely specific (xSpec)'' cohort
+  definition id in the cohort table (for noisy positives)
+\item
   xSensCohort - The number of the ``extremely sensitive (xSens)'' cohort
   definition id in the cohort table (used to estimate population
   prevalence and to exclude subjects from the noisy positives)
@@ -243,15 +309,28 @@ createPhenotypeModel should have as inputs:
   featureExtraction which should include all concept\_ids used to create
   the xSpec and xSens cohorts
 \item
+  includedCovariateIds - A list of covariate IDs that should be
+  restricted to (default=NULL)
+\item
   addDescendantsToExclude - Should descendants of excluded concepts also
   be excluded? (default=FALSE)
 \item
   mainPopulationCohort - The number of the cohort to be used as a base
   population for the model (default=NULL)
 \item
+  baseSampleSize - The maximum number of subjects in the evaluation
+  cohort (default=2M)
+\item
   lowerAgeLimit - The lower age for subjects in the model (default=NULL)
 \item
   upperAgeLimit - The upper age for subjects in the model (default=NULL)
+\item
+  startDays - The days to include prior to the cohort start date. If the
+  mainPopulationCohort = 0, this should be 0 (default=0)
+\item
+  endDays - The days to include after the cohort start date. By default
+  this is set to include all the data in a subject's record
+  (default=10000)
 \item
   gender - The gender(s) to be included (default c(8507, 8532))
 \item
@@ -261,17 +340,55 @@ createPhenotypeModel should have as inputs:
   endDate - The ending date for including subjects in the model
   (default=NULL)
 \item
-  checkDates - Should observation period dates be checked to guard
-  against errors such as dates in the future? (default=TRUE)
+  checkDates - Should dates be checked to remove future dates
+  (default=TRUE)
 \item
   cdmVersion - The CDM version of the database (default=5)
 \item
   outFolder - The folder where the output files will be written
   (default=working directory)
+\item
+  savePlpData - Determines whether the large PLP data file is saved.
+  Setting this to FALSE will reduce the use of disk space
+  (default=FALSE)
+\item
+  createModel - Run the function to create the diagnostic predictive
+  model (default=TRUE)
+\item
+  createEvaluationCohort - Run the function to create the evaluation
+  cohort (default=TRUE)
+\item
+  cohortDefinitionsToTest - A dataframe with cohorts to analyze. Leave
+  blank to not test any cohort definitions (default=Null). The dataframe
+  must contain the following elements:
 \end{itemize}
 
-The createPhenotypeModel function creates a PLP model to be used for
-determining the probability of the HOI in the evaluation cohort.
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\tightlist
+\item
+  atlasId: The cohort ID in ATLAS.
+\item
+  atlasName: The full name of the cohort.
+\item
+  cohortId: The cohort ID to use in the package. Usually the same as the
+  cohort ID in ATLAS.
+\item
+  name: A short name for the cohort, to use to create file names. Do not
+  use special characters.
+\item
+  washoutPeriod: The mininum required continuous observation time prior
+  to index date for subjects within the cohort to test.
+\end{enumerate}
+
+The createChronicPhenotypeModel function will produce one or more of the
+following artifacts (depending on the flags that were set):\\
+1) A Patient Level Prediction file (in .rds format) containg the
+information from the model building process\\
+2) A Patient Level Prediction file (in .rds format) containg the
+information from applying the model to the evaluation cohort\\
+3) A csv file containing the results from the analysis of the phenotype
+algorithms to be tested
 
 For example:
 
@@ -284,24 +401,36 @@ For example:
                                               \DataTypeTok{user =} \StringTok{"joe"}\NormalTok{,}
                                               \DataTypeTok{password =} \StringTok{"supersecret"}\NormalTok{)}
 
-\NormalTok{phenoTest <-}\StringTok{ }\NormalTok{PheValuator}\OperatorTok{::}\KeywordTok{createPhenotypeModel}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
-                           \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{,}
-                           \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{, }
-                           \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
-                           \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
-                           \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
-                           \DataTypeTok{outDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{, }\CommentTok{#a database schema with write access}
-                           \DataTypeTok{modelOutputFileName =} \StringTok{"Train_10XDM_MyCDM_18-62_20190101"}\NormalTok{,}
-                           \DataTypeTok{prevalenceCohort =} \DecValTok{1770119}\NormalTok{, }\CommentTok{#the cohort for prevalence determination}
-                           \DataTypeTok{excludedConcepts =} \KeywordTok{c}\NormalTok{(}\DecValTok{201820}\NormalTok{), }
-                           \DataTypeTok{addDescendantsToExclude =} \OtherTok{TRUE}\NormalTok{,}
-                           \DataTypeTok{mainPopulationCohort =} \DecValTok{0}\NormalTok{, }\CommentTok{#use the entire subject population}
-                           \DataTypeTok{lowerAgeLimit =} \DecValTok{18}\NormalTok{, }
-                           \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
-                           \DataTypeTok{startDate =} \StringTok{"20100101"}\NormalTok{,}
-                           \DataTypeTok{endDate =} \StringTok{"20171231"}\NormalTok{,}
-                           \DataTypeTok{checkDates =} \OtherTok{TRUE}\NormalTok{,}
-                           \DataTypeTok{outFolder =} \StringTok{"c:/phenotyping"}\NormalTok{)}
+\NormalTok{phenoTest <-}\StringTok{ }\KeywordTok{createChronicPhenotypeModel}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
+                \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
+                \DataTypeTok{databaseId =} \StringTok{"TestDB"}\NormalTok{,}
+                \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
+                \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
+                \DataTypeTok{outDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{, }\CommentTok{#a database schema with write access}
+                \DataTypeTok{modelOutputFileName =} \StringTok{"Train_10XDM_MyCDM_18-62_20190101"}\NormalTok{,}
+                \DataTypeTok{evaluationOutputFileName =} \StringTok{"Eval_10XDM_MyCDM_18-62_20190101"}\NormalTok{,}
+                \DataTypeTok{conditionName =} \StringTok{"Diabetes"}\NormalTok{,}
+                \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{,}
+                \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{,}
+                \DataTypeTok{prevalenceCohort =} \DecValTok{1770120}\NormalTok{,}
+                \DataTypeTok{excludedConcepts =} \KeywordTok{c}\NormalTok{(}\DecValTok{201820}\NormalTok{), }
+                \DataTypeTok{includedCovariateIds =} \KeywordTok{c}\NormalTok{(),}
+                \DataTypeTok{addDescendantsToExclude =} \OtherTok{TRUE}\NormalTok{,}
+                \DataTypeTok{mainPopulationCohort =} \DecValTok{0}\NormalTok{, }\CommentTok{#use the entire subject population}
+                \DataTypeTok{baseSampleSize =} \DecValTok{2000000}\NormalTok{,}
+                \DataTypeTok{lowerAgeLimit =} \DecValTok{18}\NormalTok{, }
+                \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
+                \DataTypeTok{startDays =} \DecValTok{0}\NormalTok{, }\CommentTok{#from the start of the subject's record}
+                \DataTypeTok{endDays =} \DecValTok{10000}\NormalTok{, }\CommentTok{#to the end of the subject's record}
+                \DataTypeTok{gender =} \KeywordTok{c}\NormalTok{(}\DecValTok{8507}\NormalTok{, }\DecValTok{8532}\NormalTok{),}
+                \DataTypeTok{startDate =} \StringTok{"19000101"}\NormalTok{,}
+                \DataTypeTok{endDate =} \StringTok{"21000101"}\NormalTok{,}
+                \DataTypeTok{checkDates =} \OtherTok{TRUE}\NormalTok{,}
+                \DataTypeTok{outFolder =} \StringTok{"c:/phenotyping"}\NormalTok{,}
+                \DataTypeTok{savePlpData =} \OtherTok{FALSE}\NormalTok{, }\CommentTok{#will preserve disk space}
+                \DataTypeTok{createModel =} \OtherTok{TRUE}\NormalTok{, }\CommentTok{#will create a model}
+                \DataTypeTok{createEvaluationCohort =} \OtherTok{TRUE}\NormalTok{, }\CommentTok{#will create an evaluation cohort}
+                \DataTypeTok{cohortDefinitionsToTest =}\NormalTok{ cohortSetReference)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -315,203 +444,65 @@ model will be those whose first visit in the CDM is between January 1,
 concept ID 201826, ``Type 2 diabetes mellitus'', which was used to
 create the xSpec cohort as well as all of the descendants of that
 concept ID. Their ages at the time of first visit will be between 18 and
-90. With the parameters above, the name of the predictive model output
-from this step will be:
-``c:/phenotyping/Train\_10XDM\_MyCDM\_18-62\_20190101.rds''
+90. The dataframe, cohortSetReference (see first section of this
+vignette), is now used to define the cohort definitions for which we
+want performance characteristics.
 
-\hypertarget{creating-the-evaluation-cohort}{%
-\subsection{Creating the Evaluation
-Cohort}\label{creating-the-evaluation-cohort}}
+In this example, the parameters specify that the function will create
+the model file:\\
+``c:/phenotyping/Train\_10XDM\_MyCDM\_18-62\_20190101.rds'',
 
-The function createEvaluationCohort uses the PLP function applyModel to
-produce a large cohort of subjects, each with a predicted probability
-for the HOI.
+produce the evaluation cohort file:\\
+``c:/phenotyping/Eval\_10XDM\_MyCDM\_18-62\_20190101.rds''
 
-createEvaluationCohort should have as inputs:
+and produce the phenotype algorithm performance characteristics result
+file:\\
+``c:/phenotyping/PerformanceResultsDiabetes\_TestDB.csv''
 
-\begin{itemize}
-\tightlist
-\item
-  connectionDetails - connectionDetails created using the function
-  createConnectionDetails in the DatabaseConnector package.
-\item
-  xSpecCohort - The number of the ``extremely specific (xSpec)'' cohort
-  definition id in the cohort table (for noisy positives)
-\item
-  xSensCohort - The number of the ``extremely sensitive (xSens)'' cohort
-  definition id in the cohort table (used to estimate population
-  prevalence and to exclude subjects from the noisy positives)
-\item
-  cdmDatabaseSchema - The name of the database schema that contains the
-  OMOP CDM instance. Requires read permissions to this database. On SQL
-  Server, this should specifiy both the database and the schema, so for
-  example `cdm\_instance.dbo'.
-\item
-  cohortDatabaseSchema - The name of the database schema that is the
-  location where the cohort data used to define the at risk cohort is
-  available. Requires read permissions to this database.
-\item
-  cohortDatabaseTable - The tablename that contains the at risk cohort.
-  The expectation is cohortTable has format of COHORT table:
-  cohort\_concept\_id, SUBJECT\_ID, COHORT\_START\_DATE,
-  COHORT\_END\_DATE.
-\item
-  outDatabaseSchema - The name of the database schema that is the
-  location where the data used to define the outcome cohorts is
-  available. Requires read permissions to this database.
-\item
-  evaluationOutputFileName - A string designation for the evaluation
-  cohort file.\\
-  Recommended structure: "Evaluation\_(xSpec
-  Name)\emph{(CDM)}(Qualifiers)\_(Analysis Date)``,
-  e.g.,''Evaluation\_10XStroke\_MyCDM\_Age18-62\_20190101" to designate
-  the file was from an \textbf{Evaluation}, built on the \textbf{10 X
-  Stroke} xSpec, using the \textbf{MyCDM} database, including ages
-  \textbf{18 to 62}, and analyzed on \textbf{20190101}
-\item
-  modelOutputFileName - A string designation for the training model file
-\item
-  mainPopulationCohort - The number of the cohort to be used as a base
-  population for the model (default=NULL)
-\item
-  lowerAgeLimit - The lower age for subjects in the model (default=NULL)
-\item
-  upperAgeLimit - The upper age for subjects in the model (default=NULL)
-\item
-  startDays - The days to include prior to the cohort start date
-  (default=-10000)
-\item
-  endDays - The days to include after the cohort start date
-  (default=10000)
-\item
-  gender - The gender(s) to be included (default c(8507, 8532))
-\item
-  startDate - The starting date for including subjects in the model
-  (default=NULL)
-\item
-  endDate - The ending date for including subjects in the model
-  (default=NULL)
-\item
-  cdmVersion - The CDM version of the database (default=5)
-\item
-  outFolder - The folder where the output files will be written
-  (default=working directory)
-\item
-  savePlpData - Determines whether the large PLP data file is saved.
-  Setting this to FALSE will reduce the use of disk space
-  (default=FALSE)
-\end{itemize}
+\hypertarget{evaluating-phenotype-algorithms-for-acute-health-conditions-those-requiring-an-in-patient-hospital-visit}{%
+\subsection{Evaluating phenotype algorithms for acute health conditions
+(those requiring an in-patient hospital
+visit)}\label{evaluating-phenotype-algorithms-for-acute-health-conditions-those-requiring-an-in-patient-hospital-visit}}
 
-For example:
+The function createAcutePhenotypeModel allows the user to perform a
+complete analysis for determining the performance characteristics for
+one or more phenotype algorithms (cohort defintions) for acute health
+conditions. This function initiates the process for the three major
+steps in PheValuator, namely:\\
+1) Develop a diagnostic predictive model for the health condition.\\
+2) Select a large, random set of subjects from the dataset and use the
+model to determine the probability of each of the subjects having the
+health condition.\\
+3) Determine the performance characteristics for one or more phenotype
+algorithms to be used in studies.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{options}\NormalTok{(}\DataTypeTok{fftempdir =} \StringTok{"c:/temp/ff"}\NormalTok{) }\CommentTok{#place to store large temporary files}
-
-
-\NormalTok{connectionDetails <-}\StringTok{ }\KeywordTok{createConnectionDetails}\NormalTok{(}\DataTypeTok{dbms =} \StringTok{"postgresql"}\NormalTok{,}
-                                              \DataTypeTok{server =} \StringTok{"localhost/ohdsi"}\NormalTok{,}
-                                              \DataTypeTok{user =} \StringTok{"joe"}\NormalTok{,}
-                                              \DataTypeTok{password =} \StringTok{"supersecret"}\NormalTok{)}
-
-\NormalTok{evalCohort <-}\StringTok{ }\NormalTok{PheValuator}\OperatorTok{::}\KeywordTok{createEvaluationCohort}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
-                              \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{, }
-                              \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{, }
-                              \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
-                              \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
-                              \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
-                              \DataTypeTok{outDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{,}
-                              \DataTypeTok{evaluationOutputFileName =} \StringTok{"Eval_10XDM_MyCDM_18-62_20190101"}\NormalTok{,}
-                              \DataTypeTok{modelOutputFileName =} \StringTok{"Train_10XDM_MyCDM_18-62_20190101"}\NormalTok{,}
-                              \DataTypeTok{mainPopulationCohort =} \DecValTok{0}\NormalTok{, }
-                              \DataTypeTok{lowerAgeLimit =} \DecValTok{18}\NormalTok{, }
-                              \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
-                              \DataTypeTok{startDate =} \StringTok{"20100101"}\NormalTok{,}
-                              \DataTypeTok{endDate =} \StringTok{"20171231"}
-                              \DataTypeTok{outFolder =} \StringTok{"c:/phenotyping"}\NormalTok{,}
-                              \DataTypeTok{savePlpData =} \OtherTok{FALSE}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-In this example, the parameters specify that the function should use the
-model file: ``c:/phenotyping/Train\_10XDM\_MyCDM\_18-62\_20190101.rds''
-to produce the evaluation cohort file:
-``c:/phenotyping/Eval\_10XDM\_MyCDM\_18-62\_20190101.rds'' The
-evaluation cohort file above will be used the evaluation of the PAs
-provided in the next step.
-
-\hypertarget{creating-the-phenotype-algorithms-for-evaluation}{%
-\subsection{Creating the Phenotype Algorithms for
-evaluation}\label{creating-the-phenotype-algorithms-for-evaluation}}
-
-The next step is to create the PAs to be evaluated. These are specific
-to the research question of interest. For certain questions, a very
-sensitive algorithm may be required; others may require a very specific
-algorithm. For this example, we will test an algorithm which requires
-that the subject have a diagnosis code for DM from an in-patient setting
-where the code was specified as the primary reason for discharge. An
-\href{http://www.ohdsi.org/web/atlas/\#/cohortdefinition/1769702}{example}
-of this algorithm is in the OHDSI ATLAS repository. The output of this
-function is a list containing 2 data frames, one with the results of the
-PA evaluation and a second with a set of subject IDs that were
-determined to be true positives, false positives, or false negatives
-based on prediction threshold of 50\%. A true positive, with this
-criteria, would be a subject that was included in the PA and also had a
-predicted value for the HOI of 0.5 or greater. A false positive would be
-a subject who was included in the PA and whose predicted probability was
-less than 0.5. A false negative would be a subject who was not included
-in the PA but had a predicted probability of the HOI or 0.5 or greater.
-
-testPhenotypeAlgorithm should have as inputs:
+createAcutePhenotypeModel should have the same inputs as described for
+createAcutePhenotypeModel above but with more attention paid to the
+following parameters:
 
 \begin{itemize}
 \tightlist
 \item
-  connectionDetails - ConnectionDetails created using the function
-  createConnectionDetails in the DatabaseConnector package.
+  startDays - The days to include prior to the cohort start date. For
+  acute health conditions, this will be the number of days preceding the
+  in-patient hospital visit. (default=0)
 \item
-  cutPoints - A list of threshold predictions for the evaluations.
-  Include ``EV'' for the expected value
+  endDays - The days to include after the cohort start date. (default=7,
+  i.e., 7 days after the start of the hospital visit)
 \item
-  evaluationOutputFileName - The full file name with path for the
-  evaluation file
+  mainPopulationCohortStartDay - When specifying a mainPopulationCohort,
+  the number of days relative to the mainPopulationCohort cohort start
+  date to begin including visits. (default=0, i.e., 0 days before the
+  start of the mainPopulationCohort cohort start date)
 \item
-  phenotypeCohortId - The number of the cohort of the phenotype
-  algorithm to test
+  mainPopulationCohortEndtDay - When specifying a mainPopulationCohort,
+  the number of days relative to the mainPopulationCohort cohort start
+  date to end including visits. (default=0, i.e., 0 days after the start
+  of the mainPopulationCohort cohort start date)
 \item
-  phenotypeText - A string to identify the phenotype algorithm in the
-  output file
-\item
-  cdmShortName - A string to identify the CDM tested (Default = NULL)
-\item
-  order - The order of this algorithm for sorting in the output file
-  (used when there are multiple phenotypes to test) (Default = 1)
-\item
-  modelText - Descriptive name for the model (Default = NULL)
-\item
-  xSpecCohort - The number of the ``extremely specific (xSpec)'' cohort
-  definition id in the cohort table (for noisy positives) (Default =
-  NULL)
-\item
-  xSensCohort - The number of the ``extremely sensitive (xSens)'' cohort
-  definition id in the cohort table (used to exclude subjects from the
-  base population) (Default = NULL)
-\item
-  prevalenceCohort - The number of the cohort definition id to determine
-  the disease prevalence, (default=xSensCohort)
-\item
-  cohortDatabaseSchema - The name of the database schema that is the
-  location where the cohort data used to define the at risk cohort is
-  available. Requires read permissions to this database.
-\item
-  cohortTable - The tablename that contains the at risk cohort. The
-  expectation is cohortTable has format of COHORT table:
-  cohort\_concept\_id, SUBJECT\_ID, COHORT\_START\_DATE,
-  COHORT\_END\_DATE.
-\item
-  washoutPeriod - The washoutPeriod is used when testing algorithms
-  where there is an enforced prior observation period before the index
-  date
+  visitLength - The minimum length of index visit for noisy negative
+  comparison (default=3 days). As a guideline, use the average length of
+  a hospital visit for those with the health condition.
 \end{itemize}
 
 For example:
@@ -525,20 +516,39 @@ For example:
                                               \DataTypeTok{user =} \StringTok{"joe"}\NormalTok{,}
                                               \DataTypeTok{password =} \StringTok{"supersecret"}\NormalTok{)}
 
-\NormalTok{phenoResult <-}\StringTok{ }\NormalTok{PheValuator}\OperatorTok{::}\KeywordTok{testPhenotypeAlgorithm}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
-               \DataTypeTok{cutPoints =} \KeywordTok{c}\NormalTok{(}\StringTok{"EV"}\NormalTok{),}
-               \DataTypeTok{evaluationOutputFileName =} \StringTok{"c:/phenotyping/lr_results_Eval_10X_DM_MyCDM.rds"}\NormalTok{,}
-               \DataTypeTok{phenotypeCohortId =} \DecValTok{1769702}\NormalTok{,}
-               \DataTypeTok{cdmShortName =} \StringTok{"myCDM"}\NormalTok{,}
-               \DataTypeTok{phenotypeText =} \StringTok{"All Diabetes by Phenotype 1 X In-patient, 1st Position"}\NormalTok{,}
-               \DataTypeTok{order =} \DecValTok{1}\NormalTok{,}
-               \DataTypeTok{modelText =} \StringTok{"Diabetes Mellitus xSpec Model - 10 X T2DM"}\NormalTok{,}
-               \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{,}
-               \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{,}
-               \DataTypeTok{prevalenceCohort =} \DecValTok{1770119}\NormalTok{,}
-               \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
-               \DataTypeTok{cohortTable =} \StringTok{"cohort"}\NormalTok{,}
-               \DataTypeTok{washoutPeriod =} \DecValTok{0}\NormalTok{)}
+\NormalTok{phenoTest <-}\StringTok{ }\KeywordTok{createAcutePhenotypeModel}\NormalTok{(}\DataTypeTok{connectionDetails =}\NormalTok{ connectionDetails,}
+                \DataTypeTok{cdmDatabaseSchema =} \StringTok{"my_cdm_data"}\NormalTok{,}
+                \DataTypeTok{databaseId =} \StringTok{"TestDB"}\NormalTok{,}
+                \DataTypeTok{cohortDatabaseSchema =} \StringTok{"my_results"}\NormalTok{,}
+                \DataTypeTok{cohortDatabaseTable =} \StringTok{"cohort"}\NormalTok{,}
+                \DataTypeTok{outDatabaseSchema =} \StringTok{"scratch.dbo"}\NormalTok{, }\CommentTok{#a database schema with write access}
+                \DataTypeTok{modelOutputFileName =} \StringTok{"Train_Pneumonia_MyCDM_18-62_20190101"}\NormalTok{,}
+                \DataTypeTok{evaluationOutputFileName =} \StringTok{"Eval_Pneumonia_MyCDM_18-62_20190101"}\NormalTok{,}
+                \DataTypeTok{conditionName =} \StringTok{"Pneumonia"}\NormalTok{,}
+                \DataTypeTok{xSpecCohort =} \DecValTok{1769699}\NormalTok{,}
+                \DataTypeTok{xSensCohort =} \DecValTok{1770120}\NormalTok{,}
+                \DataTypeTok{prevalenceCohort =} \DecValTok{1770120}\NormalTok{,}
+                \DataTypeTok{excludedConcepts =} \KeywordTok{c}\NormalTok{(}\DecValTok{255848}\NormalTok{), }
+                \DataTypeTok{includedCovariateIds =} \KeywordTok{c}\NormalTok{(),}
+                \DataTypeTok{addDescendantsToExclude =} \OtherTok{TRUE}\NormalTok{,}
+                \DataTypeTok{mainPopulationCohort =} \DecValTok{0}\NormalTok{, }\CommentTok{#use the entire subject population}
+                \DataTypeTok{mainPopulationCohortStartDay =} \DecValTok{0}\NormalTok{,}
+                \DataTypeTok{mainPopulationCohortEndDay =} \DecValTok{0}\NormalTok{,}
+                \DataTypeTok{baseSampleSize =} \DecValTok{2000000}\NormalTok{,}
+                \DataTypeTok{lowerAgeLimit =} \DecValTok{18}\NormalTok{, }
+                \DataTypeTok{upperAgeLimit =} \DecValTok{90}\NormalTok{,}
+                \DataTypeTok{startDays =} \DecValTok{0}\NormalTok{, }\CommentTok{#from the start of the subject's record}
+                \DataTypeTok{endDays =} \DecValTok{7}\NormalTok{, }\CommentTok{#to the end of the subject's record}
+                \DataTypeTok{visitLength =} \DecValTok{3}\NormalTok{,}
+                \DataTypeTok{gender =} \KeywordTok{c}\NormalTok{(}\DecValTok{8507}\NormalTok{, }\DecValTok{8532}\NormalTok{),}
+                \DataTypeTok{startDate =} \StringTok{"19000101"}\NormalTok{,}
+                \DataTypeTok{endDate =} \StringTok{"21000101"}\NormalTok{,}
+                \DataTypeTok{checkDates =} \OtherTok{TRUE}\NormalTok{,}
+                \DataTypeTok{outFolder =} \StringTok{"c:/phenotyping"}\NormalTok{,}
+                \DataTypeTok{savePlpData =} \OtherTok{FALSE}\NormalTok{, }\CommentTok{#will preserve disk space}
+                \DataTypeTok{createModel =} \OtherTok{TRUE}\NormalTok{, }\CommentTok{#will create a model}
+                \DataTypeTok{createEvaluationCohort =} \OtherTok{TRUE}\NormalTok{, }\CommentTok{#will create an evaluation cohort}
+                \DataTypeTok{cohortDefinitionsToTest =}\NormalTok{ cohortSetReference)}
 \end{Highlighting}
 \end{Shaded}
 

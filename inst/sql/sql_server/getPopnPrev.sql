@@ -11,17 +11,17 @@
 {DEFAULT @startDate = '19000101' }
 {DEFAULT @endDate = '21000101' }
 {DEFAULT @prevCohort = 0 }
-{DEFAULT @checkDates = TRUE }
+{DEFAULT @removeSubjectsWithFutureDates = TRUE }
 
 with init_popn as (
 select p.person_id, p.gender_concept_id, p.year_of_birth, min(year(o.observation_period_start_date)) startYear,
-			{@checkDates == TRUE} ? {
+			{@removeSubjectsWithFutureDates == TRUE} ? {
 			  case
 			  when max(year(o.observation_period_end_date)) > YEAR(getdate()) then 1900 --year in future, person will not be used
 			  else max(year(o.observation_period_end_date))
 			  end as endYear}
-			{@checkDates == FALSE} ? {
-			  max(year(o.observation_period_end_date)) endYear}			  
+			{@removeSubjectsWithFutureDates == FALSE} ? {
+			  max(year(o.observation_period_end_date)) endYear}
         from @cdm_database_schema.person p
         join @cdm_database_schema.observation_period o
           on p.person_id = o.person_id
@@ -36,8 +36,8 @@ popn as (
 	and startYear - year_of_birth >=  @lowerAgeLimit
 		and startYear - year_of_birth <=  @upperAgeLimit
 	and gender_concept_id in (@gender)
-	and ((startYear >= year(CAST('@startDate' AS DATE)) 
-			and startYear <= year(CAST('@endDate' AS DATE))) 
+	and ((startYear >= year(CAST('@startDate' AS DATE))
+			and startYear <= year(CAST('@endDate' AS DATE)))
 		or (endYear >= year(CAST('@startDate' AS DATE))
 				and endYear <= year(CAST('@endDate' AS DATE)))))
 select cohCount*1.0/totCount popPrev

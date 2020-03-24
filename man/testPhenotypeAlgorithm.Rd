@@ -9,16 +9,17 @@ testPhenotypeAlgorithm(
   cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
   evaluationOutputFileName,
   phenotypeCohortId,
-  cdmShortName = "",
+  databaseId = "",
   phenotypeText = "",
   order = 1,
   modelText = "",
-  xSpecCohort = "",
-  xSensCohort = "",
-  prevalenceCohort = "",
+  xSpecCohortId = "",
+  xSensCohortId = "",
+  prevalenceCohortId = "",
   cohortDatabaseSchema,
   cohortTable,
-  washoutPeriod = 0
+  washoutPeriod = 0,
+  modelType = "chronic"
 )
 }
 \arguments{
@@ -32,7 +33,7 @@ the expected value}
 
 \item{phenotypeCohortId}{The number of the cohort of the phenotype algorithm to test}
 
-\item{cdmShortName}{A string to identify the CDM tested (Default = NULL)}
+\item{databaseId}{A string to identify the CDM tested (Default = NULL)}
 
 \item{phenotypeText}{A string to identify the phenotype algorithm in the output file}
 
@@ -41,14 +42,14 @@ there are multiple phenotypes to test)  (Default = 1)}
 
 \item{modelText}{Descriptive name for the model (Default = NULL)}
 
-\item{xSpecCohort}{The number of the "extremely specific (xSpec)" cohort definition id in
+\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort definition id in
 the cohort table (for noisy positives) (Default = NULL)}
 
-\item{xSensCohort}{The number of the "extremely sensitive (xSens)" cohort definition id
+\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort definition id
 in the cohort table (used to exclude subjects from the base population) (Default = NULL)}
 
-\item{prevalenceCohort}{The number of the cohort definition id to determine the disease prevalence,
-(default=xSensCohort)}
+\item{prevalenceCohortId}{The number of the cohort definition id to determine the disease prevalence,
+(default=xSensCohortId)}
 
 \item{cohortDatabaseSchema}{The name of the database schema that is the location where the cohort
 data used to define the at risk cohort is available. Requires read
@@ -59,7 +60,9 @@ cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
 COHORT_START_DATE, COHORT_END_DATE.}
 
 \item{washoutPeriod}{The mininum required continuous observation time prior to index date
-for subjects within the cohort to test (phenotypeCohortId).}
+for subjects within the cohort to test (Default = 0).}
+
+\item{modelType}{The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")}
 }
 \value{
 A list containg 2 dataframes: 1) results - a dataframe with the results from the phenotype
