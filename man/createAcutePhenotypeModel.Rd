@@ -68,7 +68,7 @@ temporary cohort table will be created here.}
 
 \item{evaluationOutputFileName}{A string designation for the evaluation cohort file}
 
-\item{phenotypeEvaluationFileName}{A string designation for the .csv file with the results for the phenotype alogrithm evaluation}
+\item{phenotypeEvaluationFileName}{A string designation for the .csv file with the results for the phenotype algorithm evaluation}
 
 \item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort definition id in
 the cohort table (for noisy positives)}

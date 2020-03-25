@@ -43,7 +43,7 @@
 #'                               temporary cohort table will be created here.
 #' @param modelOutputFileName    A string designation for the training model file
 #' @param evaluationOutputFileName  A string designation for the evaluation cohort file
-#' @param phenotypeEvaluationFileName A string designation for the .csv file with the results for the phenotype alogrithm evaluation
+#' @param phenotypeEvaluationFileName A string designation for the .csv file with the results for the phenotype algorithm evaluation
 #' @param xSpecCohortId            The number of the "extremely specific (xSpec)" cohort definition id in
 #'                               the cohort table (for noisy positives)
 #' @param xSensCohortId            The number of the "extremely sensitive (xSens)" cohort definition id
