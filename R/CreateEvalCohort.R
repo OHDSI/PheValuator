@@ -185,7 +185,11 @@ createEvaluationCohort <- function(connectionDetails,
   # will only use the covariates with non-zero betas
   lrNonZeroCovs <- c(lr_results$model$varImp$covariateId[lr_results$model$varImp$covariateValue !=
                                                            0])
-  covariateSettings$includedCovariateIds <- lrNonZeroCovs
+  #covariateSettings$includedCovariateIds <- lrNonZeroCovs
+
+  for(listUp in 1:length(covariateSettings)) {
+    covariateSettings[[listUp]]$includedCovariateIds <- c(lrNonZeroCovs)
+  }
 
   plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
                                                 cdmDatabaseSchema = paste(cdmDatabaseSchema,
