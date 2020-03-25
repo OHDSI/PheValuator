@@ -28,4 +28,10 @@ Imports:
     DatabaseConnector (>= 2.1.4)
 Suggests:
     knitr
+Remotes:
+    ohdsi/PatientLevelPrediction
+    ohdsi/FeatureExtraction
+URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
+BugReports: https://github.com/OHDSI/PheValuator/issues
 RoxygenNote: 7.0.2
+Encoding: UTF-8
