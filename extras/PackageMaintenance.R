@@ -1,5 +1,3 @@
-# @file PackageMaintenance
-#
 # Copyright 2020 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
