@@ -29,7 +29,7 @@ Imports:
 Suggests:
     knitr
 Remotes:
-    ohdsi/PatientLevelPrediction
+    ohdsi/PatientLevelPrediction,
     ohdsi/FeatureExtraction
 URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
