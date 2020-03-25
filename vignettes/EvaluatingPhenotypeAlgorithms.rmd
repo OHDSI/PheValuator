@@ -74,7 +74,7 @@ The system uses the prevalence cohort to provide a reasonable approximation of t
 
 ## Evaluating phenotype algorithms for chronic health conditions
 
-The function createChronicPhenotypeModel allows the user to perform a complete analysis for determining the performance characteristics for one or more phenotype algorithms (cohort defintions) for chronic health conditions. This function initiates the process for the three major steps in PheValuator, namely:   
+The function createChronicPhenotypeModel allows the user to perform a complete analysis for determining the performance characteristics for one or more phenotype algorithms (cohort definitions) for chronic health conditions. This function initiates the process for the three major steps in PheValuator, namely:   
   1) Develop a diagnostic predictive model for the health condition.   
   2) Select a large, random set of subjects from the dataset and use the model to determine the probability of each of the subjects having the health condition.    
   3) Determine the performance characteristics for one or more phenotype algorithms to be used in studies.   

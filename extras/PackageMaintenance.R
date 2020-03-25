@@ -20,6 +20,7 @@
 OhdsiRTools::formatRFolder()
 OhdsiRTools::checkUsagePackage("PheValuator")
 OhdsiRTools::updateCopyrightYearFolder()
+devtools::spell_check()
 
 # Create manual and vignettes
 shell("rm extras/PheValuator.pdf")

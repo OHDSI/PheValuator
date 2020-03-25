@@ -79,7 +79,7 @@
 #' @param createEvaluationCohort Run the function to create the evaluation cohort (default=TRUE)
 #' @param cohortDefinitionsToTest A dataframe with cohorts to evaluate. Leave blank to not test any cohort definitions (default=Null)
 #' with the format: atlasId - The cohort ID in ATLAS; atlasName - The full name of the cohort; cohortId - The cohort ID to use in the package. Usually the same as the cohort ID in ATLAS;
-#' name - A short name for the cohort, to use to create file names. Do not use special characters; washoutPeriod - The mininum required continuous observation time prior to index date for subjects within the cohort to test
+#' name - A short name for the cohort, to use to create file names. Do not use special characters; washoutPeriod - The minimum required continuous observation time prior to index date for subjects within the cohort to test
 #'
 #' @importFrom stats runif
 #'

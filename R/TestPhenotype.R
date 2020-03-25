@@ -52,7 +52,7 @@
 #' @param modelType              The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")
 #'
 #' @return
-#' A list containg 2 dataframes: 1) results - a dataframe with the results from the phenotype
+#' A list containing 2 dataframes: 1) results - a dataframe with the results from the phenotype
 #' algorithm evaluation 2) misses - a dataframe with a sample of subject ids for TPs, FPs, TNs, and FNs
 #' for the 50 percent and over prediction threshold (must include 0.5 in cutPoints list)
 #'
