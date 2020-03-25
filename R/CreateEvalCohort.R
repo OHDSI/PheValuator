@@ -25,46 +25,54 @@
 #' Creates the evaluation cohort and applies a diagnostic prediction model for determination of a
 #' probability for the health outcome of interest
 #'
-#' @param connectionDetails      connectionDetails created using the function createConnectionDetails
-#'                               in the DatabaseConnector package
-#' @param xSpecCohortId            The number of the "extremely specific (xSpec)" cohort definition id in
-#'                               the cohort table (for noisy positives)
-#' @param xSensCohortId            The number of the "extremely sensitive (xSens)" cohort definition id in
-#'                               the cohort table (for noisy negatives)
-#' @param cdmDatabaseSchema      The name of the database schema that contains the OMOP CDM instance.
-#'                               Requires read permissions to this database. On SQL Server, this should
-#'                               specifiy both the database and the schema, so for example
-#'                               'cdm_instance.dbo'.
-#' @param cohortDatabaseSchema   The name of the database schema that is the location where the cohort
-#'                               data used to define the at risk cohort is available. Requires read
-#'                               permissions to this database.
-#' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
-#'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
-#'                               COHORT_START_DATE, COHORT_END_DATE.
-#' @param workDatabaseSchema      The name of the database schema that is the location where the data
-#'                               used to define the outcome cohorts is available. Requires read
-#'                               permissions to this database.
-#' @param covariateSettings       A covariateSettings object as generated using createCovariateSettings()
-#' @param evaluationOutputFileName  A string designation for the evaluation cohort file
-#' @param modelOutputFileName    A string designation for the training model file
-#' @param mainPopulationCohortId   The number of the cohort to be used as a base population for the model
-#'                               (default=NULL)
-#' @param mainPopulationCohortIdStartDay The number of days relative to the mainPopulationCohortId cohort start date
-#'                              to begin including visits (default=0)
-#' @param mainPopulationCohortIdEndDay   The number of days relative to the mainPopulationCohortId cohort start date
-#'                              to end including visits (default=0)
-#' @param baseSampleSize         The maximum number of subjects in the evaluation cohort (default=2M)
-#' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
-#' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
-#' @param visitLength            The minimum length of index visit (default=3)
-#' @param gender                 The gender(s) to be included (default c(8507, 8532))
-#' @param startDate              The starting date for including subjects in the model (default=NULL)
-#' @param endDate                The ending date for including subjects in the model (default=NULL)
-#' @param cdmVersion             The CDM version of the database (default=5)
-#' @param outFolder              The folder where the output files will be written (default=working directory)
-#' @param excludeModelFromEvaluation Should subjects used in the model be excluded from the evaluation cohort (default = TRUE)
-#' @param savePlpData            Should large PLP data file be saved (default=FALSE)
-#' @param modelType              The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")
+#' @param connectionDetails                connectionDetails created using the function
+#'                                         createConnectionDetails in the DatabaseConnector package
+#' @param xSpecCohortId                    The number of the "extremely specific (xSpec)" cohort
+#'                                         definition id in the cohort table (for noisy positives)
+#' @param xSensCohortId                    The number of the "extremely sensitive (xSens)" cohort
+#'                                         definition id in the cohort table (for noisy negatives)
+#' @param cdmDatabaseSchema                The name of the database schema that contains the OMOP CDM
+#'                                         instance. Requires read permissions to this database. On SQL
+#'                                         Server, this should specifiy both the database and the
+#'                                         schema, so for example 'cdm_instance.dbo'.
+#' @param cohortDatabaseSchema             The name of the database schema that is the location where
+#'                                         the cohort data used to define the at risk cohort is
+#'                                         available. Requires read permissions to this database.
+#' @param cohortTable                      The tablename that contains the at risk cohort. The
+#'                                         expectation is cohortTable has format of COHORT table:
+#'                                         cohort_concept_id, SUBJECT_ID, COHORT_START_DATE,
+#'                                         COHORT_END_DATE.
+#' @param workDatabaseSchema               The name of the database schema that is the location where
+#'                                         the data used to define the outcome cohorts is available.
+#'                                         Requires read permissions to this database.
+#' @param covariateSettings                A covariateSettings object as generated using
+#'                                         createCovariateSettings()
+#' @param evaluationOutputFileName         A string designation for the evaluation cohort file
+#' @param modelOutputFileName              A string designation for the training model file
+#' @param mainPopulationCohortId           The number of the cohort to be used as a base population for
+#'                                         the model (default=NULL)
+#' @param mainPopulationCohortIdStartDay   The number of days relative to the mainPopulationCohortId
+#'                                         cohort start date to begin including visits (default=0)
+#' @param mainPopulationCohortIdEndDay     The number of days relative to the mainPopulationCohortId
+#'                                         cohort start date to end including visits (default=0)
+#' @param baseSampleSize                   The maximum number of subjects in the evaluation cohort
+#'                                         (default=2M)
+#' @param lowerAgeLimit                    The lower age for subjects in the model (default=NULL)
+#' @param upperAgeLimit                    The upper age for subjects in the model (default=NULL)
+#' @param visitLength                      The minimum length of index visit (default=3)
+#' @param gender                           The gender(s) to be included (default c(8507, 8532))
+#' @param startDate                        The starting date for including subjects in the model
+#'                                         (default=NULL)
+#' @param endDate                          The ending date for including subjects in the model
+#'                                         (default=NULL)
+#' @param cdmVersion                       The CDM version of the database (default=5)
+#' @param outFolder                        The folder where the output files will be written
+#'                                         (default=working directory)
+#' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the
+#'                                         evaluation cohort (default = TRUE)
+#' @param savePlpData                      Should large PLP data file be saved (default=FALSE)
+#' @param modelType                        The type of health outcome in the model either "acute" or
+#'                                         "chronic" (Default = "chronic")
 #'
 #' @importFrom stats runif
 #'
@@ -82,7 +90,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    mainPopulationCohortId = 0,
                                    mainPopulationCohortIdStartDay = 0,
                                    mainPopulationCohortIdEndDay = 0,
-                                   baseSampleSize = 2000000,
+                                   baseSampleSize = 2e+06,
                                    lowerAgeLimit = 0,
                                    upperAgeLimit = 120,
                                    visitLength = 3,
@@ -128,9 +136,7 @@ createEvaluationCohort <- function(connectionDetails,
   conn <- DatabaseConnector::connect(connectionDetails)
 
   # determine the model file to use to apply to the evaluation cohort
-  resultsFileName <- file.path(workFolder, paste(modelOutputFileName,
-                                                 ".rds",
-                                                 sep = ""))
+  resultsFileName <- file.path(workFolder, paste(modelOutputFileName, ".rds", sep = ""))
   writeLines(paste("\n...reading ", resultsFileName, sep = ""))
 
   if (!file.exists(resultsFileName))
@@ -138,7 +144,7 @@ createEvaluationCohort <- function(connectionDetails,
 
   lr_results <- readRDS(resultsFileName)
 
-  #get subjects used in model file to exclude from evaluation cohort
+  # get subjects used in model file to exclude from evaluation cohort
   exclSubjectList <- c(lr_results$prediction$subjectId)
 
   if (modelType == "acute") {
@@ -184,7 +190,7 @@ createEvaluationCohort <- function(connectionDetails,
 
   # will only use the covariates with non-zero betas
   lrNonZeroCovs <- c(lr_results$model$varImp$covariateId[lr_results$model$varImp$covariateValue !=
-                                                           0])
+    0])
   if (is(covariateSettings, "covariateSettings"))
     covariateSettings <- list(covariateSettings)
 
@@ -208,12 +214,12 @@ createEvaluationCohort <- function(connectionDetails,
   summary(plpData)
 
   if (excludeModelFromEvaluation == TRUE) {
-    #remove subjects in evaluation cohort that were in model cohort
+    # remove subjects in evaluation cohort that were in model cohort
     excl <- data.frame(plpData$cohorts$rowId[plpData$cohorts$subjectId %in% c(exclSubjectList)])
-    xSpec <- c(plpData$outcomes$rowId) #those with outcome need to be left in
-    excl <- subset(excl, !(excl[,1] %in% c(xSpec)))
+    xSpec <- c(plpData$outcomes$rowId)  #those with outcome need to be left in
+    excl <- subset(excl, !(excl[, 1] %in% c(xSpec)))
 
-    plpData$cohorts <- plpData$cohorts[!(plpData$cohorts$rowId %in% c(excl[,1])),]
+    plpData$cohorts <- plpData$cohorts[!(plpData$cohorts$rowId %in% c(excl[, 1])), ]
   }
 
   population <- PatientLevelPrediction::createStudyPopulation(plpData,
@@ -235,22 +241,30 @@ createEvaluationCohort <- function(connectionDetails,
 
   pred <- appResults$prediction
 
-  #pull in the xSens cohort
+  # pull in the xSens cohort
   sql <- paste0("select subject_id, cohort_start_date, observation_period_start_date ",
-                "from ", cohortDatabaseSchema, ".", cohortTable," co ",
-                "join ", cdmDatabaseSchema, ".observation_period op ",
+                "from ",
+                cohortDatabaseSchema,
+                ".",
+                cohortTable,
+                " co ",
+                "join ",
+                cdmDatabaseSchema,
+                ".observation_period op ",
                 "on co.subject_id = op.person_id ",
                 "and cohort_start_date between observation_period_start_date and observation_period_end_date ",
-                "where cohort_definition_id = ", xSensCohortId)
+                "where cohort_definition_id = ",
+                xSensCohortId)
 
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
-  #add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout criteria during evaluation
+  # add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout
+  # criteria during evaluation
   xSensPopn <- DatabaseConnector::querySql(connection = conn, sql)
   finalPopn <- merge(pred, xSensPopn, by.x = "subjectId", by.y = "SUBJECT_ID", all.x = TRUE)
   finalPopn$daysToXSens <- as.integer(finalPopn$COHORT_START_DATE - finalPopn$OBSERVATION_PERIOD_START_DATE)
 
-  #add other parameters to the input settings list
+  # add other parameters to the input settings list
   appResults$PheValuator$inputSetting$startDays <- covariateSettings$longTermStartDays
   appResults$PheValuator$inputSetting$endDays <- covariateSettings$endDays
   appResults$PheValuator$inputSetting$visitLength <- visitLength
@@ -258,7 +272,7 @@ createEvaluationCohort <- function(connectionDetails,
   appResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
   appResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
   appResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
-  appResults$PheValuator$inputSetting$gender <-  paste(unlist(gender), collapse = ', ')
+  appResults$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse = ", ")
   appResults$PheValuator$inputSetting$startDate <- startDate
   appResults$PheValuator$inputSetting$endDate <- endDate
   appResults$PheValuator$inputSetting$modelOutputFileName <- modelOutputFileName
@@ -268,24 +282,21 @@ createEvaluationCohort <- function(connectionDetails,
 
   appResults$PheValuator$modelperformanceEvaluation <- lr_results$performanceEvaluation
 
-  #save the full data set to the model
+  # save the full data set to the model
   appResults$prediction <- finalPopn
 
-  resultsFileName <- file.path(workFolder, paste(evaluationOutputFileName,
-                                                 ".rds",
-                                                 sep = ""))
+  resultsFileName <- file.path(workFolder, paste(evaluationOutputFileName, ".rds", sep = ""))
 
-  writeLines(paste0("\nSaving PLP Evaluation Results to: ",resultsFileName))
+  writeLines(paste0("\nSaving PLP Evaluation Results to: ", resultsFileName))
 
 
   # save the plp data - to be used for phenotype evaluation
   saveRDS(appResults, resultsFileName)
 
   if (savePlpData == TRUE) {
-    plpDataFileName <- file.path(workFolder, paste(evaluationOutputFileName,
-                                                   sep = ""))
+    plpDataFileName <- file.path(workFolder, paste(evaluationOutputFileName, sep = ""))
 
-    writeLines(paste0("\nSaving PLP Data to: ",plpDataFileName))
+    writeLines(paste0("\nSaving PLP Data to: ", plpDataFileName))
     savePlpData(plpData, plpDataFileName)
   }
 

@@ -25,17 +25,15 @@
 #' This function will extract the model performance characteristics (e.g., AUC, calibration data) from
 #' the .rds output file from the model
 #'
-#' @param modelFileName          The full file name with path for the model file
-#' @param cdmShortName           A short name for the current database (CDM)
+#' @param modelFileName   The full file name with path for the model file
+#' @param cdmShortName    A short name for the current database (CDM)
 
-#'
 #' @return
-#' A list containg 2 dataframes: 1) dataframe with the model performance characteristics
-#'                               2) dataframe with top 10 positive predictors
+#' A list containg 2 dataframes: 1) dataframe with the model performance characteristics 2) dataframe
+#' with top 10 positive predictors
 #'
 #' @export
-getPerformanceCharacteristics <- function(modelFileName = "",
-                                          cdmShortName = "") {
+getPerformanceCharacteristics <- function(modelFileName = "", cdmShortName = "") {
 
   options(error = NULL)
 
@@ -56,41 +54,41 @@ getPerformanceCharacteristics <- function(modelFileName = "",
   modelFile <- readRDS(modelFileName)
   evalStats <- suppressWarnings(data.frame(modelFile$performanceEvaluation$evaluationStatistics))
 
-  newRow$TrainAuc <- round(as.numeric(as.character(evalStats$Value[evalStats$Eval == "test" &
-                            evalStats$Metric == "AUC.auc"])),3)
+  newRow$TrainAuc <- round(as.numeric(as.character(evalStats$Value[evalStats$Eval == "test" & evalStats$Metric ==
+    "AUC.auc"])), 3)
   newRow$TrainIntercept <- round(as.numeric(as.character(evalStats$Value[evalStats$Eval == "test" &
-                            evalStats$Metric == "CalibrationIntercept.Intercept"])),2)
-  newRow$TrainSlope <- round(as.numeric(as.character(evalStats$Value[evalStats$Eval == "test" &
-                            evalStats$Metric == "CalibrationSlope.Gradient"])),2)
+    evalStats$Metric == "CalibrationIntercept.Intercept"])), 2)
+  newRow$TrainSlope <- round(as.numeric(as.character(evalStats$Value[evalStats$Eval == "test" & evalStats$Metric ==
+    "CalibrationSlope.Gradient"])), 2)
 
   predStats <- data.frame(modelFile$performanceEvaluation$predictionDistribution)
-  newRow$AvgPredProbCase <- round(as.numeric(as.character(predStats$averagePredictedProbability
-                                                          [predStats$Eval == "test" & predStats$class == 1])),2)
-  newRow$MedianPredProbCase <- round(as.numeric(as.character(predStats$MedianPredictedProbability
-                                                          [predStats$Eval == "test" & predStats$class == 1])),2)
-  newRow$AvgPredProbNonCase <- round(as.numeric(as.character(predStats$averagePredictedProbability
-                                                          [predStats$Eval == "test" & predStats$class == 0])),2)
-  newRow$MedianPredProbNonCase <- round(as.numeric(as.character(predStats$MedianPredictedProbability
-                                                          [predStats$Eval == "test" & predStats$class == 0])),2)
+  newRow$AvgPredProbCase <- round(as.numeric(as.character(predStats$averagePredictedProbability[predStats$Eval ==
+    "test" & predStats$class == 1])), 2)
+  newRow$MedianPredProbCase <- round(as.numeric(as.character(predStats$MedianPredictedProbability[predStats$Eval ==
+    "test" & predStats$class == 1])), 2)
+  newRow$AvgPredProbNonCase <- round(as.numeric(as.character(predStats$averagePredictedProbability[predStats$Eval ==
+    "test" & predStats$class == 0])), 2)
+  newRow$MedianPredProbNonCase <- round(as.numeric(as.character(predStats$MedianPredictedProbability[predStats$Eval ==
+    "test" & predStats$class == 0])), 2)
 
 
   newRow$ModelFile <- as.character(modelFileName)
 
   preds <- data.frame(modelFile$model$varImp[with(modelFile$model$varImp,
-                                                  order(-modelFile$model$varImp$covariateValue)),])[1:10,]
-  preds <- preds[ , (names(preds) %in% c("CDM", "covariateName", "covariateValue"))]
+                                                  order(-modelFile$model$varImp$covariateValue)), ])[1:10, ]
+  preds <- preds[, (names(preds) %in% c("CDM", "covariateName", "covariateValue"))]
 
   preds$CDM <- as.character(cdmShortName)
 
   preds$ModelFile <- as.character(modelFileName)
   preds$covariateName <- as.character(preds$covariateName)
-  preds <- data.frame(preds[,c(3,1,2,4)], stringsAsFactors = FALSE)
+  preds <- data.frame(preds[, c(3, 1, 2, 4)], stringsAsFactors = FALSE)
 
-    if (nrow(results) == 0) {
-      results <- as.data.frame(newRow, stringsAsFactors = FALSE)
-    } else {
-      results <- rbind(results, as.data.frame(newRow))
-    }
+  if (nrow(results) == 0) {
+    results <- as.data.frame(newRow, stringsAsFactors = FALSE)
+  } else {
+    results <- rbind(results, as.data.frame(newRow))
+  }
 
   return(list(results, preds))
 }

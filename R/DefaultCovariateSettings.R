@@ -24,22 +24,23 @@
 #' @details
 #' Function to create the default covariate settings for acute diseases
 #'
-#' @param excludedCovariateConceptIds       A list of conceptIds to exclude from featureExtraction.  These should include all
-#'                               concept_ids that were used to define the xSpec model (default=NULL)
-#' @param includedCovariateIds   A list of covariate IDs that should be restricted to.
-#' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
-#' @param startDays              The days to include prior to the cohort start date (default=0)
-#' @param endDays                The days to include after the cohort start date (default=7)
+#' @param excludedCovariateConceptIds   A list of conceptIds to exclude from featureExtraction.  These
+#'                                      should include all concept_ids that were used to define the
+#'                                      xSpec model (default=NULL)
+#' @param includedCovariateIds          A list of covariate IDs that should be restricted to.
+#' @param addDescendantsToExclude       Should descendants of excluded concepts also be excluded?
+#'                                      (default=FALSE)
+#' @param startDays                     The days to include prior to the cohort start date (default=0)
+#' @param endDays                       The days to include after the cohort start date (default=7)
 #'
 #' @importFrom stats runif
 #'
 #' @export
-createDefaultAcuteCovariateSettings <- function(
-  excludedCovariateConceptIds = c(),
-  includedCovariateIds = c(),
-  addDescendantsToExclude = FALSE,
-  startDays = 0,
-  endDays = 7) {
+createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(),
+                                                includedCovariateIds = c(),
+                                                addDescendantsToExclude = FALSE,
+                                                startDays = 0,
+                                                endDays = 7) {
 
   covariateSettings1 <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
                                                                    useDemographicsAgeGroup = TRUE,
@@ -110,13 +111,11 @@ createDefaultAcuteCovariateSettings <- function(
   return(covariateSettings)
 }
 
-createDefaultChronicCovariateSettings <- function(
-  excludedCovariateConceptIds = c(),
-  includedCovariateIds = c(),
-  addDescendantsToExclude = FALSE,
-  startDays = 0,
-  endDays = 7)
-{
+createDefaultChronicCovariateSettings <- function(excludedCovariateConceptIds = c(),
+                                                  includedCovariateIds = c(),
+                                                  addDescendantsToExclude = FALSE,
+                                                  startDays = 0,
+                                                  endDays = 7) {
 
   covariateSettings <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
                                                                   useDemographicsAgeGroup = TRUE,

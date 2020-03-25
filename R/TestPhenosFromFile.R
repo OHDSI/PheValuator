@@ -14,15 +14,16 @@ testPhenosFromFile <- function(connectionDetails,
   results <- data.frame()
   phenoFile <- cohortDefinitionsToTest
 
-  if(file.exists(file.path(outFolder,paste0(evaluationOutputFileName,".rds")))) {
-    writeLines(paste("\n",Sys.time(), "test:", databaseId))
+  if (file.exists(file.path(outFolder, paste0(evaluationOutputFileName, ".rds")))) {
+    writeLines(paste("\n", Sys.time(), "test:", databaseId))
 
-    for(phenos in 1:nrow(phenoFile)) {
+    for (phenos in 1:nrow(phenoFile)) {
       phenoResult <- testPhenotypeAlgorithm(connectionDetails = connectionDetails,
                                             cutPoints = "EV",
-                                            evaluationOutputFileName = file.path(outFolder,paste0(evaluationOutputFileName,".rds")),
+                                            evaluationOutputFileName = file.path(outFolder,
+                                                                                 paste0(evaluationOutputFileName, ".rds")),
                                             phenotypeCohortId = phenoFile$atlasId[[phenos]],
-                                            phenotypeText  = phenoFile$atlasName[[phenos]],
+                                            phenotypeText = phenoFile$atlasName[[phenos]],
                                             order = phenos,
                                             modelText = phenoFile$name[[phenos]],
                                             xSpecCohortId = xSpecCohortId,
@@ -34,19 +35,27 @@ testPhenosFromFile <- function(connectionDetails,
                                             washoutPeriod = phenoFile$washoutPeriod[[phenos]],
                                             modelType = modelType)
 
-      if(nrow(results) == 0) {results <- as.data.frame(phenoResult[1], stringsAsFactors = FALSE, check.names = FALSE)}
-      else {results <- rbind(results, as.data.frame(phenoResult[1], stringsAsFactors = FALSE, check.names = FALSE))
+      if (nrow(results) == 0) {
+        results <- as.data.frame(phenoResult[1], stringsAsFactors = FALSE, check.names = FALSE)
+      } else {
+        results <- rbind(results, as.data.frame(phenoResult[1],
+                                                stringsAsFactors = FALSE,
+                                                check.names = FALSE))
       }
 
     }
 
-    write.csv(results[with(results, order(`Phenotype Order`, xtfrm(CDM))),],
-              file.path(outFolder, paste0(phenotypeEvaluationFileName, ".csv")), row.names = FALSE)
+    write.csv(results[with(results, order(`Phenotype Order`, xtfrm(CDM))),
+              ],
+              file.path(outFolder, paste0(phenotypeEvaluationFileName, ".csv")),
+              row.names = FALSE)
 
-    writeLines(paste0("\nOutput file saved as: ", file.path(outFolder, paste0(phenotypeEvaluationFileName, ".csv")), sep = ""))
+    writeLines(paste0("\nOutput file saved as: ",
+                      file.path(outFolder, paste0(phenotypeEvaluationFileName, ".csv")),
+                      sep = ""))
 
   } else {
-    writeLines(paste0("Missing file: ", file.path(outFolder,evaluationOutputFileName,".rds")))
+    writeLines(paste0("Missing file: ", file.path(outFolder, evaluationOutputFileName, ".rds")))
   }
 
 }

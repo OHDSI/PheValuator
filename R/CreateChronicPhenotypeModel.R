@@ -22,58 +22,78 @@
 #' Create the phenotype model for chronic diseases
 #
 #' @details
-#' Function to run through the complete phenotype evaluation process from model building to developing an
-#' evaluation cohort to using the evaluation cohort to determine the performance characteristics of phenotype algorithms
-#' for chronic health conditions.
+#' Function to run through the complete phenotype evaluation process from model building to developing
+#' an evaluation cohort to using the evaluation cohort to determine the performance characteristics of
+#' phenotype algorithms for chronic health conditions.
 #'
-#' @param connectionDetails      connectionDetails created using the function createConnectionDetails
-#'                               in the DatabaseConnector package.
-#' @param cdmDatabaseSchema      The name of the database schema that contains the OMOP CDM instance.
-#'                               Requires read permissions to this database. On SQL Server, this should
-#'                               specifiy both the database and the schema, so for example
-#'                               'cdm_instance.dbo'.
-#' @param databaseId             Short name for the database (default="TestDB")
-#' @param cohortDatabaseSchema   The name of the database schema that is the location where the cohort
-#'                               data used to define the at risk cohort is available. Requires read
-#'                               permissions to this database.
-#' @param cohortTable            The tablename that contains the at risk cohort. The expectation is
-#'                               cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
-#'                               COHORT_START_DATE, COHORT_END_DATE.
-#' @param workDatabaseSchema      The name of a database schema where the user has write capability.  A
-#'                               temporary cohort table will be created here.
-#' @param modelOutputFileName    A string designation for the training model file
-#' @param evaluationOutputFileName  A string designation for the evaluation cohort file
-#' @param phenotypeEvaluationFileName A string designation for the .csv file with the results for the phenotype algorithm evaluation
-#' @param xSpecCohortId            The number of the "extremely specific (xSpec)" cohort definition id in
-#'                               the cohort table (for noisy positives)
-#' @param xSensCohortId            The number of the "extremely sensitive (xSens)" cohort definition id
-#'                               in the cohort table (used to exclude subjects from the base population)
-#' @param prevalenceCohortId       The number of the cohort definition id to determine the disease prevalence,
-#'                               (default=xSensCohortId)
-#' @param excludedCovariateConceptIds       A list of conceptIds to exclude from featureExtraction.  These should include all
-#'                               concept_ids that were used to define the xSpec model (default=NULL)
-#' @param includedCovariateIds   A list of covariate IDs that should be restricted to.
-#' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
-#' @param mainPopulationCohortId   The number of the cohort ID to be used as a base population for the model
-#'                               (default=NULL)
-#' @param baseSampleSize         The maximum number of subjects in the evaluation cohort (default=2M)
-#' @param lowerAgeLimit          The lower age for subjects in the model (default=NULL)
-#' @param upperAgeLimit          The upper age for subjects in the model (default=NULL)
-#' @param startDays              The days to include prior to the cohort start date (default=0)
-#' @param endDays                The days to include after the cohort start date (default=10000)
-#' @param visitLength            The minimum length of index visit for noisy negative comparison (default=3)
-#' @param gender                 The gender(s) to be included (default c(8507, 8532))
-#' @param startDate              The starting date for including subjects in the model (default=NULL)
-#' @param endDate                The ending date for including subjects in the model (default=NULL)
-#' @param removeSubjectsWithFutureDates             Should dates be checked to remove future dates (default=TRUE)
-#' @param cdmVersion             The CDM version of the database (default=5)
-#' @param outFolder              The folder where the output files will be written (default=working directory)
-#' @param savePlpData            Should large PLP data file be saved (default=FALSE)
-#' @param createModel            Run the function to create the diagnostic predictive model (default=TRUE)
-#' @param createEvaluationCohort Run the function to create the evaluation cohort (default=TRUE)
-#' @param cohortDefinitionsToTest A dataframe with cohorts to evaluate. Leave blank to not test any cohort definitions (default=Null)
-#' with the format: atlasId - The cohort ID in ATLAS; atlasName - The full name of the cohort; cohortId - The cohort ID to use in the package. Usually the same as the cohort ID in ATLAS;
-#' name - A short name for the cohort, to use to create file names. Do not use special characters; washoutPeriod - The mininum required continuous observation time prior to index date for subjects within the cohort to test
+#' @param connectionDetails               connectionDetails created using the function
+#'                                        createConnectionDetails in the DatabaseConnector package.
+#' @param cdmDatabaseSchema               The name of the database schema that contains the OMOP CDM
+#'                                        instance. Requires read permissions to this database. On SQL
+#'                                        Server, this should specifiy both the database and the
+#'                                        schema, so for example 'cdm_instance.dbo'.
+#' @param databaseId                      Short name for the database (default="TestDB")
+#' @param cohortDatabaseSchema            The name of the database schema that is the location where
+#'                                        the cohort data used to define the at risk cohort is
+#'                                        available. Requires read permissions to this database.
+#' @param cohortTable                     The tablename that contains the at risk cohort. The
+#'                                        expectation is cohortTable has format of COHORT table:
+#'                                        cohort_concept_id, SUBJECT_ID, COHORT_START_DATE,
+#'                                        COHORT_END_DATE.
+#' @param workDatabaseSchema              The name of a database schema where the user has write
+#'                                        capability.  A temporary cohort table will be created here.
+#' @param modelOutputFileName             A string designation for the training model file
+#' @param evaluationOutputFileName        A string designation for the evaluation cohort file
+#' @param phenotypeEvaluationFileName     A string designation for the .csv file with the results for
+#'                                        the phenotype algorithm evaluation
+#' @param xSpecCohortId                   The number of the "extremely specific (xSpec)" cohort
+#'                                        definition id in the cohort table (for noisy positives)
+#' @param xSensCohortId                   The number of the "extremely sensitive (xSens)" cohort
+#'                                        definition id in the cohort table (used to exclude subjects
+#'                                        from the base population)
+#' @param prevalenceCohortId              The number of the cohort definition id to determine the
+#'                                        disease prevalence, (default=xSensCohortId)
+#' @param excludedCovariateConceptIds     A list of conceptIds to exclude from featureExtraction.
+#'                                        These should include all concept_ids that were used to define
+#'                                        the xSpec model (default=NULL)
+#' @param includedCovariateIds            A list of covariate IDs that should be restricted to.
+#' @param addDescendantsToExclude         Should descendants of excluded concepts also be excluded?
+#'                                        (default=FALSE)
+#' @param mainPopulationCohortId          The number of the cohort ID to be used as a base population
+#'                                        for the model (default=NULL)
+#' @param baseSampleSize                  The maximum number of subjects in the evaluation cohort
+#'                                        (default=2M)
+#' @param lowerAgeLimit                   The lower age for subjects in the model (default=NULL)
+#' @param upperAgeLimit                   The upper age for subjects in the model (default=NULL)
+#' @param startDays                       The days to include prior to the cohort start date
+#'                                        (default=0)
+#' @param endDays                         The days to include after the cohort start date
+#'                                        (default=10000)
+#' @param visitLength                     The minimum length of index visit for noisy negative
+#'                                        comparison (default=3)
+#' @param gender                          The gender(s) to be included (default c(8507, 8532))
+#' @param startDate                       The starting date for including subjects in the model
+#'                                        (default=NULL)
+#' @param endDate                         The ending date for including subjects in the model
+#'                                        (default=NULL)
+#' @param removeSubjectsWithFutureDates   Should dates be checked to remove future dates (default=TRUE)
+#' @param cdmVersion                      The CDM version of the database (default=5)
+#' @param outFolder                       The folder where the output files will be written
+#'                                        (default=working directory)
+#' @param savePlpData                     Should large PLP data file be saved (default=FALSE)
+#' @param createModel                     Run the function to create the diagnostic predictive model
+#'                                        (default=TRUE)
+#' @param createEvaluationCohort          Run the function to create the evaluation cohort
+#'                                        (default=TRUE)
+#' @param cohortDefinitionsToTest         A dataframe with cohorts to evaluate. Leave blank to not test
+#'                                        any cohort definitions (default=Null) with the format:
+#'                                        atlasId - The cohort ID in ATLAS; atlasName - The full name
+#'                                        of the cohort; cohortId - The cohort ID to use in the
+#'                                        package. Usually the same as the cohort ID in ATLAS; name - A
+#'                                        short name for the cohort, to use to create file names. Do
+#'                                        not use special characters; washoutPeriod - The mininum
+#'                                        required continuous observation time prior to index date for
+#'                                        subjects within the cohort to test
 #'
 #' @importFrom stats runif
 #'
@@ -94,7 +114,7 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         includedCovariateIds = c(),
                                         addDescendantsToExclude = FALSE,
                                         mainPopulationCohortId = 0,
-                                        baseSampleSize = 2000000,
+                                        baseSampleSize = 2e+06,
                                         lowerAgeLimit = 0,
                                         upperAgeLimit = 120,
                                         startDays = 0,
@@ -112,10 +132,10 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         cohortDefinitionsToTest = NULL) {
 
   options(error = NULL)
-  options(scipen=999)
+  options(scipen = 999)
 
 
-  if(createModel == TRUE) {
+  if (createModel == TRUE) {
     errorCheck(callingProgram = "createPhenotypeModel",
                connectionDetails = connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
@@ -155,12 +175,11 @@ createChronicPhenotypeModel <- function(connectionDetails,
     writeLines(paste("cdmVersion ", cdmVersion))
     writeLines(paste("outFolder ", outFolder))
 
-    covariateSettings <- createDefaultChronicCovariateSettings(
-      excludedCovariateConceptIds = excludedCovariateConceptIds,
-      includedCovariateIds = includedCovariateIds,
-      addDescendantsToExclude = addDescendantsToExclude,
-      startDays = startDays,
-      endDays = endDays)
+    covariateSettings <- createDefaultChronicCovariateSettings(excludedCovariateConceptIds = excludedCovariateConceptIds,
+                                                               includedCovariateIds = includedCovariateIds,
+                                                               addDescendantsToExclude = addDescendantsToExclude,
+                                                               startDays = startDays,
+                                                               endDays = endDays)
 
     model <- createPhenotypeModel(connectionDetails = connectionDetails,
                                   cdmDatabaseSchema = cdmDatabaseSchema,
@@ -177,15 +196,15 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                   upperAgeLimit = upperAgeLimit,
                                   visitLength = visitLength,
                                   gender = c(gender),
-                                  startDate = startDate ,
+                                  startDate = startDate,
                                   endDate = endDate,
                                   removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
                                   cdmVersion = cdmVersion,
                                   outFolder = outFolder,
-                                  modelType = 'chronic')
+                                  modelType = "chronic")
   }
 
-  if(createEvaluationCohort == TRUE) {
+  if (createEvaluationCohort == TRUE) {
     errorCheck(callingProgram = "createEvaluationCohort",
                connectionDetails = connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
@@ -223,12 +242,11 @@ createChronicPhenotypeModel <- function(connectionDetails,
     writeLines(paste("cdmVersion ", cdmVersion))
     writeLines(paste("outFolder ", outFolder))
 
-    covariateSettings <- createDefaultChronicCovariateSettings(
-      excludedCovariateConceptIds = excludedCovariateConceptIds,
-      includedCovariateIds = includedCovariateIds,
-      addDescendantsToExclude = addDescendantsToExclude,
-      startDays = startDays,
-      endDays = endDays)
+    covariateSettings <- createDefaultChronicCovariateSettings(excludedCovariateConceptIds = excludedCovariateConceptIds,
+                                                               includedCovariateIds = includedCovariateIds,
+                                                               addDescendantsToExclude = addDescendantsToExclude,
+                                                               startDays = startDays,
+                                                               endDays = endDays)
 
     evalCohort <- createEvaluationCohort(connectionDetails = connectionDetails,
                                          xSpecCohortId = xSpecCohortId,
@@ -250,10 +268,10 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                          cdmVersion = cdmVersion,
                                          outFolder = outFolder,
                                          savePlpData = savePlpData,
-                                         modelType = 'chronic')
+                                         modelType = "chronic")
   }
 
-  if(!is.null(cohortDefinitionsToTest)) {
+  if (!is.null(cohortDefinitionsToTest)) {
     errorCheck(callingProgram = "testPhenosFromFile",
                connectionDetails = connectionDetails,
                cdmDatabaseSchema = cdmDatabaseSchema,
@@ -281,7 +299,7 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         cohortTable = cohortTable,
                                         cohortDefinitionsToTest = cohortDefinitionsToTest,
                                         outFolder = outFolder,
-                                        modelType = 'chronic')
+                                        modelType = "chronic")
   }
 
 }

@@ -22,8 +22,8 @@
 #' Test the concept sets used in the models
 #'
 #' @details
-#' Function to examine the concepts in the xSpec cohort compared to the noisy negative cohort.
-#' This will give a sense of the comrrectnes/completeness of the concept set used for the model
+#' Function to examine the concepts in the xSpec cohort compared to the noisy negative cohort. This
+#' will give a sense of the comrrectnes/completeness of the concept set used for the model
 #'
 #' @param connectionDetails      connectionDetails created using the function createConnectionDetails
 #'                               in the DatabaseConnector package.
@@ -61,22 +61,22 @@
 #'
 #' @export
 testConcepts <- function(connectionDetails = list(),
-                             xSpecCohort = "",
-                             cdmDatabaseSchema = "",
-                             cohortDatabaseSchema = "",
-                             cohortDatabaseTable = "",
-                             outDatabaseSchema = "",
-                             testOutFile = "",
-                             exclCohort = "",
-                             modelAnalysisId = "1",
-                             inclConcepts = c(),
-                             cdmShortName = "CDM",
-                             mainPopnCohort = 0,
-                             lowerAgeLimit = 0,
-                             upperAgeLimit = 120,
-                             gender = c(8507, 8532),
-                             startDate = "19000101",
-                             endDate = "21000101") {
+                         xSpecCohort = "",
+                         cdmDatabaseSchema = "",
+                         cohortDatabaseSchema = "",
+                         cohortDatabaseTable = "",
+                         outDatabaseSchema = "",
+                         testOutFile = "",
+                         exclCohort = "",
+                         modelAnalysisId = "1",
+                         inclConcepts = c(),
+                         cdmShortName = "CDM",
+                         mainPopnCohort = 0,
+                         lowerAgeLimit = 0,
+                         upperAgeLimit = 120,
+                         gender = c(8507, 8532),
+                         startDate = "19000101",
+                         endDate = "21000101") {
 
   options(error = NULL)
 
@@ -210,7 +210,7 @@ testConcepts <- function(connectionDetails = list(),
     plpData <- PatientLevelPrediction::loadPlpData(plpDataFile)
   }
 
-  #produce the output for analyzing the concept set
+  # produce the output for analyzing the concept set
   covDataRef <- data.frame(plpData$covariateRef)
   covDataAll <- merge(data.frame(plpData$covariates), covDataRef, by = "covariateId")
   covDataAll <- merge(covDataAll, data.frame(plpData$cohorts), by = "rowId")
@@ -219,8 +219,8 @@ testConcepts <- function(connectionDetails = list(),
   subjOut <- c(plpData$cohorts$subjectId[plpData$cohorts$rowId %in% plpData$outcomes$rowId])
   subjNoOut <- c(plpData$cohorts$subjectId[!(plpData$cohorts$rowId %in% plpData$outcomes$rowId)])
 
-  data0 <- covDataAll[covDataAll$subjectId %in% c(subjNoOut),]
-  data1 <- covDataAll[covDataAll$subjectId %in% c(subjOut),]
+  data0 <- covDataAll[covDataAll$subjectId %in% c(subjNoOut), ]
+  data1 <- covDataAll[covDataAll$subjectId %in% c(subjOut), ]
   cov0 <- dplyr::summarize(group_by(data0, as.character(covariateId)), n())
   cov1 <- dplyr::summarize(group_by(data1, as.character(covariateId)), n())
 
@@ -232,25 +232,32 @@ testConcepts <- function(connectionDetails = list(),
   names(cov1)[2] <- "n"
   cov1$prop <- cov1$n/length(subjOut)
 
-  conceptCompare <- merge(cov1, cov0, by="covariateId", all.x=TRUE)
+  conceptCompare <- merge(cov1, cov0, by = "covariateId", all.x = TRUE)
   conceptCompare$prop.y[is.na(conceptCompare$prop.y)] <- 1e-15
   conceptCompare$n.y[is.na(conceptCompare$n.y)] <- 0
   conceptCompare$pr <- conceptCompare$prop.x/conceptCompare$prop.y
-  conceptCompare <- conceptCompare[conceptCompare$n.x >= 10,]
-  conceptCompare <- merge(conceptCompare, covDataRef, by="covariateId")
-  conceptCompare$inConceptList <- !is.na(stringr::str_locate(paste(inclConcepts, collapse=", "),
+  conceptCompare <- conceptCompare[conceptCompare$n.x >= 10, ]
+  conceptCompare <- merge(conceptCompare, covDataRef, by = "covariateId")
+  conceptCompare$inConceptList <- !is.na(stringr::str_locate(paste(inclConcepts, collapse = ", "),
                                                              as.character(conceptCompare$conceptId))[1])
-  conceptCompare$name <- substr(conceptCompare$covariateName, stringr::str_locate(conceptCompare$covariateName, ':')[1] + 2,
+  conceptCompare$name <- substr(conceptCompare$covariateName,
+                                stringr::str_locate(conceptCompare$covariateName, ":")[1] + 2,
                                 length(conceptCompare$covariateName))
-  names(conceptCompare)[names(conceptCompare)=="n.x"] <- "countxSpec"
-  names(conceptCompare)[names(conceptCompare)=="prop.x"] <- "proportionxSpec"
-  names(conceptCompare)[names(conceptCompare)=="n.y"] <- "countNeg"
-  names(conceptCompare)[names(conceptCompare)=="prop.y"] <- "proportionNeg"
-  conceptCompare <- conceptCompare[,c(9,11,10,6,2,3,4,5)]
-  conceptCompare <- conceptCompare[with(conceptCompare, order(-pr)),]
+  names(conceptCompare)[names(conceptCompare) == "n.x"] <- "countxSpec"
+  names(conceptCompare)[names(conceptCompare) == "prop.x"] <- "proportionxSpec"
+  names(conceptCompare)[names(conceptCompare) == "n.y"] <- "countNeg"
+  names(conceptCompare)[names(conceptCompare) == "prop.y"] <- "proportionNeg"
+  conceptCompare <- conceptCompare[, c(9, 11, 10, 6, 2, 3, 4, 5)]
+  conceptCompare <- conceptCompare[with(conceptCompare, order(-pr)), ]
 
-  outFile <- file.path(getwd(), paste("conceptCompare_", testOutFile, "_", cdmShortName,"_",
-                                                               modelAnalysisId, ".csv", sep = ""))
+  outFile <- file.path(getwd(), paste("conceptCompare_",
+                                      testOutFile,
+                                      "_",
+                                      cdmShortName,
+                                      "_",
+                                      modelAnalysisId,
+                                      ".csv",
+                                      sep = ""))
   write.csv(conceptCompare, outFile, row.names = FALSE)
   writeLines(paste("\nConcept Comparison File: ", outFile, sep = ""))
 
