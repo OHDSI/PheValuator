@@ -23,11 +23,11 @@ testPhenotypeAlgorithm(
 )
 }
 \arguments{
-\item{connectionDetails}{ConnectionDetails created using the function createConnectionDetails
-in the DatabaseConnector package.}
+\item{connectionDetails}{ConnectionDetails created using the function
+createConnectionDetails in the DatabaseConnector package.}
 
-\item{cutPoints}{A list of threshold predictions for the evaluations.  Include "EV" for
-the expected value}
+\item{cutPoints}{A list of threshold predictions for the evaluations.  Include "EV"
+for the expected value}
 
 \item{evaluationOutputFileName}{The full file name with path for the evaluation file}
 
@@ -37,37 +37,39 @@ the expected value}
 
 \item{phenotypeText}{A string to identify the phenotype algorithm in the output file}
 
-\item{order}{The order of this algorithm for sorting in the output file (used when
-there are multiple phenotypes to test)  (Default = 1)}
+\item{order}{The order of this algorithm for sorting in the output file (used
+when there are multiple phenotypes to test) (Default = 1)}
 
 \item{modelText}{Descriptive name for the model (Default = NULL)}
 
-\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort definition id in
-the cohort table (for noisy positives) (Default = NULL)}
+\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort definition
+id in the cohort table (for noisy positives) (Default = NULL)}
 
-\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort definition id
-in the cohort table (used to exclude subjects from the base population) (Default = NULL)}
+\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort definition
+id in the cohort table (used to exclude subjects from the base
+population) (Default = NULL)}
 
-\item{prevalenceCohortId}{The number of the cohort definition id to determine the disease prevalence,
-(default=xSensCohortId)}
+\item{prevalenceCohortId}{The number of the cohort definition id to determine the disease
+prevalence, (default=xSensCohortId)}
 
-\item{cohortDatabaseSchema}{The name of the database schema that is the location where the cohort
-data used to define the at risk cohort is available. Requires read
-permissions to this database.}
+\item{cohortDatabaseSchema}{The name of the database schema that is the location where the
+cohort data used to define the at risk cohort is available.
+Requires read permissions to this database.}
 
 \item{cohortTable}{The tablename that contains the at risk cohort. The expectation is
-cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
-COHORT_START_DATE, COHORT_END_DATE.}
+cohortTable has format of COHORT table: cohort_concept_id,
+SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.}
 
-\item{washoutPeriod}{The mininum required continuous observation time prior to index date
-for subjects within the cohort to test (Default = 0).}
+\item{washoutPeriod}{The mininum required continuous observation time prior to index
+date for subjects within the cohort to test (Default = 0).}
 
-\item{modelType}{The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")}
+\item{modelType}{The type of health outcome in the model either "acute" or
+"chronic" (Default = "chronic")}
 }
 \value{
-A list containg 2 dataframes: 1) results - a dataframe with the results from the phenotype
-algorithm evaluation 2) misses - a dataframe with a sample of subject ids for TPs, FPs, TNs, and FNs
-for the 50 percent and over prediction threshold (must include 0.5 in cutPoints list)
+A list containing 2 dataframes: 1) results - a dataframe with the results from the phenotype
+algorithm evaluation 2) misses - a dataframe with a sample of subject ids for TPs, FPs, TNs, and
+FNs for the 50 percent and over prediction threshold (must include 0.5 in cutPoints list)
 }
 \description{
 Test phenotype algorithms

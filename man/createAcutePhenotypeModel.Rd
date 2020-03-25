@@ -43,99 +43,120 @@ createAcutePhenotypeModel(
 )
 }
 \arguments{
-\item{connectionDetails}{connectionDetails created using the function createConnectionDetails
-in the DatabaseConnector package.}
+\item{connectionDetails}{connectionDetails created using the function
+createConnectionDetails in the DatabaseConnector package.}
 
-\item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM instance.
-Requires read permissions to this database. On SQL Server, this should
-specifiy both the database and the schema, so for example
-'cdm_instance.dbo'.}
+\item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM
+instance. Requires read permissions to this database. On SQL
+Server, this should specifiy both the database and the
+schema, so for example 'cdm_instance.dbo'.}
 
 \item{databaseId}{Short name for the database (default="TestDB")}
 
-\item{cohortDatabaseSchema}{The name of the database schema that is the location where the cohort
-data used to define the at risk cohort is available. Requires read
-permissions to this database.}
+\item{cohortDatabaseSchema}{The name of the database schema that is the location where
+the cohort data used to define the at risk cohort is
+available. Requires read permissions to this database.}
 
-\item{cohortTable}{The tablename that contains the at risk cohort. The expectation is
-cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
-COHORT_START_DATE, COHORT_END_DATE.}
+\item{cohortTable}{The tablename that contains the at risk cohort. The
+expectation is cohortTable has format of COHORT table:
+cohort_concept_id, SUBJECT_ID, COHORT_START_DATE,
+COHORT_END_DATE.}
 
-\item{workDatabaseSchema}{The name of a database schema where the user has write capability.  A
-temporary cohort table will be created here.}
+\item{workDatabaseSchema}{The name of a database schema where the user has write
+capability.  A temporary cohort table will be created here.}
 
 \item{modelOutputFileName}{A string designation for the training model file}
 
 \item{evaluationOutputFileName}{A string designation for the evaluation cohort file}
 
-\item{phenotypeEvaluationFileName}{A string designation for the .csv file with the results for the phenotype algorithm evaluation}
+\item{phenotypeEvaluationFileName}{A string designation for the .csv file with the results for
+the phenotype algorithm evaluation}
 
-\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort definition id in
-the cohort table (for noisy positives)}
+\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort
+definition id in the cohort table (for noisy positives)}
 
-\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort definition id
-in the cohort table (used to exclude subjects from the base population)}
+\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort
+definition id in the cohort table (used to exclude subjects
+from the base population)}
 
-\item{prevalenceCohortId}{The number of the cohort definition id to determine the disease prevalence,
-(default=xSensCohortId)}
+\item{prevalenceCohortId}{The number of the cohort definition id to determine the
+disease prevalence, (default=xSensCohortId)}
 
-\item{excludedCovariateConceptIds}{A list of conceptIds to exclude from featureExtraction.  These should include all
-concept_ids that were used to define the xSpec model (default=NULL)}
+\item{excludedCovariateConceptIds}{A list of conceptIds to exclude from featureExtraction.
+These should include all concept_ids that were used to
+define the xSpec model (default=NULL)}
 
 \item{includedCovariateIds}{A list of covariate IDs that should be restricted to.}
 
-\item{addDescendantsToExclude}{Should descendants of excluded concepts also be excluded? (default=FALSE)}
+\item{addDescendantsToExclude}{Should descendants of excluded concepts also be excluded?
+(default=FALSE)}
 
-\item{mainPopulationCohortId}{The number of the cohort ID to be used as a base population for the model
-(default=NULL)}
+\item{mainPopulationCohortId}{The number of the cohort ID to be used as a base population
+for the model (default=NULL)}
 
-\item{mainPopulationCohortIdStartDay}{The number of days relative to the mainPopulationCohortId cohort start date
-to begin including visits (default=0)}
+\item{mainPopulationCohortIdStartDay}{The number of days relative to the mainPopulationCohortId
+cohort start date to begin including visits (default=0)}
 
-\item{mainPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId cohort start date
-to end including visits (default=0)}
+\item{mainPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId
+cohort start date to end including visits (default=0)}
 
-\item{baseSampleSize}{The maximum number of subjects in the evaluation cohort (default=2M)}
+\item{baseSampleSize}{The maximum number of subjects in the evaluation cohort
+(default=2M)}
 
 \item{lowerAgeLimit}{The lower age for subjects in the model (default=NULL)}
 
 \item{upperAgeLimit}{The upper age for subjects in the model (default=NULL)}
 
-\item{startDays}{The days to include prior to the cohort start date (default=0)}
+\item{startDays}{The days to include prior to the cohort start date
+(default=0)}
 
 \item{endDays}{The days to include after the cohort start date (default=7)}
 
-\item{visitLength}{The minimum length of index visit for noisy negative comparison (default=3)}
+\item{visitLength}{The minimum length of index visit for noisy negative
+comparison (default=3)}
 
 \item{gender}{The gender(s) to be included (default c(8507, 8532))}
 
-\item{startDate}{The starting date for including subjects in the model (default=NULL)}
+\item{startDate}{The starting date for including subjects in the model
+(default=NULL)}
 
-\item{endDate}{The ending date for including subjects in the model (default=NULL)}
+\item{endDate}{The ending date for including subjects in the model
+(default=NULL)}
 
-\item{removeSubjectsWithFutureDates}{Should dates be checked to remove future dates (default=TRUE)}
+\item{removeSubjectsWithFutureDates}{Should dates be checked to remove future dates
+(default=TRUE)}
 
 \item{cdmVersion}{The CDM version of the database (default=5)}
 
-\item{outFolder}{The folder where the output files will be written (default=working directory)}
+\item{outFolder}{The folder where the output files will be written
+(default=working directory)}
 
-\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort (default = TRUE)}
+\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the
+evaluation cohort (default = TRUE)}
 
 \item{savePlpData}{Should large PLP data file be saved (default=FALSE)}
 
-\item{createModel}{Run the function to create the diagnostic predictive model (default=TRUE)}
+\item{createModel}{Run the function to create the diagnostic predictive model
+(default=TRUE)}
 
-\item{createEvaluationCohort}{Run the function to create the evaluation cohort (default=TRUE)}
+\item{createEvaluationCohort}{Run the function to create the evaluation cohort
+(default=TRUE)}
 
-\item{cohortDefinitionsToTest}{A dataframe with cohorts to evaluate. Leave blank to not test any cohort definitions (default=Null)
-with the format: atlasId - The cohort ID in ATLAS; atlasName - The full name of the cohort; cohortId - The cohort ID to use in the package. Usually the same as the cohort ID in ATLAS;
-name - A short name for the cohort, to use to create file names. Do not use special characters; washoutPeriod - The mininum required continuous observation time prior to index date for subjects within the cohort to test}
+\item{cohortDefinitionsToTest}{A dataframe with cohorts to evaluate. Leave blank to not
+test any cohort definitions (default=Null) with the format:
+atlasId - The cohort ID in ATLAS; atlasName - The full name
+of the cohort; cohortId - The cohort ID to use in the
+package. Usually the same as the cohort ID in ATLAS; name -
+A short name for the cohort, to use to create file names. Do
+not use special characters; washoutPeriod - The minimum
+required continuous observation time prior to index date for
+subjects within the cohort to test}
 }
 \description{
 Create the phenotype model for acute diseases
 }
 \details{
-Function to run through the complete phenotype evaluation process from model building to developing an
-evaluation cohort to using the evaluation cohort to determine the performance characteristics of phenotype algorithms
-for acute health conditions.
+Function to run through the complete phenotype evaluation process from model building to developing
+an evaluation cohort to using the evaluation cohort to determine the performance characteristics of
+phenotype algorithms for acute health conditions.
 }

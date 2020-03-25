@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#' PheValuator
-#'
-#' @docType package
-#' @name PheValuator
+#' @keywords internal
+"_PACKAGE"
+
 #' @importFrom stats quantile
-#' @importFrom utils capture.output
+#' @importFrom utils capture.output write.csv
+#' @importFrom methods is
 NULL

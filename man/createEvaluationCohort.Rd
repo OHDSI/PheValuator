@@ -33,48 +33,51 @@ createEvaluationCohort(
 )
 }
 \arguments{
-\item{connectionDetails}{connectionDetails created using the function createConnectionDetails
-in the DatabaseConnector package}
+\item{connectionDetails}{connectionDetails created using the function
+createConnectionDetails in the DatabaseConnector package}
 
-\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort definition id in
-the cohort table (for noisy positives)}
+\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort
+definition id in the cohort table (for noisy positives)}
 
-\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort definition id in
-the cohort table (for noisy negatives)}
+\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort
+definition id in the cohort table (for noisy negatives)}
 
-\item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM instance.
-Requires read permissions to this database. On SQL Server, this should
-specifiy both the database and the schema, so for example
-'cdm_instance.dbo'.}
+\item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM
+instance. Requires read permissions to this database. On SQL
+Server, this should specifiy both the database and the
+schema, so for example 'cdm_instance.dbo'.}
 
-\item{cohortDatabaseSchema}{The name of the database schema that is the location where the cohort
-data used to define the at risk cohort is available. Requires read
-permissions to this database.}
+\item{cohortDatabaseSchema}{The name of the database schema that is the location where
+the cohort data used to define the at risk cohort is
+available. Requires read permissions to this database.}
 
-\item{cohortTable}{The tablename that contains the at risk cohort. The expectation is
-cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
-COHORT_START_DATE, COHORT_END_DATE.}
+\item{cohortTable}{The tablename that contains the at risk cohort. The
+expectation is cohortTable has format of COHORT table:
+cohort_concept_id, SUBJECT_ID, COHORT_START_DATE,
+COHORT_END_DATE.}
 
-\item{workDatabaseSchema}{The name of the database schema that is the location where the data
-used to define the outcome cohorts is available. Requires read
-permissions to this database.}
+\item{workDatabaseSchema}{The name of the database schema that is the location where
+the data used to define the outcome cohorts is available.
+Requires read permissions to this database.}
 
-\item{covariateSettings}{A covariateSettings object as generated using createCovariateSettings()}
+\item{covariateSettings}{A covariateSettings object as generated using
+createCovariateSettings()}
 
 \item{evaluationOutputFileName}{A string designation for the evaluation cohort file}
 
 \item{modelOutputFileName}{A string designation for the training model file}
 
-\item{mainPopulationCohortId}{The number of the cohort to be used as a base population for the model
-(default=NULL)}
+\item{mainPopulationCohortId}{The number of the cohort to be used as a base population for
+the model (default=NULL)}
 
-\item{mainPopulationCohortIdStartDay}{The number of days relative to the mainPopulationCohortId cohort start date
-to begin including visits (default=0)}
+\item{mainPopulationCohortIdStartDay}{The number of days relative to the mainPopulationCohortId
+cohort start date to begin including visits (default=0)}
 
-\item{mainPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId cohort start date
-to end including visits (default=0)}
+\item{mainPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId
+cohort start date to end including visits (default=0)}
 
-\item{baseSampleSize}{The maximum number of subjects in the evaluation cohort (default=2M)}
+\item{baseSampleSize}{The maximum number of subjects in the evaluation cohort
+(default=2M)}
 
 \item{lowerAgeLimit}{The lower age for subjects in the model (default=NULL)}
 
@@ -84,19 +87,24 @@ to end including visits (default=0)}
 
 \item{gender}{The gender(s) to be included (default c(8507, 8532))}
 
-\item{startDate}{The starting date for including subjects in the model (default=NULL)}
+\item{startDate}{The starting date for including subjects in the model
+(default=NULL)}
 
-\item{endDate}{The ending date for including subjects in the model (default=NULL)}
+\item{endDate}{The ending date for including subjects in the model
+(default=NULL)}
 
 \item{cdmVersion}{The CDM version of the database (default=5)}
 
-\item{outFolder}{The folder where the output files will be written (default=working directory)}
+\item{outFolder}{The folder where the output files will be written
+(default=working directory)}
 
-\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort (default = TRUE)}
+\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the
+evaluation cohort (default = TRUE)}
 
 \item{savePlpData}{Should large PLP data file be saved (default=FALSE)}
 
-\item{modelType}{The type of health outcome in the model either "acute" or "chronic" (Default = "chronic")}
+\item{modelType}{The type of health outcome in the model either "acute" or
+"chronic" (Default = "chronic")}
 }
 \description{
 Create the evaluation cohort

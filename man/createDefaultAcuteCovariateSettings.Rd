@@ -13,12 +13,14 @@ createDefaultAcuteCovariateSettings(
 )
 }
 \arguments{
-\item{excludedCovariateConceptIds}{A list of conceptIds to exclude from featureExtraction.  These should include all
-concept_ids that were used to define the xSpec model (default=NULL)}
+\item{excludedCovariateConceptIds}{A list of conceptIds to exclude from featureExtraction.  These
+should include all concept_ids that were used to define the
+xSpec model (default=NULL)}
 
 \item{includedCovariateIds}{A list of covariate IDs that should be restricted to.}
 
-\item{addDescendantsToExclude}{Should descendants of excluded concepts also be excluded? (default=FALSE)}
+\item{addDescendantsToExclude}{Should descendants of excluded concepts also be excluded?
+(default=FALSE)}
 
 \item{startDays}{The days to include prior to the cohort start date (default=0)}
 
