@@ -96,7 +96,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    modelType = "chronic") {
 
   options(error = NULL)
-  options(scipen=999)
+  options(scipen = 999)
 
   # error checking for input
   if (modelType != "chronic" & modelType != "acute")
@@ -141,7 +141,7 @@ createEvaluationCohort <- function(connectionDetails,
   #get subjects used in model file to exclude from evaluation cohort
   exclSubjectList <- c(lr_results$prediction$subjectId)
 
-  if(modelType == "acute") {
+  if (modelType == "acute") {
     # create the evaluation cohort
     sqlScript <- SqlRender::readSql(system.file(paste("sql/", "sql_server", sep = ""),
                                                 "CreateCohortsAcuteEvaluation.sql",
@@ -180,7 +180,7 @@ createEvaluationCohort <- function(connectionDetails,
 
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
-  DatabaseConnector::executeSql(conn = conn, sql)
+  DatabaseConnector::executeSql(connection = conn, sql)
 
   # will only use the covariates with non-zero betas
   lrNonZeroCovs <- c(lr_results$model$varImp$covariateId[lr_results$model$varImp$covariateValue !=
@@ -188,7 +188,7 @@ createEvaluationCohort <- function(connectionDetails,
   if (is(covariateSettings, "covariateSettings"))
     covariateSettings <- list(covariateSettings)
 
-  for(listUp in 1:length(covariateSettings)) {
+  for (listUp in 1:length(covariateSettings)) {
     covariateSettings[[listUp]]$includedCovariateIds <- c(lrNonZeroCovs)
   }
 
@@ -207,7 +207,7 @@ createEvaluationCohort <- function(connectionDetails,
 
   summary(plpData)
 
-  if(excludeModelFromEvaluation == TRUE) {
+  if (excludeModelFromEvaluation == TRUE) {
     #remove subjects in evaluation cohort that were in model cohort
     excl <- data.frame(plpData$cohorts$rowId[plpData$cohorts$subjectId %in% c(exclSubjectList)])
     xSpec <- c(plpData$outcomes$rowId) #those with outcome need to be left in
@@ -246,7 +246,7 @@ createEvaluationCohort <- function(connectionDetails,
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
   #add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout criteria during evaluation
-  xSensPopn <- DatabaseConnector::querySql(conn = conn, sql)
+  xSensPopn <- DatabaseConnector::querySql(connection = conn, sql)
   finalPopn <- merge(pred, xSensPopn, by.x = "subjectId", by.y = "SUBJECT_ID", all.x = TRUE)
   finalPopn$daysToXSens <- as.integer(finalPopn$COHORT_START_DATE - finalPopn$OBSERVATION_PERIOD_START_DATE)
 
@@ -258,7 +258,7 @@ createEvaluationCohort <- function(connectionDetails,
   appResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
   appResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
   appResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
-  appResults$PheValuator$inputSetting$gender <-  paste(unlist(gender), collapse=', ')
+  appResults$PheValuator$inputSetting$gender <-  paste(unlist(gender), collapse = ', ')
   appResults$PheValuator$inputSetting$startDate <- startDate
   appResults$PheValuator$inputSetting$endDate <- endDate
   appResults$PheValuator$inputSetting$modelOutputFileName <- modelOutputFileName
@@ -281,7 +281,7 @@ createEvaluationCohort <- function(connectionDetails,
   # save the plp data - to be used for phenotype evaluation
   saveRDS(appResults, resultsFileName)
 
-  if(savePlpData == TRUE) {
+  if (savePlpData == TRUE) {
     plpDataFileName <- file.path(workFolder, paste(evaluationOutputFileName,
                                                    sep = ""))
 
@@ -296,8 +296,8 @@ createEvaluationCohort <- function(connectionDetails,
   sql <- SqlRender::render(sqlScript, tempDB = workDatabaseSchema, test_cohort = test_cohort)
   sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
 
-  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file=NULL)
-  DatabaseConnector::executeSql(conn = conn, sql)
+  capture.output(conn <- DatabaseConnector::connect(connectionDetails), file = NULL)
+  DatabaseConnector::executeSql(connection = conn, sql)
 
   DatabaseConnector::disconnect(conn)
 }
