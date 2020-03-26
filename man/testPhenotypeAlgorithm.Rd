@@ -7,19 +7,12 @@
 testPhenotypeAlgorithm(
   connectionDetails,
   cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
-  evaluationOutputFileName,
+  outFolder,
+  evaluationCohortId = "main",
   phenotypeCohortId,
-  databaseId = "",
-  phenotypeText = "",
-  order = 1,
-  modelText = "",
-  xSpecCohortId = "",
-  xSensCohortId = "",
-  prevalenceCohortId = "",
   cohortDatabaseSchema,
   cohortTable,
-  washoutPeriod = 0,
-  modelType = "chronic"
+  washoutPeriod = 0
 )
 }
 \arguments{
@@ -29,28 +22,11 @@ createConnectionDetails in the DatabaseConnector package.}
 \item{cutPoints}{A list of threshold predictions for the evaluations.  Include "EV"
 for the expected value}
 
-\item{evaluationOutputFileName}{The full file name with path for the evaluation file}
+\item{outFolder}{The folder where the cohort evaluation output files are written}
 
-\item{phenotypeCohortId}{The number of the cohort of the phenotype algorithm to test}
+\item{evaluationCohortId}{A string used to generate the file names for the evaluation cohort.}
 
-\item{databaseId}{A string to identify the CDM tested (Default = NULL)}
-
-\item{phenotypeText}{A string to identify the phenotype algorithm in the output file}
-
-\item{order}{The order of this algorithm for sorting in the output file (used
-when there are multiple phenotypes to test) (Default = 1)}
-
-\item{modelText}{Descriptive name for the model (Default = NULL)}
-
-\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort definition
-id in the cohort table (for noisy positives) (Default = NULL)}
-
-\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort definition
-id in the cohort table (used to exclude subjects from the base
-population) (Default = NULL)}
-
-\item{prevalenceCohortId}{The number of the cohort definition id to determine the disease
-prevalence, (default=xSensCohortId)}
+\item{phenotypeCohortId}{The ID of the cohort to evaluate in the specified cohort table.}
 
 \item{cohortDatabaseSchema}{The name of the database schema that is the location where the
 cohort data used to define the at risk cohort is available.
@@ -62,14 +38,13 @@ SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.}
 
 \item{washoutPeriod}{The mininum required continuous observation time prior to index
 date for subjects within the cohort to test (Default = 0).}
-
-\item{modelType}{The type of health outcome in the model either "acute" or
-"chronic" (Default = "chronic")}
 }
 \value{
-A list containing 2 dataframes: 1) results - a dataframe with the results from the phenotype
-algorithm evaluation 2) misses - a dataframe with a sample of subject ids for TPs, FPs, TNs, and
-FNs for the 50 percent and over prediction threshold (must include 0.5 in cutPoints list)
+A dataframe with the results from the phenotype
+algorithm evaluation.
+
+If 0.5 is included as a cutpoint, the data frame will have an attribute called 'misses', a dataframe
+with a sample of subject ids for TPs, FPs, TNs, and FNs for the 50 percent and over prediction threshold.
 }
 \description{
 Test phenotype algorithms
