@@ -52,7 +52,7 @@
   }
 
   # determine the model file to use to apply to the evaluation cohort
-  modelFileName <- file.path(outFolder, sprintf("model%s.rds", modelId))
+  modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
   ParallelLogger::logInfo("Reading model from ", modelFileName)
   if (!file.exists(modelFileName))
     stop("Model output file (", modelFileName, ") does not exist")
@@ -67,7 +67,7 @@
                      fixed = TRUE)  #unique new cohort name to use
 
   connection <- DatabaseConnector::connect(connectionDetails)
-
+  on.exit(DatabaseConnector::disconnect(connection))
   if (modelType == "acute") {
     sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
   } else {
@@ -96,8 +96,6 @@
                                            visitLength = visitLength)
   ParallelLogger::logInfo("Creating evaluation cohort on server")
   DatabaseConnector::executeSql(connection = connection, sql)
-
-  DatabaseConnector::disconnect(connection)
 
   # will only use the covariates with non-zero betas
   lrNonZeroCovs <- c(lrResults$model$varImp$covariateId[lrResults$model$varImp$covariateValue != 0])

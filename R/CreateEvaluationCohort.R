@@ -145,7 +145,8 @@ createEvaluationCohort <- function(connectionDetails,
                         modelId = evaluationCohortId,
                         modelType = modelType)
 
-  .createEvaluationCohort(xSpecCohortId = xSpecCohortId,
+  .createEvaluationCohort(connectionDetails = connectionDetails,
+                          xSpecCohortId = xSpecCohortId,
                           xSensCohortId = xSensCohortId,
                           cdmDatabaseSchema = cdmDatabaseSchema,
                           cohortDatabaseSchema = cohortDatabaseSchema,

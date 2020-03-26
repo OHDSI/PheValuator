@@ -16,7 +16,7 @@ workDatabaseSchema <- "scratch.dbo"
 # Phenotype settings
 xSpecCohortId <- 14584 # Pneumonia with second inpatient diagnose by specialist
 excludedCovariateConceptIds <- c(255848) # Pneumonia
-xSensCohortId <- 8893 # Any pneumonia ocurrence
+xSensCohortId <- 14945#8893 # Any pneumonia ocurrence
 prevalenceCohortId <- xSensCohortId
 cohortToEvaluateId <- 14713 # Inpatient pneumonia
 evaluationCohortFolder <- "s:/temp/PheValuatorOut"
@@ -24,17 +24,17 @@ modelId <- "Pneumonia"
 evaluationCohortId <- modelId
 
 
-# modelType = "chronic"
-# covariateSettings <- PheValuator:::createDefaultChronicCovariateSettings(excludedCovariateConceptIds = excludedCovariateConceptIds,
-#                                                                          addDescendantsToExclude = TRUE,
-#                                                                          startDays = -9999,
-#                                                                          endDays = 9999)
+modelType = "chronic"
+covariateSettings <- PheValuator:::createDefaultChronicCovariateSettings(excludedCovariateConceptIds = excludedCovariateConceptIds,
+                                                                         addDescendantsToExclude = TRUE,
+                                                                         startDays = -9999,
+                                                                         endDays = 9999)
 
-modelType = "acute"
-covariateSettings <- PheValuator:::createDefaultAcuteCovariateSettings(excludedCovariateConceptIds = excludedCovariateConceptIds,
-                                                                       addDescendantsToExclude = TRUE,
-                                                                       startDays = 0,
-                                                                       endDays = 30)
+# modelType = "acute"
+# covariateSettings <- PheValuator:::createDefaultAcuteCovariateSettings(excludedCovariateConceptIds = excludedCovariateConceptIds,
+#                                                                        addDescendantsToExclude = TRUE,
+#                                                                        startDays = 0,
+#                                                                        endDays = 30)
 
 createEvaluationCohort(connectionDetails = connectionDetails,
                        cdmDatabaseSchema = cdmDatabaseSchema,
@@ -46,7 +46,7 @@ createEvaluationCohort(connectionDetails = connectionDetails,
                        covariateSettings = covariateSettings,
                        outFolder = evaluationCohortFolder,
                        modelType = modelType,
-                       baseSampleSize = 10000)
+                       baseSampleSize = 2e6)
 
 results <- testPhenotypeAlgorithm(connectionDetails = connectionDetails,
                                   cohortDatabaseSchema = cohortDatabaseSchema,
@@ -87,6 +87,31 @@ results
 # Cut Point Sensitivity Sensitivity (95% CI)   PPV         PPV (95% CI) Specificity Specificity (95% CI)   NPV         NPV (95% CI) True Pos. False Pos. True Neg. False Neg. Estimated Prevalence F1 Score
 # 1 EmpirCP0.5 (0.5)       0.075 0.075 (0.067, 0.083) 0.759 0.759 (0.717, 0.801)       0.983 0.983 (0.980, 0.986) 0.601 0.601 (0.591, 0.611)       304         96      5647       3750                41.38    0.137
 # 2   Expected Value       0.071 0.071 (0.063, 0.079) 0.733 0.733 (0.690, 0.776)       0.981 0.981 (0.977, 0.985) 0.592 0.592 (0.582, 0.602)       294        106      5568       3829                42.08    0.129
+
+connection <- connect(connectionDetails)
+sql <- "SELECT * FROM @cohort_database_schema.@cohort_table WHERE cohort_definition_id = @cohort_id AND subject_id = @subject_id;"
+renderTranslateQuerySql(connection, sql, cohort_database_schema= cohortDatabaseSchema, cohort_table = cohortTable, cohort_id = xSensCohortId, subject_id =  258869504)
+
+misses <- attr(results, "misses")
+misses[misses$subjectId ==  258869504, ]
+cohort <- misses[misses$miss == "FN", c("subjectId", "cohortStartDate")]
+cohort$cohortDefinitionId <- 999999
+cohort$cohortEndDate <- cohort$cohortStartDate
+cds <- "scratch.dbo"
+ct <- "mschuemi_temp"
+insertTable(connection = connection,
+            tableName = paste(cds, ct, sep = "."),
+            data = cohort,
+            camelCaseToSnakeCase = TRUE,
+            dropTableIfExists = TRUE,
+            createTable = TRUE,
+            tempTable = FALSE)
+CohortDiagnostics::launchCohortExplorer(connectionDetails = connectionDetails,
+                                        cdmDatabaseSchema = cdmDatabaseSchema,
+                                        cohortDatabaseSchema = cds,
+                                        cohortTable = ct,
+                                        cohortId = 999999)
+
 
 x <- readRDS(file.path(evaluationCohortFolder, "model_main.rds"))
 y <- x$model$varImp
