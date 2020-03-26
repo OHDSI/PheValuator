@@ -1,7 +1,7 @@
 Package: PheValuator
 Type: Package
 Title: Rapid Phenotype Evaluation
-Version: 1.1.4
+Version: 2.0.0
 Author: Joel N. Swerdel
 Maintainer: Joel N. Swerdel <jswerdel@its.jnj.com>
 Description: A package for evaluating phenotype algorithms.  The package
@@ -16,16 +16,16 @@ License: Apache License 2.0
 VignetteBuilder: knitr
 LazyData: true
 Depends:
-    R (>= 3.2.2)
+    R (>= 3.2.2),
+    DatabaseConnector,
+    FeatureExtraction (>= 2.1.5)
 Imports:
     PatientLevelPrediction (>= 2.0.4),
-    FeatureExtraction (>= 2.1.5),
     SqlRender (>= 1.5.2),
-    data.table (>= 1.11.8),
     dplyr (>= 0.7.8),
     stringr (>= 1.3.1),
-    DatabaseConnector (>= 2.1.4),
-    methods
+    methods,
+    ParallelLogger
 Suggests:
     knitr
 Remotes:

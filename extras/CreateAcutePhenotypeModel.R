@@ -99,8 +99,6 @@
 #'                                         required continuous observation time prior to index date for
 #'                                         subjects within the cohort to test
 #'
-#' @importFrom stats runif
-#'
 #' @export
 createAcutePhenotypeModel <- function(connectionDetails,
                                       cdmDatabaseSchema,
@@ -137,10 +135,6 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                       createModel = TRUE,
                                       createEvaluationCohort = TRUE,
                                       cohortDefinitionsToTest = NULL) {
-
-  options(error = NULL)
-  options(scipen = 999)
-
 
   if (createModel == TRUE) {
     errorCheck(callingProgram = "createPhenotypeModel",
@@ -190,29 +184,29 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                                              startDays = startDays,
                                                              endDays = endDays)
 
-    model <- createPhenotypeModel(connectionDetails = connectionDetails,
-                                  cdmDatabaseSchema = cdmDatabaseSchema,
-                                  cohortDatabaseSchema = cohortDatabaseSchema,
-                                  cohortTable = cohortTable,
-                                  workDatabaseSchema = workDatabaseSchema,
-                                  modelOutputFileName = modelOutputFileName,
-                                  xSpecCohortId = xSpecCohortId,
-                                  xSensCohortId = xSensCohortId,
-                                  prevalenceCohortId = prevalenceCohortId,
-                                  covariateSettings = covariateSettings,
-                                  mainPopulationCohortId = mainPopulationCohortId,
-                                  mainPopulationCohortIdStartDay = mainPopulationCohortIdStartDay,
-                                  mainPopulationCohortIdEndDay = mainPopulationCohortIdEndDay,
-                                  lowerAgeLimit = lowerAgeLimit,
-                                  upperAgeLimit = upperAgeLimit,
-                                  visitLength = visitLength,
-                                  gender = c(gender),
-                                  startDate = startDate,
-                                  endDate = endDate,
-                                  removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
-                                  cdmVersion = cdmVersion,
-                                  outFolder = outFolder,
-                                  modelType = "acute")
+    createPhenotypeModel(connectionDetails = connectionDetails,
+                         cdmDatabaseSchema = cdmDatabaseSchema,
+                         cohortDatabaseSchema = cohortDatabaseSchema,
+                         cohortTable = cohortTable,
+                         workDatabaseSchema = workDatabaseSchema,
+                         modelId = modelOutputFileName,
+                         xSpecCohortId = xSpecCohortId,
+                         xSensCohortId = xSensCohortId,
+                         prevalenceCohortId = prevalenceCohortId,
+                         covariateSettings = covariateSettings,
+                         mainPopulationCohortId = mainPopulationCohortId,
+                         mainPopulationCohortIdStartDay = mainPopulationCohortIdStartDay,
+                         mainPopulationCohortIdEndDay = mainPopulationCohortIdEndDay,
+                         lowerAgeLimit = lowerAgeLimit,
+                         upperAgeLimit = upperAgeLimit,
+                         visitLength = visitLength,
+                         gender = c(gender),
+                         startDate = startDate,
+                         endDate = endDate,
+                         removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
+                         cdmVersion = cdmVersion,
+                         outFolder = outFolder,
+                         modelType = "acute")
   }
 
   if (createEvaluationCohort == TRUE) {
@@ -261,31 +255,31 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                                              startDays = startDays,
                                                              endDays = endDays)
 
-    evalCohort <- createEvaluationCohort(connectionDetails = connectionDetails,
-                                         xSpecCohortId = xSpecCohortId,
-                                         xSensCohortId = xSensCohortId,
-                                         cdmDatabaseSchema = cdmDatabaseSchema,
-                                         cohortDatabaseSchema = cohortDatabaseSchema,
-                                         cohortTable = cohortTable,
-                                         workDatabaseSchema = workDatabaseSchema,
-                                         covariateSettings = covariateSettings,
-                                         evaluationOutputFileName = evaluationOutputFileName,
-                                         modelOutputFileName = modelOutputFileName,
-                                         mainPopulationCohortId = mainPopulationCohortId,
-                                         mainPopulationCohortIdStartDay = mainPopulationCohortIdStartDay,
-                                         mainPopulationCohortIdEndDay = mainPopulationCohortIdEndDay,
-                                         baseSampleSize = baseSampleSize,
-                                         lowerAgeLimit = lowerAgeLimit,
-                                         upperAgeLimit = upperAgeLimit,
-                                         visitLength = visitLength,
-                                         gender = c(gender),
-                                         startDate = startDate,
-                                         endDate = endDate,
-                                         cdmVersion = cdmVersion,
-                                         outFolder = outFolder,
-                                         excludeModelFromEvaluation = excludeModelFromEvaluation,
-                                         savePlpData = savePlpData,
-                                         modelType = "acute")
+    createEvaluationCohort(connectionDetails = connectionDetails,
+                           xSpecCohortId = xSpecCohortId,
+                           xSensCohortId = xSensCohortId,
+                           cdmDatabaseSchema = cdmDatabaseSchema,
+                           cohortDatabaseSchema = cohortDatabaseSchema,
+                           cohortTable = cohortTable,
+                           workDatabaseSchema = workDatabaseSchema,
+                           covariateSettings = covariateSettings,
+                           evaluationCohortId = evaluationOutputFileName,
+                           modelId = modelOutputFileName,
+                           mainPopulationCohortId = mainPopulationCohortId,
+                           mainPopulationCohortIdStartDay = mainPopulationCohortIdStartDay,
+                           mainPopulationCohortIdEndDay = mainPopulationCohortIdEndDay,
+                           baseSampleSize = baseSampleSize,
+                           lowerAgeLimit = lowerAgeLimit,
+                           upperAgeLimit = upperAgeLimit,
+                           visitLength = visitLength,
+                           gender = c(gender),
+                           startDate = startDate,
+                           endDate = endDate,
+                           cdmVersion = cdmVersion,
+                           outFolder = outFolder,
+                           excludeModelFromEvaluation = excludeModelFromEvaluation,
+                           savePlpData = savePlpData,
+                           modelType = "acute")
   }
 
   if (!is.null(cohortDefinitionsToTest)) {
@@ -305,19 +299,17 @@ createAcutePhenotypeModel <- function(connectionDetails,
                outFolder = outFolder,
                cohortDefinitionsToTest = cohortDefinitionsToTest)
 
-    cohortsToTest <- testPhenosFromFile(connectionDetails = connectionDetails,
-                                        evaluationOutputFileName = evaluationOutputFileName,
-                                        phenotypeEvaluationFileName = phenotypeEvaluationFileName,
-                                        databaseId = databaseId,
-                                        xSpecCohortId = xSpecCohortId,
-                                        xSensCohortId = xSensCohortId,
-                                        prevalenceCohortId = prevalenceCohortId,
-                                        cohortDatabaseSchema = cohortDatabaseSchema,
-                                        cohortTable = cohortTable,
-                                        cohortDefinitionsToTest = cohortDefinitionsToTest,
-                                        outFolder = outFolder,
-                                        modelType = "acute")
+    testPhenosFromFile(connectionDetails = connectionDetails,
+                       evaluationOutputFileName = evaluationOutputFileName,
+                       phenotypeEvaluationFileName = phenotypeEvaluationFileName,
+                       databaseId = databaseId,
+                       xSpecCohortId = xSpecCohortId,
+                       xSensCohortId = xSensCohortId,
+                       prevalenceCohortId = prevalenceCohortId,
+                       cohortDatabaseSchema = cohortDatabaseSchema,
+                       cohortTable = cohortTable,
+                       cohortDefinitionsToTest = cohortDefinitionsToTest,
+                       outFolder = outFolder,
+                       modelType = "acute")
   }
-
 }
-

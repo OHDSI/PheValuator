@@ -93,8 +93,6 @@
 #'                                        required continuous observation time prior to index date for
 #'                                        subjects within the cohort to test
 #'
-#' @importFrom stats runif
-#'
 #' @export
 createChronicPhenotypeModel <- function(connectionDetails,
                                         cdmDatabaseSchema,
@@ -128,11 +126,6 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         createModel = TRUE,
                                         createEvaluationCohort = TRUE,
                                         cohortDefinitionsToTest = NULL) {
-
-  options(error = NULL)
-  options(scipen = 999)
-
-
   if (createModel == TRUE) {
     errorCheck(callingProgram = "createPhenotypeModel",
                connectionDetails = connectionDetails,
@@ -179,27 +172,27 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                                                startDays = startDays,
                                                                endDays = endDays)
 
-    model <- createPhenotypeModel(connectionDetails = connectionDetails,
-                                  cdmDatabaseSchema = cdmDatabaseSchema,
-                                  cohortDatabaseSchema = cohortDatabaseSchema,
-                                  cohortTable = cohortTable,
-                                  workDatabaseSchema = workDatabaseSchema,
-                                  modelOutputFileName = modelOutputFileName,
-                                  xSpecCohortId = xSpecCohortId,
-                                  xSensCohortId = xSensCohortId,
-                                  prevalenceCohortId = prevalenceCohortId,
-                                  covariateSettings = covariateSettings,
-                                  mainPopulationCohortId = mainPopulationCohortId,
-                                  lowerAgeLimit = lowerAgeLimit,
-                                  upperAgeLimit = upperAgeLimit,
-                                  visitLength = visitLength,
-                                  gender = c(gender),
-                                  startDate = startDate,
-                                  endDate = endDate,
-                                  removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
-                                  cdmVersion = cdmVersion,
-                                  outFolder = outFolder,
-                                  modelType = "chronic")
+    createPhenotypeModel(connectionDetails = connectionDetails,
+                         cdmDatabaseSchema = cdmDatabaseSchema,
+                         cohortDatabaseSchema = cohortDatabaseSchema,
+                         cohortTable = cohortTable,
+                         workDatabaseSchema = workDatabaseSchema,
+                         modelId = modelOutputFileName,
+                         xSpecCohortId = xSpecCohortId,
+                         xSensCohortId = xSensCohortId,
+                         prevalenceCohortId = prevalenceCohortId,
+                         covariateSettings = covariateSettings,
+                         mainPopulationCohortId = mainPopulationCohortId,
+                         lowerAgeLimit = lowerAgeLimit,
+                         upperAgeLimit = upperAgeLimit,
+                         visitLength = visitLength,
+                         gender = c(gender),
+                         startDate = startDate,
+                         endDate = endDate,
+                         removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
+                         cdmVersion = cdmVersion,
+                         outFolder = outFolder,
+                         modelType = "chronic")
   }
 
   if (createEvaluationCohort == TRUE) {
@@ -246,27 +239,27 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                                                startDays = startDays,
                                                                endDays = endDays)
 
-    evalCohort <- createEvaluationCohort(connectionDetails = connectionDetails,
-                                         xSpecCohortId = xSpecCohortId,
-                                         xSensCohortId = xSensCohortId,
-                                         cdmDatabaseSchema = cdmDatabaseSchema,
-                                         cohortDatabaseSchema = cohortDatabaseSchema,
-                                         cohortTable = cohortTable,
-                                         workDatabaseSchema = workDatabaseSchema,
-                                         evaluationOutputFileName = evaluationOutputFileName,
-                                         covariateSettings = covariateSettings,
-                                         modelOutputFileName = modelOutputFileName,
-                                         mainPopulationCohortId = mainPopulationCohortId,
-                                         baseSampleSize = baseSampleSize,
-                                         lowerAgeLimit = lowerAgeLimit,
-                                         upperAgeLimit = upperAgeLimit,
-                                         gender = c(gender),
-                                         startDate = startDate,
-                                         endDate = endDate,
-                                         cdmVersion = cdmVersion,
-                                         outFolder = outFolder,
-                                         savePlpData = savePlpData,
-                                         modelType = "chronic")
+    createEvaluationCohort(connectionDetails = connectionDetails,
+                           xSpecCohortId = xSpecCohortId,
+                           xSensCohortId = xSensCohortId,
+                           cdmDatabaseSchema = cdmDatabaseSchema,
+                           cohortDatabaseSchema = cohortDatabaseSchema,
+                           cohortTable = cohortTable,
+                           workDatabaseSchema = workDatabaseSchema,
+                           evaluationCohortId = evaluationOutputFileName,
+                           covariateSettings = covariateSettings,
+                           modelId = modelOutputFileName,
+                           mainPopulationCohortId = mainPopulationCohortId,
+                           baseSampleSize = baseSampleSize,
+                           lowerAgeLimit = lowerAgeLimit,
+                           upperAgeLimit = upperAgeLimit,
+                           gender = c(gender),
+                           startDate = startDate,
+                           endDate = endDate,
+                           cdmVersion = cdmVersion,
+                           outFolder = outFolder,
+                           savePlpData = savePlpData,
+                           modelType = "chronic")
   }
 
   if (!is.null(cohortDefinitionsToTest)) {
@@ -286,19 +279,17 @@ createChronicPhenotypeModel <- function(connectionDetails,
                outFolder = outFolder,
                cohortDefinitionsToTest = cohortDefinitionsToTest)
 
-    cohortsToTest <- testPhenosFromFile(connectionDetails = connectionDetails,
-                                        evaluationOutputFileName = evaluationOutputFileName,
-                                        phenotypeEvaluationFileName = phenotypeEvaluationFileName,
-                                        databaseId = databaseId,
-                                        xSpecCohortId = xSpecCohortId,
-                                        xSensCohortId = xSensCohortId,
-                                        prevalenceCohortId = prevalenceCohortId,
-                                        cohortDatabaseSchema = cohortDatabaseSchema,
-                                        cohortTable = cohortTable,
-                                        cohortDefinitionsToTest = cohortDefinitionsToTest,
-                                        outFolder = outFolder,
-                                        modelType = "chronic")
+    testPhenosFromFile(connectionDetails = connectionDetails,
+                       evaluationOutputFileName = evaluationOutputFileName,
+                       phenotypeEvaluationFileName = phenotypeEvaluationFileName,
+                       databaseId = databaseId,
+                       xSpecCohortId = xSpecCohortId,
+                       xSensCohortId = xSensCohortId,
+                       prevalenceCohortId = prevalenceCohortId,
+                       cohortDatabaseSchema = cohortDatabaseSchema,
+                       cohortTable = cohortTable,
+                       cohortDefinitionsToTest = cohortDefinitionsToTest,
+                       outFolder = outFolder,
+                       modelType = "chronic")
   }
-
 }
-
