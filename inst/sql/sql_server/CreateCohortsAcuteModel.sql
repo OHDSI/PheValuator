@@ -46,7 +46,7 @@ from (select co.*, p.*,
 IF OBJECT_ID('tempdb..#eligibles', 'U') IS NOT NULL
 	DROP TABLE #eligibles;
 
-select visit_occurrence.person_id, minObsStart,
+select visit_occurrence.person_id, minObsStart, minObsEnd,
    count(visit_occurrence_id) countVis,
    min(visit_start_date) minDate
 into #eligibles
@@ -54,11 +54,16 @@ from @cdm_database_schema.visit_occurrence
 join (
   select person_id, count(observation_period_id) cntPd,
     min(datediff(day, observation_period_start_date, observation_period_end_date)) lenPd,
-    min(observation_period_start_date) minObsStart
+    min(observation_period_start_date) minObsStart,
+    min(observation_period_end_date) minObsEnd
   from @cdm_database_schema.observation_period
   group by person_id) obs
   on visit_occurrence.person_id = obs.person_id
-group by visit_occurrence.person_id, minObsStart
+    and visit_start_date >= dateadd(d, 365, minObsStart)
+    and visit_start_date <= dateadd(d, -30, minObsEnd)
+	  and visit_concept_id in (9201) --in-patient only
+	  and datediff(day, visit_start_date, visit_end_date) >= @visitLength
+group by visit_occurrence.person_id, minObsStart, minObsEnd
 having minObsStart >= cast('@startDate' AS DATE)
 		and minObsStart <= cast('@endDate' AS DATE);
 
@@ -86,9 +91,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						and gender_concept_id in (@gender)
 					join #eligibles v5 --include only subjects with a visit in their record and within date range
 						on v.person_id = v5.person_id
+						  and v5.minDate = v.visit_start_date
 					where 1 = 1
-					  and v.visit_concept_id in (9201) --in-patient only
-					  and datediff(day, visit_start_date, visit_end_date) >= @visitLength
 						{@exclCohort != 0} ? {and v.person_id not in (
 													select subject_id
 													from @cohort_database_schema.@cohort_database_table
