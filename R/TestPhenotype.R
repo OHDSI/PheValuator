@@ -108,7 +108,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     sql <- "SELECT DISTINCT subject_id,
       op.observation_period_start_date
     FROM @cohort_database_schema.@cohort_table co
-    join @cdm_Database_Schema.observation_period op
+    join @cdm_database_schema.observation_period op
       on co.subject_id = op.person_id
         and co.cohort_start_date >= op.observation_period_start_date
         and co.cohort_start_date <= op.observation_period_end_date
