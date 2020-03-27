@@ -170,7 +170,8 @@
                                                 savePlpData = FALSE,
                                                 savePlpResult = FALSE,
                                                 savePlpPlots = FALSE,
-                                                saveEvaluation = FALSE)
+                                                saveEvaluation = FALSE,
+                                                saveDirectory = outFolder)
 
     lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
     lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId

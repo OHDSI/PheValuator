@@ -28,50 +28,50 @@
 #'                                        analysis?
 #'
 #' @export
-createPhevaluatorAnalysis <- function(analysisId,
+createPheValuatorAnalysis <- function(analysisId,
                                       description,
                                       createEvaluationCohortArgs,
                                       testPhenotypeAlgorithmArgs) {
   #TODO: add input checks
   analysis <- list()
-  for (name in names(formals(createPhevaluatorAnalysis))) {
+  for (name in names(formals(createPheValuatorAnalysis))) {
     analysis[[name]] <- get(name)
   }
-  class(analysis) <- "phevaluatorAnalysis"
+  class(analysis) <- "pheValuatorAnalysis"
   return(analysis)
 }
 
 #' Save a list of phevaluatorAnalysis to file
 #'
 #' @description
-#' Write a list of objects of type \code{phevaluatorAnalysis} to file. The file is in JSON format.
+#' Write a list of objects of type \code{pheValuatorAnalysis} to file. The file is in JSON format.
 #'
-#' @param phevaluatorAnalysisList   The phevaluatorAnalysis list to be written to file
+#' @param phevaluatorAnalysisList   The pheValuatorAnalysis list to be written to file
 #' @param file                      The name of the file where the results will be written
 #'
 #' @export
-savePhevaluatorAnalysisList <- function(phevaluatorAnalysisList, file) {
-  stopifnot(is.list(phevaluatorAnalysisList))
-  stopifnot(length(phevaluatorAnalysisList) > 0)
-  for (i in 1:length(phevaluatorAnalysisList)) {
-    stopifnot(class(phevaluatorAnalysisList[[i]]) == "phevaluatorAnalysis")
+savePheValuatorAnalysisList <- function(pheValuatorAnalysisList, file) {
+  stopifnot(is.list(pheValuatorAnalysisList))
+  stopifnot(length(pheValuatorAnalysisList) > 0)
+  for (i in 1:length(pheValuatorAnalysisList)) {
+    stopifnot(class(pheValuatorAnalysisList[[i]]) == "pheValuatorAnalysis")
   }
-  ParallelLogger::logTrace("Saving phevaluatorAnalysisList to ", file)
-  ParallelLogger::saveSettingsToJson(phevaluatorAnalysisList, file)
+  ParallelLogger::logTrace("Saving pheValuatorAnalysisList to ", file)
+  ParallelLogger::saveSettingsToJson(pheValuatorAnalysisList, file)
 }
 
 #' Load a list of phevaluatorAnalysis from file
 #'
 #' @description
-#' Load a list of objects of type \code{phevaluatorAnalysis} from file. The file is in JSON format.
+#' Load a list of objects of type \code{pheValuatorAnalysis} from file. The file is in JSON format.
 #'
 #' @param file   The name of the file
 #'
 #' @return
-#' A list of objects of type \code{phevaluatorAnalysis}.
+#' A list of objects of type \code{pheValuatorAnalysis}.
 #'
 #' @export
-loadPhevaluatorAnalysisList <- function(file) {
+loadPheValuatorAnalysisList <- function(file) {
   ParallelLogger::logTrace("Loading phevaluatorAnalysisList from ", file)
   return(ParallelLogger::loadSettingsFromJson(file))
 }

@@ -39,8 +39,8 @@
 #' @param cdmVersion                     Define the OMOP CDM version used: currently support "4" and
 #'                                       "5".
 #' @param outputFolder                   Name of the folder where all the outputs will written to.
-#' @param phevaluatorAnalysisList        A list of objects of type \code{phevaluatorAnalysis} as created using
-#'                                       the \code{\link{createPhevaluatorAnalysis}} function.
+#' @param pheValuatorAnalysisList        A list of objects of type \code{pheValuatorAnalysis} as created using
+#'                                       the \code{\link{createPheValuatorAnalysis}} function.
 #'
 #' @return
 #' A data frame specifiying where the constructed evaluation cohort and phenotype evaluation results can be found
@@ -53,6 +53,105 @@ runPheValuatorAnalyses <- function(connectionDetails,
                                    cohortTable = "cohort",
                                    workDatabaseSchema = cdmDatabaseSchema,
                                    cdmVersion = 5,
-                                   outputFolder = "./PhevaluatorOutput",
-                                   phevaluatorAnalysisList) {
+                                   outputFolder,
+                                   pheValuatorAnalysisList) {
+  if (!file.exists(outputFolder)) {
+    dir.create(outputFolder, recursive = TRUE)
+  }
+
+  referenceTable <- createReferenceTable(pheValuatorAnalysisList)
+  saveRDS(referenceTable, file.path(outputFolder, "reference.rds"))
+
+  ParallelLogger::logInfo("Generating evaluation cohorts")
+  evaluationCohortFolders <- unique(referenceTable$evaluationCohortFolder)
+  evaluationCohortFolders <- evaluationCohortFolders[!file.exists(file.path(outputFolder, evaluationCohortFolders, "evaluationCohort_main.rds"))]
+  if (length(evaluationCohortFolders) > 0) {
+    createTask <- function(evaluationCohortFolder) {
+      analysisId <- referenceTable$analysisId[referenceTable$evaluationCohortFolder == evaluationCohortFolders][1]
+      matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
+      args <- matched[[1]]$createEvaluationCohortArgs
+      args$connectionDetails = connectionDetails
+      args$cdmDatabaseSchema = cdmDatabaseSchema
+      args$cohortDatabaseSchema = cohortDatabaseSchema
+      args$cohortTable = cohortTable
+      args$workDatabaseSchema = workDatabaseSchema
+      args$cdmVersion = cdmVersion
+      args$outFolder = file.path(outputFolder, evaluationCohortFolder)
+      task <- list(args = args)
+      return(task)
+    }
+    tasks <- lapply(evaluationCohortFolders, createTask)
+    lapply(tasks, doCreateEvaluationCohort)
+  }
+
+  ParallelLogger::logInfo("Evaluating phenotypes")
+  resultsFiles <- unique(referenceTable$resultsFile)
+  resultsFiles <- resultsFiles[!file.exists(file.path(outputFolder, resultsFiles))]
+  if (length(resultsFiles) > 0) {
+    createTask <- function(resultsFile) {
+      analysisId <- referenceTable$analysisId[referenceTable$resultsFile == resultsFile]
+      matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
+      args <- matched[[1]]$testPhenotypeAlgorithmArgs
+      args$connectionDetails = connectionDetails
+      args$cdmDatabaseSchema = cdmDatabaseSchema
+      args$cohortDatabaseSchema = cohortDatabaseSchema
+      args$cohortTable = cohortTable
+      args$outFolder = file.path(outputFolder,
+                                 referenceTable$evaluationCohortFolder[referenceTable$analysisId == analysisId])
+      task <- list(args = args,
+                   fileName = file.path(outputFolder, resultsFile))
+      return(task)
+    }
+    tasks <- lapply(resultsFiles, createTask)
+    lapply(tasks, doTestPhenotypeAlgorithm)
+  }
+  invisible(referenceTable)
 }
+
+doCreateEvaluationCohort <- function(task) {
+  do.call("createEvaluationCohort", task$args)
+}
+
+doTestPhenotypeAlgorithm <- function(task) {
+  result <- do.call("testPhenotypeAlgorithm", task$args)
+  saveRDS(result, task$fileName)
+}
+
+createReferenceTable <- function(pheValuatorAnalysisList) {
+  referenceTable <- data.frame(analysisId = unlist(ParallelLogger::selectFromList(pheValuatorAnalysisList, "analysisId")),
+                               description = unlist(ParallelLogger::selectFromList(pheValuatorAnalysisList, "description")))
+  evalCohortArgs <- ParallelLogger::selectFromList(pheValuatorAnalysisList, "createEvaluationCohortArgs")
+  uniqueEvalCohortArgs <- unique(evalCohortArgs)
+  referenceTable$evaluationCohortFolder <- ""
+  for (evalCohortId in 1:length(uniqueEvalCohortArgs)) {
+    uniqueArgs <- uniqueEvalCohortArgs[[evalCohortId]]
+    matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, uniqueArgs)
+    analysisIds <- unlist(ParallelLogger::selectFromList(matched, "analysisId"))
+    referenceTable$evaluationCohortFolder[match(analysisIds, referenceTable$analysisId)] <- sprintf("EvaluationCohort_e%s", evalCohortId)
+  }
+  referenceTable$resultsFile <- sprintf("TestResults_a%s.rds", referenceTable$analysisId)
+  return(referenceTable)
+}
+
+#' Summarize results of PheValuator analyses
+#'
+#' @param referenceTable  A reference table as created using \code{\link{runPheValuatorAnalyses}}.
+#' @param outputFolder    The output folder used when calling \code{\link{runPheValuatorAnalyses}}.
+#'
+#' @return
+#' A data frame of resuts.
+#'
+#' @export
+summarizePheValuatorAnalyses <- function(referenceTable, outputFolder) {
+  getResults <- function(referenceRow) {
+    resultsRows <- readRDS(file.path(outputFolder, referenceRow$resultsFile))
+    resultsRows$analysisId <- referenceRow$analysisId
+    resultsRows$description <- referenceRow$description
+    return(resultsRows)
+  }
+  results <- lapply(split(referenceTable, referenceTable$analysisId), getResults)
+  results <- suppressWarnings(dplyr::bind_rows(results))
+  return(results)
+}
+
+

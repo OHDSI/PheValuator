@@ -11,8 +11,8 @@ runPheValuatorAnalyses(
   cohortTable = "cohort",
   workDatabaseSchema = cdmDatabaseSchema,
   cdmVersion = 5,
-  outputFolder = "./PhevaluatorOutput",
-  phevaluatorAnalysisList
+  outputFolder,
+  pheValuatorAnalysisList
 )
 }
 \arguments{
@@ -43,8 +43,8 @@ Requires write permissions to this database.}
 
 \item{outputFolder}{Name of the folder where all the outputs will written to.}
 
-\item{phevaluatorAnalysisList}{A list of objects of type \code{phevaluatorAnalysis} as created using
-the \code{\link{createPhevaluatorAnalysis}} function.}
+\item{pheValuatorAnalysisList}{A list of objects of type \code{pheValuatorAnalysis} as created using
+the \code{\link{createPheValuatorAnalysis}} function.}
 }
 \value{
 A data frame specifiying where the constructed evaluation cohort and phenotype evaluation results can be found

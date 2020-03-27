@@ -97,21 +97,21 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   modelType <- evaluationCohort$PheValuator$inputSetting$modelType
   if (modelType == "acute") {
     sql <- "SELECT DISTINCT subject_id,
-      visit_start_date cohort_start_date
-    FROM @cohort_database_schema.@cohort_table co
-    join @cdm_database_schema.visit_occurrence v
-      on co.subject_id = v.person_id
-        and co.cohort_start_date >= v.visit_start_date
-        and co.cohort_start_date <= v.visit_end_date
+      visit_start_date AS cohort_start_date
+    FROM @cohort_database_schema.@cohort_table
+    join @cdm_database_schema.visit_occurrence
+      on subject_id = person_id
+        and cohort_start_date >= visit_start_date
+        and cohort_start_date <= visit_end_date
     WHERE cohort_definition_id = @cohort_id;"
   } else {
     sql <- "SELECT DISTINCT subject_id,
-      op.observation_period_start_date cohort_start_date
-    FROM @cohort_database_schema.@cohort_table co
-    join @cdm_database_schema.observation_period op
-      on co.subject_id = op.person_id
-        and co.cohort_start_date >= op.observation_period_start_date
-        and co.cohort_start_date <= op.observation_period_end_date
+      observation_period_start_date AS cohort_start_date
+    FROM @cohort_database_schema.@cohort_table
+    join @cdm_database_schema.observation_period
+      on subject_id = person_id
+        and cohort_start_date >= observation_period_start_date
+        and cohort_start_date <= observation_period_end_date
     WHERE cohort_definition_id = @cohort_id;"
   }
 
@@ -127,9 +127,11 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   phenoPop <- DatabaseConnector::querySql(connection = conn, sql, snakeCaseToCamelCase = TRUE)
   DatabaseConnector::disconnect(conn)
 
-  if (nrow(phenoPop) == 0)
-    stop('Phenotype cohort did not return any rows')
-
+  if (nrow(phenoPop) == 0) {
+    warning('Phenotype cohort is empty')
+    cutPoints[cutPoints == "EV"] <- "Expected Value"
+    return(data.frame('Cut Point' = cutPoints, check.names = FALSE))
+  }
   modelAll <- evaluationCohort$prediction[evaluationCohort$prediction$outcomeCount == 0, ]
   if (washoutPeriod >= 0) {
     modelAll <- modelAll[(modelAll$daysToXSens > washoutPeriod | is.na(modelAll$daysToXSens)), ]
