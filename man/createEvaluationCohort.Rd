@@ -6,6 +6,7 @@
 \usage{
 createEvaluationCohort(
   connectionDetails,
+  oracleTempSchema = NULL,
   xSpecCohortId,
   xSensCohortId,
   prevalenceCohortId = xSensCohortId,
@@ -36,6 +37,8 @@ createEvaluationCohort(
 \arguments{
 \item{connectionDetails}{connectionDetails created using the function
 createConnectionDetails in the DatabaseConnector package.}
+
+\item{oracleTempSchema}{A schema where temp tables can be created in Oracle.}
 
 \item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort
 definition id in the cohort table (for noisy positives).}

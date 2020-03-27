@@ -25,6 +25,7 @@
 #'
 #' @param connectionDetails                connectionDetails created using the function
 #'                                         createConnectionDetails in the DatabaseConnector package.
+#' @param oracleTempSchema	               A schema where temp tables can be created in Oracle.
 #' @param xSpecCohortId                    The number of the "extremely specific (xSpec)" cohort
 #'                                         definition id in the cohort table (for noisy positives).
 #' @param xSensCohortId                    The number of the "extremely sensitive (xSens)" cohort
@@ -73,6 +74,7 @@
 #'
 #' @export
 createEvaluationCohort <- function(connectionDetails,
+                                   oracleTempSchema = NULL,
                                    xSpecCohortId,
                                    xSensCohortId,
                                    prevalenceCohortId = xSensCohortId,
