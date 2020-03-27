@@ -48,23 +48,25 @@ from (select co.*, p.*,
 IF OBJECT_ID('tempdb..#eligibles', 'U') IS NOT NULL
 	DROP TABLE #eligibles;
 
-select visit_occurrence.person_id, minObsStart,
-   count(visit_occurrence_id) countVis,
-   min(visit_start_date) minDate
+select visit_occurrence.person_id,
+    observation_period_start_date,
+    observation_period_end_date
 into #eligibles
 from @cdm_database_schema.visit_occurrence
 join (
-  select person_id, count(observation_period_id) cntPd,
-    min(datediff(day, observation_period_start_date, observation_period_end_date)) lenPd,
-    min(observation_period_start_date) minObsStart
+  select person_id,
+    datediff(day, min(observation_period_start_date), min(observation_period_end_date)) lenPd,
+    min(observation_period_start_date) observation_period_start_date,
+    min(observation_period_end_date) observation_period_end_date
   from @cdm_database_schema.observation_period
   group by person_id) obs
   on visit_occurrence.person_id = obs.person_id
-    and cntPd = 1
     and lenPd >= 730
-group by visit_occurrence.person_id, minObsStart
-having minObsStart >= cast('@startDate' AS DATE)
-		and minObsStart <= cast('@endDate' AS DATE);
+group by visit_occurrence.person_id,
+        observation_period_start_date,
+        observation_period_end_date
+having observation_period_start_date >= cast('@startDate' AS DATE)
+		and observation_period_end_date <= cast('@endDate' AS DATE);
 
 IF OBJECT_ID('@tempDB.@test_cohort', 'U') IS NOT NULL
 	DROP TABLE @tempDB.@test_cohort;
@@ -76,26 +78,27 @@ CREATE TABLE @tempDB.@test_cohort (
   cohort_end_date date);
 
 insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE)
- (select 0 as COHORT_DEFINITION_ID, person_id as SUBJECT_ID, dateadd(day, 0, visit_start_date) COHORT_START_DATE,
-            dateadd(day, 1, visit_start_date) COHORT_END_DATE
+ (select 0 as COHORT_DEFINITION_ID,
+              p.person_id as SUBJECT_ID,
+              dateadd(day, 0, observation_period_start_date) COHORT_START_DATE,
+              dateadd(day, 1, observation_period_start_date) COHORT_END_DATE
       from (select
 				{@mainPopnCohort == 0} ? {
-					v.person_id, minObsStart as visit_start_date,
-						row_number() over (order by NewId()) rn
-					from @cdm_database_schema.visit_occurrence v
-					join @cdm_database_schema.person p
-					  on v.person_id = p.person_id
-						and  year(visit_start_date) - year_of_birth >= @ageLimit
-						and year(visit_start_date) - year_of_birth <= @upperAgeLimit
-						and gender_concept_id in (@gender)
+					p.person_id,
+					observation_period_start_date,
+					row_number() over (order by NewId()) rn
+					from @cdm_database_schema.person p
 					join #eligibles v5 --include only subjects with a visit in their record and within date range
-						on v.person_id = v5.person_id
+						on p.person_id = v5.person_id
+						and  year(observation_period_start_date) - year_of_birth >= @ageLimit
+						and year(observation_period_start_date) - year_of_birth <= @upperAgeLimit
+						and gender_concept_id in (@gender)
 					where 1 = 1
-						{@exclCohort != 0} ? {and v.person_id not in (
+						{@exclCohort != 0} ? {and p.person_id not in (
 													select subject_id
 													from @cohort_database_schema.@cohort_database_table
 													where COHORT_DEFINITION_ID = @exclCohort)}
-					group by v.person_id, minObsStart)}
+					)}
 				{@mainPopnCohort != 0} ? {
 					co.subject_id as person_id, co.COHORT_START_DATE as visit_start_date,
 						row_number() over (order by NewId()) rn

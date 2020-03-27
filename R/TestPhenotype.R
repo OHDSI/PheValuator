@@ -29,6 +29,10 @@
 #'                                   for the expected value
 #' @param outFolder                  The folder where the cohort evaluation output files are written
 #' @param evaluationCohortId         A string used to generate the file names for the evaluation cohort.
+#' @param cdmDatabaseSchema          The name of the database schema that contains the OMOP CDM
+#'                                   instance. Requires read permissions to this database. On SQL
+#'                                   Server, this should specifiy both the database and the
+#'                                   schema, so for example 'cdm_instance.dbo'.
 #' @param cohortDatabaseSchema       The name of the database schema that is the location where the
 #'                                   cohort data used to define the at risk cohort is available.
 #'                                   Requires read permissions to this database.
@@ -52,6 +56,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                                    outFolder,
                                    evaluationCohortId = "main",
                                    phenotypeCohortId,
+                                   cdmDatabaseSchema,
                                    cohortDatabaseSchema,
                                    cohortTable,
                                    washoutPeriod = 0) {
@@ -92,18 +97,30 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   modelType <- evaluationCohort$PheValuator$inputSetting$modelType
   if (modelType == "acute") {
     sql <- "SELECT DISTINCT subject_id,
-      cohort_start_date
-    FROM @cohort_database_schema.@cohort_table
+      visit_start_date cohort_start_date
+    FROM @cohort_database_schema.@cohort_table co
+    join @cdm_database_schema.visit_occurrence v
+      on co.subject_id = v.person_id
+        and co.cohort_start_date >= v.visit_start_date
+        and co.cohort_start_date <= v.visit_end_date
     WHERE cohort_definition_id = @cohort_id;"
   } else {
-    sql <- "SELECT DISTINCT subject_id
-    FROM @cohort_database_schema.@cohort_table
+    sql <- "SELECT DISTINCT subject_id,
+      op.observation_period_start_date
+    FROM @cohort_database_schema.@cohort_table co
+    join @cdm_Database_Schema.observation_period op
+      on co.subject_id = op.person_id
+        and co.cohort_start_date >= op.observation_period_start_date
+        and co.cohort_start_date <= op.observation_period_end_date
     WHERE cohort_definition_id = @cohort_id;"
   }
+
   sql <- SqlRender::render(sql = sql,
                            cohort_database_schema = cohortDatabaseSchema,
+                           cdm_database_schema = cdmDatabaseSchema,
                            cohort_table = cohortTable,
                            cohort_id = phenotypeCohortId)
+
   sql <- SqlRender::translate(sql = sql, targetDialect = connectionDetails$dbms)
   conn <- DatabaseConnector::connect(connectionDetails)
   ParallelLogger::logInfo("Downloading cohort to evaluate. Assuming type is ", modelType, ".")
@@ -123,13 +140,11 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   for (cpUp in 1:length(cutPoints)) {
     # join the phenotype table with the prediction table
     if (modelType == "acute") {
-      fullTable <- merge(modelAll,
-                         phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype")],
-                         all.x = TRUE)
+      fullTable <- dplyr::left_join(modelAll,
+                                    phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype")])
     } else {
-      fullTable <- merge(modelAll,
-                         phenoPop[, c("subjectId", "inPhenotype")],
-                         all.x = TRUE)
+      fullTable <- dplyr::left_join(modelAll,
+                                    phenoPop[, c("subjectId","observationPeriodStartDate", "inPhenotype")])
     }
     fullTable$inPhenotype[is.na(fullTable$inPhenotype)] <- FALSE
 
