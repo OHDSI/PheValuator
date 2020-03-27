@@ -46,7 +46,7 @@ createPheValuatorAnalysis <- function(analysisId,
 #' @description
 #' Write a list of objects of type \code{pheValuatorAnalysis} to file. The file is in JSON format.
 #'
-#' @param phevaluatorAnalysisList   The pheValuatorAnalysis list to be written to file
+#' @param pheValuatorAnalysisList   The pheValuatorAnalysis list to be written to file
 #' @param file                      The name of the file where the results will be written
 #'
 #' @export
