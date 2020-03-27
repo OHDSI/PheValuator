@@ -90,7 +90,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					from @cdm_database_schema.person p
 					join #eligibles v5 --include only subjects with a visit in their record and within date range
 						on p.person_id = v5.person_id
-						and  year(observation_period_start_date) - year_of_birth >= @ageLimit
+						and year(observation_period_start_date) - year_of_birth >= @ageLimit
 						and year(observation_period_start_date) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
 					where 1 = 1
@@ -105,12 +105,14 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					from @cohort_database_schema.@cohort_database_table co
 					join @cdm_database_schema.person p
 					  on co.subject_id = p.person_id
-						and  year(co.COHORT_START_DATE) - year_of_birth >= @ageLimit
-						and year(co.COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
-						and gender_concept_id in (@gender)
 					join #eligibles v5 --include only subjects with a visit in their record and within date range
 						on co.subject_id = v5.person_id
+						and co.cohort_start_date >= observation_period_start_date
+						and co.cohort_start_date <= observation_period_end_date
 					where co.cohort_definition_id = @mainPopnCohort
+						and year(co.cohort_start_date) - year_of_birth >= @ageLimit
+						and year(co.cohort_start_date) - year_of_birth <= @upperAgeLimit
+						and gender_concept_id in (@gender)
 						{@exclCohort != 0} ? {and co.subject_id not in (
 													select subject_id
 													from @cohort_database_schema.@cohort_database_table
