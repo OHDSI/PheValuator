@@ -106,7 +106,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     WHERE cohort_definition_id = @cohort_id;"
   } else {
     sql <- "SELECT DISTINCT subject_id,
-      op.observation_period_start_date
+      op.observation_period_start_date cohort_start_date
     FROM @cohort_database_schema.@cohort_table co
     join @cdm_database_schema.observation_period op
       on co.subject_id = op.person_id
@@ -144,7 +144,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                                     phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype")])
     } else {
       fullTable <- dplyr::left_join(modelAll,
-                                    phenoPop[, c("subjectId","observationPeriodStartDate", "inPhenotype")])
+                                    phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype")])
     }
     fullTable$inPhenotype[is.na(fullTable$inPhenotype)] <- FALSE
 
