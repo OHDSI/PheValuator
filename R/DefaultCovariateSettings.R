@@ -145,7 +145,7 @@ createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(
 createDefaultChronicCovariateSettings <- function(excludedCovariateConceptIds = c(),
                                                   includedCovariateIds = c(),
                                                   addDescendantsToExclude = FALSE,
-                                                  startDays = -9999,
+                                                  startDays = 0,
                                                   endDays = 9999) {
 
   covariateSettings <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,

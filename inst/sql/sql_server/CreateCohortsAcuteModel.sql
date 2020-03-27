@@ -46,26 +46,31 @@ from (select co.*, p.*,
 IF OBJECT_ID('tempdb..#eligibles', 'U') IS NOT NULL
 	DROP TABLE #eligibles;
 
-select visit_occurrence.person_id, minObsStart, minObsEnd,
-   count(visit_occurrence_id) countVis,
-   min(visit_start_date) minDate
-into #eligibles
-from @cdm_database_schema.visit_occurrence
-join (
-  select person_id, count(observation_period_id) cntPd,
-    min(datediff(day, observation_period_start_date, observation_period_end_date)) lenPd,
-    min(observation_period_start_date) minObsStart,
-    min(observation_period_end_date) minObsEnd
-  from @cdm_database_schema.observation_period
-  group by person_id) obs
-  on visit_occurrence.person_id = obs.person_id
-    and visit_start_date >= dateadd(d, 365, minObsStart)
-    and visit_start_date <= dateadd(d, -30, minObsEnd)
-	  and visit_concept_id in (9201) --in-patient only
-	  and datediff(day, visit_start_date, visit_end_date) >= @visitLength
-group by visit_occurrence.person_id, minObsStart, minObsEnd
-having minObsStart >= cast('@startDate' AS DATE)
-		and minObsStart <= cast('@endDate' AS DATE);
+SELECT visit_occurrence.person_id,
+	minObsStart,
+	minObsEnd,
+	count(visit_occurrence_id) countVis,
+	min(visit_start_date) minDate
+INTO #eligibles
+FROM @cdm_database_schema.visit_occurrence
+JOIN (
+	SELECT person_id,
+		min(observation_period_start_date) minObsStart,
+		min(observation_period_end_date) minObsEnd
+	FROM @cdm_database_schema.observation_period
+	GROUP BY person_id
+	) obs
+	ON visit_occurrence.person_id = obs.person_id
+		AND visit_start_date >= dateadd(d, 365, minObsStart)
+		AND visit_start_date <= dateadd(d, - 30, minObsEnd)
+		AND visit_concept_id IN (9201) --in-patient only
+		AND datediff(day, visit_start_date, visit_end_date) >= @visitLength
+GROUP BY visit_occurrence.person_id,
+	minObsStart,
+	minObsEnd
+HAVING minObsStart >= cast('@startDate' AS DATE)
+	AND minObsStart <= cast('@endDate' AS DATE);
+
 
 IF OBJECT_ID('@tempDB.@test_cohort', 'U') IS NOT NULL
 	DROP TABLE @tempDB.@test_cohort;

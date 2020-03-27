@@ -79,7 +79,7 @@ CREATE TABLE @tempDB.@test_cohort (
 
 insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE)
  (select 0 as COHORT_DEFINITION_ID,
-              p.person_id as SUBJECT_ID,
+              person_id as SUBJECT_ID,
               dateadd(day, 0, observation_period_start_date) COHORT_START_DATE,
               dateadd(day, 1, observation_period_start_date) COHORT_END_DATE
       from (select

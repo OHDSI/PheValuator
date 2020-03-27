@@ -47,6 +47,7 @@ rCode <- ParallelLogger::createArgFunction("createEvaluationCohort",
                                            rCode = rCode)
 rCode <- ParallelLogger::createArgFunction("testPhenotypeAlgorithm",
                                            excludeArgs = c("connectionDetails",
+                                                           "cdmDatabaseSchema",
                                                            "cohortDatabaseSchema",
                                                            "cohortTable",
                                                            "outFolder",

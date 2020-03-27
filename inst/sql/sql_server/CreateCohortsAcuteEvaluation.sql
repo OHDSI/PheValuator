@@ -24,24 +24,29 @@
 IF OBJECT_ID('tempdb..#cohort_person', 'U') IS NOT NULL
 	DROP TABLE #cohort_person;
 
-select *
-into #cohort_person
-from (select co.*, p.*,
-	  row_number() over (order by NewId()) rn
-	from @cohort_database_schema.@cohort_database_table co
-	join @cdm_database_schema.person p
-	  on co.subject_id = p.person_id
-		and  year(COHORT_START_DATE) - year_of_birth >= @ageLimit
-		and year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
-		and gender_concept_id in (@gender)
-	join @cdm_database_schema.observation_period o
-	  on co.subject_id = o.person_id
-	    and co.COHORT_START_DATE >= o.observation_period_start_date
-		and co.COHORT_START_DATE <= o.observation_period_end_date
-	where cohort_definition_id = @x_spec_cohort
-	  and o.observation_period_start_date >= cast('@startDate' AS DATE)
-	  and o.observation_period_start_date <= cast('@endDate' AS DATE)) pos
-;
+SELECT *
+INTO #cohort_person
+FROM (
+	SELECT co.*,
+		p.*,
+		row_number() OVER (
+			ORDER BY NewId()
+			) rn
+	FROM @cohort_database_schema.@cohort_database_table co
+	JOIN @cdm_database_schema.person p
+		ON co.subject_id = p.person_id
+			AND year(COHORT_START_DATE) - year_of_birth >= @ageLimit
+			AND year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
+			AND gender_concept_id IN (@gender)
+	JOIN @cdm_database_schema.observation_period o
+		ON co.subject_id = o.person_id
+			AND co.COHORT_START_DATE >= o.observation_period_start_date
+			AND co.COHORT_START_DATE <= o.observation_period_end_date
+	WHERE cohort_definition_id = @x_spec_cohort
+		AND o.observation_period_start_date >= cast('@startDate' AS DATE)
+		AND o.observation_period_start_date <= cast('@endDate' AS DATE)
+	) pos;
+
 
 IF OBJECT_ID('@tempDB.@test_cohort', 'U') IS NOT NULL
 	DROP TABLE @tempDB.@test_cohort;
@@ -53,10 +58,12 @@ CREATE TABLE @tempDB.@test_cohort (
   cohort_end_date date);
 
 insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE)
- (select 0 as COHORT_DEFINITION_ID, person_id as SUBJECT_ID, dateadd(day, 0, visit_start_date) COHORT_START_DATE,
-            dateadd(day, 1, visit_start_date) COHORT_END_DATE
-      from (select
-				{@mainPopnCohort == 0} ? {
+ (
+	select 0 as COHORT_DEFINITION_ID, person_id as SUBJECT_ID, 
+		dateadd(day, 0, visit_start_date) COHORT_START_DATE,
+        dateadd(day, 1, visit_start_date) COHORT_END_DATE
+    from (select
+{@mainPopnCohort == 0} ? {
 					v.person_id, visit_start_date,
 						row_number() over (order by NewId()) rn
 					from @cdm_database_schema.visit_occurrence v
@@ -66,15 +73,18 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						and year(visit_start_date) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
 					where 1 = 1
-            and visit_start_date >= cast('@startDate' AS DATE)
-		        and visit_start_date <= cast('@endDate' AS DATE)
-					  and v.visit_concept_id in (9201) --in-patient only
-					  and datediff(day, visit_start_date, visit_end_date) >= @visitLength
-						{@exclCohort != 0} ? {and v.person_id not in (
+						and visit_start_date >= cast('@startDate' AS DATE)
+						and visit_start_date <= cast('@endDate' AS DATE)
+						and v.visit_concept_id in (9201) --in-patient only
+						and datediff(day, visit_start_date, visit_end_date) >= @visitLength
+{@exclCohort != 0} ? {
+						and v.person_id not in (
 													select subject_id
 													from @cohort_database_schema.@cohort_database_table
-													where COHORT_DEFINITION_ID = @exclCohort)}}
-				{@mainPopnCohort != 0} ? {
+													where COHORT_DEFINITION_ID = @exclCohort)
+}
+}
+{@mainPopnCohort != 0} ? {
 					co.subject_id as person_id, v.visit_start_date,
 						row_number() over (order by NewId()) rn
 					from @cohort_database_schema.@cohort_database_table co
@@ -95,7 +105,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 													select subject_id
 													from @cohort_database_schema.@cohort_database_table
 													where COHORT_DEFINITION_ID = @exclCohort)}
-						}) negs
+}
+	) negs
       where rn <= cast('@baseSampleSize' as bigint)
     union
       select 0 as COHORT_DEFINITION_ID, SUBJECT_ID, cp.COHORT_START_DATE COHORT_START_DATE,

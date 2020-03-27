@@ -10,6 +10,7 @@ testPhenotypeAlgorithm(
   outFolder,
   evaluationCohortId = "main",
   phenotypeCohortId,
+  cdmDatabaseSchema,
   cohortDatabaseSchema,
   cohortTable,
   washoutPeriod = 0
@@ -27,6 +28,11 @@ for the expected value}
 \item{evaluationCohortId}{A string used to generate the file names for the evaluation cohort.}
 
 \item{phenotypeCohortId}{The ID of the cohort to evaluate in the specified cohort table.}
+
+\item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM
+instance. Requires read permissions to this database. On SQL
+Server, this should specifiy both the database and the
+schema, so for example 'cdm_instance.dbo'.}
 
 \item{cohortDatabaseSchema}{The name of the database schema that is the location where the
 cohort data used to define the at risk cohort is available.
