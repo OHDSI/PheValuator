@@ -57,10 +57,7 @@ results <- testPhenotypeAlgorithm(connectionDetails = connectionDetails,
                                   washoutPeriod = 365)
 
 results
-
-# Cut Point Sensitivity Sensitivity (95% CI)   PPV         PPV (95% CI) Specificity Specificity (95% CI)   NPV         NPV (95% CI) True Pos. False Pos. True Neg. False Neg. Estimated Prevalence F1 Score
-# 1 EmpirCP0.5 (0.5)       0.129 0.129 (0.119, 0.139) 0.763 0.763 (0.731, 0.795)       0.972 0.972 (0.968, 0.976) 0.612 0.612 (0.602, 0.622)       522        162      5581       3532                41.38    0.221
-# 2   Expected Value       0.122 0.122 (0.112, 0.132) 0.736 0.736 (0.703, 0.769)       0.968 0.968 (0.963, 0.973) 0.603 0.603 (0.593, 0.613)       504        180      5495       3618                42.07    0.209
+misses <- attr(results, "misses")
 
 #Evaluating xSpec cohort
 results <- testPhenotypeAlgorithm(connectionDetails = connectionDetails,
@@ -71,9 +68,6 @@ results <- testPhenotypeAlgorithm(connectionDetails = connectionDetails,
                                   cutPoints = c(0.5, "EV"),
                                   washoutPeriod = 365)
 results
-# Cut Point Sensitivity Sensitivity (95% CI)   PPV         PPV (95% CI) Specificity Specificity (95% CI)   NPV         NPV (95% CI) True Pos. False Pos. True Neg. False Neg. Estimated Prevalence F1 Score
-# 1 EmpirCP0.5 (0.5)       0.005 0.005 (0.003, 0.007) 0.978 0.978 (0.917, 1.039)       0.999 0.999 (0.998, 1.000) 0.587 0.587 (0.577, 0.597)        22          0      5743       4032                41.38     0.01
-# 2   Expected Value       0.005 0.005 (0.003, 0.007) 0.917 0.917 (0.802, 1.032)       0.999 0.999 (0.998, 1.000) 0.580 0.580 (0.570, 0.590)        21          1      5673       4102                42.08     0.01
 
 #Evaluating xSens cohort
 results <- testPhenotypeAlgorithm(connectionDetails = connectionDetails,
@@ -84,13 +78,10 @@ results <- testPhenotypeAlgorithm(connectionDetails = connectionDetails,
                                   cutPoints = c(0.5, "EV"),
                                   washoutPeriod = 365)
 results
-# Cut Point Sensitivity Sensitivity (95% CI)   PPV         PPV (95% CI) Specificity Specificity (95% CI)   NPV         NPV (95% CI) True Pos. False Pos. True Neg. False Neg. Estimated Prevalence F1 Score
-# 1 EmpirCP0.5 (0.5)       0.075 0.075 (0.067, 0.083) 0.759 0.759 (0.717, 0.801)       0.983 0.983 (0.980, 0.986) 0.601 0.601 (0.591, 0.611)       304         96      5647       3750                41.38    0.137
-# 2   Expected Value       0.071 0.071 (0.063, 0.079) 0.733 0.733 (0.690, 0.776)       0.981 0.981 (0.977, 0.985) 0.592 0.592 (0.582, 0.602)       294        106      5568       3829                42.08    0.129
 
 connection <- connect(connectionDetails)
 sql <- "SELECT * FROM @cohort_database_schema.@cohort_table WHERE cohort_definition_id = @cohort_id AND subject_id = @subject_id;"
-renderTranslateQuerySql(connection, sql, cohort_database_schema= cohortDatabaseSchema, cohort_table = cohortTable, cohort_id = xSensCohortId, subject_id =  258869504)
+renderTranslateQuerySql(connection, sql, cohort_database_schema = cohortDatabaseSchema, cohort_table = cohortTable, cohort_id = xSensCohortId, subject_id = 258869504)
 
 misses <- attr(results, "misses")
 misses[misses$subjectId ==  258869504, ]
