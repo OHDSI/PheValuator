@@ -150,8 +150,9 @@
 
   # pull in the xSens cohort
   sql <- "SELECT subject_id,
-    cohort_start_date,
-    observation_period_start_date
+    cohort_start_date xsens_cohort_start_date,
+    observation_period_start_date cohort_start_date,
+    datediff(d, observation_period_start_date, cohort_start_date) days_to_xsens
   FROM @cohort_database_schema.@cohort_table
   JOIN @cdm_database_schema.observation_period
     ON subject_id = person_id
@@ -168,7 +169,7 @@
   # add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout
   # criteria during evaluation
   finalPopn <- merge(pred, xSensPopn, all.x = TRUE)
-  finalPopn$daysToXSens <- as.integer(finalPopn$cohortStartDate - finalPopn$observationPeriodStartDate)
+  finalPopn$daysToXSens <- as.integer(finalPopn$daysToXsens)
 
   # add other parameters to the input settings list
   appResults$PheValuator$inputSetting$startDays <- covariateSettings[[1]]$longTermStartDays

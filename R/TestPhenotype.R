@@ -131,7 +131,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     stop('Phenotype cohort did not return any rows')
 
   modelAll <- evaluationCohort$prediction[evaluationCohort$prediction$outcomeCount == 0, ]
-  if (washoutPeriod > 0) {
+  if (washoutPeriod >= 0) {
     modelAll <- modelAll[(modelAll$daysToXSens > washoutPeriod | is.na(modelAll$daysToXSens)), ]
   }
   modelAll <- modelAll[order(modelAll$value), ]
@@ -145,8 +145,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                                     by = c("subjectId", "cohortStartDate"))
     } else {
       fullTable <- dplyr::left_join(modelAll,
-                                    phenoPop[, c("subjectId","observationPeriodStartDate", "inPhenotype")],
-                                    by = c("subjectId","observationPeriodStartDate"))
+                                    phenoPop[, c("subjectId","cohortStartDate", "inPhenotype")],
+                                    by = c("subjectId","cohortStartDate"))
     }
     fullTable$inPhenotype[is.na(fullTable$inPhenotype)] <- FALSE
 
