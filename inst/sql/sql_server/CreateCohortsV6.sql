@@ -57,11 +57,13 @@ join (
   select person_id,
     datediff(day, min(observation_period_start_date), min(observation_period_end_date)) lenPd,
     min(observation_period_start_date) observation_period_start_date,
-    min(observation_period_end_date) observation_period_end_date
+    min(observation_period_end_date) observation_period_end_date,
+    count(observation_period_id) cntPd
   from @cdm_database_schema.observation_period
   group by person_id) obs
   on visit_occurrence.person_id = obs.person_id
     and lenPd >= 730
+    and cntPd = 1
 group by visit_occurrence.person_id,
         observation_period_start_date,
         observation_period_end_date
