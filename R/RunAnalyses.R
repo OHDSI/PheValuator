@@ -67,7 +67,7 @@ runPheValuatorAnalyses <- function(connectionDetails,
   evaluationCohortFolders <- evaluationCohortFolders[!file.exists(file.path(outputFolder, evaluationCohortFolders, "evaluationCohort_main.rds"))]
   if (length(evaluationCohortFolders) > 0) {
     createTask <- function(evaluationCohortFolder) {
-      analysisId <- referenceTable$analysisId[referenceTable$evaluationCohortFolder == evaluationCohortFolders][1]
+      analysisId <- referenceTable$analysisId[referenceTable$evaluationCohortFolder == evaluationCohortFolder][1]
       matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
       args <- matched[[1]]$createEvaluationCohortArgs
       args$connectionDetails = connectionDetails

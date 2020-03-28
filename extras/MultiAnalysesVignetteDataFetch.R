@@ -1,3 +1,4 @@
+library(PheValuator)
 # Create analysis settings ----------------------------------------------------------------------------------------
 pneumoniaCovSettingsChronic <- createDefaultChronicCovariateSettings(excludedCovariateConceptIds = c(255848),
                                                                      addDescendantsToExclude = TRUE)
@@ -49,7 +50,7 @@ savePheValuatorAnalysisList(pheValuatorAnalysisList, file.path(folder, "pheValua
 # Run saved analysis settings -------------------------------------------------------------------
 library(PheValuator)
 
-options(fftempdir = "s:/FFtemp")
+options(fftempdir = "s:/temp")
 connectionDetails <- createConnectionDetails(dbms = "pdw",
                                              server = Sys.getenv("PDW_SERVER"),
                                              port = Sys.getenv("PDW_PORT"))
