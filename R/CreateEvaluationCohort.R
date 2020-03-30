@@ -97,7 +97,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    cdmVersion = "5",
                                    outFolder = getwd(),
                                    evaluationCohortId = "main",
-                                   removeSubjectsWithFutureDates = FALSE,
+                                   removeSubjectsWithFutureDates = TRUE,
                                    saveEvaluationCohortPlpData = FALSE,
                                    modelType = "chronic") {
   if (modelType != "chronic" & modelType != "acute")
