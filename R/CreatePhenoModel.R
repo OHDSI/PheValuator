@@ -29,6 +29,7 @@
                                   lowerAgeLimit = 0,
                                   upperAgeLimit = 120,
                                   visitLength = 3,
+                                  visitType = c(9201),
                                   gender = c(8507, 8532),
                                   startDate = "19000101",
                                   endDate = "21000101",
@@ -59,7 +60,7 @@
   if (popPrev == 0)
     stop("Unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
 
-  ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.1f%%", 100 * popPrev))
+  ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.2f%%", 100 * popPrev))
 
   # set reasonable model populations - for fast, but accurate models
   if (popPrev >= 0.3) {
@@ -86,8 +87,51 @@
                        (paste("test_cohort", runif(1, min = 0, max = 1), sep = "")),
                        fixed = TRUE)
     if (modelType == "acute") {
+      #first check number of eligible visits in db
+      sql <- paste("select count_big(*)",
+                   "from @cdm_database_schema.visit_occurrence v",
+                   "JOIN @cdm_database_schema.observation_period obs",
+                   "on v.person_id = obs.person_id",
+                   "and v.visit_start_date >= dateadd(d, 365, obs.observation_period_start_date)",
+                   "AND v.visit_start_date <= dateadd(d, -30, obs.observation_period_end_date)",
+                   "JOIN @cdm_database_schema.person p",
+                   "on v.person_id = p.person_id",
+                   "and year(visit_start_date) - year_of_birth >= @ageLimit",
+                   "and year(visit_start_date) - year_of_birth <= @upperAgeLimit",
+                   "and gender_concept_id in (@gender)",
+                   "where visit_start_date >= cast('@startDate' AS DATE)",
+                   "and visit_start_date <= cast('@endDate' AS DATE)",
+                   "AND visit_concept_id IN (@visitType)",
+                   "AND datediff(day, visit_start_date, visit_end_date) >= @visitLength",
+                   "{@exclCohort != 0} ? {and v.person_id not in (",
+                     "select subject_id",
+                     "from @cohort_database_schema.@cohort_database_table",
+                     "where COHORT_DEFINITION_ID = @exclCohort)}",
+                   ";")
+
+      sql <- SqlRender::render(sql = sql,
+                               cdm_database_schema = cdmDatabaseSchema,
+                               cohort_database_schema = cohortDatabaseSchema,
+                               cohort_database_table = cohortTable,
+                               ageLimit = lowerAgeLimit,
+                               upperAgeLimit = upperAgeLimit,
+                               gender = gender,
+                               startDate = startDate,
+                               endDate = endDate,
+                               visitType = visitType,
+                               visitLength = visitLength,
+                               exclCohort = xSensCohortId)
+
+      sql <- SqlRender::translate(sql = sql, targetDialect = connectionDetails$dbms)
+
+      cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
+
+      #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
+      if (cntVisits > 100000000) {firstCut <- TRUE} else {firstCut <- FALSE}
+
       sqlFileName <- "CreateCohortsAcuteModel.sql"
     } else {
+      firstCut <- FALSE
       sqlFileName <- "CreateCohortsV6.sql"
     }
     ParallelLogger::logInfo("Subsetting and sampling cohorts")
@@ -111,7 +155,9 @@
                                              mainPopnCohort = mainPopulationCohortId,
                                              mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
                                              mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
-                                             visitLength = visitLength)
+                                             visitLength = visitLength,
+                                             visitType = c(visitType),
+                                             firstCut = firstCut)
     DatabaseConnector::executeSql(connection = connection, sql)
 
     plpData <- PatientLevelPrediction::getPlpData(connectionDetails,

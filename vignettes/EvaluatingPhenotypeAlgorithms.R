@@ -2,7 +2,37 @@
 library(PheValuator)
 
 ## ----tidy=FALSE,eval=FALSE----------------------------------------------------
-#  cohortSetReference <- read.csv("c:/myCohortFile.csv")
+#  options(fftempdir = "c:/temp/ff") #place to store large temporary files
+#  
+#  connectionDetails <- createConnectionDetails(dbms = "postgresql",
+#                                                server = "localhost/ohdsi",
+#                                                user = "joe",
+#                                                password = "supersecret")
+#  
+#  phenoTest <- createEvaluationCohort(connectionDetails = connectionDetails,
+#                                     xSpecCohortId = 1769699,
+#                                     xSensCohortId = 1770120,
+#                                     prevalenceCohortId = 1770119,
+#                                     cdmDatabaseSchema = "my_cdm_data",
+#                                     cohortDatabaseSchema = "my_results",
+#                                     cohortTable  = "cohort",
+#                                     workDatabaseSchema = "scratch.dbo",
+#                                     covariateSettings =
+#                                      createDefaultChronicCovariateSettings(
+#                                       excludedCovariateConceptIds = c(201826),
+#                                       addDescendantsToExclude = TRUE),
+#                                     baseSampleSize = 2000000,
+#                                     lowerAgeLimit = 18,
+#                                     upperAgeLimit = 90,
+#                                     gender = c(8507, 8532),
+#                                     startDate = "20101010",
+#                                     endDate = "21000101",
+#                                     cdmVersion = "5",
+#                                     outFolder = "c:/phenotyping",
+#                                     evaluationCohortId = "diabetes",
+#                                     removeSubjectsWithFutureDates = TRUE,
+#                                     saveEvaluationCohortPlpData = FALSE,
+#                                     modelType = "chronic")
 #  
 
 ## ----tidy=FALSE,eval=FALSE----------------------------------------------------
@@ -13,76 +43,19 @@ library(PheValuator)
 #                                                user = "joe",
 #                                                password = "supersecret")
 #  
-#  phenoTest <- createChronicPhenotypeModel(connectionDetails = connectionDetails,
-#                  cdmDatabaseSchema = "my_cdm_data",
-#                  databaseId = "TestDB",
-#                  cohortDatabaseSchema = "my_results",
-#                  cohortTable  = "cohort",
-#                  workDatabaseSchema = "scratch.dbo", #a database schema with write access
-#                  modelOutputFileName = "Train_10XDM_MyCDM_18-62_20190101",
-#                  evaluationOutputFileName = "Eval_10XDM_MyCDM_18-62_20190101",
-#                  xSpecCohortId = 1769699,
-#                  xSensCohortId = 1770120,
-#                  prevalenceCohortId = 1770120,
-#                  excludedCovariateConceptIds = c(201820),
-#                  includedCovariateIds = c(),
-#                  addDescendantsToExclude = TRUE,
-#                  mainPopulationCohortId = 0, #use the entire subject population
-#                  baseSampleSize = 2000000,
-#                  lowerAgeLimit = 18,
-#                  upperAgeLimit = 90,
-#                  startDays = 0, #from the start of the subject's record
-#                  endDays = 10000, #to the end of the subject's record
-#                  gender = c(8507, 8532),
-#                  startDate = "19000101",
-#                  endDate = "21000101",
-#                  removeSubjectsWithFutureDates = TRUE,
-#                  outFolder = "c:/phenotyping",
-#                  savePlpData = FALSE, #will preserve disk space
-#                  createModel = TRUE, #will create a model
-#                  createEvaluationCohort = TRUE, #will create an evaluation cohort
-#                  cohortDefinitionsToTest = cohortSetReference)
+#  phenotypeResults <- testPhenotypeAlgorithm(connectionDetails,
+#                                     cutPoints = c("EV"),
+#                                     outFolder = "c:/phenotyping",
+#                                     evaluationCohortId = "diabetes",
+#                                     phenotypeCohortId = 7142,
+#                                     cdmDatabaseSchema = "my_cdm_data",
+#                                     cohortDatabaseSchema = "my_results",
+#                                     cohortTable  = "cohort",
+#                                     washoutPeriod = 365)
 #  
 
 ## ----tidy=FALSE,eval=FALSE----------------------------------------------------
-#  options(fftempdir = "c:/temp/ff") #place to store large temporary files
 #  
-#  connectionDetails <- createConnectionDetails(dbms = "postgresql",
-#                                                server = "localhost/ohdsi",
-#                                                user = "joe",
-#                                                password = "supersecret")
-#  
-#  phenoTest <- createAcutePhenotypeModel(connectionDetails = connectionDetails,
-#                  cdmDatabaseSchema = "my_cdm_data",
-#                  databaseId = "TestDB",
-#                  cohortDatabaseSchema = "my_results",
-#                  cohortTable  = "cohort",
-#                  workDatabaseSchema = "scratch.dbo", #a database schema with write access
-#                  modelOutputFileName = "Train_Pneumonia_MyCDM_18-62_20190101",
-#                  evaluationOutputFileName = "Eval_Pneumonia_MyCDM_18-62_20190101",
-#                  xSpecCohortId = 1769699,
-#                  xSensCohortId = 1770120,
-#                  prevalenceCohortId = 1770120,
-#                  excludedCovariateConceptIds = c(255848),
-#                  includedCovariateIds = c(),
-#                  addDescendantsToExclude = TRUE,
-#                  mainPopulationCohortId = 0, #use the entire subject population
-#                  mainPopulationCohortIdStartDay = 0,
-#                  mainPopulationCohortIdEndDay = 0,
-#                  baseSampleSize = 2000000,
-#                  lowerAgeLimit = 18,
-#                  upperAgeLimit = 90,
-#                  startDays = 0, #from the start of the subject's record
-#                  endDays = 7, #to the end of the subject's record
-#                  visitLength = 3,
-#                  gender = c(8507, 8532),
-#                  startDate = "19000101",
-#                  endDate = "21000101",
-#                  removeSubjectsWithFutureDates = TRUE,
-#                  outFolder = "c:/phenotyping",
-#                  savePlpData = FALSE, #will preserve disk space
-#                  createModel = TRUE, #will create a model
-#                  createEvaluationCohort = TRUE, #will create an evaluation cohort
-#                  cohortDefinitionsToTest = cohortSetReference)
+#        write.csv(phenotypeResults, "c:/phenotyping/diabetes_results.csv", row.names = FALSE)
 #  
 

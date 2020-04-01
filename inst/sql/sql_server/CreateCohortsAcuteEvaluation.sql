@@ -19,7 +19,9 @@
 {DEFAULT @mainPopnCohortStartDay = 0 }
 {DEFAULT @mainPopnCohortEndDay = 0 }
 {DEFAULT @exclCohort = 0 }
-{DEFAULT @visitLength = 1 }
+{DEFAULT @visitLength = 0 }
+{DEFAULT @visitType = c(9201) }
+{DEFAULT @firstCut = FALSE }
 
 IF OBJECT_ID('tempdb..#cohort_person', 'U') IS NOT NULL
 	DROP TABLE #cohort_person;
@@ -38,13 +40,9 @@ FROM (
 			AND year(COHORT_START_DATE) - year_of_birth >= @ageLimit
 			AND year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
 			AND gender_concept_id IN (@gender)
-	JOIN @cdm_database_schema.observation_period o
-		ON co.subject_id = o.person_id
-			AND co.COHORT_START_DATE >= o.observation_period_start_date
-			AND co.COHORT_START_DATE <= o.observation_period_end_date
 	WHERE cohort_definition_id = @x_spec_cohort
-		AND o.observation_period_start_date >= cast('@startDate' AS DATE)
-		AND o.observation_period_start_date <= cast('@endDate' AS DATE)
+		AND co.COHORT_START_DATE >= cast('@startDate' AS DATE)
+		AND co.COHORT_START_DATE <= cast('@endDate' AS DATE)
 	) pos;
 
 
@@ -59,7 +57,7 @@ CREATE TABLE @tempDB.@test_cohort (
 
 insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE)
  (
-	select 0 as COHORT_DEFINITION_ID, person_id as SUBJECT_ID, 
+	select 0 as COHORT_DEFINITION_ID, person_id as SUBJECT_ID,
 		dateadd(day, 0, visit_start_date) COHORT_START_DATE,
         dateadd(day, 1, visit_start_date) COHORT_END_DATE
     from (select
@@ -67,16 +65,20 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					v.person_id, visit_start_date,
 						row_number() over (order by NewId()) rn
 					from @cdm_database_schema.visit_occurrence v
+	        JOIN @cdm_database_schema.observation_period obs
+	          on v.person_id = obs.person_id
+	            AND v.visit_start_date >= dateadd(d, 365, obs.observation_period_start_date)
+		          AND v.visit_start_date <= dateadd(d, -30, obs.observation_period_end_date)
 					join @cdm_database_schema.person p
 					  on v.person_id = p.person_id
 						and year(visit_start_date) - year_of_birth >= @ageLimit
 						and year(visit_start_date) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
-					where 1 = 1
-						and visit_start_date >= cast('@startDate' AS DATE)
+					where visit_start_date >= cast('@startDate' AS DATE)
 						and visit_start_date <= cast('@endDate' AS DATE)
-						and v.visit_concept_id in (9201) --in-patient only
+						and v.visit_concept_id in (@visitType)
 						and datediff(day, visit_start_date, visit_end_date) >= @visitLength
+{@firstCut} ? {and 11*(9*(v.visit_occurrence_id/9)/11) = v.visit_occurrence_id}
 {@exclCohort != 0} ? {
 						and v.person_id not in (
 													select subject_id
@@ -90,7 +92,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					from @cohort_database_schema.@cohort_database_table co
 					join @cdm_database_schema.visit_occurrence v
 					  on v.person_id = co.subject_id
-					    and v.visit_concept_id in (9201) --in-patient only
+					    and v.visit_concept_id in (@visitType)
 					    and v.visit_start_date >= dateadd(day, @mainPopnCohortStartDay, co.COHORT_START_DATE)
 					    and v.visit_start_date <= dateadd(day, @mainPopnCohortEndDay, co.COHORT_START_DATE)
 					    and v.visit_start_date >= cast('@startDate' AS DATE)

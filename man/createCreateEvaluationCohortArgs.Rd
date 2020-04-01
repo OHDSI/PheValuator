@@ -17,6 +17,7 @@ createCreateEvaluationCohortArgs(
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
   visitLength = 3,
+  visitType = c(9201),
   gender = c(8507, 8532),
   startDate = "19001010",
   endDate = "21000101",
@@ -59,6 +60,8 @@ visits.}
 \item{upperAgeLimit}{The upper age for subjects in the model.}
 
 \item{visitLength}{The minimum length of index visit for acute outcomes.}
+
+\item{visitType}{The concept_id for the visit type (default = 9201)}
 
 \item{gender}{The gender(s) to be included.}
 

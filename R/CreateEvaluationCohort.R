@@ -59,6 +59,7 @@
 #' @param lowerAgeLimit                    The lower age for subjects in the model.
 #' @param upperAgeLimit                    The upper age for subjects in the model.
 #' @param visitLength                      The minimum length of index visit for acute outcomes.
+#' @param visitType                        The concept_id for the visit type (default = 9201)
 #' @param gender                           The gender(s) to be included.
 #' @param startDate                        The starting date for including subjects in the model.
 #' @param endDate                          The ending date for including subjects in the model.
@@ -91,6 +92,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    lowerAgeLimit = 0,
                                    upperAgeLimit = 120,
                                    visitLength = 3,
+                                   visitType = c(9201),
                                    gender = c(8507, 8532),
                                    startDate = "19001010",
                                    endDate = "21000101",
@@ -138,6 +140,7 @@ createEvaluationCohort <- function(connectionDetails,
                         lowerAgeLimit = lowerAgeLimit,
                         upperAgeLimit = upperAgeLimit,
                         visitLength = visitLength,
+                        visitType = c(visitType),
                         gender = gender,
                         startDate = startDate,
                         endDate = endDate,
@@ -162,6 +165,7 @@ createEvaluationCohort <- function(connectionDetails,
                           lowerAgeLimit = lowerAgeLimit,
                           upperAgeLimit = upperAgeLimit,
                           visitLength = visitLength,
+                          visitType = c(visitType),
                           gender = gender,
                           startDate = startDate,
                           endDate = endDate,
