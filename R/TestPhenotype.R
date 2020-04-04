@@ -147,8 +147,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                                     by = c("subjectId", "cohortStartDate"))
     } else {
       fullTable <- dplyr::left_join(modelAll,
-                                    phenoPop[, c("subjectId","cohortStartDate", "inPhenotype")],
-                                    by = c("subjectId","cohortStartDate"))
+                                    phenoPop[, c("subjectId", "inPhenotype")],
+                                    by = c("subjectId"))
     }
     fullTable$inPhenotype[is.na(fullTable$inPhenotype)] <- FALSE
 
