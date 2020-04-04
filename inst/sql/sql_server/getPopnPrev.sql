@@ -10,6 +10,7 @@
 {DEFAULT @gender = c(8507, 8532)}
 {DEFAULT @startDate = '19000101' }
 {DEFAULT @endDate = '21000101' }
+{DEFAULT @mainPopnCohort = 0 }
 {DEFAULT @prevCohort = 0 }
 {DEFAULT @removeSubjectsWithFutureDates = TRUE }
 
@@ -25,6 +26,9 @@ select p.person_id, p.gender_concept_id, p.year_of_birth, min(year(o.observation
         from @cdm_database_schema.person p
         join @cdm_database_schema.observation_period o
           on p.person_id = o.person_id
+{@mainPopnCohort != 0} ? {join @cohort_database_schema.@cohort_database_table co
+                  on p.person_id = co.subject_id
+                    and cohort_definition_id = @mainPopnCohort}
         group by p.person_id, p.gender_concept_id, p.year_of_birth
 ),
 popn as (

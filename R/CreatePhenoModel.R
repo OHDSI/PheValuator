@@ -53,6 +53,7 @@
                                            gender = gender,
                                            startDate = startDate,
                                            endDate = endDate,
+                                           mainPopnCohort = mainPopulationCohortId,
                                            prevCohort = prevalenceCohortId,
                                            removeSubjectsWithFutureDates = removeSubjectsWithFutureDates)
   popPrev <- DatabaseConnector::querySql(connection = connection, sql)

@@ -20,6 +20,7 @@
 {DEFAULT @mainPopnCohortEndDay = 0 }
 {DEFAULT @exclCohort = 0 }
 {DEFAULT @visitLength = 0 }
+{DEFAULT @visitType = c(9201) }
 {DEFAULT @firstCut = FALSE }
 
 
