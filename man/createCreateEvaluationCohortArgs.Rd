@@ -21,6 +21,7 @@ createCreateEvaluationCohortArgs(
   gender = c(8507, 8532),
   startDate = "19001010",
   endDate = "21000101",
+  excludeModelFromEvaluation = TRUE,
   removeSubjectsWithFutureDates = FALSE,
   saveEvaluationCohortPlpData = FALSE,
   modelType = "chronic"
@@ -68,6 +69,8 @@ visits.}
 \item{startDate}{The starting date for including subjects in the model.}
 
 \item{endDate}{The ending date for including subjects in the model.}
+
+\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort? (default=TRUE)}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects
 withdates in the future?}

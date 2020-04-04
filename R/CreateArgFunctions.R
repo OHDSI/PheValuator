@@ -34,6 +34,7 @@
 #' @param endDate                          The ending date for including subjects in the model.
 #' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects
 #'                                         withdates in the future?
+#' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the evaluation cohort? (default=TRUE)
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be
 #'                                         saved? To beused for debugging purposes.
 #' @param modelType                        The type of health outcome in the model either "acute"
@@ -56,6 +57,7 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              gender = c(8507, 8532),
                                              startDate = "19001010",
                                              endDate = "21000101",
+                                             excludeModelFromEvaluation = TRUE,
                                              removeSubjectsWithFutureDates = FALSE,
                                              saveEvaluationCohortPlpData = FALSE,
                                              modelType = "chronic") {
