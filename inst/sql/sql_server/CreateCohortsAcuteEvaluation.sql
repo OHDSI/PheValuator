@@ -69,6 +69,19 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 	          on v.person_id = obs.person_id
 	            AND v.visit_start_date >= dateadd(d, 365, obs.observation_period_start_date)
 		          AND v.visit_start_date <= dateadd(d, -30, obs.observation_period_end_date)
+          join (
+                select person_id,
+                  datediff(day, min(observation_period_start_date), min(observation_period_end_date)) lenPd,
+                  min(observation_period_start_date) observation_period_start_date,
+                  min(observation_period_end_date) observation_period_end_date,
+                  count(observation_period_id) cntPd
+                from @cdm_database_schema.observation_period
+                group by person_id) obs2
+                on v.person_id = obs2.person_id
+                  and v.visit_start_date >= obs2.observation_period_start_date
+                  and v.visit_start_date <= obs2.observation_period_end_date
+                  and lenPd >= 730
+                  and cntPd = 1
 					join @cdm_database_schema.person p
 					  on v.person_id = p.person_id
 						and year(visit_start_date) - year_of_birth >= @ageLimit
