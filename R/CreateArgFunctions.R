@@ -5,7 +5,6 @@
 #' @details
 #' Create an object defining the parameter values.
 #'
-#' @param oracleTempSchema                 A schema where temp tables can be created in Oracle.
 #' @param xSpecCohortId                    The number of the "extremely specific (xSpec)"
 #'                                         cohortdefinition id in the cohort table (for noisy
 #'                                         positives).
@@ -43,8 +42,7 @@
 #'                                         or"chronic".
 #'
 #' @export
-createCreateEvaluationCohortArgs <- function(oracleTempSchema = NULL,
-                                             xSpecCohortId,
+createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              xSensCohortId,
                                              prevalenceCohortId = xSensCohortId,
                                              covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds = c(),

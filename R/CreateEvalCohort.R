@@ -71,42 +71,20 @@
   on.exit(DatabaseConnector::disconnect(connection))
   if (modelType == "acute") {
     #first check number of eligible visits in db
-    sql <- paste("select count_big(*)",
-                 "from @cdm_database_schema.visit_occurrence v",
-                 "JOIN @cdm_database_schema.observation_period obs",
-                 "on v.person_id = obs.person_id",
-                 "and v.visit_start_date >= dateadd(d, 365, obs.observation_period_start_date)",
-                 "AND v.visit_start_date <= dateadd(d, -30, obs.observation_period_end_date)",
-                 "JOIN @cdm_database_schema.person p",
-                 "on v.person_id = p.person_id",
-                 "and year(visit_start_date) - year_of_birth >= @ageLimit",
-                 "and year(visit_start_date) - year_of_birth <= @upperAgeLimit",
-                 "and gender_concept_id in (@gender)",
-                 "where visit_start_date >= cast('@startDate' AS DATE)",
-                 "and visit_start_date <= cast('@endDate' AS DATE)",
-                 "AND visit_concept_id IN (@visitType)",
-                 "AND datediff(day, visit_start_date, visit_end_date) >= @visitLength",
-                 "{@exclCohort != 0} ? {and v.person_id not in (",
-                 "select subject_id",
-                 "from @cohort_database_schema.@cohort_database_table",
-                 "where COHORT_DEFINITION_ID = @exclCohort)}",
-                 ";")
-
-    sql <- SqlRender::render(sql = sql,
-                             cdm_database_schema = cdmDatabaseSchema,
-                             cohort_database_schema = cohortDatabaseSchema,
-                             cohort_database_table = cohortTable,
-                             ageLimit = lowerAgeLimit,
-                             upperAgeLimit = upperAgeLimit,
-                             gender = gender,
-                             startDate = startDate,
-                             endDate = endDate,
-                             visitType = visitType,
-                             visitLength = visitLength,
-                             exclCohort = xSensCohortId)
-
-    sql <- SqlRender::translate(sql = sql, targetDialect = connectionDetails$dbms)
-
+    sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
+                                             packageName = "PheValuator",
+                                             dbms = connectionDetails$dbms,
+                                             cdm_database_schema = cdmDatabaseSchema,
+                                             cohort_database_schema = cohortDatabaseSchema,
+                                             cohort_database_table = cohortTable,
+                                             ageLimit = lowerAgeLimit,
+                                             upperAgeLimit = upperAgeLimit,
+                                             gender = gender,
+                                             startDate = startDate,
+                                             endDate = endDate,
+                                             visitType = visitType,
+                                             visitLength = visitLength,
+                                             exclCohort = xSensCohortId)
     cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
 
     #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
@@ -195,21 +173,13 @@
   pred <- appResults$prediction
 
   # pull in the xSens cohort
-  sql <- "SELECT subject_id,
-    cohort_start_date xsens_cohort_start_date,
-    observation_period_start_date cohort_start_date,
-    datediff(d, observation_period_start_date, cohort_start_date) days_to_xsens
-  FROM @cohort_database_schema.@cohort_table
-  JOIN @cdm_database_schema.observation_period
-    ON subject_id = person_id
-      AND cohort_start_date >= observation_period_start_date
-      AND cohort_start_date <= observation_period_end_date
-  WHERE cohort_definition_id = @cohort_id;"
-  sql <- SqlRender::render(sql = sql,
-                           cohort_database_schema = cohortDatabaseSchema,
-                           cohort_table = cohortTable,
-                           cdm_database_schema = cdmDatabaseSchema,
-                           cohort_id = xSensCohortId)
+  sql <- SqlRender::loadRenderTranslateSql("GetXsensCohort.sql",
+                                           packageName = "PheValuator",
+                                           dbms = connection@dbms,
+                                           cohort_database_schema = cohortDatabaseSchema,
+                                           cohort_table = cohortTable,
+                                           cdm_database_schema = cdmDatabaseSchema,
+                                           cohort_id = xSensCohortId)
   sql <- SqlRender::translate(sql, connection@dbms)
   xSensPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
   # add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout

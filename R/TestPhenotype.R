@@ -99,8 +99,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     sql <- "SELECT DISTINCT subject_id,
       visit_start_date AS cohort_start_date
     FROM @cohort_database_schema.@cohort_table
-    join @cdm_database_schema.visit_occurrence
-      on subject_id = person_id
+    JOIN @cdm_database_schema.visit_occurrence
+      ON subject_id = person_id
         and cohort_start_date >= visit_start_date
         and cohort_start_date <= visit_end_date
     WHERE cohort_definition_id = @cohort_id;"
@@ -108,8 +108,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     sql <- "SELECT DISTINCT subject_id,
       observation_period_start_date AS cohort_start_date
     FROM @cohort_database_schema.@cohort_table
-    join @cdm_database_schema.observation_period
-      on subject_id = person_id
+    JOIN @cdm_database_schema.observation_period
+      ON subject_id = person_id
         and cohort_start_date >= observation_period_start_date
         and cohort_start_date <= observation_period_end_date
     WHERE cohort_definition_id = @cohort_id;"
@@ -122,10 +122,10 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                            cohort_id = phenotypeCohortId)
 
   sql <- SqlRender::translate(sql = sql, targetDialect = connectionDetails$dbms)
-  conn <- DatabaseConnector::connect(connectionDetails)
+  connection <- DatabaseConnector::connect(connectionDetails)
   ParallelLogger::logInfo("Downloading cohort to evaluate. Assuming type is ", modelType, ".")
-  phenoPop <- DatabaseConnector::querySql(connection = conn, sql, snakeCaseToCamelCase = TRUE)
-  DatabaseConnector::disconnect(conn)
+  phenoPop <- DatabaseConnector::querySql(connection = connection, sql, snakeCaseToCamelCase = TRUE)
+  DatabaseConnector::disconnect(connection)
 
   if (nrow(phenoPop) == 0) {
     warning('Phenotype cohort is empty')

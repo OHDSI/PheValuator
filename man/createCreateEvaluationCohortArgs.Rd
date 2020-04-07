@@ -5,7 +5,6 @@
 \title{Create a parameter object for the function createEvaluationCohort}
 \usage{
 createCreateEvaluationCohortArgs(
-  oracleTempSchema = NULL,
   xSpecCohortId,
   xSensCohortId,
   prevalenceCohortId = xSensCohortId,
@@ -29,8 +28,6 @@ createCreateEvaluationCohortArgs(
 )
 }
 \arguments{
-\item{oracleTempSchema}{A schema where temp tables can be created in Oracle.}
-
 \item{xSpecCohortId}{The number of the "extremely specific (xSpec)"
 cohortdefinition id in the cohort table (for noisy
 positives).}
