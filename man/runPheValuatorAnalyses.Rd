@@ -41,8 +41,7 @@ COHORT_END_DATE.}
 a table can be created and afterwards removed.
 Requires write permissions to this database.}
 
-\item{cdmVersion}{Define the OMOP CDM version used: currently support "4" and
-"5".}
+\item{cdmVersion}{Define the OMOP CDM version used: currently supports "5".}
 
 \item{outputFolder}{Name of the folder where all the outputs will written to.}
 

@@ -1,4 +1,4 @@
-SELECT COUNT_BIG(*),
+SELECT COUNT_BIG(*)
 FROM @cdm_database_schema.visit_occurrence v
 JOIN @cdm_database_schema.observation_period obs
 	ON v.person_id = obs.person_id
@@ -15,8 +15,8 @@ WHERE visit_start_date >= cast('@startDate' AS DATE)
 	AND datediff(day, visit_start_date, visit_end_date) >= @visitLength 
 {@exclCohort != 0 } ? {	
 	AND v.person_id NOT IN (
-		SELECT subject_id,
-		FROM @cohort_database_schema.@cohort_database_table,
+		SELECT subject_id
+		FROM @cohort_database_schema.@cohort_database_table
 		WHERE COHORT_DEFINITION_ID = @exclCohort
 		) 
 }
