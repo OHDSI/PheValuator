@@ -90,7 +90,7 @@ cohort start date to end including visits.}
 
 \item{visitLength}{The minimum length of index visit for acute outcomes.}
 
-\item{visitType}{The concept_id for the visit type (default = 9201)}
+\item{visitType}{The concept_id for the visit type.}
 
 \item{gender}{The gender(s) to be included.}
 
@@ -104,7 +104,7 @@ cohort start date to end including visits.}
 
 \item{evaluationCohortId}{A string used to generate the file names for this evaluation cohort.}
 
-\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort? (default=TRUE)}
+\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort?}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects with
 dates in the future?}

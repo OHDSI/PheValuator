@@ -59,14 +59,14 @@
 #' @param lowerAgeLimit                    The lower age for subjects in the model.
 #' @param upperAgeLimit                    The upper age for subjects in the model.
 #' @param visitLength                      The minimum length of index visit for acute outcomes.
-#' @param visitType                        The concept_id for the visit type (default = 9201)
+#' @param visitType                        The concept_id for the visit type.
 #' @param gender                           The gender(s) to be included.
 #' @param startDate                        The starting date for including subjects in the model.
 #' @param endDate                          The ending date for including subjects in the model.
 #' @param cdmVersion                       The CDM version of the database.
 #' @param outFolder                        The folder where the output files will be written.
 #' @param evaluationCohortId               A string used to generate the file names for this evaluation cohort.
-#' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the evaluation cohort? (default=TRUE)
+#' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the evaluation cohort?
 #' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects with
 #'                                         dates in the future?
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be saved? To be

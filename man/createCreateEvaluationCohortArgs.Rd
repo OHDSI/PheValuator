@@ -5,6 +5,7 @@
 \title{Create a parameter object for the function createEvaluationCohort}
 \usage{
 createCreateEvaluationCohortArgs(
+  oracleTempSchema = NULL,
   xSpecCohortId,
   xSensCohortId,
   prevalenceCohortId = xSensCohortId,
@@ -22,12 +23,14 @@ createCreateEvaluationCohortArgs(
   startDate = "19001010",
   endDate = "21000101",
   excludeModelFromEvaluation = TRUE,
-  removeSubjectsWithFutureDates = FALSE,
+  removeSubjectsWithFutureDates = TRUE,
   saveEvaluationCohortPlpData = FALSE,
   modelType = "chronic"
 )
 }
 \arguments{
+\item{oracleTempSchema}{A schema where temp tables can be created in Oracle.}
+
 \item{xSpecCohortId}{The number of the "extremely specific (xSpec)"
 cohortdefinition id in the cohort table (for noisy
 positives).}
@@ -62,7 +65,7 @@ visits.}
 
 \item{visitLength}{The minimum length of index visit for acute outcomes.}
 
-\item{visitType}{The concept_id for the visit type (default = 9201)}
+\item{visitType}{The concept_id for the visit type.}
 
 \item{gender}{The gender(s) to be included.}
 
@@ -70,7 +73,8 @@ visits.}
 
 \item{endDate}{The ending date for including subjects in the model.}
 
-\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort? (default=TRUE)}
+\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the
+evaluation cohort?}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects
 withdates in the future?}
