@@ -24,13 +24,16 @@ Imports:
     SqlRender (>= 1.5.2),
     dplyr (>= 0.7.8),
     stringr (>= 1.3.1),
+    readr,
     methods,
     ParallelLogger
 Suggests:
-    knitr
+    knitr,
+    ROhdsiWebApi
 Remotes:
     ohdsi/PatientLevelPrediction,
-    ohdsi/FeatureExtraction
+    ohdsi/FeatureExtraction,
+    ohdsi/ROhdsiWebApi
 URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
 RoxygenNote: 7.1.0

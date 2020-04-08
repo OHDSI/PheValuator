@@ -139,6 +139,7 @@
                                              firstCut = firstCut)
     DatabaseConnector::executeSql(connection = connection, sql)
 
+    ParallelLogger::logInfo("Getting data for prediction model from server")
     plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
                                                   cdmDatabaseSchema = cdmDatabaseSchema,
                                                   cohortId = 0,
@@ -169,6 +170,7 @@
   }
 
   if (!file.exists(modelFileName)) {
+    ParallelLogger::logInfo("Fitting predictive model")
     population <- PatientLevelPrediction::createStudyPopulation(plpData,
                                                                 population = NULL,
                                                                 outcomeId = xSpecCohortId,

@@ -43,7 +43,7 @@ Requires write permissions to this database.}
 
 \item{cdmVersion}{Define the OMOP CDM version used: currently supports "5".}
 
-\item{outputFolder}{Name of the folder where all the outputs will written to.}
+\item{outputFolder}{Name of the folder where all the outputs will be written to.}
 
 \item{pheValuatorAnalysisList}{A list of objects of type \code{pheValuatorAnalysis} as created using
 the \code{\link{createPheValuatorAnalysis}} function.}

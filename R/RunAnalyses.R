@@ -38,7 +38,7 @@
 #'                                       a table can be created and afterwards removed.
 #'                                       Requires write permissions to this database.
 #' @param cdmVersion                     Define the OMOP CDM version used: currently supports "5".
-#' @param outputFolder                   Name of the folder where all the outputs will written to.
+#' @param outputFolder                   Name of the folder where all the outputs will be written to.
 #' @param pheValuatorAnalysisList        A list of objects of type \code{pheValuatorAnalysis} as created using
 #'                                       the \code{\link{createPheValuatorAnalysis}} function.
 #'

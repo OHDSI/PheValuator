@@ -69,6 +69,7 @@
 
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
+
   if (modelType == "acute") {
     #first check number of eligible visits in db
     sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
@@ -129,6 +130,7 @@
     covariateSettings[[listUp]]$includedCovariateIds <- c(lrNonZeroCovs)
   }
 
+  ParallelLogger::logInfo("Getting evaluation cohort data from server")
   plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
                                                 cdmDatabaseSchema = cdmDatabaseSchema,
                                                 cohortId = 0,
@@ -167,6 +169,8 @@
                                                               addExposureDaysToStart = FALSE,
                                                               riskWindowEnd = 1,
                                                               addExposureDaysToEnd = T)
+
+  ParallelLogger::logInfo("Applying predictive model to evaluation cohort")
 
   # apply the model to the evaluation cohort
   appResults <- PatientLevelPrediction::applyModel(population, plpData, lrResults$model)
