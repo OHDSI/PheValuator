@@ -75,7 +75,7 @@
   }
 
   # set the number of noisy negatives in the model either from the prevalence or to 500K max
-  baseSampleSize <- min(as.integer(xspecSize/popPrev), 5e+05)  #use 500,000 as largest base sample
+  baseSampleSize <- min(as.integer(xspecSize/popPrev), format(5e+05, scientific = FALSE))  #use 500,000 as largest base sample
 
   plpDataFile <- file.path(outFolder, sprintf("plpData_%s", modelId))
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
@@ -129,7 +129,7 @@
                                              gender = gender,
                                              startDate = startDate,
                                              endDate = endDate,
-                                             baseSampleSize = baseSampleSize,
+                                             baseSampleSize = format(baseSampleSize, scientific = FALSE),
                                              xSpecSampleSize = xspecSize,
                                              mainPopnCohort = mainPopulationCohortId,
                                              mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
