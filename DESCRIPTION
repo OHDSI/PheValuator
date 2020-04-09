@@ -29,7 +29,11 @@ Imports:
     ParallelLogger
 Suggests:
     knitr,
-    ROhdsiWebApi
+    ROhdsiWebApi,
+    shiny,
+    shinydashboard,
+    DT,
+    htmltools
 Remotes:
     ohdsi/PatientLevelPrediction,
     ohdsi/FeatureExtraction,

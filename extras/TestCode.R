@@ -61,3 +61,5 @@ str(results)
 
 
 misses <- attr(results, "misses")
+
+prepareForShiny("s:/examplePackage/mdcd/export")

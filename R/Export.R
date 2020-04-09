@@ -82,6 +82,11 @@ exportPheValuatorResults <- function(outputFolder,
     ParallelLogger::saveSettingsToJson(pheValuatorAnalysis, tempFileName)
     row <- tibble::tibble(analysisId = pheValuatorAnalysis$analysisId,
                           description = pheValuatorAnalysis$description,
+                          xSpecCohortId = pheValuatorAnalysis$createEvaluationCohortArgs$xSpecCohortId,
+                          xSensCohortId = pheValuatorAnalysis$createEvaluationCohortArgs$xSensCohortId,
+                          prevalenceCohortId = pheValuatorAnalysis$createEvaluationCohortArgs$prevalenceCohortId,
+                          mainPopulationCohortId = pheValuatorAnalysis$createEvaluationCohortArgs$mainPopulationCohortId,
+                          phenotypeCohortId = pheValuatorAnalysis$testPhenotypeAlgorithmArgs$phenotypeCohortId,
                           definition = readChar(tempFileName, file.info(tempFileName)$size))
     return(row)
   }
@@ -94,7 +99,7 @@ exportPheValuatorResults <- function(outputFolder,
   ParallelLogger::logInfo("Saving PheValuator results")
   referenceTable <- readRDS(file.path(outputFolder, "reference.rds"))
   analysisSummary <- summarizePheValuatorAnalyses(referenceTable, outputFolder)
-  results <- analysisSummary[, c("analysisId", "truePositives", "falsePositives", "trueNegatives", "falseNegatives")]
+  results <- analysisSummary[, c("analysisId", "cutPoint", "truePositives", "falsePositives", "trueNegatives", "falseNegatives")]
   results$databaseId <- rep(databaseId, nrow(results))
   if (nrow(results) > 0) {
     results <- enforceMinCellValue(results, fieldName = "truePositives", minValues = minCellCount)

@@ -47,4 +47,3 @@ execute(connectionDetails = connectionDetails,
         runPheValuator = TRUE,
         exportResults = TRUE,
         minCellCount = 5)
-
