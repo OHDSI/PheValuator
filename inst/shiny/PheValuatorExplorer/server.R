@@ -23,15 +23,26 @@ minCellCountDef <- function(columns) {
   )
 }
 
-minCellPercentDef <- function(columns) {
-  list(
-    targets = columns,
-    render = JS("function(data, type) {
+minCellPercentDef <- function(columns, showSign = TRUE) {
+  if (showSign) {
+    list(
+      targets = columns,
+      render = JS("function(data, type) {
     if (type !== 'display' || isNaN(parseFloat(data))) return data;
     if (data >= 0) return (100 * data).toFixed(1).replace(/(\\d)(?=(\\d{3})+(?!\\d))/g, '$1,') + '%';
     return '<' + Math.abs(100 * data).toFixed(1).replace(/(\\d)(?=(\\d{3})+(?!\\d))/g, '$1,') + '%';
   }")
-  )
+    ) 
+  } else {
+    list(
+      targets = columns,
+      render = JS("function(data, type) {
+    if (type !== 'display' || isNaN(parseFloat(data))) return data;
+    if (data >= 0) return (100 * data).toFixed(1).replace(/(\\d)(?=(\\d{3})+(?!\\d))/g, '$1,');
+    return '<' + Math.abs(100 * data).toFixed(1).replace(/(\\d)(?=(\\d{3})+(?!\\d))/g, '$1,');
+  }")
+    ) 
+  }
 }
 
 minCellRealDef <- function(columns, digits = 1) {
@@ -63,10 +74,10 @@ shinyServer(function(input, output, session) {
     if (nrow(data) == 0) {
       return(NULL)
     }
-    data$sensCi <- sprintf("(%0.1f%% - %0.1f%%)", 100*abs(data$sensCi95Lb), 100*abs(data$sensCi95Ub))
-    data$ppvCi <- sprintf("(%0.1f%% - %0.1f%%)", 100*abs(data$ppvCi95Lb), 100*abs(data$ppvCi95Ub))
-    data$specCi <- sprintf("(%0.1f%% - %0.1f%%)", 100*abs(data$specCi95Lb), 100*abs(data$specCi95Ub))
-    data$npvCi <- sprintf("(%0.1f%% - %0.1f%%)", 100*abs(data$npvCi95Lb), 100*abs(data$npvCi95Ub))
+    data$sensCi <- sprintf("(%0.1f - %0.1f)", 100*abs(data$sensCi95Lb), 100*abs(data$sensCi95Ub))
+    data$ppvCi <- sprintf("(%0.1f - %0.1f)", 100*abs(data$ppvCi95Lb), 100*abs(data$ppvCi95Ub))
+    data$specCi <- sprintf("(%0.1f - %0.1f)", 100*abs(data$specCi95Lb), 100*abs(data$specCi95Ub))
+    data$npvCi <- sprintf("(%0.1f - %0.1f)", 100*abs(data$npvCi95Lb), 100*abs(data$npvCi95Ub))
     data$cohortName <- cohort$cohortFullName[match(data$phenotypeCohortId, cohort$cohortId)]
     table <- data[, c("databaseId", "description", "cohortName", "cutPoint","sens", "sensCi", "ppv", "ppvCi", "spec", "specCi", "npv", "npvCi", "f1Score")]
     options = list(pageLength = 15,
@@ -75,8 +86,9 @@ shinyServer(function(input, output, session) {
                    ordering = TRUE,
                    paging = TRUE,
                    info = TRUE,
-                   columnDefs = list(truncateStringDef(1:2, 100),
-                                     minCellPercentDef(c(4, 6, 8, 10)),
+                   columnDefs = list(truncateStringDef(0, 10),
+                                     truncateStringDef(1:2, 50),
+                                     minCellPercentDef(c(4, 6, 8, 10), showSign = FALSE),
                                      minCellRealDef(12, 3)))
     sketch <- htmltools::withTags(table(
       class = "display",
@@ -87,13 +99,13 @@ shinyServer(function(input, output, session) {
           th(rowspan = 2, "Evaluated cohort"),
           th(rowspan = 2, "Cutpoint"),
           th(colspan = 2, "Sensitivity", class = "dt-center"),
-          th(colspan = 2, "Positive Predictive Value", class = "dt-center"),
+          th(colspan = 2, "PPV", class = "dt-center"),
           th(colspan = 2, "Specificity", class = "dt-center"),
-          th(colspan = 2, "Negative  Predictive Value", class = "dt-center"),
+          th(colspan = 2, "NPV", class = "dt-center"),
           th(rowspan = 2, "F1 Score"),
         ),
         tr(
-          lapply(rep(c("Estimate", "95% CI"), 4), th)
+          lapply(rep(c("%", "95% CI"), 4), th)
         )
       )
     ))
@@ -135,19 +147,23 @@ shinyServer(function(input, output, session) {
         string <- gsub("^-", "<", string)
         return(string)
       }
-      
+      formatPercent <- function(x) {
+        string <- sprintf("%0.1f%%", 100*x)
+        string <- gsub("^-", "<", string)
+        return(string)
+      }
       getCohortName <- function(cohortId) {
-        return(cohort$cohortFullName[cohort$cohortId == cohortId])
+        return(sprintf("<strong>%s</strong> (cohort ID %s)", cohort$cohortFullName[cohort$cohortId == cohortId], cohortId))
       }
       
       lines <- list("<table>",
-                    sprintf("<tr><td>Database</td><td>&nbsp;&nbsp;</td><td align = 'right'><strong>%s</strong></td></tr>", row$databaseId),
-                    sprintf("<tr><td>Analysis</td><td>&nbsp;&nbsp;</td><td align = 'right'><strong>%s</strong></td></tr>", row$description),
-                    sprintf("<tr><td>Evaluated cohort</td><td>&nbsp;&nbsp;</td><td align = 'right'><strong>%s</strong></td></tr>", getCohortName(row$phenotypeCohortId)),
-                    sprintf("<tr><td>Cut point</td><td>&nbsp;&nbsp;</td><td align = 'right'><strong>%s</strong></td></tr>", row$cutPoint),
-                    sprintf("<tr><td>xSpec cohort</td><td>&nbsp;&nbsp;</td><td align = 'right'><strong>%s</strong></td></tr>", getCohortName(row$xSpecCohortId)),
-                    sprintf("<tr><td>xSens cohort</td><td>&nbsp;&nbsp;</td><td align = 'right'><strong>%s</strong></td></tr>", getCohortName(row$xSensCohortId)),
-                    sprintf("<tr><td>Estimated prevalence</td><td>&nbsp;&nbsp;</td><td align = 'right'><strong>%0.1f%%</strong></td></tr>", 100*row$estimatedPrevalence),
+                    sprintf("<tr><td>Database</td><td>&nbsp;&nbsp;</td><td><strong>%s</strong></td></tr>", row$databaseId),
+                    sprintf("<tr><td>Analysis</td><td>&nbsp;&nbsp;</td><td><strong>%s</strong></td></tr>", row$description),
+                    sprintf("<tr><td>Evaluated cohort</td><td>&nbsp;&nbsp;</td><td>%s</td></tr>", getCohortName(row$phenotypeCohortId)),
+                    sprintf("<tr><td>Cut point</td><td>&nbsp;&nbsp;</td><td><strong>%s</strong></td></tr>", row$cutPoint),
+                    sprintf("<tr><td>xSpec cohort</td><td>&nbsp;&nbsp;</td><td>%s</td></tr>", getCohortName(row$xSpecCohortId)),
+                    sprintf("<tr><td>xSens cohort</td><td>&nbsp;&nbsp;</td><td>%s</td></tr>", getCohortName(row$xSensCohortId)),
+                    sprintf("<tr><td>Estimated prevalence</td><td>&nbsp;&nbsp;</td><td><strong>%s</strong></td></tr>", formatPercent(row$estimatedPrevalence)),
                     "</table>",
                     "<br/>",
                     "<table>",
@@ -196,7 +212,7 @@ shinyServer(function(input, output, session) {
   }
   
   observeEvent(input$pheValuatorResultsInfo, {
-    showInfoBox("PheValuator Results", "html/pheValuatorResults.html")
+    showInfoBox("PheValuator Results", "html/phevaluatorResults.html")
   })
   
 })

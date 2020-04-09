@@ -2,7 +2,7 @@ if (!exists("shinySettings")) {
   if (file.exists("data")) {
     shinySettings <- list(dataFolder = "data")
   } else {
-    shinySettings <- list(dataFolder = "s:/examplePackage/mdcd/export/")
+    shinySettings <- list(dataFolder = "C:/TEMP/PheValuatorExport")
   }
 }
 dataFolder <- shinySettings$dataFolder
