@@ -47,3 +47,7 @@ execute(connectionDetails = connectionDetails,
         runPheValuator = TRUE,
         exportResults = TRUE,
         minCellCount = 5)
+
+# For the study coordinating site, results can be viewed using:
+PheValuator::prepareForShiny(file.path(outputFolder, "export"))
+PheValuator::launchPheValuatorExplorer(file.path(outputFolder, "export"))
