@@ -21,16 +21,13 @@ dashboardPage(
                 conditionalPanel(condition = "input.tabs=='pheValuatorResults'",
                                  checkboxGroupInput("databases", "Database", database$databaseId, selected = database$databaseId[1])
                 )
-                # conditionalPanel(condition = "input.tabs=='pheValuatorResults'",
-                #                  selectInput("cohort", "Cohort", choices = cohort$cohortFullName, selectize = FALSE)
-                # )
     )
   ),
   dashboardBody(
     tabItems(
       tabItem(tabName = "pheValuatorResults",
               dataTableOutput("pheValuatorResultsTable"),
-              uiOutput("pheValuatorDetailsUi"),
+              uiOutput("pheValuatorDetailsUi")
       ),
       tabItem(tabName = "databaseInformation",
               dataTableOutput("databaseInformationTable")

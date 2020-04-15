@@ -102,7 +102,7 @@ shinyServer(function(input, output, session) {
           th(colspan = 2, "PPV", class = "dt-center"),
           th(colspan = 2, "Specificity", class = "dt-center"),
           th(colspan = 2, "NPV", class = "dt-center"),
-          th(rowspan = 2, "F1 Score"),
+          th(rowspan = 2, "F1 Score")
         ),
         tr(
           lapply(rep(c("%", "95% CI"), 4), th)
