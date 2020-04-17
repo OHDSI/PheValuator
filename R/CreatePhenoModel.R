@@ -85,7 +85,7 @@
     ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.2f%%", 100 * popPrev))
 
     if (!is.null(xSpecCohortSize)) { #pre-specified xSpec cohort size
-      xspecSize = max(c(xSpecCohortSize, xSpecCount))
+      xspecSize = xSpecCohortSize
     } else {
       # set reasonable model populations - for fast, but accurate models
       if (popPrev >= 0.3) {
