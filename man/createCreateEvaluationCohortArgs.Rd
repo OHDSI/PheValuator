@@ -8,6 +8,7 @@ createCreateEvaluationCohortArgs(
   xSpecCohortId,
   xSensCohortId,
   prevalenceCohortId = xSensCohortId,
+  xSpecCohortSize = NULL,
   covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds
     = c(), addDescendantsToExclude = FALSE),
   mainPopulationCohortId = 0,
@@ -38,6 +39,8 @@ negatives).}
 
 \item{prevalenceCohortId}{The number of the cohort definition id to determine
 thedisease prevalence.}
+
+\item{xSpecCohortSize}{The recommended xSpec sample size to use in model (default = NULL)}
 
 \item{covariateSettings}{A covariateSettings object as generated
 usingcreateCovariateSettings().}
