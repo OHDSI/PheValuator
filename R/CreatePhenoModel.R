@@ -53,7 +53,7 @@
                 " where cohort_definition_id = ", xSpecCohortId)
 
   sql <- SqlRender::translate(sql, connection@dbms)
-  xSpecCount <- DatabaseConnector::querySql(connection = connection, sql = sql)
+  xSpecCount <- as.numeric(DatabaseConnector::querySql(connection = connection, sql = sql))
   if (xSpecCount < 200) {
     ParallelLogger::logInfo("Too few subjects in xSpec to produce model. (Outcome count = ", xSpecCount, ")")
     ParallelLogger::logInfo("Saving null model summary to ", modelFileName)
@@ -85,7 +85,7 @@
     ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.2f%%", 100 * popPrev))
 
     if (!is.null(xSpecCohortSize)) { #pre-specified xSpec cohort size
-      xspecSize = max(xSpecCohortSize, xSpecCount)
+      xspecSize = max(c(xSpecCohortSize, xSpecCount))
     } else {
       # set reasonable model populations - for fast, but accurate models
       if (popPrev >= 0.3) {
