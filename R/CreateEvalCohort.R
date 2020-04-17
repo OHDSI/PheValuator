@@ -59,166 +59,172 @@
     stop("Model output file (", modelFileName, ") does not exist")
   lrResults <- readRDS(modelFileName)
 
-  # get subjects used in model file to exclude from evaluation cohort
-  exclSubjectList <- c(lrResults$prediction$subjectId)
+  #test that viable model was created
+  if (!is.null(lrResults$errorMessage)) {
+    ParallelLogger::logInfo(lrResults$errorMessage, " - Evaluation cohort not created.")
+    saveRDS(lrResults, evaluationCohortFileName)
+  } else {
+    # get subjects used in model file to exclude from evaluation cohort
+    exclSubjectList <- c(lrResults$prediction$subjectId)
 
-  testCohort <- gsub(".",
-                     "",
-                     (paste("test_cohort", runif(1, min = 0, max = 1), sep = "")),
-                     fixed = TRUE)  #unique new cohort name to use
+    testCohort <- gsub(".",
+                       "",
+                       (paste("test_cohort", runif(1, min = 0, max = 1), sep = "")),
+                       fixed = TRUE)  #unique new cohort name to use
 
-  connection <- DatabaseConnector::connect(connectionDetails)
-  on.exit(DatabaseConnector::disconnect(connection))
+    connection <- DatabaseConnector::connect(connectionDetails)
+    on.exit(DatabaseConnector::disconnect(connection))
 
-  if (modelType == "acute") {
-    #first check number of eligible visits in db
-    sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
+    if (modelType == "acute") {
+      #first check number of eligible visits in db
+      sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
+                                               packageName = "PheValuator",
+                                               dbms = connectionDetails$dbms,
+                                               cdm_database_schema = cdmDatabaseSchema,
+                                               cohort_database_schema = cohortDatabaseSchema,
+                                               cohort_database_table = cohortTable,
+                                               ageLimit = lowerAgeLimit,
+                                               upperAgeLimit = upperAgeLimit,
+                                               gender = gender,
+                                               startDate = startDate,
+                                               endDate = endDate,
+                                               visitType = visitType,
+                                               visitLength = visitLength,
+                                               exclCohort = xSensCohortId)
+      cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
+
+      #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
+      if (cntVisits > 100000000) {firstCut <- TRUE} else {firstCut <- FALSE}
+
+      sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
+    } else {
+      firstCut <- FALSE
+      sqlFilename <- "CreateCohortsV6.sql"
+    }
+    sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFilename,
                                              packageName = "PheValuator",
-                                             dbms = connectionDetails$dbms,
+                                             dbms = connection@dbms,
                                              cdm_database_schema = cdmDatabaseSchema,
                                              cohort_database_schema = cohortDatabaseSchema,
                                              cohort_database_table = cohortTable,
+                                             x_spec_cohort = xSpecCohortId,
+                                             tempDB = workDatabaseSchema,
+                                             test_cohort = testCohort,
+                                             exclCohort = 0,
                                              ageLimit = lowerAgeLimit,
                                              upperAgeLimit = upperAgeLimit,
                                              gender = gender,
                                              startDate = startDate,
                                              endDate = endDate,
-                                             visitType = visitType,
+                                             baseSampleSize = format(baseSampleSize, scientific = FALSE),
+                                             xSpecSampleSize = 100,
+                                             mainPopnCohort = mainPopulationCohortId,
+                                             mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
+                                             mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
                                              visitLength = visitLength,
-                                             exclCohort = xSensCohortId)
-    cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
+                                             visitType = c(visitType),
+                                             firstCut = firstCut)
+    ParallelLogger::logInfo("Creating evaluation cohort on server")
+    DatabaseConnector::executeSql(connection = connection, sql)
 
-    #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
-    if (cntVisits > 100000000) {firstCut <- TRUE} else {firstCut <- FALSE}
+    # will only use the covariates with non-zero betas
+    lrNonZeroCovs <- c(lrResults$model$varImp$covariateId[lrResults$model$varImp$covariateValue != 0])
+    if (is(covariateSettings, "covariateSettings"))
+      covariateSettings <- list(covariateSettings)
+    for (listUp in 1:length(covariateSettings)) {
+      covariateSettings[[listUp]]$includedCovariateIds <- c(lrNonZeroCovs)
+    }
 
-    sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
-  } else {
-    firstCut <- FALSE
-    sqlFilename <- "CreateCohortsV6.sql"
+    ParallelLogger::logInfo("Getting evaluation cohort data from server")
+    plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
+                                                  cdmDatabaseSchema = cdmDatabaseSchema,
+                                                  cohortId = 0,
+                                                  outcomeIds = xSpecCohortId,
+                                                  outcomeDatabaseSchema = workDatabaseSchema,
+                                                  outcomeTable = testCohort,
+                                                  cohortDatabaseSchema = workDatabaseSchema,
+                                                  cohortTable = testCohort,
+                                                  cdmVersion = cdmVersion,
+                                                  washoutPeriod = 0,
+                                                  covariateSettings = covariateSettings)
+
+    if (excludeModelFromEvaluation == TRUE) {
+      # remove subjects in evaluation cohort that were in model cohort
+      excl <- data.frame(plpData$cohorts$rowId[plpData$cohorts$subjectId %in% c(exclSubjectList)])
+      xSpec <- c(plpData$outcomes$rowId)  #those with outcome need to be left in
+      excl <- subset(excl, !(excl[, 1] %in% c(xSpec)))
+      plpData$cohorts <- plpData$cohorts[!(plpData$cohorts$rowId %in% c(excl[, 1])), ]
+    }
+
+    if (savePlpData == TRUE) {
+      ParallelLogger::logInfo("Saving evaluation cohort PLP data to: ", evaluationCohortPlpDataFileName)
+      PatientLevelPrediction::savePlpData(plpData, evaluationCohortPlpDataFileName)
+    }
+
+    population <- PatientLevelPrediction::createStudyPopulation(plpData,
+                                                                population = NULL,
+                                                                outcomeId = xSpecCohortId,
+                                                                firstExposureOnly = FALSE,
+                                                                washoutPeriod = 0,
+                                                                removeSubjectsWithPriorOutcome = TRUE,
+                                                                priorOutcomeLookback = 1,
+                                                                riskWindowStart = 0,
+                                                                requireTimeAtRisk = FALSE,
+                                                                minTimeAtRisk = 0,
+                                                                addExposureDaysToStart = FALSE,
+                                                                riskWindowEnd = 1,
+                                                                addExposureDaysToEnd = T)
+
+    ParallelLogger::logInfo("Applying predictive model to evaluation cohort")
+
+    # apply the model to the evaluation cohort
+    appResults <- PatientLevelPrediction::applyModel(population, plpData, lrResults$model)
+    pred <- appResults$prediction
+
+    # pull in the xSens cohort
+    sql <- SqlRender::loadRenderTranslateSql("GetXsensCohort.sql",
+                                             packageName = "PheValuator",
+                                             dbms = connection@dbms,
+                                             cohort_database_schema = cohortDatabaseSchema,
+                                             cohort_table = cohortTable,
+                                             cdm_database_schema = cdmDatabaseSchema,
+                                             cohort_id = xSensCohortId)
+    sql <- SqlRender::translate(sql, connection@dbms)
+    xSensPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
+    # add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout
+    # criteria during evaluation
+    finalPopn <- merge(pred, xSensPopn, all.x = TRUE)
+    finalPopn$daysToXSens <- as.integer(finalPopn$daysToXsens)
+
+    # add other parameters to the input settings list
+    appResults$PheValuator$inputSetting$startDays <- covariateSettings[[1]]$longTermStartDays
+    appResults$PheValuator$inputSetting$endDays <- covariateSettings[[1]]$endDays
+    appResults$PheValuator$inputSetting$visitLength <- visitLength
+    appResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
+    appResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
+    appResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
+    appResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
+    appResults$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse = ", ")
+    appResults$PheValuator$inputSetting$startDate <- startDate
+    appResults$PheValuator$inputSetting$endDate <- endDate
+    appResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId
+    appResults$PheValuator$inputSetting$modelType <- modelType
+    appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
+
+    appResults$PheValuator$modelperformanceEvaluation <- lrResults$performanceEvaluation
+
+    # save the full data set to the model
+    appResults$prediction <- finalPopn
+
+    ParallelLogger::logInfo("Saving evaluation cohort to: ", evaluationCohortFileName)
+    saveRDS(appResults, evaluationCohortFileName)
+
+    # remove temp cohort table
+    sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "DropTempTable.sql",
+                                             packageName = "PheValuator",
+                                             dbms = connection@dbms,
+                                             tempDB = workDatabaseSchema,
+                                             test_cohort = testCohort)
+    DatabaseConnector::executeSql(connection = connection, sql = sql, progressBar = FALSE, reportOverallTime = FALSE)
   }
-  sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFilename,
-                                           packageName = "PheValuator",
-                                           dbms = connection@dbms,
-                                           cdm_database_schema = cdmDatabaseSchema,
-                                           cohort_database_schema = cohortDatabaseSchema,
-                                           cohort_database_table = cohortTable,
-                                           x_spec_cohort = xSpecCohortId,
-                                           tempDB = workDatabaseSchema,
-                                           test_cohort = testCohort,
-                                           exclCohort = 0,
-                                           ageLimit = lowerAgeLimit,
-                                           upperAgeLimit = upperAgeLimit,
-                                           gender = gender,
-                                           startDate = startDate,
-                                           endDate = endDate,
-                                           baseSampleSize = format(baseSampleSize, scientific = FALSE),
-                                           xSpecSampleSize = 100,
-                                           mainPopnCohort = mainPopulationCohortId,
-                                           mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
-                                           mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
-                                           visitLength = visitLength,
-                                           visitType = c(visitType),
-                                           firstCut = firstCut)
-  ParallelLogger::logInfo("Creating evaluation cohort on server")
-  DatabaseConnector::executeSql(connection = connection, sql)
-
-  # will only use the covariates with non-zero betas
-  lrNonZeroCovs <- c(lrResults$model$varImp$covariateId[lrResults$model$varImp$covariateValue != 0])
-  if (is(covariateSettings, "covariateSettings"))
-    covariateSettings <- list(covariateSettings)
-  for (listUp in 1:length(covariateSettings)) {
-    covariateSettings[[listUp]]$includedCovariateIds <- c(lrNonZeroCovs)
-  }
-
-  ParallelLogger::logInfo("Getting evaluation cohort data from server")
-  plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
-                                                cdmDatabaseSchema = cdmDatabaseSchema,
-                                                cohortId = 0,
-                                                outcomeIds = xSpecCohortId,
-                                                outcomeDatabaseSchema = workDatabaseSchema,
-                                                outcomeTable = testCohort,
-                                                cohortDatabaseSchema = workDatabaseSchema,
-                                                cohortTable = testCohort,
-                                                cdmVersion = cdmVersion,
-                                                washoutPeriod = 0,
-                                                covariateSettings = covariateSettings)
-
-  if (excludeModelFromEvaluation == TRUE) {
-    # remove subjects in evaluation cohort that were in model cohort
-    excl <- data.frame(plpData$cohorts$rowId[plpData$cohorts$subjectId %in% c(exclSubjectList)])
-    xSpec <- c(plpData$outcomes$rowId)  #those with outcome need to be left in
-    excl <- subset(excl, !(excl[, 1] %in% c(xSpec)))
-    plpData$cohorts <- plpData$cohorts[!(plpData$cohorts$rowId %in% c(excl[, 1])), ]
-  }
-
-  if (savePlpData == TRUE) {
-    ParallelLogger::logInfo("Saving evaluation cohort PLP data to: ", evaluationCohortPlpDataFileName)
-    PatientLevelPrediction::savePlpData(plpData, evaluationCohortPlpDataFileName)
-  }
-
-  population <- PatientLevelPrediction::createStudyPopulation(plpData,
-                                                              population = NULL,
-                                                              outcomeId = xSpecCohortId,
-                                                              firstExposureOnly = FALSE,
-                                                              washoutPeriod = 0,
-                                                              removeSubjectsWithPriorOutcome = TRUE,
-                                                              priorOutcomeLookback = 1,
-                                                              riskWindowStart = 0,
-                                                              requireTimeAtRisk = FALSE,
-                                                              minTimeAtRisk = 0,
-                                                              addExposureDaysToStart = FALSE,
-                                                              riskWindowEnd = 1,
-                                                              addExposureDaysToEnd = T)
-
-  ParallelLogger::logInfo("Applying predictive model to evaluation cohort")
-
-  # apply the model to the evaluation cohort
-  appResults <- PatientLevelPrediction::applyModel(population, plpData, lrResults$model)
-  pred <- appResults$prediction
-
-  # pull in the xSens cohort
-  sql <- SqlRender::loadRenderTranslateSql("GetXsensCohort.sql",
-                                           packageName = "PheValuator",
-                                           dbms = connection@dbms,
-                                           cohort_database_schema = cohortDatabaseSchema,
-                                           cohort_table = cohortTable,
-                                           cdm_database_schema = cdmDatabaseSchema,
-                                           cohort_id = xSensCohortId)
-  sql <- SqlRender::translate(sql, connection@dbms)
-  xSensPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
-  # add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout
-  # criteria during evaluation
-  finalPopn <- merge(pred, xSensPopn, all.x = TRUE)
-  finalPopn$daysToXSens <- as.integer(finalPopn$daysToXsens)
-
-  # add other parameters to the input settings list
-  appResults$PheValuator$inputSetting$startDays <- covariateSettings[[1]]$longTermStartDays
-  appResults$PheValuator$inputSetting$endDays <- covariateSettings[[1]]$endDays
-  appResults$PheValuator$inputSetting$visitLength <- visitLength
-  appResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
-  appResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
-  appResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
-  appResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
-  appResults$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse = ", ")
-  appResults$PheValuator$inputSetting$startDate <- startDate
-  appResults$PheValuator$inputSetting$endDate <- endDate
-  appResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId
-  appResults$PheValuator$inputSetting$modelType <- modelType
-  appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
-
-  appResults$PheValuator$modelperformanceEvaluation <- lrResults$performanceEvaluation
-
-  # save the full data set to the model
-  appResults$prediction <- finalPopn
-
-  ParallelLogger::logInfo("Saving evaluation cohort to: ", evaluationCohortFileName)
-  saveRDS(appResults, evaluationCohortFileName)
-
-  # remove temp cohort table
-  sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "DropTempTable.sql",
-                                           packageName = "PheValuator",
-                                           dbms = connection@dbms,
-                                           tempDB = workDatabaseSchema,
-                                           test_cohort = testCohort)
-  DatabaseConnector::executeSql(connection = connection, sql = sql, progressBar = FALSE, reportOverallTime = FALSE)
 }

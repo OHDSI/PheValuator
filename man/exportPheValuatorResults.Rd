@@ -16,7 +16,9 @@ exportPheValuatorResults(
 )
 }
 \arguments{
-\item{outputFolder}{Name of the folder where all the outputs will written to.}
+\item{outputFolder}{Name of the folder where all the outputs will be written to.}
+
+\item{exportFolder}{Name of the folder where all the exported files will be written to.}
 
 \item{pheValuatorAnalysisList}{A list of objects of type \code{pheValuatorAnalysis} as created using
 the \code{\link{createPheValuatorAnalysis}} function.}

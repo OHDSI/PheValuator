@@ -62,7 +62,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
         dateadd(day, 1, visit_start_date) COHORT_END_DATE
     from (select
 {@mainPopnCohort == 0} ? {
-					v.person_id, visit_start_date,
+					v.person_id, FIRST_VALUE(visit_start_date) OVER (PARTITION BY v.person_id ORDER BY NewId()) visit_start_date,
 						row_number() over (order by NewId()) rn
 					from @cdm_database_schema.visit_occurrence v
 	        JOIN @cdm_database_schema.observation_period obs

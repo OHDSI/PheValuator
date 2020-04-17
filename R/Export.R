@@ -16,7 +16,8 @@
 
 #' Export the PheValuator results to CSV files
 #'
-#' @param outputFolder                   Name of the folder where all the outputs will written to.
+#' @param outputFolder                   Name of the folder where all the outputs will be written to.
+#' @param exportFolder                   Name of the folder where all the exported files will be written to.
 #' @param pheValuatorAnalysisList        A list of objects of type \code{pheValuatorAnalysis} as created using
 #'                                       the \code{\link{createPheValuatorAnalysis}} function.
 #' @param packageName         The name of the package containing the cohort definitions. Can be left NULL if

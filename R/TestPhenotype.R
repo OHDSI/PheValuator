@@ -77,15 +77,21 @@ testPhenotypeAlgorithm <- function(connectionDetails,
   ParallelLogger::logInfo("Loading evaluation cohort from ", evaluationCohortFileName)
   evaluationCohort <- readRDS(evaluationCohortFileName)
 
-  countsTable <- tibble::tibble()
-  misses <- tibble::tibble()
-  xSpecP <- 0.5
-  xSpecP2 <- -1
-  xSpecP3 <- -1
+  #test that viable evaluation cohort was created
+  if (!is.null(evaluationCohort$errorMessage)) {
+    ParallelLogger::logInfo(evaluationCohort$errorMessage, " - Evaluation cohort not created.")
+    results <- tibble::tibble(cutPoint = evaluationCohort$errorMessage)
+  } else {
 
-  modelType <- evaluationCohort$PheValuator$inputSetting$modelType
-  if (modelType == "acute") {
-    sql <- "SELECT DISTINCT subject_id,
+    countsTable <- tibble::tibble()
+    misses <- tibble::tibble()
+    xSpecP <- 0.5
+    xSpecP2 <- -1
+    xSpecP3 <- -1
+
+    modelType <- evaluationCohort$PheValuator$inputSetting$modelType
+    if (modelType == "acute") {
+      sql <- "SELECT DISTINCT subject_id,
       visit_start_date AS cohort_start_date
     FROM @cohort_database_schema.@cohort_table
     JOIN @cdm_database_schema.visit_occurrence
@@ -93,8 +99,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
         and cohort_start_date >= visit_start_date
         and cohort_start_date <= visit_end_date
     WHERE cohort_definition_id = @cohort_id;"
-  } else {
-    sql <- "SELECT DISTINCT subject_id,
+    } else {
+      sql <- "SELECT DISTINCT subject_id,
       observation_period_start_date AS cohort_start_date
     FROM @cohort_database_schema.@cohort_table
     JOIN @cdm_database_schema.observation_period
@@ -102,130 +108,131 @@ testPhenotypeAlgorithm <- function(connectionDetails,
         and cohort_start_date >= observation_period_start_date
         and cohort_start_date <= observation_period_end_date
     WHERE cohort_definition_id = @cohort_id;"
-  }
-
-  sql <- SqlRender::render(sql = sql,
-                           cohort_database_schema = cohortDatabaseSchema,
-                           cdm_database_schema = cdmDatabaseSchema,
-                           cohort_table = cohortTable,
-                           cohort_id = phenotypeCohortId)
-
-  sql <- SqlRender::translate(sql = sql, targetDialect = connectionDetails$dbms)
-  connection <- DatabaseConnector::connect(connectionDetails)
-  ParallelLogger::logInfo("Downloading cohort to evaluate. Assuming type is ", modelType, ".")
-  phenoPop <- DatabaseConnector::querySql(connection = connection, sql, snakeCaseToCamelCase = TRUE)
-  DatabaseConnector::disconnect(connection)
-
-  if (nrow(phenoPop) == 0) {
-    warning('Phenotype cohort is empty')
-    cutPoints[cutPoints == "EV"] <- "Expected Value"
-    return(tibble::tibble('Cut Point' = cutPoints, check.names = FALSE))
-  }
-  ParallelLogger::logInfo("Computing evaluation statistics")
-  modelAll <- evaluationCohort$prediction[evaluationCohort$prediction$outcomeCount == 0, ]
-  if (washoutPeriod >= 0) {
-    modelAll <- modelAll[(modelAll$daysToXSens > washoutPeriod | is.na(modelAll$daysToXSens)), ]
-  }
-  modelAll <- modelAll[order(modelAll$value), ]
-  modelAll$rownum <- 1:nrow(modelAll)
-  phenoPop$inPhenotype <- rep(TRUE, nrow(phenoPop))
-  for (cpUp in 1:length(cutPoints)) {
-    # join the phenotype table with the prediction table
-    if (modelType == "acute") {
-      fullTable <- dplyr::left_join(modelAll,
-                                    phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype"),],
-                                    by = c("subjectId", "cohortStartDate"))
-    } else {
-      fullTable <- dplyr::left_join(modelAll,
-                                    phenoPop[, c("subjectId", "inPhenotype")],
-                                    by = c("subjectId"))
     }
-    fullTable$inPhenotype[is.na(fullTable$inPhenotype)] <- FALSE
 
-    # a cut point = 'EV' indicates to calculate the expected values - using the probability to proportion
-    # trues and falses
-    fullTable$valueOrig <- fullTable$value
-    if (cutPoints[cpUp] != "EV") {
-      # for numeric cutpoints determine the cut point to use
-      cutPt <- as.numeric(cutPoints[cpUp])
-      fullTable$value <- fullTable$value > cutPt
-    }
-    fullTable$tp <- 0
-    fullTable$tn <- 0
-    fullTable$fp <- 0
-    fullTable$fn <- 0
-    fullTable$tp[fullTable$inPhenotype] <- fullTable$value[fullTable$inPhenotype]
-    fullTable$tn[!fullTable$inPhenotype] <- 1 - fullTable$value[!fullTable$inPhenotype]
-    fullTable$fp[fullTable$inPhenotype] <- 1 - fullTable$value[fullTable$inPhenotype]
-    fullTable$fn[!fullTable$inPhenotype] <- fullTable$value[!fullTable$inPhenotype]
+    sql <- SqlRender::render(sql = sql,
+                             cohort_database_schema = cohortDatabaseSchema,
+                             cdm_database_schema = cdmDatabaseSchema,
+                             cohort_table = cohortTable,
+                             cohort_id = phenotypeCohortId)
 
-    # capture subject id's of mistakes if requested - only for the 0.5 or xSpecP cutpoint
-    if (!is.null(xSpecP)) {
-      missesCP <- xSpecP
-    } else {
-      missesCP <- 0.5
+    sql <- SqlRender::translate(sql = sql, targetDialect = connectionDetails$dbms)
+    connection <- DatabaseConnector::connect(connectionDetails)
+    ParallelLogger::logInfo("Downloading cohort to evaluate. Assuming type is ", modelType, ".")
+    phenoPop <- DatabaseConnector::querySql(connection = connection, sql, snakeCaseToCamelCase = TRUE)
+    DatabaseConnector::disconnect(connection)
+
+    if (nrow(phenoPop) == 0) {
+      warning('Phenotype cohort is empty')
+      cutPoints[cutPoints == "EV"] <- "Expected Value"
+      return(tibble::tibble('Cut Point' = cutPoints, check.names = FALSE))
     }
-    if (cutPoints[cpUp] == missesCP) {
-      subjects <- fullTable[fullTable$tp == 1, ]
-      if (nrow(subjects) > 0) {
-        subjects <- subjects[order(-subjects$valueOrig), ]
-        tempMisses <- subjects[min(5, nrow(subjects)), c("subjectId", "cohortStartDate", "daysFromObsStart", "valueOrig")]
-        tempMisses$miss <- "TP"
-        misses <- dplyr::bind_rows(misses, tempMisses)
+    ParallelLogger::logInfo("Computing evaluation statistics")
+    modelAll <- evaluationCohort$prediction[evaluationCohort$prediction$outcomeCount == 0, ]
+    if (washoutPeriod >= 0) {
+      modelAll <- modelAll[(modelAll$daysToXSens > washoutPeriod | is.na(modelAll$daysToXSens)), ]
+    }
+    modelAll <- modelAll[order(modelAll$value), ]
+    modelAll$rownum <- 1:nrow(modelAll)
+    phenoPop$inPhenotype <- rep(TRUE, nrow(phenoPop))
+    for (cpUp in 1:length(cutPoints)) {
+      # join the phenotype table with the prediction table
+      if (modelType == "acute") {
+        fullTable <- dplyr::left_join(modelAll,
+                                      phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype"),],
+                                      by = c("subjectId", "cohortStartDate"))
+      } else {
+        fullTable <- dplyr::left_join(modelAll,
+                                      phenoPop[, c("subjectId", "inPhenotype")],
+                                      by = c("subjectId"))
       }
-      subjects <- fullTable[fullTable$fp == 1, ]
-      if (nrow(subjects) > 0) {
-        subjects <- subjects[order(-subjects$valueOrig), ]
-        tempMisses <- subjects[min(50, nrow(subjects)), c("subjectId", "cohortStartDate", "daysFromObsStart", "valueOrig")]
-        tempMisses$miss <- "FP"
-        misses <- dplyr::bind_rows(misses, tempMisses)
+      fullTable$inPhenotype[is.na(fullTable$inPhenotype)] <- FALSE
+
+      # a cut point = 'EV' indicates to calculate the expected values - using the probability to proportion
+      # trues and falses
+      fullTable$valueOrig <- fullTable$value
+      if (cutPoints[cpUp] != "EV") {
+        # for numeric cutpoints determine the cut point to use
+        cutPt <- as.numeric(cutPoints[cpUp])
+        fullTable$value <- fullTable$value > cutPt
       }
-      subjects <- fullTable[fullTable$fn == 1, ]
-      if (nrow(subjects) > 0) {
-        subjects <- subjects[order(-subjects$valueOrig), ]
-        tempMisses <- subjects[min(50, nrow(subjects)), c("subjectId", "cohortStartDate", "daysFromObsStart", "valueOrig")]
-        tempMisses$miss <- "FN"
-        misses <- dplyr::bind_rows(misses, tempMisses)
+      fullTable$tp <- 0
+      fullTable$tn <- 0
+      fullTable$fp <- 0
+      fullTable$fn <- 0
+      fullTable$tp[fullTable$inPhenotype] <- fullTable$value[fullTable$inPhenotype]
+      fullTable$tn[!fullTable$inPhenotype] <- 1 - fullTable$value[!fullTable$inPhenotype]
+      fullTable$fp[fullTable$inPhenotype] <- 1 - fullTable$value[fullTable$inPhenotype]
+      fullTable$fn[!fullTable$inPhenotype] <- fullTable$value[!fullTable$inPhenotype]
+
+      # capture subject id's of mistakes if requested - only for the 0.5 or xSpecP cutpoint
+      if (!is.null(xSpecP)) {
+        missesCP <- xSpecP
+      } else {
+        missesCP <- 0.5
       }
+      if (cutPoints[cpUp] == missesCP) {
+        subjects <- fullTable[fullTable$tp == 1, ]
+        if (nrow(subjects) > 0) {
+          subjects <- subjects[order(-subjects$valueOrig), ]
+          tempMisses <- subjects[min(5, nrow(subjects)), c("subjectId", "cohortStartDate", "daysFromObsStart", "valueOrig")]
+          tempMisses$miss <- "TP"
+          misses <- dplyr::bind_rows(misses, tempMisses)
+        }
+        subjects <- fullTable[fullTable$fp == 1, ]
+        if (nrow(subjects) > 0) {
+          subjects <- subjects[order(-subjects$valueOrig), ]
+          tempMisses <- subjects[min(50, nrow(subjects)), c("subjectId", "cohortStartDate", "daysFromObsStart", "valueOrig")]
+          tempMisses$miss <- "FP"
+          misses <- dplyr::bind_rows(misses, tempMisses)
+        }
+        subjects <- fullTable[fullTable$fn == 1, ]
+        if (nrow(subjects) > 0) {
+          subjects <- subjects[order(-subjects$valueOrig), ]
+          tempMisses <- subjects[min(50, nrow(subjects)), c("subjectId", "cohortStartDate", "daysFromObsStart", "valueOrig")]
+          tempMisses$miss <- "FN"
+          misses <- dplyr::bind_rows(misses, tempMisses)
+        }
+      }
+      newRow <- tibble::tibble(truePositives = sum(fullTable$tp),
+                               trueNegatives = sum(fullTable$tn),
+                               falsePositives = sum(fullTable$fp),
+                               falseNegatives = sum(fullTable$fn))
+
+      if (cutPoints[cpUp] == xSpecP) {
+        newRow$cutPoint <- paste("EmpirCP0.5 (", round(xSpecP, 2), ")", sep = "")
+      } else if (cutPoints[cpUp] == xSpecP2) {
+        newRow$cutPoint <- paste("EmpirCP1.0 (", round(xSpecP2, 2), ")", sep = "")
+      } else if (cutPoints[cpUp] == xSpecP3) {
+        newRow$cutPoint <- paste("EmpirCP1.5 (", round(xSpecP3, 2), ")", sep = "")
+      } else if (cutPoints[cpUp] == "EV") {
+        newRow$cutPoint <- paste("Expected Value", sep = "")
+      } else {
+        newRow$cutPoint <- cutPoints[cpUp]
+      }
+      countsTable <- dplyr::bind_rows(countsTable, newRow)
     }
-    newRow <- tibble::tibble(truePositives = sum(fullTable$tp),
-                             trueNegatives = sum(fullTable$tn),
-                             falsePositives = sum(fullTable$fp),
-                             falseNegatives = sum(fullTable$fn))
+    countsTable <- computePerformanceMetricsFromCounts(countsTable)
 
-    if (cutPoints[cpUp] == xSpecP) {
-      newRow$cutPoint <- paste("EmpirCP0.5 (", round(xSpecP, 2), ")", sep = "")
-    } else if (cutPoints[cpUp] == xSpecP2) {
-      newRow$cutPoint <- paste("EmpirCP1.0 (", round(xSpecP2, 2), ")", sep = "")
-    } else if (cutPoints[cpUp] == xSpecP3) {
-      newRow$cutPoint <- paste("EmpirCP1.5 (", round(xSpecP3, 2), ")", sep = "")
-    } else if (cutPoints[cpUp] == "EV") {
-      newRow$cutPoint <- paste("Expected Value", sep = "")
-    } else {
-      newRow$cutPoint <- cutPoints[cpUp]
+    # Make pretty results table
+    results <- tibble::tibble(cutPoint = countsTable$cutPoint,
+                              truePositives = round(countsTable$truePositives, 0),
+                              trueNegatives = round(countsTable$trueNegatives, 0),
+                              falsePositives = round(countsTable$falsePositives, 0),
+                              falseNegatives = round(countsTable$falseNegatives, 0),
+                              sensitivity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Lb),
+                              ppv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Lb),
+                              specificity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$spec, countsTable$spec),
+                              npv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Lb),
+                              estimatedPrevalence = sprintf("%0.1f", 100*countsTable$estimatedPrevalence),
+                              f1Score = sprintf("%0.3f", countsTable$f1Score))
+
+    if (nrow(misses) > 0) {
+      attr(results, "misses") <- misses
     }
-    countsTable <- dplyr::bind_rows(countsTable, newRow)
+    delta <- Sys.time() - start
+    ParallelLogger::logInfo("Testing phenotype algorithm took ", signif(delta, 3), " ", attr(delta, "units"))
   }
-  countsTable <- computePerformanceMetricsFromCounts(countsTable)
-
-  # Make pretty results table
-  results <- tibble::tibble(cutPoint = countsTable$cutPoint,
-                            truePositives = round(countsTable$truePositives, 0),
-                            trueNegatives = round(countsTable$trueNegatives, 0),
-                            falsePositives = round(countsTable$falsePositives, 0),
-                            falseNegatives = round(countsTable$falseNegatives, 0),
-                            sensitivity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Lb),
-                            ppv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Lb),
-                            specificity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$spec, countsTable$spec),
-                            npv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Lb),
-                            estimatedPrevalence = sprintf("%0.1f", 100*countsTable$estimatedPrevalence),
-                            f1Score = sprintf("%0.3f", countsTable$f1Score))
-
-  if (nrow(misses) > 0) {
-    attr(results, "misses") <- misses
-  }
-  delta <- Sys.time() - start
-  ParallelLogger::logInfo("Testing phenotype algorithm took ", signif(delta, 3), " ", attr(delta, "units"))
   return(results)
 }
 

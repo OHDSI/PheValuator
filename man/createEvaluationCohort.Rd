@@ -10,6 +10,7 @@ createEvaluationCohort(
   xSpecCohortId,
   xSensCohortId,
   prevalenceCohortId = xSensCohortId,
+  xSpecCohortSize = NULL,
   cdmDatabaseSchema,
   cohortDatabaseSchema,
   cohortTable,
@@ -50,6 +51,8 @@ definition id in the cohort table (for noisy negatives).}
 
 \item{prevalenceCohortId}{The number of the cohort definition id to determine the
 disease prevalence.}
+
+\item{xSpecCohortSize}{The recommended xSpec sample size to use in model (default = NULL)}
 
 \item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM
 instance. Requires read permissions to this database. On SQL

@@ -32,6 +32,7 @@
 #'                                         definition id in the cohort table (for noisy negatives).
 #' @param prevalenceCohortId               The number of the cohort definition id to determine the
 #'                                         disease prevalence.
+#' @param xSpecCohortSize                  The recommended xSpec sample size to use in model (default = NULL)
 #' @param cdmDatabaseSchema                The name of the database schema that contains the OMOP CDM
 #'                                         instance. Requires read permissions to this database. On SQL
 #'                                         Server, this should specifiy both the database and the
@@ -80,6 +81,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    xSpecCohortId,
                                    xSensCohortId,
                                    prevalenceCohortId = xSensCohortId,
+                                   xSpecCohortSize = NULL,
                                    cdmDatabaseSchema,
                                    cohortDatabaseSchema,
                                    cohortTable,
