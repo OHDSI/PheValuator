@@ -100,7 +100,7 @@
     }
 
     # set the number of noisy negatives in the model either from the prevalence or to 500K max
-    baseSampleSize <- min(as.integer(xspecSize/popPrev), format(5e+05, scientific = FALSE))  #use 500,000 as largest base sample
+    baseSampleSize <- min(c(as.integer(xspecSize/popPrev), as.integer(format(5e+05, scientific = FALSE))))  #use 500,000 as largest base sample
 
     if (!file.exists(plpDataFile)) {
       # only pull the plp data if it doesn't already exist create a unique name for the temporary cohort table
