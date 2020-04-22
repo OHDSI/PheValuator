@@ -26,6 +26,7 @@
 #'                                       instance. Requires read permissions to this database. On SQL
 #'                                       Server, this should specifiy both the database and the
 #'                                       schema, so for example 'cdm_instance.dbo'.
+#' @param oracleTempSchema	             A schema where temp tables can be created in Oracle.
 #' @param cohortDatabaseSchema           The name of the database schema that is the location where
 #'                                       the cohort data used to define the at risk cohort is
 #'                                       available. Requires read permissions to this database.
@@ -36,9 +37,8 @@
 #' @param workDatabaseSchema             The name of the database schema that is the location where
 #'                                       a table can be created and afterwards removed.
 #'                                       Requires write permissions to this database.
-#' @param cdmVersion                     Define the OMOP CDM version used: currently support "4" and
-#'                                       "5".
-#' @param outputFolder                   Name of the folder where all the outputs will written to.
+#' @param cdmVersion                     Define the OMOP CDM version used: currently supports "5".
+#' @param outputFolder                   Name of the folder where all the outputs will be written to.
 #' @param pheValuatorAnalysisList        A list of objects of type \code{pheValuatorAnalysis} as created using
 #'                                       the \code{\link{createPheValuatorAnalysis}} function.
 #'
@@ -49,6 +49,7 @@
 #' @export
 runPheValuatorAnalyses <- function(connectionDetails,
                                    cdmDatabaseSchema,
+                                   oracleTempSchema = NULL,
                                    cohortDatabaseSchema = cdmDatabaseSchema,
                                    cohortTable = "cohort",
                                    workDatabaseSchema = cdmDatabaseSchema,
@@ -70,13 +71,14 @@ runPheValuatorAnalyses <- function(connectionDetails,
       analysisId <- referenceTable$analysisId[referenceTable$evaluationCohortFolder == evaluationCohortFolder][1]
       matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
       args <- matched[[1]]$createEvaluationCohortArgs
-      args$connectionDetails = connectionDetails
-      args$cdmDatabaseSchema = cdmDatabaseSchema
-      args$cohortDatabaseSchema = cohortDatabaseSchema
-      args$cohortTable = cohortTable
-      args$workDatabaseSchema = workDatabaseSchema
-      args$cdmVersion = cdmVersion
-      args$outFolder = file.path(outputFolder, evaluationCohortFolder)
+      args$connectionDetails <- connectionDetails
+      args$cdmDatabaseSchema <- cdmDatabaseSchema
+      args$oracleTempSchema <- oracleTempSchema
+      args$cohortDatabaseSchema <- cohortDatabaseSchema
+      args$cohortTable <- cohortTable
+      args$workDatabaseSchema <- workDatabaseSchema
+      args$cdmVersion <- cdmVersion
+      args$outFolder <- file.path(outputFolder, evaluationCohortFolder)
       task <- list(args = args)
       return(task)
     }
@@ -92,11 +94,11 @@ runPheValuatorAnalyses <- function(connectionDetails,
       analysisId <- referenceTable$analysisId[referenceTable$resultsFile == resultsFile]
       matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
       args <- matched[[1]]$testPhenotypeAlgorithmArgs
-      args$connectionDetails = connectionDetails
-      args$cdmDatabaseSchema = cdmDatabaseSchema
-      args$cohortDatabaseSchema = cohortDatabaseSchema
-      args$cohortTable = cohortTable
-      args$outFolder = file.path(outputFolder,
+      args$connectionDetails <- connectionDetails
+      args$cdmDatabaseSchema <- cdmDatabaseSchema
+      args$cohortDatabaseSchema <- cohortDatabaseSchema
+      args$cohortTable <- cohortTable
+      args$outFolder <- file.path(outputFolder,
                                  referenceTable$evaluationCohortFolder[referenceTable$analysisId == analysisId])
       task <- list(args = args,
                    fileName = file.path(outputFolder, resultsFile))

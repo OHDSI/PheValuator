@@ -1,7 +1,11 @@
 Package: PheValuator
 Type: Package
 Title: Rapid Phenotype Evaluation
+<<<<<<< HEAD
 Version: 2.0.4
+=======
+Version: 2.0.6
+>>>>>>> develop
 Author: Joel N. Swerdel
 Maintainer: Joel N. Swerdel <jswerdel@its.jnj.com>
 Description: A package for evaluating phenotype algorithms.  The package
@@ -24,14 +28,22 @@ Imports:
     SqlRender (>= 1.5.2),
     dplyr (>= 0.7.8),
     stringr (>= 1.3.1),
+    readr,
     methods,
-    ParallelLogger
+    ParallelLogger,
+    tibble
 Suggests:
-    knitr
+    knitr,
+    ROhdsiWebApi,
+    shiny,
+    shinydashboard,
+    DT,
+    htmltools
 Remotes:
     ohdsi/PatientLevelPrediction,
-    ohdsi/FeatureExtraction
+    ohdsi/FeatureExtraction,
+    ohdsi/ROhdsiWebApi
 URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Encoding: UTF-8

@@ -8,6 +8,7 @@ createCreateEvaluationCohortArgs(
   xSpecCohortId,
   xSensCohortId,
   prevalenceCohortId = xSensCohortId,
+  xSpecCohortSize = NULL,
   covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds
     = c(), addDescendantsToExclude = FALSE),
   mainPopulationCohortId = 0,
@@ -17,10 +18,12 @@ createCreateEvaluationCohortArgs(
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
   visitLength = 3,
+  visitType = c(9201),
   gender = c(8507, 8532),
   startDate = "19001010",
   endDate = "21000101",
-  removeSubjectsWithFutureDates = FALSE,
+  excludeModelFromEvaluation = TRUE,
+  removeSubjectsWithFutureDates = TRUE,
   saveEvaluationCohortPlpData = FALSE,
   modelType = "chronic"
 )
@@ -36,6 +39,8 @@ negatives).}
 
 \item{prevalenceCohortId}{The number of the cohort definition id to determine
 thedisease prevalence.}
+
+\item{xSpecCohortSize}{The recommended xSpec sample size to use in model (default = NULL)}
 
 \item{covariateSettings}{A covariateSettings object as generated
 usingcreateCovariateSettings().}
@@ -60,11 +65,16 @@ visits.}
 
 \item{visitLength}{The minimum length of index visit for acute outcomes.}
 
+\item{visitType}{The concept_id for the visit type.}
+
 \item{gender}{The gender(s) to be included.}
 
 \item{startDate}{The starting date for including subjects in the model.}
 
 \item{endDate}{The ending date for including subjects in the model.}
+
+\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the
+evaluation cohort?}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects
 withdates in the future?}

@@ -10,6 +10,7 @@ createEvaluationCohort(
   xSpecCohortId,
   xSensCohortId,
   prevalenceCohortId = xSensCohortId,
+  xSpecCohortSize = NULL,
   cdmDatabaseSchema,
   cohortDatabaseSchema,
   cohortTable,
@@ -23,12 +24,14 @@ createEvaluationCohort(
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
   visitLength = 3,
+  visitType = c(9201),
   gender = c(8507, 8532),
   startDate = "19001010",
   endDate = "21000101",
   cdmVersion = "5",
   outFolder = getwd(),
   evaluationCohortId = "main",
+  excludeModelFromEvaluation = TRUE,
   removeSubjectsWithFutureDates = TRUE,
   saveEvaluationCohortPlpData = FALSE,
   modelType = "chronic"
@@ -48,6 +51,8 @@ definition id in the cohort table (for noisy negatives).}
 
 \item{prevalenceCohortId}{The number of the cohort definition id to determine the
 disease prevalence.}
+
+\item{xSpecCohortSize}{The recommended xSpec sample size to use in model (default = NULL)}
 
 \item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM
 instance. Requires read permissions to this database. On SQL
@@ -88,6 +93,8 @@ cohort start date to end including visits.}
 
 \item{visitLength}{The minimum length of index visit for acute outcomes.}
 
+\item{visitType}{The concept_id for the visit type.}
+
 \item{gender}{The gender(s) to be included.}
 
 \item{startDate}{The starting date for including subjects in the model.}
@@ -99,6 +106,8 @@ cohort start date to end including visits.}
 \item{outFolder}{The folder where the output files will be written.}
 
 \item{evaluationCohortId}{A string used to generate the file names for this evaluation cohort.}
+
+\item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort?}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects with
 dates in the future?}

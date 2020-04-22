@@ -32,6 +32,7 @@
 #'                                         definition id in the cohort table (for noisy negatives).
 #' @param prevalenceCohortId               The number of the cohort definition id to determine the
 #'                                         disease prevalence.
+#' @param xSpecCohortSize                  The recommended xSpec sample size to use in model (default = NULL)
 #' @param cdmDatabaseSchema                The name of the database schema that contains the OMOP CDM
 #'                                         instance. Requires read permissions to this database. On SQL
 #'                                         Server, this should specifiy both the database and the
@@ -59,12 +60,14 @@
 #' @param lowerAgeLimit                    The lower age for subjects in the model.
 #' @param upperAgeLimit                    The upper age for subjects in the model.
 #' @param visitLength                      The minimum length of index visit for acute outcomes.
+#' @param visitType                        The concept_id for the visit type.
 #' @param gender                           The gender(s) to be included.
 #' @param startDate                        The starting date for including subjects in the model.
 #' @param endDate                          The ending date for including subjects in the model.
 #' @param cdmVersion                       The CDM version of the database.
 #' @param outFolder                        The folder where the output files will be written.
 #' @param evaluationCohortId               A string used to generate the file names for this evaluation cohort.
+#' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the evaluation cohort?
 #' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects with
 #'                                         dates in the future?
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be saved? To be
@@ -78,6 +81,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    xSpecCohortId,
                                    xSensCohortId,
                                    prevalenceCohortId = xSensCohortId,
+                                   xSpecCohortSize = NULL,
                                    cdmDatabaseSchema,
                                    cohortDatabaseSchema,
                                    cohortTable,
@@ -91,12 +95,14 @@ createEvaluationCohort <- function(connectionDetails,
                                    lowerAgeLimit = 0,
                                    upperAgeLimit = 120,
                                    visitLength = 3,
+                                   visitType = c(9201),
                                    gender = c(8507, 8532),
                                    startDate = "19001010",
                                    endDate = "21000101",
                                    cdmVersion = "5",
                                    outFolder = getwd(),
                                    evaluationCohortId = "main",
+                                   excludeModelFromEvaluation = TRUE,
                                    removeSubjectsWithFutureDates = TRUE,
                                    saveEvaluationCohortPlpData = FALSE,
                                    modelType = "chronic") {
@@ -131,6 +137,7 @@ createEvaluationCohort <- function(connectionDetails,
                         xSpecCohortId = xSpecCohortId,
                         xSensCohortId = xSensCohortId,
                         prevalenceCohortId = prevalenceCohortId,
+                        xSpecCohortSize = xSpecCohortSize,
                         covariateSettings = covariateSettings,
                         mainPopulationCohortId = mainPopulationCohortId,
                         mainPopulationCohortIdStartDay = mainPopulationCohortIdStartDay,
@@ -138,6 +145,7 @@ createEvaluationCohort <- function(connectionDetails,
                         lowerAgeLimit = lowerAgeLimit,
                         upperAgeLimit = upperAgeLimit,
                         visitLength = visitLength,
+                        visitType = c(visitType),
                         gender = gender,
                         startDate = startDate,
                         endDate = endDate,
@@ -162,6 +170,7 @@ createEvaluationCohort <- function(connectionDetails,
                           lowerAgeLimit = lowerAgeLimit,
                           upperAgeLimit = upperAgeLimit,
                           visitLength = visitLength,
+                          visitType = c(visitType),
                           gender = gender,
                           startDate = startDate,
                           endDate = endDate,

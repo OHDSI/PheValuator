@@ -7,6 +7,7 @@
 runPheValuatorAnalyses(
   connectionDetails,
   cdmDatabaseSchema,
+  oracleTempSchema = NULL,
   cohortDatabaseSchema = cdmDatabaseSchema,
   cohortTable = "cohort",
   workDatabaseSchema = cdmDatabaseSchema,
@@ -25,6 +26,8 @@ instance. Requires read permissions to this database. On SQL
 Server, this should specifiy both the database and the
 schema, so for example 'cdm_instance.dbo'.}
 
+\item{oracleTempSchema}{A schema where temp tables can be created in Oracle.}
+
 \item{cohortDatabaseSchema}{The name of the database schema that is the location where
 the cohort data used to define the at risk cohort is
 available. Requires read permissions to this database.}
@@ -38,10 +41,9 @@ COHORT_END_DATE.}
 a table can be created and afterwards removed.
 Requires write permissions to this database.}
 
-\item{cdmVersion}{Define the OMOP CDM version used: currently support "4" and
-"5".}
+\item{cdmVersion}{Define the OMOP CDM version used: currently supports "5".}
 
-\item{outputFolder}{Name of the folder where all the outputs will written to.}
+\item{outputFolder}{Name of the folder where all the outputs will be written to.}
 
 \item{pheValuatorAnalysisList}{A list of objects of type \code{pheValuatorAnalysis} as created using
 the \code{\link{createPheValuatorAnalysis}} function.}
