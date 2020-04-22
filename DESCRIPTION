@@ -1,14 +1,10 @@
 Package: PheValuator
 Type: Package
 Title: Rapid Phenotype Evaluation
-<<<<<<< HEAD
-Version: 2.0.4
-=======
 Version: 2.0.6
->>>>>>> develop
 Author: Joel N. Swerdel
 Maintainer: Joel N. Swerdel <jswerdel@its.jnj.com>
-Description: A package for evaluating phenotype algorithms. The package
+Description: A package for evaluating phenotype algorithms.  The package
     develops a diagnostic prediction model using a set of noisy positives
     and noisy negatives.  It can then apply the model to a large cohort
     to create a set of subjects each with a predicted probability for the

@@ -42,43 +42,6 @@
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
 
-<<<<<<< HEAD
-  # determine population prevalence for correct xSpec/noisy negative popn ratio
-  sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "getPopnPrev.sql",
-                                           packageName = "PheValuator",
-                                           dbms = connection@dbms,
-                                           cdm_database_schema = cdmDatabaseSchema,
-                                           cohort_database_schema = cohortDatabaseSchema,
-                                           cohort_database_table = cohortTable,
-                                           lowerAgeLimit = lowerAgeLimit,
-                                           upperAgeLimit = upperAgeLimit,
-                                           gender = gender,
-                                           startDate = startDate,
-                                           endDate = endDate,
-                                           prevCohort = prevalenceCohortId,
-                                           removeSubjectsWithFutureDates = removeSubjectsWithFutureDates)
-  popPrev <- DatabaseConnector::querySql(connection = connection, sql)
-
-  if (popPrev == 0)
-    stop("Unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
-
-  ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.1f%%", 100 * popPrev))
-
-  # set reasonable model populations - for fast, but accurate models
-  if (popPrev >= 0.3) {
-    xspecSize <- 4000  #use large xSpec size for higher prevalence values
-  } else if (popPrev >= 0.2) {
-    xspecSize <- 3000
-  } else if (popPrev >= 0.1) {
-    xspecSize <- 2000
-  } else {
-    xspecSize <- 1500  #use smaller xSpec size for lower prevalence values
-  }
-
-  # set the number of noisy negatives in the model either from the prevalence or to 500K max
-  baseSampleSize <- min(as.integer(xspecSize/popPrev), format(5e+05, scientific = FALSE))  #use 500,000 as largest base sample
-=======
->>>>>>> develop
 
   plpDataFile <- file.path(outFolder, sprintf("plpData_%s", modelId))
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
@@ -111,11 +74,6 @@
                                              gender = gender,
                                              startDate = startDate,
                                              endDate = endDate,
-<<<<<<< HEAD
-                                             baseSampleSize = format(baseSampleSize, scientific = FALSE),
-                                             xSpecSampleSize = xspecSize,
-=======
->>>>>>> develop
                                              mainPopnCohort = mainPopulationCohortId,
                                              prevCohort = prevalenceCohortId,
                                              removeSubjectsWithFutureDates = removeSubjectsWithFutureDates)
