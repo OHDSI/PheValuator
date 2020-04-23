@@ -1,11 +1,7 @@
 Package: PheValuator
 Type: Package
 Title: Rapid Phenotype Evaluation
-<<<<<<< HEAD
-Version: 2.0.9
-=======
 Version: 2.0.10
->>>>>>> develop
 Author: Joel N. Swerdel
 Maintainer: Joel N. Swerdel <jswerdel@its.jnj.com>
 Description: A package for evaluating phenotype algorithms.  The package
