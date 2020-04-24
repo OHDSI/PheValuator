@@ -264,26 +264,22 @@ computePerformanceMetricsFromCounts <- function(counts) {
 
   counts <- dplyr::bind_cols(counts,
                              computeProportions(counts$truePositives,
-                                                abs(counts$truePositives) + abs(counts$falseNegatives) +
-                                                  max(abs(counts$truePositives) + abs(counts$falseNegatives), 1), #prevent division by 0
+                                                max(abs(counts$truePositives) + abs(counts$falseNegatives), 1), #prevent division by 0
                                                 "sens"))
 
   counts <- dplyr::bind_cols(counts,
                              computeProportions(counts$truePositives,
-                                                abs(counts$truePositives) + abs(counts$falsePositives) +
-                                                  max(abs(counts$truePositives) + abs(counts$falsePositives), 1),
+                                                max(abs(counts$truePositives) + abs(counts$falsePositives), 1),
                                                 "ppv"))
 
   counts <- dplyr::bind_cols(counts,
                              computeProportions(counts$trueNegatives,
-                                                abs(counts$trueNegatives) + abs(counts$falsePositives) +
-                                                  max(abs(counts$trueNegatives) + abs(counts$falsePositives), 1),
+                                                max(abs(counts$trueNegatives) + abs(counts$falsePositives), 1),
                                                 "spec"))
 
   counts <- dplyr::bind_cols(counts,
                              computeProportions(counts$trueNegatives,
-                                                abs(counts$trueNegatives) + abs(counts$falseNegatives) +
-                                                  max(abs(counts$trueNegatives) + abs(counts$falseNegatives), 1),
+                                                max(abs(counts$trueNegatives) + abs(counts$falseNegatives), 1),
                                                 "npv"))
 
   counts$estimatedPrevalence <- (abs(counts$truePositives) + abs(counts$falseNegatives)) / (abs(counts$truePositives) + abs(counts$trueNegatives) + abs(counts$falsePositives) + abs(counts$falseNegatives))
