@@ -6,7 +6,7 @@
 \alias{PheValuator-package}
 \title{PheValuator: Rapid Phenotype Evaluation}
 \description{
-A package for evaluating phenotype algorithms. The package
+A package for evaluating phenotype algorithms.  The package
     develops a diagnostic prediction model using a set of noisy positives
     and noisy negatives.  It can then apply the model to a large cohort
     to create a set of subjects each with a predicted probability for the
