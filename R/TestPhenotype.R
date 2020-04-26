@@ -262,24 +262,26 @@ computePerformanceMetricsFromCounts <- function(counts) {
     return(proportions)
   }
 
+  counts$falseNegatives[counts$falseNegatives == 0] <- 1  #prevent division by 0
+  counts$falsePositives[counts$falsePositives == 0] <- 1  #prevent division by 0
   counts <- dplyr::bind_cols(counts,
                              computeProportions(counts$truePositives,
-                                                max(abs(counts$truePositives) + abs(counts$falseNegatives), 1), #prevent division by 0
+                                                abs(counts$truePositives) + abs(counts$falseNegatives),
                                                 "sens"))
 
   counts <- dplyr::bind_cols(counts,
                              computeProportions(counts$truePositives,
-                                                max(abs(counts$truePositives) + abs(counts$falsePositives), 1),
+                                                abs(counts$truePositives) + abs(counts$falsePositives),
                                                 "ppv"))
 
   counts <- dplyr::bind_cols(counts,
                              computeProportions(counts$trueNegatives,
-                                                max(abs(counts$trueNegatives) + abs(counts$falsePositives), 1),
+                                                abs(counts$trueNegatives) + abs(counts$falsePositives),
                                                 "spec"))
 
   counts <- dplyr::bind_cols(counts,
                              computeProportions(counts$trueNegatives,
-                                                max(abs(counts$trueNegatives) + abs(counts$falseNegatives), 1),
+                                                abs(counts$trueNegatives) + abs(counts$falseNegatives),
                                                 "npv"))
 
   counts$estimatedPrevalence <- (abs(counts$truePositives) + abs(counts$falseNegatives)) / (abs(counts$truePositives) + abs(counts$trueNegatives) + abs(counts$falsePositives) + abs(counts$falseNegatives))
