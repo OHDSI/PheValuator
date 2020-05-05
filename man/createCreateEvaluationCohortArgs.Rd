@@ -22,6 +22,8 @@ createCreateEvaluationCohortArgs(
   gender = c(8507, 8532),
   startDate = "19001010",
   endDate = "21000101",
+  modelId = "main",
+  evaluationCohortId = "main",
   excludeModelFromEvaluation = TRUE,
   removeSubjectsWithFutureDates = TRUE,
   saveEvaluationCohortPlpData = FALSE,
@@ -72,6 +74,10 @@ visits.}
 \item{startDate}{The starting date for including subjects in the model.}
 
 \item{endDate}{The ending date for including subjects in the model.}
+
+\item{modelId}{A string used to generate the file names for this model.}
+
+\item{evaluationCohortId}{A string used to generate the file names for this evaluation cohort.}
 
 \item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the
 evaluation cohort?}

@@ -33,6 +33,8 @@
 #' @param gender                           The gender(s) to be included.
 #' @param startDate                        The starting date for including subjects in the model.
 #' @param endDate                          The ending date for including subjects in the model.
+#' @param modelId                          A string used to generate the file names for this model.
+#' @param evaluationCohortId               A string used to generate the file names for this evaluation cohort.
 #' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the
 #'                                         evaluation cohort?
 #' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects
@@ -60,6 +62,8 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              gender = c(8507, 8532),
                                              startDate = "19001010",
                                              endDate = "21000101",
+                                             modelId = "main",
+                                             evaluationCohortId = "main",
                                              excludeModelFromEvaluation = TRUE,
                                              removeSubjectsWithFutureDates = TRUE,
                                              saveEvaluationCohortPlpData = FALSE,

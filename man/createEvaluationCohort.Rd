@@ -30,6 +30,7 @@ createEvaluationCohort(
   endDate = "21000101",
   cdmVersion = "5",
   outFolder = getwd(),
+  modelId = "main",
   evaluationCohortId = "main",
   excludeModelFromEvaluation = TRUE,
   removeSubjectsWithFutureDates = TRUE,
@@ -104,6 +105,8 @@ cohort start date to end including visits.}
 \item{cdmVersion}{The CDM version of the database.}
 
 \item{outFolder}{The folder where the output files will be written.}
+
+\item{modelId}{A string used to generate the file names for this model.}
 
 \item{evaluationCohortId}{A string used to generate the file names for this evaluation cohort.}
 
