@@ -104,7 +104,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 													where COHORT_DEFINITION_ID = @exclCohort)}
 					)}
 				{@mainPopnCohort != 0} ? {
-					p.person_id, co.cohort_start_date,
+					p.person_id, co.cohort_start_date observation_period_start_date,
 						row_number() over (order by NewId()) rn
 					from @cohort_database_schema.@cohort_database_table co
 					join @cdm_database_schema.person p
