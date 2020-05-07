@@ -49,12 +49,19 @@
 #'                                         Requires write permissions to this database.
 #' @param covariateSettings                A covariateSettings object as generated using
 #'                                         createCovariateSettings().
-#' @param mainPopulationCohortId           The number of the cohort to be used as a base population for
+#' @param modelPopulationCohortId           The number of the cohort to be used as a base population for
 #'                                         the model. If set to 0, the entire database population will be
 #'                                         used.
-#' @param mainPopulationCohortIdStartDay   The number of days relative to the mainPopulationCohortId
+#' @param modelPopulationCohortIdStartDay   The number of days relative to the mainPopulationCohortId
 #'                                         cohort start date to begin including visits.
-#' @param mainPopulationCohortIdEndDay     The number of days relative to the mainPopulationCohortId
+#' @param modelPopulationCohortIdEndDay     The number of days relative to the mainPopulationCohortId
+#'                                         cohort start date to end including visits.
+#' @param evaluationPopulationCohortId           The number of the cohort to be used as a base population for
+#'                                         the evalution cohort. If set to 0, the entire database population will be
+#'                                         used.
+#' @param evaluationPopulationCohortIdStartDay   The number of days relative to the evaluationPopulationCohortId
+#'                                         cohort start date to begin including visits.
+#' @param evaluationPopulationCohortIdEndDay     The number of days relative to the evaluationPopulationCohortId
 #'                                         cohort start date to end including visits.
 #' @param baseSampleSize                   The maximum number of subjects in the evaluation cohort.
 #' @param lowerAgeLimit                    The lower age for subjects in the model.
@@ -89,9 +96,12 @@ createEvaluationCohort <- function(connectionDetails,
                                    workDatabaseSchema,
                                    covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds = c(),
                                                                                              addDescendantsToExclude = FALSE),
-                                   mainPopulationCohortId = 0,
-                                   mainPopulationCohortIdStartDay = 0,
-                                   mainPopulationCohortIdEndDay = 0,
+                                   modelPopulationCohortId = 0,
+                                   modelPopulationCohortIdStartDay = 0,
+                                   modelPopulationCohortIdEndDay = 0,
+                                   evaluationPopulationCohortId = 0,
+                                   evaluationPopulationCohortIdStartDay = 0,
+                                   evaluationPopulationCohortIdEndDay = 0,
                                    baseSampleSize = 2e+06,
                                    lowerAgeLimit = 0,
                                    upperAgeLimit = 120,
@@ -141,9 +151,9 @@ createEvaluationCohort <- function(connectionDetails,
                         prevalenceCohortId = prevalenceCohortId,
                         xSpecCohortSize = xSpecCohortSize,
                         covariateSettings = covariateSettings,
-                        mainPopulationCohortId = mainPopulationCohortId,
-                        mainPopulationCohortIdStartDay = mainPopulationCohortIdStartDay,
-                        mainPopulationCohortIdEndDay = mainPopulationCohortIdEndDay,
+                        mainPopulationCohortId = modelPopulationCohortId,
+                        mainPopulationCohortIdStartDay = modelPopulationCohortIdStartDay,
+                        mainPopulationCohortIdEndDay = modelPopulationCohortIdEndDay,
                         lowerAgeLimit = lowerAgeLimit,
                         upperAgeLimit = upperAgeLimit,
                         visitLength = visitLength,
@@ -165,9 +175,9 @@ createEvaluationCohort <- function(connectionDetails,
                           cohortTable = cohortTable,
                           workDatabaseSchema = workDatabaseSchema,
                           covariateSettings = covariateSettings,
-                          mainPopulationCohortId = mainPopulationCohortId,
-                          mainPopulationCohortIdStartDay = mainPopulationCohortIdStartDay,
-                          mainPopulationCohortIdEndDay = mainPopulationCohortIdEndDay,
+                          mainPopulationCohortId = evaluationPopulationCohortId,
+                          mainPopulationCohortIdStartDay = evaluationPopulationCohortIdStartDay,
+                          mainPopulationCohortIdEndDay = evaluationPopulationCohortIdEndDay,
                           baseSampleSize = baseSampleSize,
                           lowerAgeLimit = lowerAgeLimit,
                           upperAgeLimit = upperAgeLimit,

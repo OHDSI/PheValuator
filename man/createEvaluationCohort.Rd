@@ -17,9 +17,12 @@ createEvaluationCohort(
   workDatabaseSchema,
   covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds
     = c(), addDescendantsToExclude = FALSE),
-  mainPopulationCohortId = 0,
-  mainPopulationCohortIdStartDay = 0,
-  mainPopulationCohortIdEndDay = 0,
+  modelPopulationCohortId = 0,
+  modelPopulationCohortIdStartDay = 0,
+  modelPopulationCohortIdEndDay = 0,
+  evaluationPopulationCohortId = 0,
+  evaluationPopulationCohortIdStartDay = 0,
+  evaluationPopulationCohortIdEndDay = 0,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
@@ -76,14 +79,24 @@ Requires write permissions to this database.}
 \item{covariateSettings}{A covariateSettings object as generated using
 createCovariateSettings().}
 
-\item{mainPopulationCohortId}{The number of the cohort to be used as a base population for
+\item{modelPopulationCohortId}{The number of the cohort to be used as a base population for
 the model. If set to 0, the entire database population will be
 used.}
 
-\item{mainPopulationCohortIdStartDay}{The number of days relative to the mainPopulationCohortId
+\item{modelPopulationCohortIdStartDay}{The number of days relative to the mainPopulationCohortId
 cohort start date to begin including visits.}
 
-\item{mainPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId
+\item{modelPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId
+cohort start date to end including visits.}
+
+\item{evaluationPopulationCohortId}{The number of the cohort to be used as a base population for
+the evalution cohort. If set to 0, the entire database population will be
+used.}
+
+\item{evaluationPopulationCohortIdStartDay}{The number of days relative to the evaluationPopulationCohortId
+cohort start date to begin including visits.}
+
+\item{evaluationPopulationCohortIdEndDay}{The number of days relative to the evaluationPopulationCohortId
 cohort start date to end including visits.}
 
 \item{baseSampleSize}{The maximum number of subjects in the evaluation cohort.}
