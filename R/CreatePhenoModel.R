@@ -47,12 +47,20 @@
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
   plpResultsFileName <- file.path(outFolder, sprintf("plpResults_%s", modelId))
 
-  #do an initial check to see if there are enough xSpec subjects to create a model
-  sql <- paste0("select count(*) from ",
-                cohortDatabaseSchema, ".", cohortTable,
-                " where cohort_definition_id = ", xSpecCohortId)
+  #get xSpec subjects to create a model
+  sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "GetxSpecCount.sql",
+                                           packageName = "PheValuator",
+                                           dbms = connection@dbms,
+                                           cdm_database_schema = cdmDatabaseSchema,
+                                           cohort_database_schema = cohortDatabaseSchema,
+                                           cohort_database_table = cohortTable,
+                                           x_spec_cohort = xSpecCohortId,
+                                           ageLimit = lowerAgeLimit,
+                                           upperAgeLimit = upperAgeLimit,
+                                           gender = gender,
+                                           startDate = startDate,
+                                           endDate = endDate)
 
-  sql <- SqlRender::translate(sql, connection@dbms)
   xSpecCount <- as.numeric(DatabaseConnector::querySql(connection = connection, sql = sql))
   if (xSpecCount < 200) {
     ParallelLogger::logInfo("Too few subjects in xSpec to produce model. (Outcome count = ", xSpecCount, ")")
@@ -62,6 +70,7 @@
     saveRDS(lrResults, modelFileName)
   } else {
 
+    if (prevalenceCohortId >= 1) {
     # determine population prevalence for correct xSpec/noisy negative popn ratio
     sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "getPopnPrev.sql",
                                              packageName = "PheValuator",
@@ -78,6 +87,7 @@
                                              prevCohort = prevalenceCohortId,
                                              removeSubjectsWithFutureDates = removeSubjectsWithFutureDates)
     popPrev <- DatabaseConnector::querySql(connection = connection, sql)
+    } else {popPrev <- prevalenceCohortId}
 
     if (popPrev == 0)
       stop("Unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
@@ -99,8 +109,18 @@
       }
     }
 
+    if (xspecSize > xSpecCount) {xspecSize <- xSpecCount} #set xSpec size to either what was specified or to maximum available
+
     # set the number of noisy negatives in the model either from the prevalence or to 1500K max
     baseSampleSize <- min(c(as.integer(xspecSize/popPrev), as.integer(format(1.5e+06, scientific = FALSE))))  #use 1,500,000 as largest base sample
+
+    if (baseSampleSize != as.integer(xspecSize/popPrev)) {
+      xspecSize <- as.integer(baseSampleSize * popPrev)} #set final xSpec size for low prevalence values if necessary
+
+    ParallelLogger::logInfo(sprintf("Using xSpec size of: %i", xspecSize))
+    ParallelLogger::logInfo(sprintf("Using base sample size of: %i", baseSampleSize))
+
+    baseSampleSize <- baseSampleSize - xspecSize #adjust for adding xSpec
 
     if (!file.exists(plpDataFile)) {
       # only pull the plp data if it doesn't already exist create a unique name for the temporary cohort table
@@ -217,38 +237,47 @@
       } else {
         modelSettings <- PatientLevelPrediction::setLassoLogisticRegression(variance = 0.01, seed = 5)
 
-        lrResults <- PatientLevelPrediction::runPlp(population,
-                                                    plpData,
-                                                    modelSettings = modelSettings,
-                                                    testSplit = "person",
-                                                    testFraction = 0.25,
-                                                    splitSeed = 5,
-                                                    nfold = 3,
-                                                    savePlpData = FALSE,
-                                                    savePlpResult = FALSE,
-                                                    savePlpPlots = FALSE,
-                                                    saveEvaluation = FALSE,
-                                                    saveDirectory = outFolder)
+        tryCatch({
+          lrResults <- PatientLevelPrediction::runPlp(population,
+                                                      plpData,
+                                                      modelSettings = modelSettings,
+                                                      testSplit = "person",
+                                                      testFraction = 0.25,
+                                                      splitSeed = 5,
+                                                      nfold = 3,
+                                                      savePlpData = FALSE,
+                                                      savePlpResult = FALSE,
+                                                      savePlpPlots = FALSE,
+                                                      saveEvaluation = FALSE,
+                                                      saveDirectory = outFolder)
 
-        lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
-        lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
-        lrResults$PheValuator$inputSetting$prevalenceCohortId <- prevalenceCohortId
-        lrResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId
-        lrResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
-        lrResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
-        lrResults$PheValuator$inputSetting$startDays <- covariateSettings$longTermStartDays
-        lrResults$PheValuator$inputSetting$endDays <- covariateSettings$endDays
-        lrResults$PheValuator$inputSetting$visitLength <- visitLength
-        lrResults$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse = ", ")
-        lrResults$PheValuator$inputSetting$startDate <- startDate
-        lrResults$PheValuator$inputSetting$endDate <- endDate
-        lrResults$PheValuator$inputSetting$modelType <- modelType
+          lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
+          lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
+          lrResults$PheValuator$inputSetting$prevalenceCohortId <- prevalenceCohortId
+          lrResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId
+          lrResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
+          lrResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
+          lrResults$PheValuator$inputSetting$startDays <- covariateSettings$longTermStartDays
+          lrResults$PheValuator$inputSetting$endDays <- covariateSettings$endDays
+          lrResults$PheValuator$inputSetting$visitLength <- visitLength
+          lrResults$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse = ", ")
+          lrResults$PheValuator$inputSetting$startDate <- startDate
+          lrResults$PheValuator$inputSetting$endDate <- endDate
+          lrResults$PheValuator$inputSetting$modelType <- modelType
 
-        ParallelLogger::logInfo("Saving model summary to ", modelFileName)
-        saveRDS(lrResults, modelFileName)
+          ParallelLogger::logInfo("Saving model summary to ", modelFileName)
+          saveRDS(lrResults, modelFileName)
 
-        ParallelLogger::logInfo("Saving PLP results to ", plpResultsFileName)
-        PatientLevelPrediction::savePlpResult(lrResults, plpResultsFileName)
+          ParallelLogger::logInfo("Saving PLP results to ", plpResultsFileName)
+          PatientLevelPrediction::savePlpResult(lrResults, plpResultsFileName)
+        },
+        error = function(e) {message("error found: ")
+          message(e)
+          ParallelLogger::logInfo("Saving null model summary to ", modelFileName)
+          lrResults <- NULL
+          lrResults$errorMessage <- paste0("Error: ", e)
+          saveRDS(lrResults, modelFileName)
+        })
       }
     } else {
       ParallelLogger::logInfo("Skipping creation of ", modelFileName, " because it already exists")
