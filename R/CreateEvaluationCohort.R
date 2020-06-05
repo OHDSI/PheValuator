@@ -190,7 +190,7 @@ createEvaluationCohort <- function(connectionDetails,
                           outFolder = outFolder,
                           modelId = modelId,
                           evaluationCohortId = evaluationCohortId,
-                          excludeModelFromEvaluation = TRUE,
+                          excludeModelFromEvaluation = excludeModelFromEvaluation,
                           savePlpData = saveEvaluationCohortPlpData,
                           modelType = modelType)
   delta <- Sys.time() - start
