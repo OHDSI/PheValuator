@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create the evaluation cohort — createEvaluationCohort • PheValuator</title>
+<title>Create a parameter object for the function createEvaluationCohort — createCreateEvaluationCohortArgs • PheValuator</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Create the evaluation cohort — createEvaluationCohort" />
-<meta property="og:description" content="Create the evaluation cohort" />
+<meta property="og:title" content="Create a parameter object for the function createEvaluationCohort — createCreateEvaluationCohortArgs" />
+<meta property="og:description" content="Create a parameter object for the function createEvaluationCohort" />
 
 
 
@@ -123,26 +123,20 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create the evaluation cohort</h1>
-    <small class="dont-index">Source: <a href='https://github.com/OHDSI/PheValuator/blob/master/R/CreateEvaluationCohort.R'><code>R/CreateEvaluationCohort.R</code></a></small>
-    <div class="hidden name"><code>createEvaluationCohort.Rd</code></div>
+    <h1>Create a parameter object for the function createEvaluationCohort</h1>
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/PheValuator/blob/master/R/CreateArgFunctions.R'><code>R/CreateArgFunctions.R</code></a></small>
+    <div class="hidden name"><code>createCreateEvaluationCohortArgs.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create the evaluation cohort</p>
+    <p>Create a parameter object for the function createEvaluationCohort</p>
     </div>
 
-    <pre class="usage"><span class='fu'>createEvaluationCohort</span>(
-  <span class='no'>connectionDetails</span>,
-  <span class='kw'>oracleTempSchema</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+    <pre class="usage"><span class='fu'>createCreateEvaluationCohortArgs</span>(
   <span class='no'>xSpecCohortId</span>,
   <span class='no'>xSensCohortId</span>,
   <span class='kw'>prevalenceCohortId</span> <span class='kw'>=</span> <span class='no'>xSensCohortId</span>,
   <span class='kw'>xSpecCohortSize</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>cdmDatabaseSchema</span>,
-  <span class='no'>cohortDatabaseSchema</span>,
-  <span class='no'>cohortTable</span>,
-  <span class='no'>workDatabaseSchema</span>,
   <span class='kw'>covariateSettings</span> <span class='kw'>=</span> <span class='fu'><a href='createDefaultChronicCovariateSettings.html'>createDefaultChronicCovariateSettings</a></span>(<span class='kw'>excludedCovariateConceptIds</span>
     <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(), <span class='kw'>addDescendantsToExclude</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>),
   <span class='kw'>modelPopulationCohortId</span> <span class='kw'>=</span> <span class='fl'>0</span>,
@@ -159,8 +153,6 @@
   <span class='kw'>gender</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>8507</span>, <span class='fl'>8532</span>),
   <span class='kw'>startDate</span> <span class='kw'>=</span> <span class='st'>"19001010"</span>,
   <span class='kw'>endDate</span> <span class='kw'>=</span> <span class='st'>"21000101"</span>,
-  <span class='kw'>cdmVersion</span> <span class='kw'>=</span> <span class='st'>"5"</span>,
-  <span class='kw'>outFolder</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span>(),
   <span class='kw'>modelId</span> <span class='kw'>=</span> <span class='st'>"main"</span>,
   <span class='kw'>evaluationCohortId</span> <span class='kw'>=</span> <span class='st'>"main"</span>,
   <span class='kw'>excludeModelFromEvaluation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -173,63 +165,30 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>connectionDetails</th>
-      <td><p>connectionDetails created using the function
-createConnectionDetails in the DatabaseConnector package.</p></td>
-    </tr>
-    <tr>
-      <th>oracleTempSchema</th>
-      <td><p>A schema where temp tables can be created in Oracle.</p></td>
-    </tr>
-    <tr>
       <th>xSpecCohortId</th>
-      <td><p>The number of the "extremely specific (xSpec)" cohort
-definition id in the cohort table (for noisy positives).</p></td>
+      <td><p>The number of the "extremely specific (xSpec)"
+cohortdefinition id in the cohort table (for noisy
+positives).</p></td>
     </tr>
     <tr>
       <th>xSensCohortId</th>
-      <td><p>The number of the "extremely sensitive (xSens)" cohort
-definition id in the cohort table (for noisy negatives).</p></td>
+      <td><p>The number of the "extremely sensitive (xSens)"
+cohortdefinition id in the cohort table (for noisy
+negatives).</p></td>
     </tr>
     <tr>
       <th>prevalenceCohortId</th>
-      <td><p>The number of the cohort definition id to determine the
-disease prevalence.</p></td>
+      <td><p>The number of the cohort definition id to determine
+thedisease prevalence.</p></td>
     </tr>
     <tr>
       <th>xSpecCohortSize</th>
       <td><p>The recommended xSpec sample size to use in model (default = NULL)</p></td>
     </tr>
     <tr>
-      <th>cdmDatabaseSchema</th>
-      <td><p>The name of the database schema that contains the OMOP CDM
-instance. Requires read permissions to this database. On SQL
-Server, this should specifiy both the database and the
-schema, so for example 'cdm_instance.dbo'.</p></td>
-    </tr>
-    <tr>
-      <th>cohortDatabaseSchema</th>
-      <td><p>The name of the database schema that is the location where
-the cohort data used to define the at risk cohort is
-available. Requires read permissions to this database.</p></td>
-    </tr>
-    <tr>
-      <th>cohortTable</th>
-      <td><p>The tablename that contains the at risk cohort. The
-expectation is cohortTable has format of COHORT table:
-cohort_concept_id, SUBJECT_ID, COHORT_START_DATE,
-COHORT_END_DATE.</p></td>
-    </tr>
-    <tr>
-      <th>workDatabaseSchema</th>
-      <td><p>The name of the database schema that is the location where
-a table can be created and afterwards removed.
-Requires write permissions to this database.</p></td>
-    </tr>
-    <tr>
       <th>covariateSettings</th>
-      <td><p>A covariateSettings object as generated using
-createCovariateSettings().</p></td>
+      <td><p>A covariateSettings object as generated
+usingcreateCovariateSettings().</p></td>
     </tr>
     <tr>
       <th>modelPopulationCohortId</th>
@@ -296,14 +255,6 @@ cohort start date to end including visits.</p></td>
       <td><p>The ending date for including subjects in the model.</p></td>
     </tr>
     <tr>
-      <th>cdmVersion</th>
-      <td><p>The CDM version of the database.</p></td>
-    </tr>
-    <tr>
-      <th>outFolder</th>
-      <td><p>The folder where the output files will be written.</p></td>
-    </tr>
-    <tr>
       <th>modelId</th>
       <td><p>A string used to generate the file names for this model.</p></td>
     </tr>
@@ -313,29 +264,29 @@ cohort start date to end including visits.</p></td>
     </tr>
     <tr>
       <th>excludeModelFromEvaluation</th>
-      <td><p>Should subjects used in the model be excluded from the evaluation cohort?</p></td>
+      <td><p>Should subjects used in the model be excluded from the
+evaluation cohort?</p></td>
     </tr>
     <tr>
       <th>removeSubjectsWithFutureDates</th>
-      <td><p>For buggy data with data in the future: ignore subjects with
-dates in the future?</p></td>
+      <td><p>For buggy data with data in the future: ignore subjects
+withdates in the future?</p></td>
     </tr>
     <tr>
       <th>saveEvaluationCohortPlpData</th>
-      <td><p>Should the large PLP file for the evaluation cohort be saved? To be
-used for debugging purposes.</p></td>
+      <td><p>Should the large PLP file for the evaluation cohort be
+saved? To beused for debugging purposes.</p></td>
     </tr>
     <tr>
       <th>modelType</th>
-      <td><p>The type of health outcome in the model either "acute" or
-"chronic".</p></td>
+      <td><p>The type of health outcome in the model either "acute"
+or"chronic".</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Fits a diagnostic pretiction model, and uses it to create an evaluation cohort with
-probabilities for the health outcome of interest.</p>
+    <p>Create an object defining the parameter values.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

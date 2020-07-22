@@ -8,23 +8,29 @@
 
 <title>Test phenotype algorithms — testPhenotypeAlgorithm • PheValuator</title>
 
-<!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<!-- jquery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -32,10 +38,10 @@
 
 
 
-<meta property="og:title" content="Test phenotype algorithms — testPhenotypeAlgorithm" />
 
+<meta property="og:title" content="Test phenotype algorithms — testPhenotypeAlgorithm" />
 <meta property="og:description" content="Test phenotype algorithms" />
-<meta name="twitter:card" content="summary" />
+
 
 
 
@@ -52,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -66,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.10</span>
       </span>
     </div>
 
@@ -93,10 +99,17 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/OHDSI/PheValuator/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -111,112 +124,93 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Test phenotype algorithms</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/PheValuator/blob/master/R/TestPhenotype.R'><code>R/TestPhenotype.R</code></a></small>
     <div class="hidden name"><code>testPhenotypeAlgorithm.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    
     <p>Test phenotype algorithms</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>testPhenotypeAlgorithm</span>(<span class='no'>connectionDetails</span>, <span class='kw'>cutPoints</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.2</span>, <span class='fl'>0.3</span>,
-  <span class='fl'>0.4</span>, <span class='fl'>0.5</span>, <span class='st'>"EV"</span>, <span class='fl'>0.6</span>, <span class='fl'>0.7</span>, <span class='fl'>0.8</span>, <span class='fl'>0.9</span>), <span class='no'>evaluationOutputFileName</span>,
-  <span class='no'>phenotypeCohortId</span>, <span class='kw'>cdmShortName</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>phenotypeText</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>order</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>modelText</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>xSpecCohort</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>xSensCohort</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>prevalenceCohort</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='no'>cohortDatabaseSchema</span>, <span class='no'>cohortTable</span>)</pre>
-    
+    <pre class="usage"><span class='fu'>testPhenotypeAlgorithm</span>(
+  <span class='no'>connectionDetails</span>,
+  <span class='kw'>cutPoints</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.2</span>, <span class='fl'>0.3</span>, <span class='fl'>0.4</span>, <span class='fl'>0.5</span>, <span class='st'>"EV"</span>, <span class='fl'>0.6</span>, <span class='fl'>0.7</span>, <span class='fl'>0.8</span>, <span class='fl'>0.9</span>),
+  <span class='no'>outFolder</span>,
+  <span class='kw'>evaluationCohortId</span> <span class='kw'>=</span> <span class='st'>"main"</span>,
+  <span class='no'>phenotypeCohortId</span>,
+  <span class='no'>cdmDatabaseSchema</span>,
+  <span class='no'>cohortDatabaseSchema</span>,
+  <span class='no'>cohortTable</span>,
+  <span class='kw'>washoutPeriod</span> <span class='kw'>=</span> <span class='fl'>0</span>
+)</pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>connectionDetails</th>
-      <td><p>ConnectionDetails created using the function createConnectionDetails
-in the DatabaseConnector package.</p></td>
+      <td><p>ConnectionDetails created using the function
+createConnectionDetails in the DatabaseConnector package.</p></td>
     </tr>
     <tr>
       <th>cutPoints</th>
-      <td><p>A list of threshold predictions for the evaluations.  Include "EV" for
-the expected value</p></td>
+      <td><p>A list of threshold predictions for the evaluations.  Include "EV"
+for the expected value</p></td>
     </tr>
     <tr>
-      <th>evaluationOutputFileName</th>
-      <td><p>The full file name with path for the evaluation file</p></td>
+      <th>outFolder</th>
+      <td><p>The folder where the cohort evaluation output files are written</p></td>
+    </tr>
+    <tr>
+      <th>evaluationCohortId</th>
+      <td><p>A string used to generate the file names for the evaluation cohort.</p></td>
     </tr>
     <tr>
       <th>phenotypeCohortId</th>
-      <td><p>The number of the cohort of the phenotype algorithm to test</p></td>
+      <td><p>The ID of the cohort to evaluate in the specified cohort table.</p></td>
     </tr>
     <tr>
-      <th>cdmShortName</th>
-      <td><p>A string to identify the CDM tested (Default = NULL)</p></td>
-    </tr>
-    <tr>
-      <th>phenotypeText</th>
-      <td><p>A string to identify the phenotype algorithm in the output file</p></td>
-    </tr>
-    <tr>
-      <th>order</th>
-      <td><p>The order of this algorithm for sorting in the output file (used when
-there are multiple phenotypes to test)  (Default = 1)</p></td>
-    </tr>
-    <tr>
-      <th>modelText</th>
-      <td><p>Descriptive name for the model (Default = NULL)</p></td>
-    </tr>
-    <tr>
-      <th>xSpecCohort</th>
-      <td><p>The number of the "extremely specific (xSpec)" cohort definition id in
-the cohort table (for noisy positives) (Default = NULL)</p></td>
-    </tr>
-    <tr>
-      <th>xSensCohort</th>
-      <td><p>The number of the "extremely sensitive (xSens)" cohort definition id
-in the cohort table (used to exclude subjects from the base population) (Default = NULL)</p></td>
-    </tr>
-    <tr>
-      <th>prevalenceCohort</th>
-      <td><p>The number of the cohort definition id to determine the disease prevalence,
-(default=xSensCohort)</p></td>
+      <th>cdmDatabaseSchema</th>
+      <td><p>The name of the database schema that contains the OMOP CDM
+instance. Requires read permissions to this database. On SQL
+Server, this should specifiy both the database and the
+schema, so for example 'cdm_instance.dbo'.</p></td>
     </tr>
     <tr>
       <th>cohortDatabaseSchema</th>
-      <td><p>The name of the database schema that is the location where the cohort
-data used to define the at risk cohort is available. Requires read
-permissions to this database.</p></td>
+      <td><p>The name of the database schema that is the location where the
+cohort data used to define the at risk cohort is available.
+Requires read permissions to this database.</p></td>
     </tr>
     <tr>
       <th>cohortTable</th>
       <td><p>The tablename that contains the at risk cohort. The expectation is
-cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID,
-COHORT_START_DATE, COHORT_END_DATE.</p></td>
+cohortTable has format of COHORT table: cohort_concept_id,
+SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.</p></td>
+    </tr>
+    <tr>
+      <th>washoutPeriod</th>
+      <td><p>The mininum required continuous observation time prior to index
+date for subjects within the cohort to test (Default = 0).</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list containg 2 dataframes: 1) results - a dataframe with the results from the phenotype
-algorithm evaluation 2) misses - a dataframe with a sample of subject ids for TPs, FPs, TNs, and FNs
-for the 50 percent and over prediction threshold</p>
-    
+    <p>A dataframe with the results from the phenotype
+algorithm evaluation.</p>
+<p>If 0.5 is included as a cutpoint, the data frame will have an attribute called 'misses', a dataframe
+with a sample of subject ids for TPs, FPs, TNs, and FNs for the 50 percent and over prediction threshold.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This function will perform the phenotype algorithm evaluation using the evaluation cohort returned
 from createEvalCohort and the phenotype algorithm cohort specified</p>
-    
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#details">Details</a></li>
-          </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -227,7 +221,7 @@ from createEvalCohort and the phenotype algorithm cohort specified</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

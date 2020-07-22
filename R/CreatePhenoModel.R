@@ -86,7 +86,7 @@
                                              mainPopnCohort = mainPopulationCohortId,
                                              prevCohort = prevalenceCohortId,
                                              removeSubjectsWithFutureDates = removeSubjectsWithFutureDates)
-    popPrev <- DatabaseConnector::querySql(connection = connection, sql)
+    popPrev <- as.numeric(DatabaseConnector::querySql(connection = connection, sql))
     } else {popPrev <- prevalenceCohortId}
 
     if (popPrev == 0)
@@ -111,11 +111,13 @@
 
     if (xspecSize > xSpecCount) {xspecSize <- xSpecCount} #set xSpec size to either what was specified or to maximum available
 
-    # set the number of noisy negatives in the model either from the prevalence or to 1500K max
-    baseSampleSize <- min(c(as.integer(xspecSize/popPrev), as.integer(format(1.5e+06, scientific = FALSE))))  #use 1,500,000 as largest base sample
+    prevToUse <- as.numeric(0.05) #set the prevalence to 5% for model building - to be re-calibrated
 
-    if (baseSampleSize != as.integer(xspecSize/popPrev)) {
-      xspecSize <- as.integer(baseSampleSize * popPrev)} #set final xSpec size for low prevalence values if necessary
+    # set the number of noisy negatives in the model either from the prevalence or to 1500K max
+    baseSampleSize <- min(c(as.integer(xspecSize/prevToUse), as.integer(format(1.5e+06, scientific = FALSE))))  #use 1,500,000 as largest base sample
+
+    if (baseSampleSize != as.integer(xspecSize/prevToUse)) {
+      xspecSize <- as.integer(baseSampleSize * prevToUse)} #set final xSpec size for low prevalence values if necessary
 
     ParallelLogger::logInfo(sprintf("Using xSpec size of: %i", xspecSize))
     ParallelLogger::logInfo(sprintf("Using base sample size of: %i", baseSampleSize))
@@ -251,6 +253,15 @@
                                                       saveEvaluation = FALSE,
                                                       saveDirectory = outFolder)
 
+          #re-calibrate model
+          prevToUseOdds <- prevToUse/(1 - prevToUse) #uses prevalence for model building
+          popPrevOdds <- popPrev/(1 - popPrev) #uses actual prevalence
+          modelYIntercept <- lrResults$model$model$coefficients[1]
+          delta <- log(prevToUseOdds) - log(popPrevOdds)
+          yIntercept <- as.numeric(lrResults$model$model$coefficients[1])
+          lrResults$model$model$coefficients[1] <- as.numeric(yIntercept - delta)  # Equation (7) in King and Zeng (2001)
+          lrResults$model$predict <- PatientLevelPrediction:::createTransform(lrResults$model)
+
           lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
           lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
           lrResults$PheValuator$inputSetting$prevalenceCohortId <- prevalenceCohortId
@@ -264,6 +275,10 @@
           lrResults$PheValuator$inputSetting$startDate <- startDate
           lrResults$PheValuator$inputSetting$endDate <- endDate
           lrResults$PheValuator$inputSetting$modelType <- modelType
+          lrResults$PheValuator$runTimeValues$truePrevalencePopulation <- popPrev
+          lrResults$PheValuator$runTimeValues$prevalenceModel <- prevToUse
+          lrResults$PheValuator$runTimeValues$modelYIntercept <- modelYIntercept
+          lrResults$PheValuator$runTimeValues$recalibratedYIntercept <- lrResults$model$model$coefficients[1]
 
           ParallelLogger::logInfo("Saving model summary to ", modelFileName)
           saveRDS(lrResults, modelFileName)
