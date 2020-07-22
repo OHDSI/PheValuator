@@ -65,8 +65,8 @@ runPheValuatorAnalyses <- function(connectionDetails,
 
   ParallelLogger::logInfo("Generating evaluation cohorts")
   evaluationCohortFolders <- unique(referenceTable$evaluationCohortFolder)
-  evaluationCohortFolders <- evaluationCohortFolders[!file.exists(file.path(outputFolder, evaluationCohortFolders, "evaluationCohort_main.rds"))]
-  if (length(evaluationCohortFolders) > 0) {
+  #evaluationCohortFolders <- evaluationCohortFolders[!file.exists(file.path(outputFolder, evaluationCohortFolders, "evaluationCohort_main.rds"))]
+  #if (length(evaluationCohortFolders) > 0) {
     createTask <- function(evaluationCohortFolder) {
       analysisId <- referenceTable$analysisId[referenceTable$evaluationCohortFolder == evaluationCohortFolder][1]
       matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
@@ -84,7 +84,7 @@ runPheValuatorAnalyses <- function(connectionDetails,
     }
     tasks <- lapply(evaluationCohortFolders, createTask)
     lapply(tasks, doCreateEvaluationCohort)
-  }
+  #}
 
   ParallelLogger::logInfo("Evaluating phenotypes")
   resultsFiles <- unique(referenceTable$resultsFile)

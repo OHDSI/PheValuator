@@ -43,8 +43,8 @@ from (select co.*, p.*,
 		and co.COHORT_START_DATE <= o.observation_period_end_date
 	    and datediff(day, o.observation_period_start_date, co.COHORT_START_DATE) >= 365
 	where cohort_definition_id = @x_spec_cohort
-	  and o.observation_period_start_date >= cast('@startDate' AS DATE)
-	  and o.observation_period_start_date <= cast('@endDate' AS DATE)) pos
+	  and co.COHORT_START_DATE >= cast('@startDate' AS DATE)
+	  and co.COHORT_START_DATE <= cast('@endDate' AS DATE)) pos
 ;
 
 IF OBJECT_ID('tempdb..#eligibles', 'U') IS NOT NULL
@@ -104,7 +104,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 													where COHORT_DEFINITION_ID = @exclCohort)}
 					)}
 				{@mainPopnCohort != 0} ? {
-					p.person_id, observation_period_start_date,
+					p.person_id, co.cohort_start_date observation_period_start_date,
 						row_number() over (order by NewId()) rn
 					from @cohort_database_schema.@cohort_database_table co
 					join @cdm_database_schema.person p

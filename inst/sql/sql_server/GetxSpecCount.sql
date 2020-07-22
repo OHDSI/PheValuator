@@ -1,0 +1,36 @@
+/************************************************************************
+@file GetxSpecCount.sql
+************************************************************************/
+
+{DEFAULT @cdm_database_schema = 'CDM_SIM' }
+{DEFAULT @cohort_database_schema = 'CDM_SIM' }
+{DEFAULT @cohort_database_table = 'cohort'
+{DEFAULT @x_spec_cohort = 0 }
+{DEFAULT @ageLimit = 0}
+{DEFAULT @upperAgeLimit = 120}
+{DEFAULT @gender = c(8507, 8532)}
+{DEFAULT @startDate = '19000101' }
+{DEFAULT @endDate = '21000101' }
+
+
+select count(*)
+from (select co.*, p.*,
+	  row_number() over (order by NewId()) rn
+	from @cohort_database_schema.@cohort_database_table co
+	join @cdm_database_schema.person p
+	  on co.subject_id = p.person_id
+		and  year(COHORT_START_DATE) - year_of_birth >= @ageLimit
+		and year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
+		and gender_concept_id in (@gender)
+	join @cdm_database_schema.observation_period o
+	  on co.subject_id = o.person_id
+	    and co.COHORT_START_DATE >= o.observation_period_start_date
+		and co.COHORT_START_DATE <= o.observation_period_end_date
+	    and datediff(day, o.observation_period_start_date, co.COHORT_START_DATE) >= 365
+	where cohort_definition_id = @x_spec_cohort
+	  and co.COHORT_START_DATE >= cast('@startDate' AS DATE)
+	  and co.COHORT_START_DATE <= cast('@endDate' AS DATE)) pos
+;
+
+
+

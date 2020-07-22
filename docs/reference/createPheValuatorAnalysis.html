@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • PheValuator</title>
+<title>Create a PheValuator analysis specification — createPheValuatorAnalysis • PheValuator</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Create a PheValuator analysis specification — createPheValuatorAnalysis" />
+<meta property="og:description" content="Create a PheValuator analysis specification" />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -120,138 +121,53 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Create a PheValuator analysis specification</h1>
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/PheValuator/blob/master/R/Analyses.R'><code>R/Analyses.R</code></a></small>
+    <div class="hidden name"><code>createPheValuatorAnalysis.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Create a PheValuator analysis specification</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>createPheValuatorAnalysis</span>(
+  <span class='no'>analysisId</span>,
+  <span class='no'>description</span>,
+  <span class='no'>createEvaluationCohortArgs</span>,
+  <span class='no'>testPhenotypeAlgorithmArgs</span>
+)</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="computePerformanceMetricsFromCounts.html">computePerformanceMetricsFromCounts()</a></code> </p>
-        </td>
-        <td><p>Compute performance metrics based on a 2-by-2 counts table</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="createAcutePhenotypeModel.html">createAcutePhenotypeModel()</a></code> </p>
-        </td>
-        <td><p>Create the phenotype model for acute diseases</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="createChronicPhenotypeModel.html">createChronicPhenotypeModel()</a></code> </p>
-        </td>
-        <td><p>Create the phenotype model for chronic diseases</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs()</a></code> </p>
-        </td>
-        <td><p>Create a parameter object for the function createEvaluationCohort</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="createDefaultAcuteCovariateSettings.html">createDefaultAcuteCovariateSettings()</a></code> </p>
-        </td>
-        <td><p>Create the default covariate settings</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="createDefaultChronicCovariateSettings.html">createDefaultChronicCovariateSettings()</a></code> </p>
-        </td>
-        <td><p>Create the default covariate settings</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="createEvaluationCohort.html">createEvaluationCohort()</a></code> </p>
-        </td>
-        <td><p>Create the evaluation cohort</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="createPheValuatorAnalysis.html">createPheValuatorAnalysis()</a></code> </p>
-        </td>
-        <td><p>Create a PheValuator analysis specification</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs()</a></code> </p>
-        </td>
-        <td><p>Create a parameter object for the function testPhenotypeAlgorithm</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="exportPheValuatorResults.html">exportPheValuatorResults()</a></code> </p>
-        </td>
-        <td><p>Export the PheValuator results to CSV files</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="launchPheValuatorExplorer.html">launchPheValuatorExplorer()</a></code> </p>
-        </td>
-        <td><p>Launch the PheValuator Explorer Shiny app</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="loadPheValuatorAnalysisList.html">loadPheValuatorAnalysisList()</a></code> </p>
-        </td>
-        <td><p>Load a list of phevaluatorAnalysis from file</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="prepareForShiny.html">prepareForShiny()</a></code> </p>
-        </td>
-        <td><p>Preprare results for Shiny viewer</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="runPheValuatorAnalyses.html">runPheValuatorAnalyses()</a></code> </p>
-        </td>
-        <td><p>Run a list of analyses</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="savePheValuatorAnalysisList.html">savePheValuatorAnalysisList()</a></code> </p>
-        </td>
-        <td><p>Save a list of phevaluatorAnalysis to file</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="summarizePheValuatorAnalyses.html">summarizePheValuatorAnalyses()</a></code> </p>
-        </td>
-        <td><p>Summarize results of PheValuator analyses</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="testPhenotypeAlgorithm.html">testPhenotypeAlgorithm()</a></code> </p>
-        </td>
-        <td><p>Test phenotype algorithms</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>analysisId</th>
+      <td><p>An integer that will be used later to refer to this specific
+set of analysis choices.</p></td>
+    </tr>
+    <tr>
+      <th>description</th>
+      <td><p>A short description of the analysis.</p></td>
+    </tr>
+    <tr>
+      <th>createEvaluationCohortArgs</th>
+      <td><p>An object representing the arguments to be used when calling
+the <code><a href='createCreateEvaluationCohortArgs.html'>createCreateEvaluationCohortArgs</a></code> function.</p></td>
+    </tr>
+    <tr>
+      <th>testPhenotypeAlgorithmArgs</th>
+      <td><p>Should the <code><a href='createTestPhenotypeAlgorithmArgs.html'>createTestPhenotypeAlgorithmArgs</a></code> function be used in this
+analysis?</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Create a set of analysis choices, to be used with the <code><a href='runPheValuatorAnalyses.html'>runPheValuatorAnalyses</a></code> function.</p>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
