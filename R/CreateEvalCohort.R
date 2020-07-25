@@ -69,7 +69,7 @@
 
     testCohort <- gsub(".",
                        "",
-                       (paste("test_cohort_eval_", runif(1, min = 0, max = 1), "_", as.numeric(xSpecCohortId), sep = "")),
+                       (paste0("test_eval_",xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))),
                        fixed = TRUE)  #unique new cohort name to use
 
     connection <- DatabaseConnector::connect(connectionDetails)
