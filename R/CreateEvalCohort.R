@@ -129,6 +129,12 @@
 
     # will only use the covariates with non-zero betas
     lrNonZeroCovs <- c(lrResults$model$varImp$covariateId[lrResults$model$varImp$covariateValue != 0])
+
+    ######
+    lrNonZeroCovs <- c(lrNonZeroCovs, as.numeric(paste0(excludedCovariateConceptIds, 210)))
+    writeLines(paste0("\n\n***changing list of covariates to include excluded covariates\n\n"))
+    ######
+
     if (is(covariateSettings, "covariateSettings"))
       covariateSettings <- list(covariateSettings)
     for (listUp in 1:length(covariateSettings)) {
