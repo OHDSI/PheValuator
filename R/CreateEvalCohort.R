@@ -69,7 +69,7 @@
 
     testCohort <- gsub(".",
                        "",
-                       (paste("test_cohort", runif(1, min = 0, max = 1), sep = "")),
+                       (paste0("test_eval_",xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))),
                        fixed = TRUE)  #unique new cohort name to use
 
     connection <- DatabaseConnector::connect(connectionDetails)
@@ -129,6 +129,12 @@
 
     # will only use the covariates with non-zero betas
     lrNonZeroCovs <- c(lrResults$model$varImp$covariateId[lrResults$model$varImp$covariateValue != 0])
+
+    ######
+    lrNonZeroCovs <- c(lrNonZeroCovs, as.numeric(paste0(excludedCovariateConceptIds, 210)))
+    writeLines(paste0("\n\n***changing list of covariates to include excluded covariates\n\n"))
+    ######
+
     if (is(covariateSettings, "covariateSettings"))
       covariateSettings <- list(covariateSettings)
     for (listUp in 1:length(covariateSettings)) {
