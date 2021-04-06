@@ -24,6 +24,7 @@
                                   prevalenceCohortId = xSensCohortId,
                                   xSpecCohortSize = NULL,
                                   covariateSettings,
+                                  modelProportion = 0.05,
                                   mainPopulationCohortId = 0,
                                   mainPopulationCohortIdStartDay = 0,
                                   mainPopulationCohortIdEndDay = 0,
@@ -111,7 +112,7 @@
 
     if (xspecSize > xSpecCount) {xspecSize <- xSpecCount} #set xSpec size to either what was specified or to maximum available
 
-    prevToUse <- as.numeric(0.05) #set the prevalence to 5% for model building - to be re-calibrated
+    prevToUse <- as.numeric(modelProportion) #set the proportion for model building - to be re-calibrated
 
     # set the number of noisy negatives in the model either from the prevalence or to 1500K max
     baseSampleSize <- min(c(as.integer(xspecSize/prevToUse), as.integer(format(1.5e+06, scientific = FALSE))))  #use 1,500,000 as largest base sample

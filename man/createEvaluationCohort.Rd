@@ -17,6 +17,7 @@ createEvaluationCohort(
   workDatabaseSchema,
   covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds
     = c(), addDescendantsToExclude = FALSE),
+  modelProportion = 0.05,
   modelPopulationCohortId = 0,
   modelPopulationCohortIdStartDay = 0,
   modelPopulationCohortIdEndDay = 0,
@@ -78,6 +79,8 @@ Requires write permissions to this database.}
 
 \item{covariateSettings}{A covariateSettings object as generated using
 createCovariateSettings().}
+
+\item{modelProportion}{The proportion of cases to non-cases in the model (default = 0.05)}
 
 \item{modelPopulationCohortId}{The number of the cohort to be used as a base population for
 the model. If set to 0, the entire database population will be

@@ -22,6 +22,7 @@
                                     cohortTable,
                                     workDatabaseSchema,
                                     covariateSettings,
+                                    modelProportion = 0.05,
                                     mainPopulationCohortId = 0,
                                     mainPopulationCohortIdStartDay = 0,
                                     mainPopulationCohortIdEndDay = 0,

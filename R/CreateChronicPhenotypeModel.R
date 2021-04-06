@@ -54,6 +54,7 @@
 #'                               concept_ids that were used to define the xSpec model (default=NULL)
 #' @param includedCovariateIds   A list of covariate IDs that should be restricted to.
 #' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
+#' @param modelProportion                  The proportion of cases to non-cases in the model (default = 0.05)
 #' @param mainPopulationCohortId   The number of the cohort ID to be used as a base population for the model
 #'                               (default=NULL)
 #' @param baseSampleSize         The maximum number of subjects in the evaluation cohort (default=2M)
@@ -93,6 +94,7 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         excludedCovariateConceptIds = c(),
                                         includedCovariateIds = c(),
                                         addDescendantsToExclude = FALSE,
+                                        modelProportion = 0.05,
                                         mainPopulationCohortId = 0,
                                         baseSampleSize = 2000000,
                                         lowerAgeLimit = 0,
@@ -142,6 +144,7 @@ createChronicPhenotypeModel <- function(connectionDetails,
     writeLines(paste("prevalenceCohortId ", prevalenceCohortId))
     writeLines(paste("excludedCovariateConceptIds ", c(excludedCovariateConceptIds)))
     writeLines(paste("addDescendantsToExclude ", addDescendantsToExclude))
+    writeLines(paste("modelProportion ", modelProportion))
     writeLines(paste("mainPopulationCohortId ", mainPopulationCohortId))
     writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
     writeLines(paste("upperAgeLimit ", upperAgeLimit))
@@ -172,6 +175,7 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                   xSensCohortId = xSensCohortId,
                                   prevalenceCohortId = prevalenceCohortId,
                                   covariateSettings = covariateSettings,
+                                  modelProportion = modelProportion,
                                   mainPopulationCohortId = mainPopulationCohortId,
                                   lowerAgeLimit = lowerAgeLimit,
                                   upperAgeLimit = upperAgeLimit,
@@ -210,6 +214,7 @@ createChronicPhenotypeModel <- function(connectionDetails,
     writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
     writeLines(paste("evaluationOutputFileName ", evaluationOutputFileName))
     writeLines(paste("modelOutputFileName ", modelOutputFileName))
+    writeLines(paste("modelProportion ", modelProportion))
     writeLines(paste("mainPopulationCohortId ", mainPopulationCohortId))
     writeLines(paste("baseSampleSize ", baseSampleSize))
     writeLines(paste("lowerAgeLimit ", lowerAgeLimit))
@@ -240,6 +245,7 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                          evaluationOutputFileName = evaluationOutputFileName,
                                          covariateSettings = covariateSettings,
                                          modelOutputFileName = modelOutputFileName,
+                                         modelProportion = modelProportion,
                                          mainPopulationCohortId = mainPopulationCohortId,
                                          baseSampleSize = baseSampleSize,
                                          lowerAgeLimit = lowerAgeLimit,
