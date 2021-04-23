@@ -42,11 +42,6 @@
                                     savePlpData = FALSE,
                                     modelType = "chronic") {
 
-  ##########################
-  modelType <- "chronic"
-  ##########################
-
-
   if (savePlpData == TRUE) {
     evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))
     if (file.exists(evaluationCohortPlpDataFileName))
