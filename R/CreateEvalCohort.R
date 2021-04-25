@@ -142,18 +142,24 @@
       covariateSettings[[listUp]]$includedCovariateIds <- c(lrNonZeroCovs)
     }
 
-    ParallelLogger::logInfo("Getting evaluation cohort data from server")
-    plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
-                                                  cdmDatabaseSchema = cdmDatabaseSchema,
-                                                  cohortId = 0,
-                                                  outcomeIds = xSpecCohortId,
-                                                  outcomeDatabaseSchema = workDatabaseSchema,
-                                                  outcomeTable = testCohort,
-                                                  cohortDatabaseSchema = workDatabaseSchema,
-                                                  cohortTable = testCohort,
-                                                  cdmVersion = cdmVersion,
-                                                  washoutPeriod = 0,
-                                                  covariateSettings = covariateSettings)
+    evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))
+    if (file.exists(evaluationCohortPlpDataFileName)) {
+      ParallelLogger::logInfo("Getting evaluation cohort data from existing folder")
+      plpData <- PatientLevelPrediction::loadPlpData(evaluationCohortPlpDataFileName)
+    } else {
+      ParallelLogger::logInfo("Getting evaluation cohort data from server")
+      plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
+                                                    cdmDatabaseSchema = cdmDatabaseSchema,
+                                                    cohortId = 0,
+                                                    outcomeIds = xSpecCohortId,
+                                                    outcomeDatabaseSchema = workDatabaseSchema,
+                                                    outcomeTable = testCohort,
+                                                    cohortDatabaseSchema = workDatabaseSchema,
+                                                    cohortTable = testCohort,
+                                                    cdmVersion = cdmVersion,
+                                                    washoutPeriod = 0,
+                                                    covariateSettings = covariateSettings)
+    }
 
     if (excludeModelFromEvaluation == TRUE) {
       # remove subjects in evaluation cohort that were in model cohort
@@ -167,6 +173,8 @@
       ParallelLogger::logInfo("Saving evaluation cohort PLP data to: ", evaluationCohortPlpDataFileName)
       PatientLevelPrediction::savePlpData(plpData, evaluationCohortPlpDataFileName)
     }
+
+
 
     population <- PatientLevelPrediction::createStudyPopulation(plpData,
                                                                 population = NULL,
