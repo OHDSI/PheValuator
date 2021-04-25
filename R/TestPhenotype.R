@@ -139,13 +139,13 @@ testPhenotypeAlgorithm <- function(connectionDetails,
       # join the phenotype table with the prediction table
       if (modelType == "acute") {
 
-        # fullTable <- dplyr::left_join(modelAll,
-        #                               phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype"),],
-        #                               by = c("subjectId", "cohortStartDate"))
-
         fullTable <- dplyr::left_join(modelAll,
-                                      phenoPop[, c("subjectId", "inPhenotype")],
-                                      by = c("subjectId"))
+                                      phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype"),],
+                                      by = c("subjectId", "cohortStartDate"))
+
+        # fullTable <- dplyr::left_join(modelAll,
+        #                               phenoPop[, c("subjectId", "inPhenotype")],
+        #                               by = c("subjectId"))
 
       } else {
         fullTable <- dplyr::left_join(modelAll,
