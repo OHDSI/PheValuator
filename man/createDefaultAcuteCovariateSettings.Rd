@@ -7,6 +7,7 @@
 createDefaultAcuteCovariateSettings(
   excludedCovariateConceptIds = c(),
   includedCovariateIds = c(),
+  includedCovariateConceptIds = c(),
   addDescendantsToExclude = FALSE,
   startDays = 0,
   endDays = 7
