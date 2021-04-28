@@ -193,7 +193,7 @@
     ParallelLogger::logInfo("Applying predictive model to evaluation cohort")
 
     # apply the model to the evaluation cohort
-    appResults <- PatientLevelPrediction::applyModel(population, plpData, lrResults$model, calculatePerformance = FALSE)
+    appResults <- PatientLevelPrediction::applyModel(population, plpData, lrResults$model)
     pred <- appResults$prediction
 
     # pull in the xSens cohort
