@@ -252,8 +252,7 @@
                                                       savePlpResult = FALSE,
                                                       savePlpPlots = FALSE,
                                                       saveEvaluation = FALSE,
-                                                      saveDirectory = outFolder,
-                                                      runCovariateSummary = FALSE)
+                                                      saveDirectory = outFolder)
 
           PatientLevelPrediction::runPlp
 
