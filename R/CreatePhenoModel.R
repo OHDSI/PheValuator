@@ -252,7 +252,10 @@
                                                       savePlpResult = FALSE,
                                                       savePlpPlots = FALSE,
                                                       saveEvaluation = FALSE,
-                                                      saveDirectory = outFolder)
+                                                      saveDirectory = outFolder,
+                                                      runCovariateSummary = FALSE)
+
+          PatientLevelPrediction::runPlp
 
           #re-calibrate model
           prevToUseOdds <- prevToUse/(1 - prevToUse) #uses prevalence for model building
