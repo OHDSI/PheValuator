@@ -230,7 +230,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                               ppv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
                               specificity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
                               npv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
-                              estimatedPrevalence = sprintf("%0.1f", 100*countsTable$estimatedPrevalence),
+                              estimatedPrevalence = sprintf("%0.3f", 100*countsTable$estimatedPrevalence),
                               f1Score = sprintf("%0.3f", countsTable$f1Score))
 
     if (nrow(misses) > 0) {
