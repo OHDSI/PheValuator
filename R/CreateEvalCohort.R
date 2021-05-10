@@ -134,6 +134,8 @@
     ######
     lrNonZeroCovs <- c(lrNonZeroCovs, as.numeric(paste0(excludedCovariateConceptIds, 210)))
     writeLines(paste0("\n\n***changing list of covariates to include excluded covariates\n\n"))
+
+    lrNonZeroCovs <- c(lrNonZeroCovs, c(900000010802, 900000010803, 900000010804))
     ######
 
     if (is(covariateSettings, "covariateSettings"))
