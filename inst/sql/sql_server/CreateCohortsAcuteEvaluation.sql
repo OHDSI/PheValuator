@@ -103,7 +103,7 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					--co.subject_id as person_id, v.visit_start_date,
 					--	row_number() over (order by NewId()) rn
 
-					co.subject_id as v.person_id, FIRST_VALUE(v.visit_start_date) OVER (PARTITION BY v.person_id ORDER BY NewId()) visit_start_date,
+					co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (PARTITION BY v.person_id ORDER BY NewId()) visit_start_date,
 						row_number() over (order by NewId()) rn
 
 					from @cohort_database_schema.@cohort_database_table co
