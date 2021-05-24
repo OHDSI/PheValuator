@@ -87,16 +87,18 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						and year(visit_start_date) - year_of_birth >= @ageLimit
 						and year(visit_start_date) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
+{@exclCohort != 0} ? {
+          left join @cohort_database_schema.@cohort_database_table excl
+            on v.person_id = excl.subject_id
+              and v.visit_start_date = excl.COHORT_START_DATE
+          }
 					where visit_start_date >= cast('@startDate' AS DATE)
 						and visit_start_date <= cast('@endDate' AS DATE)
 						and v.visit_concept_id in (@visitType)
 						and datediff(day, visit_start_date, visit_end_date) >= @visitLength
 {@firstCut} ? {and 11*(9*(v.visit_occurrence_id/9)/11) = v.visit_occurrence_id}
 {@exclCohort != 0} ? {
-						and v.person_id not in (
-													select subject_id
-													from @cohort_database_schema.@cohort_database_table
-													where COHORT_DEFINITION_ID = @exclCohort)
+						and excl.subject_id is NULL
 }
 }
 {@mainPopnCohort != 0} ? {
