@@ -49,7 +49,6 @@
 #'                                         Requires write permissions to this database.
 #' @param covariateSettings                A covariateSettings object as generated using
 #'                                         createCovariateSettings().
-#' @param modelProportion                  The proportion of cases to non-cases in the model (default = 0.05)
 #' @param modelPopulationCohortId           The number of the cohort to be used as a base population for
 #'                                         the model. If set to 0, the entire database population will be
 #'                                         used.
@@ -97,7 +96,6 @@ createEvaluationCohort <- function(connectionDetails,
                                    workDatabaseSchema,
                                    covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds = c(),
                                                                                              addDescendantsToExclude = FALSE),
-                                   modelProportion = 0.05,
                                    modelPopulationCohortId = 0,
                                    modelPopulationCohortIdStartDay = 0,
                                    modelPopulationCohortIdEndDay = 0,
@@ -153,7 +151,6 @@ createEvaluationCohort <- function(connectionDetails,
                         prevalenceCohortId = prevalenceCohortId,
                         xSpecCohortSize = xSpecCohortSize,
                         covariateSettings = covariateSettings,
-                        modelProportion = modelProportion,
                         mainPopulationCohortId = modelPopulationCohortId,
                         mainPopulationCohortIdStartDay = modelPopulationCohortIdStartDay,
                         mainPopulationCohortIdEndDay = modelPopulationCohortIdEndDay,
@@ -178,7 +175,6 @@ createEvaluationCohort <- function(connectionDetails,
                           cohortTable = cohortTable,
                           workDatabaseSchema = workDatabaseSchema,
                           covariateSettings = covariateSettings,
-                          modelProportion = modelProportion,
                           mainPopulationCohortId = evaluationPopulationCohortId,
                           mainPopulationCohortIdStartDay = evaluationPopulationCohortIdStartDay,
                           mainPopulationCohortIdEndDay = evaluationPopulationCohortIdEndDay,

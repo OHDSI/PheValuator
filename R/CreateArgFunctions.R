@@ -16,7 +16,6 @@
 #' @param xSpecCohortSize                  The recommended xSpec sample size to use in model (default = NULL)
 #' @param covariateSettings                A covariateSettings object as generated
 #'                                         usingcreateCovariateSettings().
-#' @param modelProportion                  The proportion of cases to non-cases in the model (default = 0.05)
 #' @param modelPopulationCohortId           The number of the cohort to be used as a base population for
 #'                                         the model. If set to 0, the entire database population will be
 #'                                         used.
@@ -44,9 +43,9 @@
 #' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the
 #'                                         evaluation cohort?
 #' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects
-#'                                         withdates in the future?
+#'                                         with dates in the future?
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be
-#'                                         saved? To beused for debugging purposes.
+#'                                         saved? To be used for debugging purposes.
 #' @param modelType                        The type of health outcome in the model either "acute"
 #'                                         or"chronic".
 #'
@@ -57,7 +56,6 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              xSpecCohortSize = NULL,
                                              covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds = c(),
                                                                                                        addDescendantsToExclude = FALSE),
-                                             modelProportion = 0.05,
                                              modelPopulationCohortId = 0,
                                              modelPopulationCohortIdStartDay = 0,
                                              modelPopulationCohortIdEndDay = 0,
@@ -77,7 +75,7 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              excludeModelFromEvaluation = TRUE,
                                              removeSubjectsWithFutureDates = TRUE,
                                              saveEvaluationCohortPlpData = FALSE,
-                                             modelType = "chronic") {
+                                             modelType = "acute") {
   # First: get default values:
   analysis <- list()
   for (name in names(formals(createCreateEvaluationCohortArgs))) {
