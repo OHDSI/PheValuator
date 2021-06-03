@@ -16,11 +16,10 @@ createChronicPhenotypeModel(
   phenotypeEvaluationFileName = "results",
   xSpecCohortId,
   xSensCohortId,
-  prevalenceCohortId = xSensCohortId,
+  prevalenceCohortId,
   excludedCovariateConceptIds = c(),
   includedCovariateIds = c(),
-  addDescendantsToExclude = FALSE,
-  modelProportion = 0.05,
+  addDescendantsToExclude = TRUE,
   mainPopulationCohortId = 0,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
@@ -34,7 +33,7 @@ createChronicPhenotypeModel(
   removeSubjectsWithFutureDates = TRUE,
   cdmVersion = "5",
   outFolder = getwd(),
-  savePlpData = F,
+  savePlpData = FALSE,
   createModel = TRUE,
   createEvaluationCohort = TRUE,
   cohortDefinitionsToTest = NULL
@@ -83,8 +82,6 @@ concept_ids that were used to define the xSpec model (default=NULL)}
 \item{includedCovariateIds}{A list of covariate IDs that should be restricted to.}
 
 \item{addDescendantsToExclude}{Should descendants of excluded concepts also be excluded? (default=FALSE)}
-
-\item{modelProportion}{The proportion of cases to non-cases in the model (default = 0.05)}
 
 \item{mainPopulationCohortId}{The number of the cohort ID to be used as a base population for the model
 (default=NULL)}

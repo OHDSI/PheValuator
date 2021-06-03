@@ -16,11 +16,10 @@ createAcutePhenotypeModel(
   phenotypeEvaluationFileName = "results",
   xSpecCohortId,
   xSensCohortId,
-  prevalenceCohortId = xSensCohortId,
+  prevalenceCohortId,
   excludedCovariateConceptIds = c(),
   includedCovariateIds = c(),
-  addDescendantsToExclude = FALSE,
-  modelProportion = 0.05,
+  addDescendantsToExclude = TRUE,
   mainPopulationCohortId = 0,
   mainPopulationCohortIdStartDay = 0,
   mainPopulationCohortIdEndDay = 0,
@@ -29,14 +28,14 @@ createAcutePhenotypeModel(
   upperAgeLimit = 120,
   startDays = 0,
   endDays = 7,
-  visitLength = 3,
+  visitLength = 0,
   gender = c(8507, 8532),
   startDate = "19000101",
   endDate = "21000101",
   removeSubjectsWithFutureDates = TRUE,
   cdmVersion = "5",
   outFolder = getwd(),
-  excludeModelFromEvaluation = TRUE,
+  excludeModelFromEvaluation = FALSE,
   savePlpData = FALSE,
   createModel = TRUE,
   createEvaluationCohort = TRUE,
@@ -86,8 +85,6 @@ concept_ids that were used to define the xSpec model (default=NULL)}
 \item{includedCovariateIds}{A list of covariate IDs that should be restricted to.}
 
 \item{addDescendantsToExclude}{Should descendants of excluded concepts also be excluded? (default=FALSE)}
-
-\item{modelProportion}{The proportion of cases to non-cases in the model (default = 0.05)}
 
 \item{mainPopulationCohortId}{The number of the cohort ID to be used as a base population for the model
 (default=NULL)}

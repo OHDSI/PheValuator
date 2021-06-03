@@ -55,7 +55,6 @@
 #'                               concept_ids that were used to define the xSpec model (default=NULL)
 #' @param includedCovariateIds   A list of covariate IDs that should be restricted to.
 #' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
-#' @param modelProportion                  The proportion of cases to non-cases in the model (default = 0.05)
 #' @param mainPopulationCohortId   The number of the cohort ID to be used as a base population for the model
 #'                               (default=NULL)
 #' @param mainPopulationCohortIdStartDay The number of days relative to the mainPopulationCohortId cohort start date
@@ -96,11 +95,10 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                       phenotypeEvaluationFileName = "results",
                                       xSpecCohortId,
                                       xSensCohortId,
-                                      prevalenceCohortId = xSensCohortId,
+                                      prevalenceCohortId,
                                       excludedCovariateConceptIds = c(),
                                       includedCovariateIds = c(),
-                                      addDescendantsToExclude = FALSE,
-                                      modelProportion = 0.05,
+                                      addDescendantsToExclude = TRUE,
                                       mainPopulationCohortId = 0,
                                       mainPopulationCohortIdStartDay = 0,
                                       mainPopulationCohortIdEndDay = 0,
@@ -109,14 +107,14 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                       upperAgeLimit = 120,
                                       startDays = 0,
                                       endDays = 7,
-                                      visitLength = 3,
+                                      visitLength = 0,
                                       gender = c(8507, 8532),
                                       startDate = "19000101",
                                       endDate = "21000101",
                                       removeSubjectsWithFutureDates = TRUE,
                                       cdmVersion = "5",
                                       outFolder = getwd(),
-                                      excludeModelFromEvaluation = TRUE,
+                                      excludeModelFromEvaluation = FALSE,
                                       savePlpData = FALSE,
                                       createModel = TRUE,
                                       createEvaluationCohort = TRUE,
@@ -153,7 +151,6 @@ createAcutePhenotypeModel <- function(connectionDetails,
     writeLines(paste("prevalenceCohortId ", prevalenceCohortId))
     writeLines(paste("excludedCovariateConceptIds ", c(excludedCovariateConceptIds)))
     writeLines(paste("addDescendantsToExclude ", addDescendantsToExclude))
-    writeLines(paste("modelProportion ", modelProportion))
     writeLines(paste("mainPopulationCohortId ", mainPopulationCohortId))
     writeLines(paste("mainPopulationCohortIdStartDay ", mainPopulationCohortIdStartDay))
     writeLines(paste("mainPopulationCohortIdEndDay ", mainPopulationCohortIdEndDay))
@@ -173,8 +170,12 @@ createAcutePhenotypeModel <- function(connectionDetails,
       excludedCovariateConceptIds = excludedCovariateConceptIds,
       includedCovariateIds = includedCovariateIds,
       addDescendantsToExclude = addDescendantsToExclude,
-      startDays = startDays,
-      endDays = endDays)
+      startDayWindow1 = 0,
+      endDayWindow1 = 30,
+      startDayWindow2 = 31,
+      endDayWindow2 = 60,
+      startDayWindow3 = 61,
+      endDayWindow3 = 90)
 
     model <- createPhenotypeModel(connectionDetails = connectionDetails,
                                   cdmDatabaseSchema = cdmDatabaseSchema,
@@ -186,7 +187,6 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                   xSensCohortId = xSensCohortId,
                                   prevalenceCohortId = prevalenceCohortId,
                                   covariateSettings = covariateSettings,
-                                  modelProportion = modelProportion,
                                   mainPopulationCohortId = mainPopulationCohortId,
                                   mainPopulationCohortIdStartDay = mainPopulationCohortIdStartDay,
                                   mainPopulationCohortIdEndDay = mainPopulationCohortIdEndDay,
@@ -227,7 +227,6 @@ createAcutePhenotypeModel <- function(connectionDetails,
     writeLines(paste("outDatabaseSchema ", outDatabaseSchema))
     writeLines(paste("evaluationOutputFileName ", evaluationOutputFileName))
     writeLines(paste("modelOutputFileName ", modelOutputFileName))
-    writeLines(paste("modelProportion ", modelProportion))
     writeLines(paste("mainPopulationCohortId ", mainPopulationCohortId))
     writeLines(paste("mainPopulationCohortIdStartDay ", mainPopulationCohortIdStartDay))
     writeLines(paste("mainPopulationCohortIdEndDay ", mainPopulationCohortIdEndDay))
@@ -247,8 +246,12 @@ createAcutePhenotypeModel <- function(connectionDetails,
       excludedCovariateConceptIds = excludedCovariateConceptIds,
       includedCovariateIds = includedCovariateIds,
       addDescendantsToExclude = addDescendantsToExclude,
-      startDays = startDays,
-      endDays = endDays)
+      startDayWindow1 = 0,
+      endDayWindow1 = 30,
+      startDayWindow2 = 31,
+      endDayWindow2 = 60,
+      startDayWindow3 = 61,
+      endDayWindow3 = 90)
 
     evalCohort <- createEvaluationCohort(connectionDetails = connectionDetails,
                                          xSpecCohortId = xSpecCohortId,
@@ -260,7 +263,6 @@ createAcutePhenotypeModel <- function(connectionDetails,
                                          covariateSettings = covariateSettings,
                                          evaluationOutputFileName = evaluationOutputFileName,
                                          modelOutputFileName = modelOutputFileName,
-                                         modelProportion = modelProportion,
                                          mainPopulationCohortId = mainPopulationCohortId,
                                          mainPopulationCohortIdStartDay = mainPopulationCohortIdStartDay,
                                          mainPopulationCohortIdEndDay = mainPopulationCohortIdEndDay,

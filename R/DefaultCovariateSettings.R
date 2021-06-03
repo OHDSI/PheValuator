@@ -26,23 +26,27 @@
 #'                                      should include all concept_ids that were used to define the
 #'                                      xSpec model (default=NULL)
 #' @param includedCovariateIds          A list of covariate IDs that should be restricted to.
+#' @param includedCovariateConceptIds   A list of covariate concept IDs that should be restricted to.
 #' @param addDescendantsToExclude       Should descendants of excluded concepts also be excluded?
 #'                                      (default=FALSE)
-#' @param startEndDaysList              The days to include in the features time window
-#'                                      list(startDays - Start of the time window, endDays - End of the time window)
-#'                                      there can be up to 3 time windows, create as a list of lists
-#'                                      (default = list(list(startDays=0, endDays=60),
-#'                                                     list(startDays=61, endDays=90),
-#'                                                     list(startDays=91, endDays=9999)))
+#' @param startDayWindow1              The day to start time window 1 for feature extraction
+#' @param endDayWindow1                The day to end time window 1 for feature extraction
+#' @param startDayWindow2              The day to start time window 2 for feature extraction
+#' @param endDayWindow2                The day to end time window 2 for feature extraction
+#' @param startDayWindow3              The day to start time window 3 for feature extraction
+#' @param endDayWindow3                The day to end time window 3 for feature extraction #'
 #'
 #' @export
 createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(),
                                                 includedCovariateIds = c(),
                                                 includedCovariateConceptIds = c(),
                                                 addDescendantsToExclude = FALSE,
-                                                startEndDaysList = list(list(startDays=0, endDays=60),
-                                                                        list(startDays=61, endDays=90),
-                                                                        list(startDays=91, endDays=9999))) {
+                                                startDayWindow1 = 0,
+                                                endDayWindow1 = 9999,
+                                                startDayWindow2 = NULL,
+                                                endDayWindow2 = NULL,
+                                                startDayWindow3 = NULL,
+                                                endDayWindow3 = NULL) {
 
   covariateSettings1 <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
                                                                    useDemographicsAgeGroup = TRUE,
@@ -62,15 +66,15 @@ createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(
                                                                    useDistinctMeasurementCountLongTerm = TRUE,
                                                                    useVisitCountLongTerm = TRUE,
                                                                    useVisitConceptCountLongTerm = TRUE,
-                                                                   longTermStartDays = startEndDaysList[[1]]$startDays,
-                                                                   endDays = startEndDaysList[[1]]$endDays,
+                                                                   longTermStartDays = startDayWindow1,
+                                                                   endDays = endDayWindow1,
                                                                    includedCovariateConceptIds = c(includedCovariateConceptIds),
                                                                    addDescendantsToInclude = addDescendantsToExclude,
                                                                    excludedCovariateConceptIds = excludedCovariateConceptIds,
                                                                    addDescendantsToExclude = addDescendantsToExclude,
                                                                    includedCovariateIds = c(includedCovariateIds))
 
-  if(length(startEndDaysList) > 1) {
+  if(!(is.null(startDayWindow2))) {
     covariateSettings2 <- FeatureExtraction::createCovariateSettings(useConditionGroupEraShortTerm = TRUE,
                                                                      useDrugGroupEraShortTerm = TRUE,
                                                                      useProcedureOccurrenceShortTerm = TRUE,
@@ -85,8 +89,8 @@ createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(
                                                                      useDistinctMeasurementCountShortTerm = TRUE,
                                                                      useVisitCountShortTerm = TRUE,
                                                                      useVisitConceptCountShortTerm = TRUE,
-                                                                     shortTermStartDays = startEndDaysList[[2]]$startDays,
-                                                                     endDays = startEndDaysList[[2]]$endDays,
+                                                                     shortTermStartDays = startDayWindow2,
+                                                                     endDays = endDayWindow2,
                                                                      includedCovariateConceptIds = c(includedCovariateConceptIds),
                                                                      addDescendantsToInclude = addDescendantsToExclude,
                                                                      excludedCovariateConceptIds = excludedCovariateConceptIds,
@@ -94,7 +98,7 @@ createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(
                                                                      includedCovariateIds = c(includedCovariateIds))
   }
 
-  if(length(startEndDaysList) > 2) {
+  if(!(is.null(startDayWindow3))) {
     covariateSettings3 <- FeatureExtraction::createCovariateSettings(useConditionGroupEraMediumTerm = TRUE,
                                                                      useDrugGroupEraMediumTerm = TRUE,
                                                                      useProcedureOccurrenceMediumTerm = TRUE,
@@ -109,8 +113,8 @@ createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(
                                                                      useDistinctMeasurementCountMediumTerm = TRUE,
                                                                      useVisitCountMediumTerm = TRUE,
                                                                      useVisitConceptCountMediumTerm = TRUE,
-                                                                     mediumTermStartDays = startEndDaysList[[3]]$startDays,
-                                                                     endDays = startEndDaysList[[3]]$endDays,
+                                                                     mediumTermStartDays = startDayWindow3,
+                                                                     endDays = endDayWindow3,
                                                                      includedCovariateConceptIds = c(includedCovariateConceptIds),
                                                                      addDescendantsToInclude = addDescendantsToExclude,
                                                                      excludedCovariateConceptIds = excludedCovariateConceptIds,
@@ -118,10 +122,14 @@ createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(
                                                                      includedCovariateIds = c(includedCovariateIds))
   }
 
-  if(length(startEndDaysList) == 1) {
+  if (is.null(startDayWindow1)) {
+    stop("The first time window must not be null")
+  } else if(is.null(startDayWindow2) & is.null(startDayWindow3)) {
     covariateSettings <- list(covariateSettings1)
-  } else if(length(startEndDaysList) == 2) {
+  } else if(!(is.null(startDayWindow2)) & is.null(startDayWindow3)) {
     covariateSettings <- list(covariateSettings1, covariateSettings2)
+  } else if(!(is.null(startDayWindow3)) & is.null(startDayWindow2)) {
+    covariateSettings <- list(covariateSettings1, covariateSettings3)
   } else {
     covariateSettings <- list(covariateSettings1, covariateSettings2, covariateSettings3)
   }

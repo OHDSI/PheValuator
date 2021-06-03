@@ -7,11 +7,10 @@
 createCreateEvaluationCohortArgs(
   xSpecCohortId,
   xSensCohortId,
-  prevalenceCohortId = xSensCohortId,
-  xSpecCohortSize = NULL,
+  prevalenceCohortId,
+  xSpecCohortSize = 5000,
   covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds
-    = c(), addDescendantsToExclude = FALSE),
-  modelProportion = 0.05,
+    = c(), addDescendantsToExclude = TRUE),
   modelPopulationCohortId = 0,
   modelPopulationCohortIdStartDay = 0,
   modelPopulationCohortIdEndDay = 0,
@@ -21,17 +20,17 @@ createCreateEvaluationCohortArgs(
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
-  visitLength = 3,
-  visitType = c(9201),
+  visitLength = 0,
+  visitType = c(9201, 9202, 9203),
   gender = c(8507, 8532),
   startDate = "19001010",
   endDate = "21000101",
   modelId = "main",
   evaluationCohortId = "main",
-  excludeModelFromEvaluation = TRUE,
+  excludeModelFromEvaluation = FALSE,
   removeSubjectsWithFutureDates = TRUE,
   saveEvaluationCohortPlpData = FALSE,
-  modelType = "chronic"
+  modelType = "acute"
 )
 }
 \arguments{
@@ -44,14 +43,12 @@ cohortdefinition id in the cohort table (for noisy
 negatives).}
 
 \item{prevalenceCohortId}{The number of the cohort definition id to determine
-thedisease prevalence.}
+the disease prevalence.}
 
-\item{xSpecCohortSize}{The recommended xSpec sample size to use in model (default = NULL)}
+\item{xSpecCohortSize}{The recommended xSpec sample size to use in model (default = 5000)}
 
 \item{covariateSettings}{A covariateSettings object as generated
-usingcreateCovariateSettings().}
-
-\item{modelProportion}{The proportion of cases to non-cases in the model (default = 0.05)}
+using createCovariateSettings().}
 
 \item{modelPopulationCohortId}{The number of the cohort to be used as a base population for
 the model. If set to 0, the entire database population will be
@@ -97,10 +94,10 @@ cohort start date to end including visits.}
 evaluation cohort?}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects
-withdates in the future?}
+with dates in the future?}
 
 \item{saveEvaluationCohortPlpData}{Should the large PLP file for the evaluation cohort be
-saved? To beused for debugging purposes.}
+saved? To be used for debugging purposes.}
 
 \item{modelType}{The type of health outcome in the model either "acute"
 or"chronic".}

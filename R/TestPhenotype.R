@@ -52,7 +52,7 @@
 #'
 #' @export
 testPhenotypeAlgorithm <- function(connectionDetails,
-                                   cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
+                                   cutPoints = c("EV"),
                                    outFolder,
                                    evaluationCohortId = "main",
                                    phenotypeCohortId,

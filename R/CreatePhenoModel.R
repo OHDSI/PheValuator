@@ -21,16 +21,16 @@
                                   workDatabaseSchema,
                                   xSpecCohortId,
                                   xSensCohortId,
-                                  prevalenceCohortId = xSensCohortId,
-                                  xSpecCohortSize = NULL,
+                                  prevalenceCohortId,
+                                  xSpecCohortSize = 5000,
                                   covariateSettings,
                                   mainPopulationCohortId = 0,
                                   mainPopulationCohortIdStartDay = 0,
                                   mainPopulationCohortIdEndDay = 0,
                                   lowerAgeLimit = 0,
                                   upperAgeLimit = 120,
-                                  visitLength = 3,
-                                  visitType = c(9201),
+                                  visitLength = 0,
+                                  visitType = c(9201,9202,9203),
                                   gender = c(8507, 8532),
                                   startDate = "19000101",
                                   endDate = "21000101",
@@ -38,7 +38,7 @@
                                   cdmVersion = "5",
                                   outFolder = getwd(),
                                   modelId = "main",
-                                  modelType = "chronic") {
+                                  modelType = "acute") {
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
 

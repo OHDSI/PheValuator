@@ -9,15 +9,14 @@ createEvaluationCohort(
   oracleTempSchema = NULL,
   xSpecCohortId,
   xSensCohortId,
-  prevalenceCohortId = xSensCohortId,
-  xSpecCohortSize = NULL,
+  prevalenceCohortId,
+  xSpecCohortSize = 5000,
   cdmDatabaseSchema,
   cohortDatabaseSchema,
   cohortTable,
   workDatabaseSchema,
   covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds
-    = c(), addDescendantsToExclude = FALSE),
-  modelProportion = 0.05,
+    = c(), addDescendantsToExclude = TRUE),
   modelPopulationCohortId = 0,
   modelPopulationCohortIdStartDay = 0,
   modelPopulationCohortIdEndDay = 0,
@@ -27,8 +26,8 @@ createEvaluationCohort(
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
-  visitLength = 3,
-  visitType = c(9201),
+  visitLength = 0,
+  visitType = c(9201, 9202, 9203),
   gender = c(8507, 8532),
   startDate = "19001010",
   endDate = "21000101",
@@ -36,10 +35,10 @@ createEvaluationCohort(
   outFolder = getwd(),
   modelId = "main",
   evaluationCohortId = "main",
-  excludeModelFromEvaluation = TRUE,
+  excludeModelFromEvaluation = FALSE,
   removeSubjectsWithFutureDates = TRUE,
   saveEvaluationCohortPlpData = FALSE,
-  modelType = "chronic"
+  modelType = "acute"
 )
 }
 \arguments{
@@ -79,8 +78,6 @@ Requires write permissions to this database.}
 
 \item{covariateSettings}{A covariateSettings object as generated using
 createCovariateSettings().}
-
-\item{modelProportion}{The proportion of cases to non-cases in the model (default = 0.05)}
 
 \item{modelPopulationCohortId}{The number of the cohort to be used as a base population for
 the model. If set to 0, the entire database population will be

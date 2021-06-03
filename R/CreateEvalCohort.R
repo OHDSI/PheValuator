@@ -22,15 +22,14 @@
                                     cohortTable,
                                     workDatabaseSchema,
                                     covariateSettings,
-                                    modelProportion = 0.05,
                                     mainPopulationCohortId = 0,
                                     mainPopulationCohortIdStartDay = 0,
                                     mainPopulationCohortIdEndDay = 0,
                                     baseSampleSize = 2e+06,
                                     lowerAgeLimit = 0,
                                     upperAgeLimit = 120,
-                                    visitLength = 3,
-                                    visitType = c(9201),
+                                    visitLength = 0,
+                                    visitType = c(9201,9202,9203),
                                     gender = c(8507, 8532),
                                     startDate = "19001010",
                                     endDate = "21000101",
@@ -38,9 +37,9 @@
                                     outFolder = getwd(),
                                     modelId = "main",
                                     evaluationCohortId = "main",
-                                    excludeModelFromEvaluation = TRUE,
+                                    excludeModelFromEvaluation = FALSE,
                                     savePlpData = FALSE,
-                                    modelType = "chronic") {
+                                    modelType = "acute") {
 
   if (savePlpData == TRUE) {
     evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))

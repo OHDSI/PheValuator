@@ -54,7 +54,6 @@
 #'                               concept_ids that were used to define the xSpec model (default=NULL)
 #' @param includedCovariateIds   A list of covariate IDs that should be restricted to.
 #' @param addDescendantsToExclude        Should descendants of excluded concepts also be excluded? (default=FALSE)
-#' @param modelProportion                  The proportion of cases to non-cases in the model (default = 0.05)
 #' @param mainPopulationCohortId   The number of the cohort ID to be used as a base population for the model
 #'                               (default=NULL)
 #' @param baseSampleSize         The maximum number of subjects in the evaluation cohort (default=2M)
@@ -90,11 +89,10 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         phenotypeEvaluationFileName = "results",
                                         xSpecCohortId,
                                         xSensCohortId,
-                                        prevalenceCohortId = xSensCohortId,
+                                        prevalenceCohortId,
                                         excludedCovariateConceptIds = c(),
                                         includedCovariateIds = c(),
-                                        addDescendantsToExclude = FALSE,
-                                        modelProportion = 0.05,
+                                        addDescendantsToExclude = TRUE,
                                         mainPopulationCohortId = 0,
                                         baseSampleSize = 2000000,
                                         lowerAgeLimit = 0,
@@ -108,7 +106,7 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         removeSubjectsWithFutureDates = TRUE,
                                         cdmVersion = "5",
                                         outFolder = getwd(),
-                                        savePlpData = F,
+                                        savePlpData = FALSE,
                                         createModel = TRUE,
                                         createEvaluationCohort = TRUE,
                                         cohortDefinitionsToTest = NULL) {
