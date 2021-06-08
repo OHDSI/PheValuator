@@ -189,8 +189,10 @@
     # apply the model to the evaluation cohort
     appResults <- NULL
     appResults$prediction <- PatientLevelPrediction::applyModel(population, plpData, lrResults$model, calculatePerformance = FALSE)
-    pred <- appResults$prediction
 
+    appResults$prediction$value <- round(appResults$prediction$value, digits = 3)
+
+    pred <- appResults$prediction
 
     # pull in the xSens cohort
     sql <- SqlRender::loadRenderTranslateSql("GetXsensCohort.sql",
