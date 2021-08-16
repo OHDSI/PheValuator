@@ -87,21 +87,27 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						and year(visit_start_date) - year_of_birth >= @ageLimit
 						and year(visit_start_date) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
+{@exclCohort != 0} ? { -- exclude subjects in the xSens cohort
+          left join @cohort_database_schema.@cohort_database_table excl
+            on v.person_id = excl.subject_id
+              and v.visit_start_date = excl.COHORT_START_DATE
+          }
 					where visit_start_date >= cast('@startDate' AS DATE)
 						and visit_start_date <= cast('@endDate' AS DATE)
 						and v.visit_concept_id in (@visitType)
 						and datediff(day, visit_start_date, visit_end_date) >= @visitLength
 {@firstCut} ? {and 11*(9*(v.visit_occurrence_id/9)/11) = v.visit_occurrence_id}
-{@exclCohort != 0} ? {
-						and v.person_id not in (
-													select subject_id
-													from @cohort_database_schema.@cohort_database_table
-													where COHORT_DEFINITION_ID = @exclCohort)
+{@exclCohort != 0} ? { -- exclusion = did not match on the above left join
+						and excl.subject_id is NULL
 }
 }
 {@mainPopnCohort != 0} ? {
-					co.subject_id as person_id, v.visit_start_date,
+					--co.subject_id as person_id, v.visit_start_date,
+					--	row_number() over (order by NewId()) rn
+
+					co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (PARTITION BY v.person_id ORDER BY NewId()) visit_start_date,
 						row_number() over (order by NewId()) rn
+
 					from @cohort_database_schema.@cohort_database_table co
 					join @cdm_database_schema.visit_occurrence v
 					  on v.person_id = co.subject_id
@@ -115,11 +121,15 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						and  year(co.COHORT_START_DATE) - year_of_birth >= @ageLimit
 						and year(co.COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
+						{@exclCohort != 0} ? {
+          left join @cohort_database_schema.@cohort_database_table excl
+            on v.person_id = excl.subject_id
+              and v.visit_start_date = excl.COHORT_START_DATE
+          }
 					where co.cohort_definition_id = @mainPopnCohort
-						{@exclCohort != 0} ? {and co.subject_id not in (
-													select subject_id
-													from @cohort_database_schema.@cohort_database_table
-													where COHORT_DEFINITION_ID = @exclCohort)}
+{@exclCohort != 0} ? {
+						and excl.subject_id is NULL
+}
 }
 	) negs
       where rn <= cast('@baseSampleSize' as bigint)

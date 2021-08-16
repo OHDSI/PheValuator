@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.12</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -106,7 +106,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/OHDSI/PheValuator/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -144,10 +144,10 @@
   <span class='kw'>phenotypeEvaluationFileName</span> <span class='kw'>=</span> <span class='st'>"results"</span>,
   <span class='no'>xSpecCohortId</span>,
   <span class='no'>xSensCohortId</span>,
-  <span class='kw'>prevalenceCohortId</span> <span class='kw'>=</span> <span class='no'>xSensCohortId</span>,
+  <span class='no'>prevalenceCohortId</span>,
   <span class='kw'>excludedCovariateConceptIds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
   <span class='kw'>includedCovariateIds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
-  <span class='kw'>addDescendantsToExclude</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>addDescendantsToExclude</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>mainPopulationCohortId</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>mainPopulationCohortIdStartDay</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>mainPopulationCohortIdEndDay</span> <span class='kw'>=</span> <span class='fl'>0</span>,
@@ -156,14 +156,14 @@
   <span class='kw'>upperAgeLimit</span> <span class='kw'>=</span> <span class='fl'>120</span>,
   <span class='kw'>startDays</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>endDays</span> <span class='kw'>=</span> <span class='fl'>7</span>,
-  <span class='kw'>visitLength</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>visitLength</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>gender</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>8507</span>, <span class='fl'>8532</span>),
   <span class='kw'>startDate</span> <span class='kw'>=</span> <span class='st'>"19000101"</span>,
   <span class='kw'>endDate</span> <span class='kw'>=</span> <span class='st'>"21000101"</span>,
   <span class='kw'>removeSubjectsWithFutureDates</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>cdmVersion</span> <span class='kw'>=</span> <span class='st'>"5"</span>,
   <span class='kw'>outFolder</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span>(),
-  <span class='kw'>excludeModelFromEvaluation</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>excludeModelFromEvaluation</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>savePlpData</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>createModel</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>createEvaluationCohort</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,

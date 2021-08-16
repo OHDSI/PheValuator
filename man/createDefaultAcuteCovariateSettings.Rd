@@ -7,9 +7,14 @@
 createDefaultAcuteCovariateSettings(
   excludedCovariateConceptIds = c(),
   includedCovariateIds = c(),
+  includedCovariateConceptIds = c(),
   addDescendantsToExclude = FALSE,
-  startDays = 0,
-  endDays = 7
+  startDayWindow1 = 0,
+  endDayWindow1 = 9999,
+  startDayWindow2 = NULL,
+  endDayWindow2 = NULL,
+  startDayWindow3 = NULL,
+  endDayWindow3 = NULL
 )
 }
 \arguments{
@@ -19,12 +24,22 @@ xSpec model (default=NULL)}
 
 \item{includedCovariateIds}{A list of covariate IDs that should be restricted to.}
 
+\item{includedCovariateConceptIds}{A list of covariate concept IDs that should be restricted to.}
+
 \item{addDescendantsToExclude}{Should descendants of excluded concepts also be excluded?
 (default=FALSE)}
 
-\item{startDays}{The days to include prior to the cohort start date (default=0)}
+\item{startDayWindow1}{The day to start time window 1 for feature extraction}
 
-\item{endDays}{The days to include after the cohort start date (default=7)}
+\item{endDayWindow1}{The day to end time window 1 for feature extraction}
+
+\item{startDayWindow2}{The day to start time window 2 for feature extraction}
+
+\item{endDayWindow2}{The day to end time window 2 for feature extraction}
+
+\item{startDayWindow3}{The day to start time window 3 for feature extraction}
+
+\item{endDayWindow3}{The day to end time window 3 for feature extraction #'}
 }
 \description{
 Create the default covariate settings for acute diseases

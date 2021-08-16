@@ -12,10 +12,10 @@
 #'                                         cohortdefinition id in the cohort table (for noisy
 #'                                         negatives).
 #' @param prevalenceCohortId               The number of the cohort definition id to determine
-#'                                         thedisease prevalence.
-#' @param xSpecCohortSize                  The recommended xSpec sample size to use in model (default = NULL)
+#'                                         the disease prevalence.
+#' @param xSpecCohortSize                  The recommended xSpec sample size to use in model (default = 5000)
 #' @param covariateSettings                A covariateSettings object as generated
-#'                                         usingcreateCovariateSettings().
+#'                                         using createCovariateSettings().
 #' @param modelPopulationCohortId           The number of the cohort to be used as a base population for
 #'                                         the model. If set to 0, the entire database population will be
 #'                                         used.
@@ -43,19 +43,19 @@
 #' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the
 #'                                         evaluation cohort?
 #' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects
-#'                                         withdates in the future?
+#'                                         with dates in the future?
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be
-#'                                         saved? To beused for debugging purposes.
+#'                                         saved? To be used for debugging purposes.
 #' @param modelType                        The type of health outcome in the model either "acute"
 #'                                         or"chronic".
 #'
 #' @export
 createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              xSensCohortId,
-                                             prevalenceCohortId = xSensCohortId,
-                                             xSpecCohortSize = NULL,
+                                             prevalenceCohortId,
+                                             xSpecCohortSize = 5000,
                                              covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds = c(),
-                                                                                                       addDescendantsToExclude = FALSE),
+                                                                                                       addDescendantsToExclude = TRUE),
                                              modelPopulationCohortId = 0,
                                              modelPopulationCohortIdStartDay = 0,
                                              modelPopulationCohortIdEndDay = 0,
@@ -65,17 +65,17 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              baseSampleSize = 2e+06,
                                              lowerAgeLimit = 0,
                                              upperAgeLimit = 120,
-                                             visitLength = 3,
-                                             visitType = c(9201),
+                                             visitLength = 0,
+                                             visitType = c(9201,9202,9203),
                                              gender = c(8507, 8532),
                                              startDate = "19001010",
                                              endDate = "21000101",
                                              modelId = "main",
                                              evaluationCohortId = "main",
-                                             excludeModelFromEvaluation = TRUE,
+                                             excludeModelFromEvaluation = FALSE,
                                              removeSubjectsWithFutureDates = TRUE,
                                              saveEvaluationCohortPlpData = FALSE,
-                                             modelType = "chronic") {
+                                             modelType = "acute") {
   # First: get default values:
   analysis <- list()
   for (name in names(formals(createCreateEvaluationCohortArgs))) {
@@ -103,16 +103,7 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
 #'                            subjects within the cohort to test (Default = 0).
 #'
 #' @export
-createTestPhenotypeAlgorithmArgs <- function(cutPoints = c(0.1,
-                                                           0.2,
-                                                           0.3,
-                                                           0.4,
-                                                           0.5,
-                                                           "EV",
-                                                           0.6,
-                                                           0.7,
-                                                           0.8,
-                                                           0.9), phenotypeCohortId, washoutPeriod = 0) {
+createTestPhenotypeAlgorithmArgs <- function(cutPoints = c("EV"), phenotypeCohortId, washoutPeriod = 0) {
   # First: get default values:
   analysis <- list()
   for (name in names(formals(createTestPhenotypeAlgorithmArgs))) {

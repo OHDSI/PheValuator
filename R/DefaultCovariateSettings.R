@@ -26,17 +26,27 @@
 #'                                      should include all concept_ids that were used to define the
 #'                                      xSpec model (default=NULL)
 #' @param includedCovariateIds          A list of covariate IDs that should be restricted to.
+#' @param includedCovariateConceptIds   A list of covariate concept IDs that should be restricted to.
 #' @param addDescendantsToExclude       Should descendants of excluded concepts also be excluded?
 #'                                      (default=FALSE)
-#' @param startDays                     The days to include prior to the cohort start date (default=0)
-#' @param endDays                       The days to include after the cohort start date (default=7)
+#' @param startDayWindow1              The day to start time window 1 for feature extraction
+#' @param endDayWindow1                The day to end time window 1 for feature extraction
+#' @param startDayWindow2              The day to start time window 2 for feature extraction
+#' @param endDayWindow2                The day to end time window 2 for feature extraction
+#' @param startDayWindow3              The day to start time window 3 for feature extraction
+#' @param endDayWindow3                The day to end time window 3 for feature extraction #'
 #'
 #' @export
 createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(),
                                                 includedCovariateIds = c(),
+                                                includedCovariateConceptIds = c(),
                                                 addDescendantsToExclude = FALSE,
-                                                startDays = 0,
-                                                endDays = 7) {
+                                                startDayWindow1 = 0,
+                                                endDayWindow1 = 9999,
+                                                startDayWindow2 = NULL,
+                                                endDayWindow2 = NULL,
+                                                startDayWindow3 = NULL,
+                                                endDayWindow3 = NULL) {
 
   covariateSettings1 <- FeatureExtraction::createCovariateSettings(useDemographicsGender = TRUE,
                                                                    useDemographicsAgeGroup = TRUE,
@@ -56,76 +66,78 @@ createDefaultAcuteCovariateSettings <- function(excludedCovariateConceptIds = c(
                                                                    useDistinctMeasurementCountLongTerm = TRUE,
                                                                    useVisitCountLongTerm = TRUE,
                                                                    useVisitConceptCountLongTerm = TRUE,
-                                                                   longTermStartDays = -9999,
-                                                                   endDays = 9999,
-                                                                   includedCovariateConceptIds = includedCovariateIds,
+                                                                   longTermStartDays = startDayWindow1,
+                                                                   shortTermStartDays = startDayWindow1,
+                                                                   mediumTermStartDays = startDayWindow1,
+                                                                   endDays = endDayWindow1,
+                                                                   includedCovariateConceptIds = c(includedCovariateConceptIds),
                                                                    addDescendantsToInclude = addDescendantsToExclude,
                                                                    excludedCovariateConceptIds = excludedCovariateConceptIds,
                                                                    addDescendantsToExclude = addDescendantsToExclude,
                                                                    includedCovariateIds = c(includedCovariateIds))
 
-  covariateSettings2 <- FeatureExtraction::createCovariateSettings(useConditionGroupEraShortTerm = TRUE,
-                                                                   useDrugGroupEraShortTerm = TRUE,
-                                                                   useProcedureOccurrenceShortTerm = TRUE,
-                                                                   useDeviceExposureShortTerm = TRUE,
-                                                                   useMeasurementShortTerm = TRUE,
-                                                                   useMeasurementValueShortTerm = TRUE,
-                                                                   useMeasurementRangeGroupShortTerm = TRUE,
-                                                                   useObservationShortTerm = TRUE,
-                                                                   useDistinctConditionCountShortTerm = TRUE,
-                                                                   useDistinctIngredientCountShortTerm = TRUE,
-                                                                   useDistinctProcedureCountShortTerm = TRUE,
-                                                                   useDistinctMeasurementCountShortTerm = TRUE,
-                                                                   useVisitCountShortTerm = TRUE,
-                                                                   useVisitConceptCountShortTerm = TRUE,
-                                                                   endDays = endDays,
-                                                                   includedCovariateConceptIds = includedCovariateIds,
-                                                                   addDescendantsToInclude = addDescendantsToExclude,
-                                                                   excludedCovariateConceptIds = excludedCovariateConceptIds,
-                                                                   addDescendantsToExclude = addDescendantsToExclude,
-                                                                   includedCovariateIds = c(includedCovariateIds))
+  if(!(is.null(startDayWindow2))) {
+    covariateSettings2 <- FeatureExtraction::createCovariateSettings(useConditionGroupEraShortTerm = TRUE,
+                                                                     useDrugGroupEraShortTerm = TRUE,
+                                                                     useProcedureOccurrenceShortTerm = TRUE,
+                                                                     useDeviceExposureShortTerm = TRUE,
+                                                                     useMeasurementShortTerm = TRUE,
+                                                                     useMeasurementValueShortTerm = TRUE,
+                                                                     useMeasurementRangeGroupShortTerm = TRUE,
+                                                                     useObservationShortTerm = TRUE,
+                                                                     useDistinctConditionCountShortTerm = TRUE,
+                                                                     useDistinctIngredientCountShortTerm = TRUE,
+                                                                     useDistinctProcedureCountShortTerm = TRUE,
+                                                                     useDistinctMeasurementCountShortTerm = TRUE,
+                                                                     useVisitCountShortTerm = TRUE,
+                                                                     useVisitConceptCountShortTerm = TRUE,
+                                                                     longTermStartDays = startDayWindow2,
+                                                                     shortTermStartDays = startDayWindow2,
+                                                                     mediumTermStartDays = startDayWindow2,
+                                                                     endDays = endDayWindow2,
+                                                                     includedCovariateConceptIds = c(includedCovariateConceptIds),
+                                                                     addDescendantsToInclude = addDescendantsToExclude,
+                                                                     excludedCovariateConceptIds = excludedCovariateConceptIds,
+                                                                     addDescendantsToExclude = addDescendantsToExclude,
+                                                                     includedCovariateIds = c(includedCovariateIds))
+  }
 
-  #covariateSettings <- list(covariateSettings1, covariateSettings2)
+  if(!(is.null(startDayWindow3))) {
+    covariateSettings3 <- FeatureExtraction::createCovariateSettings(useConditionGroupEraMediumTerm = TRUE,
+                                                                     useDrugGroupEraMediumTerm = TRUE,
+                                                                     useProcedureOccurrenceMediumTerm = TRUE,
+                                                                     useDeviceExposureMediumTerm = TRUE,
+                                                                     useMeasurementMediumTerm = TRUE,
+                                                                     useMeasurementValueMediumTerm = TRUE,
+                                                                     useMeasurementRangeGroupMediumTerm = TRUE,
+                                                                     useObservationMediumTerm = TRUE,
+                                                                     useDistinctConditionCountMediumTerm = TRUE,
+                                                                     useDistinctIngredientCountMediumTerm = TRUE,
+                                                                     useDistinctProcedureCountMediumTerm = TRUE,
+                                                                     useDistinctMeasurementCountMediumTerm = TRUE,
+                                                                     useVisitCountMediumTerm = TRUE,
+                                                                     useVisitConceptCountMediumTerm = TRUE,
+                                                                     longTermStartDays = startDayWindow3,
+                                                                     shortTermStartDays = startDayWindow3,
+                                                                     mediumTermStartDays = startDayWindow3,                                                                     endDays = endDayWindow3,
+                                                                     includedCovariateConceptIds = c(includedCovariateConceptIds),
+                                                                     addDescendantsToInclude = addDescendantsToExclude,
+                                                                     excludedCovariateConceptIds = excludedCovariateConceptIds,
+                                                                     addDescendantsToExclude = addDescendantsToExclude,
+                                                                     includedCovariateIds = c(includedCovariateIds))
+  }
 
-  covariateSettings3 <- FeatureExtraction::createCovariateSettings(useConditionGroupEraMediumTerm = TRUE,
-                                                                   useDrugGroupEraMediumTerm = TRUE,
-                                                                   useProcedureOccurrenceMediumTerm = TRUE,
-                                                                   useDeviceExposureMediumTerm = TRUE,
-                                                                   useMeasurementMediumTerm = TRUE,
-                                                                   useMeasurementValueMediumTerm = TRUE,
-                                                                   useMeasurementRangeGroupMediumTerm = TRUE,
-                                                                   useObservationMediumTerm = TRUE,
-                                                                   useDistinctConditionCountMediumTerm = TRUE,
-                                                                   useDistinctIngredientCountMediumTerm = TRUE,
-                                                                   useDistinctProcedureCountMediumTerm = TRUE,
-                                                                   useDistinctMeasurementCountMediumTerm = TRUE,
-                                                                   useVisitCountMediumTerm = TRUE,
-                                                                   useVisitConceptCountMediumTerm = TRUE,
-                                                                   mediumTermStartDays = endDays + 1,
-                                                                   endDays = 180,
-                                                                   includedCovariateConceptIds = includedCovariateIds,
-                                                                   addDescendantsToInclude = addDescendantsToExclude,
-                                                                   excludedCovariateConceptIds = excludedCovariateConceptIds,
-                                                                   addDescendantsToExclude = addDescendantsToExclude,
-                                                                   includedCovariateIds = c(includedCovariateIds))
-
-  # covariateSettings2 <- FeatureExtraction::createCovariateSettings(useConditionGroupEraShortTerm = TRUE,
-  #                                                                  useDrugGroupEraShortTerm = TRUE,
-  #                                                                  useProcedureOccurrenceShortTerm = TRUE,
-  #                                                                  useDeviceExposureShortTerm = TRUE,
-  #                                                                  useMeasurementShortTerm = TRUE,
-  #                                                                  useMeasurementValueShortTerm = TRUE,
-  #                                                                  useMeasurementRangeGroupShortTerm = TRUE,
-  #                                                                  useObservationShortTerm = TRUE,
-  #                                                                  shortTermStartDays = startDays,
-  #                                                                  endDays = endDays,
-  #                                                                  includedCovariateConceptIds = includedCovariateIds,
-  #                                                                  addDescendantsToInclude = addDescendantsToExclude,
-  #                                                                  excludedCovariateConceptIds = excludedCovariateConceptIds,
-  #                                                                  addDescendantsToExclude = addDescendantsToExclude,
-  #                                                                  includedCovariateIds = c(includedCovariateIds))
-  #
-  covariateSettings <- list(covariateSettings1, covariateSettings2, covariateSettings3)
+  if (is.null(startDayWindow1)) {
+    stop("The first time window must not be null")
+  } else if(is.null(startDayWindow2) & is.null(startDayWindow3)) {
+    covariateSettings <- list(covariateSettings1)
+  } else if(!(is.null(startDayWindow2)) & is.null(startDayWindow3)) {
+    covariateSettings <- list(covariateSettings1, covariateSettings2)
+  } else if(!(is.null(startDayWindow3)) & is.null(startDayWindow2)) {
+    covariateSettings <- list(covariateSettings1, covariateSettings3)
+  } else {
+    covariateSettings <- list(covariateSettings1, covariateSettings2, covariateSettings3)
+  }
 
   return(covariateSettings)
 }

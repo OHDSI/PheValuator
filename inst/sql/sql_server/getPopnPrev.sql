@@ -7,7 +7,7 @@
 {DEFAULT @cohort_database_table = 'cohort' }
 {DEFAULT @lowerAgeLimit = 20}
 {DEFAULT @upperAgeLimit = 120}
-{DEFAULT @gender = c(8507, 8532)}
+{DEFAULT @gender = "8507, 8532"}
 {DEFAULT @startDate = '19000101' }
 {DEFAULT @endDate = '21000101' }
 {DEFAULT @mainPopnCohort = 0 }

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.12</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -106,7 +106,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/OHDSI/PheValuator/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -135,9 +135,14 @@
     <pre class="usage"><span class='fu'>createDefaultAcuteCovariateSettings</span>(
   <span class='kw'>excludedCovariateConceptIds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
   <span class='kw'>includedCovariateIds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
+  <span class='kw'>includedCovariateConceptIds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
   <span class='kw'>addDescendantsToExclude</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>startDays</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>endDays</span> <span class='kw'>=</span> <span class='fl'>7</span>
+  <span class='kw'>startDayWindow1</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>endDayWindow1</span> <span class='kw'>=</span> <span class='fl'>9999</span>,
+  <span class='kw'>startDayWindow2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>endDayWindow2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>startDayWindow3</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>endDayWindow3</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -154,17 +159,37 @@ xSpec model (default=NULL)</p></td>
       <td><p>A list of covariate IDs that should be restricted to.</p></td>
     </tr>
     <tr>
+      <th>includedCovariateConceptIds</th>
+      <td><p>A list of covariate concept IDs that should be restricted to.</p></td>
+    </tr>
+    <tr>
       <th>addDescendantsToExclude</th>
       <td><p>Should descendants of excluded concepts also be excluded?
 (default=FALSE)</p></td>
     </tr>
     <tr>
-      <th>startDays</th>
-      <td><p>The days to include prior to the cohort start date (default=0)</p></td>
+      <th>startDayWindow1</th>
+      <td><p>The day to start time window 1 for feature extraction</p></td>
     </tr>
     <tr>
-      <th>endDays</th>
-      <td><p>The days to include after the cohort start date (default=7)</p></td>
+      <th>endDayWindow1</th>
+      <td><p>The day to end time window 1 for feature extraction</p></td>
+    </tr>
+    <tr>
+      <th>startDayWindow2</th>
+      <td><p>The day to start time window 2 for feature extraction</p></td>
+    </tr>
+    <tr>
+      <th>endDayWindow2</th>
+      <td><p>The day to end time window 2 for feature extraction</p></td>
+    </tr>
+    <tr>
+      <th>startDayWindow3</th>
+      <td><p>The day to start time window 3 for feature extraction</p></td>
+    </tr>
+    <tr>
+      <th>endDayWindow3</th>
+      <td><p>The day to end time window 3 for feature extraction #'</p></td>
     </tr>
     </table>
 

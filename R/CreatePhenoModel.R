@@ -21,16 +21,16 @@
                                   workDatabaseSchema,
                                   xSpecCohortId,
                                   xSensCohortId,
-                                  prevalenceCohortId = xSensCohortId,
-                                  xSpecCohortSize = NULL,
+                                  prevalenceCohortId,
+                                  xSpecCohortSize = 5000,
                                   covariateSettings,
                                   mainPopulationCohortId = 0,
                                   mainPopulationCohortIdStartDay = 0,
                                   mainPopulationCohortIdEndDay = 0,
                                   lowerAgeLimit = 0,
                                   upperAgeLimit = 120,
-                                  visitLength = 3,
-                                  visitType = c(9201),
+                                  visitLength = 0,
+                                  visitType = c(9201,9202,9203),
                                   gender = c(8507, 8532),
                                   startDate = "19000101",
                                   endDate = "21000101",
@@ -38,7 +38,7 @@
                                   cdmVersion = "5",
                                   outFolder = getwd(),
                                   modelId = "main",
-                                  modelType = "chronic") {
+                                  modelType = "acute") {
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
 
@@ -71,22 +71,22 @@
   } else {
 
     if (prevalenceCohortId >= 1) {
-    # determine population prevalence for correct xSpec/noisy negative popn ratio
-    sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "getPopnPrev.sql",
-                                             packageName = "PheValuator",
-                                             dbms = connection@dbms,
-                                             cdm_database_schema = cdmDatabaseSchema,
-                                             cohort_database_schema = cohortDatabaseSchema,
-                                             cohort_database_table = cohortTable,
-                                             lowerAgeLimit = lowerAgeLimit,
-                                             upperAgeLimit = upperAgeLimit,
-                                             gender = gender,
-                                             startDate = startDate,
-                                             endDate = endDate,
-                                             mainPopnCohort = mainPopulationCohortId,
-                                             prevCohort = prevalenceCohortId,
-                                             removeSubjectsWithFutureDates = removeSubjectsWithFutureDates)
-    popPrev <- as.numeric(DatabaseConnector::querySql(connection = connection, sql))
+      # determine population prevalence for correct xSpec/noisy negative popn ratio
+      sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "getPopnPrev.sql",
+                                               packageName = "PheValuator",
+                                               dbms = connection@dbms,
+                                               cdm_database_schema = cdmDatabaseSchema,
+                                               cohort_database_schema = cohortDatabaseSchema,
+                                               cohort_database_table = cohortTable,
+                                               lowerAgeLimit = lowerAgeLimit,
+                                               upperAgeLimit = upperAgeLimit,
+                                               gender = gender,
+                                               startDate = startDate,
+                                               endDate = endDate,
+                                               mainPopnCohort = mainPopulationCohortId,
+                                               prevCohort = prevalenceCohortId,
+                                               removeSubjectsWithFutureDates = removeSubjectsWithFutureDates)
+      popPrev <- as.numeric(DatabaseConnector::querySql(connection = connection, sql))
     } else {popPrev <- prevalenceCohortId}
 
     if (popPrev == 0)
@@ -94,35 +94,12 @@
 
     ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.2f%%", 100 * popPrev))
 
-    if (!is.null(xSpecCohortSize)) { #pre-specified xSpec cohort size
-      xspecSize = xSpecCohortSize
-    } else {
-      # set reasonable model populations - for fast, but accurate models
-      if (popPrev >= 0.3) {
-        xspecSize <- 4000  #use large xSpec size for higher prevalence values
-      } else if (popPrev >= 0.2) {
-        xspecSize <- 3000
-      } else if (popPrev >= 0.1) {
-        xspecSize <- 2000
-      } else {
-        xspecSize <- 1500  #use smaller xSpec size for lower prevalence values
-      }
-    }
-
-    if (xspecSize > xSpecCount) {xspecSize <- xSpecCount} #set xSpec size to either what was specified or to maximum available
-
-    prevToUse <- as.numeric(0.05) #set the prevalence to 5% for model building - to be re-calibrated
-
-    # set the number of noisy negatives in the model either from the prevalence or to 1500K max
-    baseSampleSize <- min(c(as.integer(xspecSize/prevToUse), as.integer(format(1.5e+06, scientific = FALSE))))  #use 1,500,000 as largest base sample
-
-    if (baseSampleSize != as.integer(xspecSize/prevToUse)) {
-      xspecSize <- as.integer(baseSampleSize * prevToUse)} #set final xSpec size for low prevalence values if necessary
+    xspecSize <- min(c(xSpecCohortSize, xSpecCount)) #min value of pre-specified and available xSpec subjects
+    baseSampleSize <- max(c(xspecSize, 5000))  #use either a matching number of non-xspec subjects or 5K whichever is more
+    prevToUse <- xspecSize/(xspecSize + baseSampleSize) #calculate the prevalence of the model subjects - to be recalibrated
 
     ParallelLogger::logInfo(sprintf("Using xSpec size of: %i", xspecSize))
-    ParallelLogger::logInfo(sprintf("Using base sample size of: %i", baseSampleSize))
-
-    baseSampleSize <- baseSampleSize - xspecSize #adjust for adding xSpec
+    ParallelLogger::logInfo(sprintf("Using base sample size of: %i", (xspecSize + baseSampleSize)))
 
     if (!file.exists(plpDataFile)) {
       # only pull the plp data if it doesn't already exist create a unique name for the temporary cohort table

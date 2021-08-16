@@ -52,7 +52,7 @@
 #'
 #' @export
 testPhenotypeAlgorithm <- function(connectionDetails,
-                                   cutPoints = c(0.1, 0.2, 0.3, 0.4, 0.5, "EV", 0.6, 0.7, 0.8, 0.9),
+                                   cutPoints = c("EV"),
                                    outFolder,
                                    evaluationCohortId = "main",
                                    phenotypeCohortId,
@@ -91,14 +91,24 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
     modelType <- evaluationCohort$PheValuator$inputSetting$modelType
     if (modelType == "acute") {
+    #   sql <- "SELECT DISTINCT subject_id,
+    #   visit_start_date AS cohort_start_date
+    # FROM @cohort_database_schema.@cohort_table
+    # JOIN @cdm_database_schema.visit_occurrence
+    #   ON subject_id = person_id
+    #     and cohort_start_date >= visit_start_date
+    #     and cohort_start_date <= visit_end_date
+    # WHERE cohort_definition_id = @cohort_id;"
+
       sql <- "SELECT DISTINCT subject_id,
-      visit_start_date AS cohort_start_date
+      observation_period_start_date AS cohort_start_date
     FROM @cohort_database_schema.@cohort_table
-    JOIN @cdm_database_schema.visit_occurrence
+    JOIN @cdm_database_schema.observation_period
       ON subject_id = person_id
-        and cohort_start_date >= visit_start_date
-        and cohort_start_date <= visit_end_date
+        and cohort_start_date >= observation_period_start_date
+        and cohort_start_date <= observation_period_end_date
     WHERE cohort_definition_id = @cohort_id;"
+
     } else {
       sql <- "SELECT DISTINCT subject_id,
       observation_period_start_date AS cohort_start_date
@@ -138,9 +148,15 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     for (cpUp in 1:length(cutPoints)) {
       # join the phenotype table with the prediction table
       if (modelType == "acute") {
+
+        # fullTable <- dplyr::left_join(modelAll,
+        #                               phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype"),],
+        #                               by = c("subjectId", "cohortStartDate"))
+
         fullTable <- dplyr::left_join(modelAll,
-                                      phenoPop[, c("subjectId", "cohortStartDate", "inPhenotype"),],
-                                      by = c("subjectId", "cohortStartDate"))
+                                      phenoPop[, c("subjectId", "inPhenotype")],
+                                      by = c("subjectId"))
+
       } else {
         fullTable <- dplyr::left_join(modelAll,
                                       phenoPop[, c("subjectId", "inPhenotype")],
@@ -224,7 +240,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                               ppv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
                               specificity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
                               npv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
-                              estimatedPrevalence = sprintf("%0.1f", 100*countsTable$estimatedPrevalence),
+                              estimatedPrevalence = sprintf("%0.3f", 100*countsTable$estimatedPrevalence),
                               f1Score = sprintf("%0.3f", countsTable$f1Score))
 
     if (nrow(misses) > 0) {
