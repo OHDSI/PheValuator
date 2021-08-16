@@ -169,7 +169,6 @@
     }
 
 
-
     population <- PatientLevelPrediction::createStudyPopulation(plpData,
                                                                 population = NULL,
                                                                 outcomeId = xSpecCohortId,
