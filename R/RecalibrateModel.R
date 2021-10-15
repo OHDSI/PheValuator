@@ -56,6 +56,8 @@
 #' @param destinationModelFileDirectory    Directory name to put the recalibrated model file
 #' @param evalFileDirectory               Directory name of the RDS evaluation file to get cohort
 #' @param destinationevalFileDirectory     Directory name to put the cohort RDS file
+#' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects with
+#'                                         dates in the future?
 #'
 #' @export
 recalibrateModel <- function(connectionDetails,
@@ -77,7 +79,8 @@ recalibrateModel <- function(connectionDetails,
                              modelFileDirectory = NULL,
                              destinationModelFileDirectory = NULL,
                              evalFileDirectory = NULL,
-                             destinationevalFileDirectory = NULL) {
+                             destinationevalFileDirectory = NULL,
+                             removeSubjectsWithFutureDates = TRUE) {
 
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
