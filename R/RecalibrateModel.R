@@ -173,12 +173,17 @@ recalibrateModel <- function(connectionDetails,
     names(cohortData)[1] <- "cohortDefinitionId"
     cohortData$cohortEndDate <- cohortData$cohortStartDate + 1
 
+    outcomeCohort <- cohortData[1:100,]
+    outcomeCohort$cohortDefinitionId <- 1
+
+    fullCohortData <- rbind(cohortData, outcomeCohort)
+
     dir.create(destinationEvalFileDirectory, showWarnings = FALSE)
     evaluationFullDirectory <- file.path(destinationEvalFileDirectory, "EvaluationCohort_e1")
     dir.create(evaluationFullDirectory, showWarnings = FALSE)
 
     ParallelLogger::logInfo("Saving cohort file to ", file.path(evaluationFullDirectory, "evaluationCohortSubjects.rds"))
-    saveRDS(cohortData, file.path(evaluationFullDirectory, "evaluationCohortSubjects.rds"))
+    saveRDS(fullCohortData, file.path(evaluationFullDirectory, "evaluationCohortSubjects.rds"))
   }
 
 }
