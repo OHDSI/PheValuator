@@ -157,6 +157,8 @@ recalibrateModel <- function(connectionDetails,
 
     ParallelLogger::logInfo("Saving recalibrated model summary to ", destinationModelFileName)
     dir.create(destinationModelFileDirectory, showWarnings = FALSE)
+    evaluationFullDirectory <- file.path(destinationModelFileDirectory, "EvaluationCohort_e1")
+    dir.create(evaluationFullDirectory, showWarnings = FALSE)
     saveRDS(lrResults, destinationModelFileName)
   }
 
