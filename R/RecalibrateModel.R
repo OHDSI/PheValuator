@@ -54,8 +54,8 @@
 #' @param evaluationCohortId               A string used to generate the file names for this evaluation cohort.
 #' @param modelFileDirectory               Directory name of the RDS model file to recalibrate
 #' @param destinationModelFileDirectory    Directory name to put the recalibrated model file
-#' @param evalFileDirectory               Directory name of the RDS evaluation file to get cohort
-#' @param destinationevalFileDirectory     Directory name to put the cohort RDS file
+#' @param evalFileDirectory                Directory name of the RDS evaluation file to get cohort
+#' @param destinationEvalFileDirectory     Directory name to put the cohort RDS file
 #' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects with
 #'                                         dates in the future?
 #'
@@ -79,14 +79,14 @@ recalibrateModel <- function(connectionDetails,
                              modelFileDirectory = NULL,
                              destinationModelFileDirectory = NULL,
                              evalFileDirectory = NULL,
-                             destinationevalFileDirectory = NULL,
+                             destinationEvalFileDirectory = NULL,
                              removeSubjectsWithFutureDates = TRUE) {
 
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
 
   modelFileName <- file.path(modelFileDirectory, sprintf("model_%s.rds", modelId))
-  newModelFileName <- file.path(destinationModelFileDirectory, sprintf("model_%s.rds", modelId))
+  destinationModelFileName <- file.path(destinationModelFileDirectory, sprintf("model_%s.rds", modelId))
 
   evaluationCohortFileName <- file.path(evalFileDirectory, sprintf("evaluationCohort_%s.rds", evaluationCohortId))
 
@@ -168,7 +168,7 @@ recalibrateModel <- function(connectionDetails,
     cohortData$cohortEndDate <- cohortData$cohortStartDate + 1
 
     dir.create(destinationevalFileDirectory, showWarnings = FALSE)
-    saveRDS(cohortData, file.path(destinationevalFileDirectory, "evaluationCohortSubjects.rds"))
+    saveRDS(cohortData, file.path(destinationEvalFileDirectory, "evaluationCohortSubjects.rds"))
   }
 
 }

@@ -24,7 +24,7 @@ recalibrateModel(
   modelFileDirectory = NULL,
   destinationModelFileDirectory = NULL,
   evalFileDirectory = NULL,
-  destinationevalFileDirectory = NULL,
+  destinationEvalFileDirectory = NULL,
   removeSubjectsWithFutureDates = TRUE
 )
 }
@@ -81,7 +81,7 @@ cohort start date to end including visits.}
 
 \item{evalFileDirectory}{Directory name of the RDS evaluation file to get cohort}
 
-\item{destinationevalFileDirectory}{Directory name to put the cohort RDS file}
+\item{destinationEvalFileDirectory}{Directory name to put the cohort RDS file}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects with
 dates in the future?}
