@@ -86,7 +86,6 @@ recalibrateModel <- function(connectionDetails,
   on.exit(DatabaseConnector::disconnect(connection))
 
   modelFileName <- file.path(modelFileDirectory, sprintf("model_%s.rds", modelId))
-  destinationModelFileName <- file.path(destinationModelFileDirectory, sprintf("model_%s.rds", modelId))
 
   evaluationCohortFileName <- file.path(evalFileDirectory, sprintf("evaluationCohort_%s.rds", evaluationCohortId))
 
@@ -157,8 +156,12 @@ recalibrateModel <- function(connectionDetails,
 
     ParallelLogger::logInfo("Saving recalibrated model summary to ", destinationModelFileName)
     dir.create(destinationModelFileDirectory, showWarnings = FALSE)
+
     evaluationFullDirectory <- file.path(destinationModelFileDirectory, "EvaluationCohort_e1")
     dir.create(evaluationFullDirectory, showWarnings = FALSE)
+
+    destinationModelFileName <- file.path(evaluationFullDirectory, sprintf("model_%s.rds", modelId))
+
     saveRDS(lrResults, destinationModelFileName)
   }
 
@@ -173,7 +176,7 @@ recalibrateModel <- function(connectionDetails,
     evaluationFullDirectory <- file.path(destinationModelFileDirectory, "EvaluationCohort_e1")
     dir.create(evaluationFullDirectory, showWarnings = FALSE)
 
-    saveRDS(cohortData, file.path(destinationEvalFileDirectory, "evaluationCohortSubjects.rds"))
+    saveRDS(cohortData, file.path(evaluationFullDirectory, "evaluationCohortSubjects.rds"))
   }
 
 }
