@@ -75,57 +75,77 @@
     connection <- DatabaseConnector::connect(connectionDetails)
     on.exit(DatabaseConnector::disconnect(connection))
 
-    if (modelType == "acute") {
-      #first check number of eligible visits in db
-      sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
+    if(file.exists(file.path(outFolder, "evaluationCohortSubjects.rds"))) {
+      #use existing subjects from local file to create a cohort table on server
+      cohort <- readRDS(file.path(outFolder, "evaluationCohortSubjects.rds"))
+
+      insertTable(
+        connection = connection,
+        databaseSchema = workDatabaseSchema,
+        tableName = testCohort,
+        data = cohort,
+        dropTableIfExists = TRUE,
+        createTable = TRUE,
+        tempTable = FALSE,
+        oracleTempSchema = NULL,
+        progressBar = TRUE,
+        camelCaseToSnakeCase = TRUE)
+
+        ParallelLogger::logInfo("Creating evaluation cohort on server from cohort file")
+
+    } else { #otherwise create the evaluation cohort from an sql query
+      if (modelType == "acute") {
+        #first check number of eligible visits in db
+        sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
+                                                 packageName = "PheValuator",
+                                                 dbms = connectionDetails$dbms,
+                                                 cdm_database_schema = cdmDatabaseSchema,
+                                                 cohort_database_schema = cohortDatabaseSchema,
+                                                 cohort_database_table = cohortTable,
+                                                 ageLimit = lowerAgeLimit,
+                                                 upperAgeLimit = upperAgeLimit,
+                                                 gender = gender,
+                                                 startDate = startDate,
+                                                 endDate = endDate,
+                                                 visitType = visitType,
+                                                 visitLength = visitLength,
+                                                 exclCohort = xSensCohortId)
+        cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
+
+        #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
+        if (cntVisits > 100000000) {firstCut <- TRUE} else {firstCut <- FALSE}
+
+        sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
+      } else {
+        firstCut <- FALSE
+        sqlFilename <- "CreateCohortsV6.sql"
+      }
+      sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFilename,
                                                packageName = "PheValuator",
-                                               dbms = connectionDetails$dbms,
+                                               dbms = connection@dbms,
                                                cdm_database_schema = cdmDatabaseSchema,
                                                cohort_database_schema = cohortDatabaseSchema,
                                                cohort_database_table = cohortTable,
+                                               x_spec_cohort = xSpecCohortId,
+                                               tempDB = workDatabaseSchema,
+                                               test_cohort = testCohort,
+                                               exclCohort = 0,
                                                ageLimit = lowerAgeLimit,
                                                upperAgeLimit = upperAgeLimit,
                                                gender = gender,
                                                startDate = startDate,
                                                endDate = endDate,
-                                               visitType = visitType,
+                                               baseSampleSize = format(baseSampleSize, scientific = FALSE),
+                                               xSpecSampleSize = 100,
+                                               mainPopnCohort = mainPopulationCohortId,
+                                               mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
+                                               mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
                                                visitLength = visitLength,
-                                               exclCohort = xSensCohortId)
-      cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
-
-      #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
-      if (cntVisits > 100000000) {firstCut <- TRUE} else {firstCut <- FALSE}
-
-      sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
-    } else {
-      firstCut <- FALSE
-      sqlFilename <- "CreateCohortsV6.sql"
+                                               visitType = c(visitType),
+                                               firstCut = firstCut)
+      ParallelLogger::logInfo("Creating evaluation cohort on server from sql")
+      DatabaseConnector::executeSql(connection = connection, sql)
     }
-    sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFilename,
-                                             packageName = "PheValuator",
-                                             dbms = connection@dbms,
-                                             cdm_database_schema = cdmDatabaseSchema,
-                                             cohort_database_schema = cohortDatabaseSchema,
-                                             cohort_database_table = cohortTable,
-                                             x_spec_cohort = xSpecCohortId,
-                                             tempDB = workDatabaseSchema,
-                                             test_cohort = testCohort,
-                                             exclCohort = 0,
-                                             ageLimit = lowerAgeLimit,
-                                             upperAgeLimit = upperAgeLimit,
-                                             gender = gender,
-                                             startDate = startDate,
-                                             endDate = endDate,
-                                             baseSampleSize = format(baseSampleSize, scientific = FALSE),
-                                             xSpecSampleSize = 100,
-                                             mainPopnCohort = mainPopulationCohortId,
-                                             mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
-                                             mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
-                                             visitLength = visitLength,
-                                             visitType = c(visitType),
-                                             firstCut = firstCut)
-    ParallelLogger::logInfo("Creating evaluation cohort on server")
-    DatabaseConnector::executeSql(connection = connection, sql)
 
     # will only use the covariates with non-zero betas
     lrNonZeroCovs <- c(lrResults$model$varImp$covariateId[lrResults$model$varImp$covariateValue != 0])
