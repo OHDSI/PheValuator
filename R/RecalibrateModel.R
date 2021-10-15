@@ -154,7 +154,6 @@ recalibrateModel <- function(connectionDetails,
     lrResults$PheValuator$runTimeValues$recalibratedYIntercept <- lrResults$model$model$coefficients[1]
 
 
-    ParallelLogger::logInfo("Saving recalibrated model summary to ", destinationModelFileName)
     dir.create(destinationModelFileDirectory, showWarnings = FALSE)
 
     evaluationFullDirectory <- file.path(destinationModelFileDirectory, "EvaluationCohort_e1")
@@ -162,6 +161,7 @@ recalibrateModel <- function(connectionDetails,
 
     destinationModelFileName <- file.path(evaluationFullDirectory, sprintf("model_%s.rds", modelId))
 
+    ParallelLogger::logInfo("Saving recalibrated model summary to ", destinationModelFileName)
     saveRDS(lrResults, destinationModelFileName)
   }
 
@@ -176,6 +176,7 @@ recalibrateModel <- function(connectionDetails,
     evaluationFullDirectory <- file.path(destinationModelFileDirectory, "EvaluationCohort_e1")
     dir.create(evaluationFullDirectory, showWarnings = FALSE)
 
+    ParallelLogger::logInfo("Saving cohort file to ", file.path(evaluationFullDirectory, "evaluationCohortSubjects.rds"))
     saveRDS(cohortData, file.path(evaluationFullDirectory, "evaluationCohortSubjects.rds"))
   }
 
