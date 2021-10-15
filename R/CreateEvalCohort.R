@@ -88,6 +88,7 @@
         createTable = TRUE,
         tempTable = FALSE,
         oracleTempSchema = NULL,
+        bulkLoad = TRUE,
         progressBar = TRUE,
         camelCaseToSnakeCase = TRUE)
 
