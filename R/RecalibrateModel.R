@@ -170,6 +170,9 @@ recalibrateModel <- function(connectionDetails,
     cohortData$cohortEndDate <- cohortData$cohortStartDate + 1
 
     dir.create(destinationevalFileDirectory, showWarnings = FALSE)
+    evaluationFullDirectory <- file.path(destinationModelFileDirectory, "EvaluationCohort_e1")
+    dir.create(evaluationFullDirectory, showWarnings = FALSE)
+
     saveRDS(cohortData, file.path(destinationEvalFileDirectory, "evaluationCohortSubjects.rds"))
   }
 
