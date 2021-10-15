@@ -24,6 +24,8 @@
 #'
 #' @param connectionDetails                connectionDetails created using the function
 #'                                         createConnectionDetails in the DatabaseConnector package.
+#' @param xSpecCohortId                    The number of the "extremely specific (xSpec)" cohort
+#'                                         definition id in the cohort table (for noisy positives).
 #' @param prevalenceCohortId               The number of the cohort definition id to determine the
 #'                                         disease prevalence.
 #' @param cdmDatabaseSchema                The name of the database schema that contains the OMOP CDM
@@ -64,6 +66,7 @@ recalibrateModel <- function(connectionDetails,
                              cdmDatabaseSchema,
                              cohortDatabaseSchema,
                              cohortTable,
+                             xSpecCohortId,
                              prevalenceCohortId,
                              mainPopulationCohortId = 0,
                              mainPopulationCohortIdStartDay = 0,
@@ -174,7 +177,7 @@ recalibrateModel <- function(connectionDetails,
     cohortData$cohortEndDate <- cohortData$cohortStartDate + 1
 
     outcomeCohort <- cohortData[1:100,]
-    outcomeCohort$cohortDefinitionId <- 1
+    outcomeCohort$cohortDefinitionId <- xSpecCohortId
 
     fullCohortData <- rbind(cohortData, outcomeCohort)
 
