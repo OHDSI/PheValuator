@@ -47,6 +47,7 @@
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
   plpResultsFileName <- file.path(outFolder, sprintf("plpResults_%s", modelId))
 
+  if (!file.exists(modelFileName)) {
   #get xSpec subjects to create a model
   sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "GetxSpecCount.sql",
                                            packageName = "PheValuator",
@@ -189,7 +190,6 @@
       plpData <- PatientLevelPrediction::loadPlpData(plpDataFile)
     }
 
-    if (!file.exists(modelFileName)) {
       ParallelLogger::logInfo("Fitting predictive model")
       population <- PatientLevelPrediction::createStudyPopulation(plpData,
                                                                   population = NULL,
@@ -271,9 +271,9 @@
           saveRDS(lrResults, modelFileName)
         })
       }
-    } else {
-      ParallelLogger::logInfo("Skipping creation of ", modelFileName, " because it already exists")
     }
+  } else {
+    ParallelLogger::logInfo("Skipping creation of ", modelFileName, " because it already exists")
   }
 }
 
