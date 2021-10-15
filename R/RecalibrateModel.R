@@ -104,7 +104,7 @@ recalibrateModel <- function(connectionDetails,
       stop(paste0(evaluationCohortFileName, " does not exist."))
     }
 
-    if(is.null(destinationevalFileDirectory)) {
+    if(is.null(destinationEvalFileDirectory)) {
       stop(paste0("...must provide a evaluation file destination."))
     }
   }
@@ -172,7 +172,7 @@ recalibrateModel <- function(connectionDetails,
     cohortData <- data.frame(evalData$prediction[,c(4,1,2)])
     cohortData$cohortEndDate <- cohortData$cohortStartDate + 1
 
-    dir.create(destinationevalFileDirectory, showWarnings = FALSE)
+    dir.create(destinationEvalFileDirectory, showWarnings = FALSE)
     evaluationFullDirectory <- file.path(destinationModelFileDirectory, "EvaluationCohort_e1")
     dir.create(evaluationFullDirectory, showWarnings = FALSE)
 
