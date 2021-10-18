@@ -97,23 +97,21 @@
       error=function(cond) {
         if(grepl("Bulk load credentials", cond, fixed = TRUE)) {
           message(paste0("...bulk load failed...trying without bulk load...this may be slow"))
+          insertTable(
+            connection = connection,
+            databaseSchema = workDatabaseSchema,
+            tableName = testCohort,
+            data = cohort,
+            dropTableIfExists = TRUE,
+            createTable = TRUE,
+            tempTable = FALSE,
+            oracleTempSchema = NULL,
+            bulkLoad = FALSE,
+            progressBar = TRUE,
+            camelCaseToSnakeCase = TRUE)
         } else {
           stop(cond)
         }
-      },
-      finally = {
-        insertTable(
-          connection = connection,
-          databaseSchema = workDatabaseSchema,
-          tableName = testCohort,
-          data = cohort,
-          dropTableIfExists = TRUE,
-          createTable = TRUE,
-          tempTable = FALSE,
-          oracleTempSchema = NULL,
-          bulkLoad = FALSE,
-          progressBar = TRUE,
-          camelCaseToSnakeCase = TRUE)
       })
 
     } else { #otherwise create the evaluation cohort from an sql query
