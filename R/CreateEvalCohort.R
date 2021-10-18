@@ -78,21 +78,43 @@
     if(file.exists(file.path(outFolder, "evaluationCohortSubjects.rds"))) {
       #use existing subjects from local file to create a cohort table on server
       cohort <- readRDS(file.path(outFolder, "evaluationCohortSubjects.rds"))
+      ParallelLogger::logInfo("Creating evaluation cohort on server from cohort file")
 
-      insertTable(
-        connection = connection,
-        databaseSchema = workDatabaseSchema,
-        tableName = testCohort,
-        data = cohort,
-        dropTableIfExists = TRUE,
-        createTable = TRUE,
-        tempTable = FALSE,
-        oracleTempSchema = NULL,
-        bulkLoad = TRUE,
-        progressBar = TRUE,
-        camelCaseToSnakeCase = TRUE)
-
-        ParallelLogger::logInfo("Creating evaluation cohort on server from cohort file")
+      tryCatch({
+        insertTable(
+          connection = connection,
+          databaseSchema = workDatabaseSchema,
+          tableName = testCohort,
+          data = cohort,
+          dropTableIfExists = TRUE,
+          createTable = TRUE,
+          tempTable = FALSE,
+          oracleTempSchema = NULL,
+          bulkLoad = TRUE,
+          progressBar = TRUE,
+          camelCaseToSnakeCase = TRUE)
+      },
+      error=function(cond) {
+        if(grepl("Bulk load credentials", cond, fixed = TRUE)) {
+          message(paste0("...bulk load failed...trying without bulk load...this may be slow"))
+        } else {
+          stop(cond)
+        }
+      },
+      finally = {
+        insertTable(
+          connection = connection,
+          databaseSchema = workDatabaseSchema,
+          tableName = testCohort,
+          data = cohort,
+          dropTableIfExists = TRUE,
+          createTable = TRUE,
+          tempTable = FALSE,
+          oracleTempSchema = NULL,
+          bulkLoad = FALSE,
+          progressBar = TRUE,
+          camelCaseToSnakeCase = TRUE)
+      })
 
     } else { #otherwise create the evaluation cohort from an sql query
       if (modelType == "acute") {

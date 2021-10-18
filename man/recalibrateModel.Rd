@@ -9,6 +9,7 @@ recalibrateModel(
   cdmDatabaseSchema,
   cohortDatabaseSchema,
   cohortTable,
+  xSpecCohortId,
   prevalenceCohortId,
   mainPopulationCohortId = 0,
   mainPopulationCohortIdStartDay = 0,
@@ -45,6 +46,9 @@ available. Requires read permissions to this database.}
 expectation is cohortTable has format of COHORT table:
 cohort_concept_id, SUBJECT_ID, COHORT_START_DATE,
 COHORT_END_DATE.}
+
+\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort
+definition id in the cohort table (for noisy positives).}
 
 \item{prevalenceCohortId}{The number of the cohort definition id to determine the
 disease prevalence.}

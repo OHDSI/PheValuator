@@ -172,14 +172,15 @@ recalibrateModel <- function(connectionDetails,
   if(!is.null(evalFileDirectory)) {
     #create an RDS file with the provided evaluation cohort
     evalData <- readRDS(evaluationCohortFileName)
-    cohortData <- data.frame(evalData$prediction[,c(4,1,2)])
+    cohortData <- data.frame(evalData$prediction[,c(4,1,2,10)])
     names(cohortData)[1] <- "cohortDefinitionId"
     cohortData$cohortEndDate <- cohortData$cohortStartDate + 1
 
-    outcomeCohort <- cohortData[1:100,]
+    outcomeCohort <- cohortData[cohortData$outcomeCount == 1,]
     outcomeCohort$cohortDefinitionId <- xSpecCohortId
 
     fullCohortData <- rbind(cohortData, outcomeCohort)
+    fullCohortData <- fullCohortData[,c(1,2,3,5)]
 
     dir.create(destinationEvalFileDirectory, showWarnings = FALSE)
     evaluationFullDirectory <- file.path(destinationEvalFileDirectory, "EvaluationCohort_e1")
