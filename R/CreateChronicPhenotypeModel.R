@@ -63,6 +63,8 @@
 #' @param endDays                The days to include after the cohort start date (default=10000)
 #' @param visitLength            The minimum length of index visit for noisy negative comparison (default=3)
 #' @param gender                 The gender(s) to be included (default c(8507, 8532))
+#' @param race                   The race(s) to be included.
+#' @param ethnicity              The ethnicity(s) to be included.
 #' @param startDate              The starting date for including subjects in the model (default=NULL)
 #' @param endDate                The ending date for including subjects in the model (default=NULL)
 #' @param removeSubjectsWithFutureDates             Should dates be checked to remove future dates (default=TRUE)
@@ -101,6 +103,8 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                         endDays = 10000,
                                         visitLength = 10000,
                                         gender = c(8507, 8532),
+                                        race = 0,
+                                        ethnicity = 0,
                                         startDate = "19000101",
                                         endDate = "21000101",
                                         removeSubjectsWithFutureDates = TRUE,
@@ -150,6 +154,8 @@ createChronicPhenotypeModel <- function(connectionDetails,
     writeLines(paste("endDays ", endDays))
     writeLines(paste("visitLength ", visitLength))
     writeLines(paste("gender ", gender))
+    writeLines(paste("race ", race))
+    writeLines(paste("ethnicity ", ethnicity))
     writeLines(paste("startDate ", startDate))
     writeLines(paste("endDate ", endDate))
     writeLines(paste("removeSubjectsWithFutureDates ", removeSubjectsWithFutureDates))
@@ -179,6 +185,8 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                   upperAgeLimit = upperAgeLimit,
                                   visitLength = visitLength,
                                   gender = c(gender),
+                                  race = race,
+                                  ethnicity = ethnicity,
                                   startDate = startDate ,
                                   endDate = endDate,
                                   removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
@@ -221,6 +229,8 @@ createChronicPhenotypeModel <- function(connectionDetails,
     writeLines(paste("endDays ", endDays))
     writeLines(paste("visitLength ", visitLength))
     writeLines(paste("gender ", gender))
+    writeLines(paste("race ", race))
+    writeLines(paste("ethnicity ", ethnicity))
     writeLines(paste("startDate ", startDate))
     writeLines(paste("endDate ", endDate))
     writeLines(paste("cdmVersion ", cdmVersion))
@@ -249,6 +259,8 @@ createChronicPhenotypeModel <- function(connectionDetails,
                                          lowerAgeLimit = lowerAgeLimit,
                                          upperAgeLimit = upperAgeLimit,
                                          gender = c(gender),
+                                         race = race,
+                                         ethnicity = ethnicity,
                                          startDate = startDate,
                                          endDate = endDate,
                                          cdmVersion = cdmVersion,

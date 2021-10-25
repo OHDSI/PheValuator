@@ -32,6 +32,8 @@
                                   visitLength = 0,
                                   visitType = c(9201,9202,9203),
                                   gender = c(8507, 8532),
+                                  race = 0,
+                                  ethnicity = 0,
                                   startDate = "19000101",
                                   endDate = "21000101",
                                   removeSubjectsWithFutureDates = TRUE,
@@ -47,6 +49,7 @@
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
   plpResultsFileName <- file.path(outFolder, sprintf("plpResults_%s", modelId))
 
+  if (!file.exists(modelFileName)) {
   #get xSpec subjects to create a model
   sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "GetxSpecCount.sql",
                                            packageName = "PheValuator",
@@ -58,6 +61,8 @@
                                            ageLimit = lowerAgeLimit,
                                            upperAgeLimit = upperAgeLimit,
                                            gender = gender,
+                                           race = race,
+                                           ethnicity = ethnicity,
                                            startDate = startDate,
                                            endDate = endDate)
 
@@ -81,6 +86,8 @@
                                                lowerAgeLimit = lowerAgeLimit,
                                                upperAgeLimit = upperAgeLimit,
                                                gender = gender,
+                                               race = race,
+                                               ethnicity = ethnicity,
                                                startDate = startDate,
                                                endDate = endDate,
                                                mainPopnCohort = mainPopulationCohortId,
@@ -115,6 +122,8 @@
                                                  ageLimit = lowerAgeLimit,
                                                  upperAgeLimit = upperAgeLimit,
                                                  gender = gender,
+                                                 race = race,
+                                                 ethnicity = ethnicity,
                                                  startDate = startDate,
                                                  endDate = endDate,
                                                  visitType = visitType,
@@ -147,6 +156,8 @@
                                                ageLimit = lowerAgeLimit,
                                                upperAgeLimit = upperAgeLimit,
                                                gender = gender,
+                                               race = race,
+                                               ethnicity = ethnicity,
                                                startDate = startDate,
                                                endDate = endDate,
                                                baseSampleSize = format(baseSampleSize, scientific = FALSE),
@@ -189,7 +200,6 @@
       plpData <- PatientLevelPrediction::loadPlpData(plpDataFile)
     }
 
-    if (!file.exists(modelFileName)) {
       ParallelLogger::logInfo("Fitting predictive model")
       population <- PatientLevelPrediction::createStudyPopulation(plpData,
                                                                   population = NULL,
@@ -249,6 +259,8 @@
           lrResults$PheValuator$inputSetting$endDays <- covariateSettings$endDays
           lrResults$PheValuator$inputSetting$visitLength <- visitLength
           lrResults$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse = ", ")
+          lrResults$PheValuator$inputSetting$race <- paste(unlist(race), collapse = ", ")
+          lrResults$PheValuator$inputSetting$ethnicity <- paste(unlist(ethnicity), collapse = ", ")
           lrResults$PheValuator$inputSetting$startDate <- startDate
           lrResults$PheValuator$inputSetting$endDate <- endDate
           lrResults$PheValuator$inputSetting$modelType <- modelType
@@ -271,9 +283,9 @@
           saveRDS(lrResults, modelFileName)
         })
       }
-    } else {
-      ParallelLogger::logInfo("Skipping creation of ", modelFileName, " because it already exists")
     }
+  } else {
+    ParallelLogger::logInfo("Skipping creation of ", modelFileName, " because it already exists")
   }
 }
 

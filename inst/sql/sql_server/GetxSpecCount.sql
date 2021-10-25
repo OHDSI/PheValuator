@@ -9,6 +9,8 @@
 {DEFAULT @ageLimit = 0}
 {DEFAULT @upperAgeLimit = 120}
 {DEFAULT @gender = c(8507, 8532)}
+{DEFAULT @race = 0}
+{DEFAULT @ethnicity = 0}
 {DEFAULT @startDate = '19000101' }
 {DEFAULT @endDate = '21000101' }
 
@@ -22,6 +24,8 @@ from (select co.*, p.*,
 		and  year(COHORT_START_DATE) - year_of_birth >= @ageLimit
 		and year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
 		and gender_concept_id in (@gender)
+		{@race != 0} ? {AND race_concept_id in (@race)}
+    {@ethnicity != 0} ? {AND ethnicity_concept_id in (@ethnicity)}
 	join @cdm_database_schema.observation_period o
 	  on co.subject_id = o.person_id
 	    and co.COHORT_START_DATE >= o.observation_period_start_date
