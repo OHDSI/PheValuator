@@ -11,6 +11,8 @@
 {DEFAULT @ageLimit = 0}
 {DEFAULT @upperAgeLimit = 120}
 {DEFAULT @gender = c(8507, 8532)}
+{DEFAULT @race = 0}
+{DEFAULT @ethnicity = 0}
 {DEFAULT @startDate = '19000101' }
 {DEFAULT @endDate = '21000101' }
 {DEFAULT @baseSampleSize = 150000 }
@@ -40,6 +42,8 @@ FROM (
 			AND year(COHORT_START_DATE) - year_of_birth >= @ageLimit
 			AND year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
 			AND gender_concept_id IN (@gender)
+			{@race != 0} ? {AND race_concept_id in (@race)}
+      {@ethnicity != 0} ? {AND ethnicity_concept_id in (@ethnicity)}
 	WHERE cohort_definition_id = @x_spec_cohort
 		AND co.COHORT_START_DATE >= cast('@startDate' AS DATE)
 		AND co.COHORT_START_DATE <= cast('@endDate' AS DATE)
@@ -87,6 +91,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						and year(visit_start_date) - year_of_birth >= @ageLimit
 						and year(visit_start_date) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
+						{@race != 0} ? {AND race_concept_id in (@race)}
+            {@ethnicity != 0} ? {AND ethnicity_concept_id in (@ethnicity)}
 {@exclCohort != 0} ? { -- exclude subjects in the xSens cohort
           left join @cohort_database_schema.@cohort_database_table excl
             on v.person_id = excl.subject_id
@@ -121,6 +127,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						and  year(co.COHORT_START_DATE) - year_of_birth >= @ageLimit
 						and year(co.COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
 						and gender_concept_id in (@gender)
+						{@race != 0} ? {AND race_concept_id in (@race)}
+            {@ethnicity != 0} ? {AND ethnicity_concept_id in (@ethnicity)}
 						{@exclCohort != 0} ? {
           left join @cohort_database_schema.@cohort_database_table excl
             on v.person_id = excl.subject_id

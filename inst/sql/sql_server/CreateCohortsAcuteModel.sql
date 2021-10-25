@@ -11,6 +11,8 @@
 {DEFAULT @ageLimit = 0}
 {DEFAULT @upperAgeLimit = 120}
 {DEFAULT @gender = c(8507, 8532)}
+{DEFAULT @race = 0}
+{DEFAULT @ethnicity = 0}
 {DEFAULT @startDate = '19000101' }
 {DEFAULT @endDate = '21000101' }
 {DEFAULT @baseSampleSize = 150000 }
@@ -36,6 +38,8 @@ FROM (SELECT co.*, p.*,
 		AND  year(COHORT_START_DATE) - year_of_birth >= @ageLimit
 		AND year(COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
 		AND gender_concept_id in (@gender)
+		{@race != 0} ? {AND race_concept_id in (@race)}
+    {@ethnicity != 0} ? {AND ethnicity_concept_id in (@ethnicity)}
 	WHERE cohort_definition_id = @x_spec_cohort
 	  AND co.COHORT_START_DATE >= cast('@startDate' AS DATE)
 	  AND co.COHORT_START_DATE <= cast('@endDate' AS DATE)) pos
@@ -80,6 +84,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						AND year(visit_start_date) - year_of_birth >= @ageLimit
 						AND year(visit_start_date) - year_of_birth <= @upperAgeLimit
 						AND gender_concept_id in (@gender)
+						{@race != 0} ? {AND race_concept_id in (@race)}
+		        {@ethnicity != 0} ? {AND ethnicity_concept_id in (@ethnicity)}
 					WHERE visit_start_date >= cast('@startDate' AS DATE)
 						AND visit_start_date <= cast('@endDate' AS DATE)
 						AND visit_concept_id IN (@visitType)
@@ -107,6 +113,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						AND  year(co.COHORT_START_DATE) - year_of_birth >= @ageLimit
 						AND year(co.COHORT_START_DATE) - year_of_birth <= @upperAgeLimit
 						AND gender_concept_id in (@gender)
+						{@race != 0} ? {AND race_concept_id in (@race)}
+		        {@ethnicity != 0} ? {AND ethnicity_concept_id in (@ethnicity)}
 					WHERE co.cohort_definition_id = @mainPopnCohort
 						{@exclCohort != 0} ? {AND co.subject_id not in (
 													SELECT subject_id

@@ -31,6 +31,8 @@
                                     visitLength = 0,
                                     visitType = c(9201,9202,9203),
                                     gender = c(8507, 8532),
+                                    race = 0,
+                                    ethnicity = 0,
                                     startDate = "19001010",
                                     endDate = "21000101",
                                     cdmVersion = "5",
@@ -126,6 +128,8 @@
                                                  ageLimit = lowerAgeLimit,
                                                  upperAgeLimit = upperAgeLimit,
                                                  gender = gender,
+                                                 race = race,
+                                                 ethnicity = ethnicity,
                                                  startDate = startDate,
                                                  endDate = endDate,
                                                  visitType = visitType,
@@ -154,6 +158,8 @@
                                                ageLimit = lowerAgeLimit,
                                                upperAgeLimit = upperAgeLimit,
                                                gender = gender,
+                                               race = race,
+                                               ethnicity = ethnicity,
                                                startDate = startDate,
                                                endDate = endDate,
                                                baseSampleSize = format(baseSampleSize, scientific = FALSE),
@@ -258,6 +264,8 @@
     appResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
     appResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
     appResults$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse = ", ")
+    appResults$PheValuator$inputSetting$race <- paste(unlist(race), collapse = ", ")
+    appResults$PheValuator$inputSetting$ethnicity <- paste(unlist(ethnicity), collapse = ", ")
     appResults$PheValuator$inputSetting$startDate <- startDate
     appResults$PheValuator$inputSetting$endDate <- endDate
     appResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId

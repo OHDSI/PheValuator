@@ -17,6 +17,8 @@ recalibrateModel(
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
   gender = c(8507, 8532),
+  race = 0,
+  ethnicity = 0,
   startDate = "19000101",
   endDate = "21000101",
   cdmVersion = "5",
@@ -68,6 +70,10 @@ cohort start date to end including visits.}
 \item{upperAgeLimit}{The upper age for subjects in the model.}
 
 \item{gender}{The gender(s) to be included.}
+
+\item{race}{The race(s) to be included.}
+
+\item{ethnicity}{The ethnicity(s) to be included.}
 
 \item{startDate}{The starting date for including subjects in the model.}
 

@@ -29,6 +29,8 @@ createEvaluationCohort(
   visitLength = 0,
   visitType = c(9201, 9202, 9203),
   gender = c(8507, 8532),
+  race = 0,
+  ethnicity = 0,
   startDate = "19001010",
   endDate = "21000101",
   cdmVersion = "5",
@@ -110,6 +112,10 @@ cohort start date to end including visits.}
 \item{visitType}{The concept_id for the visit type.}
 
 \item{gender}{The gender(s) to be included.}
+
+\item{race}{The race(s) to be included.}
+
+\item{ethnicity}{The ethnicity(s) to be included.}
 
 \item{startDate}{The starting date for including subjects in the model.}
 

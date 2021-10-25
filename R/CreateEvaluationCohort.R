@@ -69,6 +69,8 @@
 #' @param visitLength                      The minimum length of index visit for acute outcomes.
 #' @param visitType                        The concept_id for the visit type.
 #' @param gender                           The gender(s) to be included.
+#' @param race                             The race(s) to be included.
+#' @param ethnicity                        The ethnicity(s) to be included.
 #' @param startDate                        The starting date for including subjects in the model.
 #' @param endDate                          The ending date for including subjects in the model.
 #' @param cdmVersion                       The CDM version of the database.
@@ -108,6 +110,8 @@ createEvaluationCohort <- function(connectionDetails,
                                    visitLength = 0,
                                    visitType = c(9201,9202,9203),
                                    gender = c(8507, 8532),
+                                   race = 0,
+                                   ethnicity = 0,
                                    startDate = "19001010",
                                    endDate = "21000101",
                                    cdmVersion = "5",
@@ -159,6 +163,8 @@ createEvaluationCohort <- function(connectionDetails,
                         visitLength = visitLength,
                         visitType = c(visitType),
                         gender = gender,
+                        race = race,
+                        ethnicity = ethnicity,
                         startDate = startDate,
                         endDate = endDate,
                         removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
@@ -184,6 +190,8 @@ createEvaluationCohort <- function(connectionDetails,
                           visitLength = visitLength,
                           visitType = c(visitType),
                           gender = gender,
+                          race = race,
+                          ethnicity = ethnicity,
                           startDate = startDate,
                           endDate = endDate,
                           cdmVersion = cdmVersion,

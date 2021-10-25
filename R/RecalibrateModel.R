@@ -49,6 +49,8 @@
 #' @param lowerAgeLimit                    The lower age for subjects in the model.
 #' @param upperAgeLimit                    The upper age for subjects in the model.
 #' @param gender                           The gender(s) to be included.
+#' @param race                             The race(s) to be included.
+#' @param ethnicity                        The ethnicity(s) to be included.
 #' @param startDate                        The starting date for including subjects in the model.
 #' @param endDate                          The ending date for including subjects in the model.
 #' @param cdmVersion                       The CDM version of the database.
@@ -74,6 +76,8 @@ recalibrateModel <- function(connectionDetails,
                              lowerAgeLimit = 0,
                              upperAgeLimit = 120,
                              gender = c(8507, 8532),
+                             race = 0,
+                             ethnicity = 0,
                              startDate = "19000101",
                              endDate = "21000101",
                              cdmVersion = "5",
@@ -124,6 +128,8 @@ recalibrateModel <- function(connectionDetails,
                                                lowerAgeLimit = lowerAgeLimit,
                                                upperAgeLimit = upperAgeLimit,
                                                gender = gender,
+                                               race = race,
+                                               ethnicity = ethnicity,
                                                startDate = startDate,
                                                endDate = endDate,
                                                mainPopnCohort = mainPopulationCohortId,

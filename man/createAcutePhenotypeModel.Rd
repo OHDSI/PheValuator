@@ -30,6 +30,8 @@ createAcutePhenotypeModel(
   endDays = 7,
   visitLength = 0,
   gender = c(8507, 8532),
+  race = 0,
+  ethnicity = 0,
   startDate = "19000101",
   endDate = "21000101",
   removeSubjectsWithFutureDates = TRUE,
@@ -108,6 +110,10 @@ to end including visits (default=0)}
 \item{visitLength}{The minimum length of index visit for noisy negative comparison (default=3)}
 
 \item{gender}{The gender(s) to be included (default c(8507, 8532))}
+
+\item{race}{The race(s) to be included.}
+
+\item{ethnicity}{The ethnicity(s) to be included.}
 
 \item{startDate}{The starting date for including subjects in the model (default=NULL)}
 
