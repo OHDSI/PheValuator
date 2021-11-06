@@ -102,7 +102,7 @@
     ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.2f%%", 100 * popPrev))
 
     xspecSize <- min(c(xSpecCohortSize, xSpecCount)) #min value of pre-specified and available xSpec subjects
-    baseSampleSize <- max(c(xspecSize, 15000))  #use either a matching number of non-xspec subjects or 5K whichever is more
+    baseSampleSize <- max(c(xspecSize, 15000))  #use either a matching number of non-xspec subjects or 15K whichever is more
     prevToUse <- xspecSize/(xspecSize + baseSampleSize) #calculate the prevalence of the model subjects - to be recalibrated
 
     ParallelLogger::logInfo(sprintf("Using xSpec size of: %i", xspecSize))
@@ -233,7 +233,7 @@
                                                       testSplit = "stratified",
                                                       testFraction = 0.25,
                                                       splitSeed = 5,
-                                                      nfold = 3,
+                                                      nfold = 10,
                                                       savePlpData = FALSE,
                                                       savePlpResult = FALSE,
                                                       savePlpPlots = FALSE,
