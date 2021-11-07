@@ -233,7 +233,7 @@
                                                       testSplit = "stratified",
                                                       testFraction = 0.25,
                                                       splitSeed = 5,
-                                                      nfold = 3,
+                                                      nfold = 5,
                                                       savePlpData = FALSE,
                                                       savePlpResult = FALSE,
                                                       savePlpPlots = FALSE,
