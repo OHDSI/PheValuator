@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>PheValuator: Rapid Phenotype Evaluation — PheValuator-package • PheValuator</title>
+<title>Create the default covariate settings — createDefaultCovariateSettings • PheValuator</title>
 
 
 <!-- jquery -->
@@ -39,15 +39,8 @@
 
 
 
-<meta property="og:title" content="PheValuator: Rapid Phenotype Evaluation — PheValuator-package" />
-<meta property="og:description" content="A package for evaluating phenotype algorithms.  The package
-    develops a diagnostic prediction model using a set of noisy positives
-    and noisy negatives.  It can then apply the model to a large cohort
-    to create a set of subjects each with a predicted probability for the
-    health outcome of interest.  This cohort can then be used to evaluate
-    phenotype algorithms through the calculation of the necessary performance
-    characteristics - sensitivity, specificity, and positive and negative
-    preditive value." />
+<meta property="og:title" content="Create the default covariate settings — createDefaultCovariateSettings" />
+<meta property="og:description" content="Create the default covariate settings for acute or chronic diseases" />
 
 
 
@@ -130,33 +123,79 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>PheValuator: Rapid Phenotype Evaluation</h1>
-    <small class="dont-index">Source: <a href='https://github.com/OHDSI/PheValuator/blob/master/R/PheValuator.R'><code>R/PheValuator.R</code></a></small>
-    <div class="hidden name"><code>PheValuator-package.Rd</code></div>
+    <h1>Create the default covariate settings</h1>
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/PheValuator/blob/master/R/DefaultCovariateSettings.R'><code>R/DefaultCovariateSettings.R</code></a></small>
+    <div class="hidden name"><code>createDefaultCovariateSettings.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>A package for evaluating phenotype algorithms.  The package
-    develops a diagnostic prediction model using a set of noisy positives
-    and noisy negatives.  It can then apply the model to a large cohort
-    to create a set of subjects each with a predicted probability for the
-    health outcome of interest.  This cohort can then be used to evaluate
-    phenotype algorithms through the calculation of the necessary performance
-    characteristics - sensitivity, specificity, and positive and negative
-    preditive value.</p>
+    <p>Create the default covariate settings for acute or chronic diseases</p>
     </div>
 
+    <pre class="usage"><span class='fu'>createDefaultCovariateSettings</span>(
+  <span class='kw'>excludedCovariateConceptIds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
+  <span class='kw'>includedCovariateIds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
+  <span class='kw'>includedCovariateConceptIds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(),
+  <span class='kw'>addDescendantsToExclude</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>startDayWindow1</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>endDayWindow1</span> <span class='kw'>=</span> <span class='fl'>9999</span>,
+  <span class='kw'>startDayWindow2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>endDayWindow2</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>startDayWindow3</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>endDayWindow3</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>excludedCovariateConceptIds</th>
+      <td><p>A list of conceptIds to exclude from featureExtraction.  These
+should include all concept_ids that were used to define the
+xSpec model (default=NULL)</p></td>
+    </tr>
+    <tr>
+      <th>includedCovariateIds</th>
+      <td><p>A list of covariate IDs that should be restricted to.</p></td>
+    </tr>
+    <tr>
+      <th>includedCovariateConceptIds</th>
+      <td><p>A list of covariate concept IDs that should be restricted to.</p></td>
+    </tr>
+    <tr>
+      <th>addDescendantsToExclude</th>
+      <td><p>Should descendants of excluded concepts also be excluded?
+(default=FALSE)</p></td>
+    </tr>
+    <tr>
+      <th>startDayWindow1</th>
+      <td><p>The day to start time window 1 for feature extraction</p></td>
+    </tr>
+    <tr>
+      <th>endDayWindow1</th>
+      <td><p>The day to end time window 1 for feature extraction</p></td>
+    </tr>
+    <tr>
+      <th>startDayWindow2</th>
+      <td><p>The day to start time window 2 for feature extraction</p></td>
+    </tr>
+    <tr>
+      <th>endDayWindow2</th>
+      <td><p>The day to end time window 2 for feature extraction</p></td>
+    </tr>
+    <tr>
+      <th>startDayWindow3</th>
+      <td><p>The day to start time window 3 for feature extraction</p></td>
+    </tr>
+    <tr>
+      <th>endDayWindow3</th>
+      <td><p>The day to end time window 3 for feature extraction #'</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <div class='dont-index'><p>Useful links:</p><ul>
-<li><p><a href='https://ohdsi.github.io/PheValuator'>https://ohdsi.github.io/PheValuator</a></p></li>
-<li><p><a href='https://github.com/OHDSI/PheValuator'>https://github.com/OHDSI/PheValuator</a></p></li>
-<li><p>Report bugs at <a href='https://github.com/OHDSI/PheValuator/issues'>https://github.com/OHDSI/PheValuator/issues</a></p></li>
-</ul>
-
-</div>
+    <p>Function to create the default covariate settings for acute or chronic diseases</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

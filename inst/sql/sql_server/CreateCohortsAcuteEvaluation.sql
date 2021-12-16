@@ -93,6 +93,19 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						and gender_concept_id in (@gender)
 						{@race != 0} ? {AND race_concept_id in (@race)}
             {@ethnicity != 0} ? {AND ethnicity_concept_id in (@ethnicity)}
+            join (
+              select person_id,
+                datediff(day, min(observation_period_start_date), min(observation_period_end_date)) lenPd,
+                min(observation_period_start_date) observation_period_start_date,
+                min(observation_period_end_date) observation_period_end_date,
+                count(observation_period_id) cntPd
+              from @cdm_database_schema.observation_period
+              group by person_id) obs2
+              on v.person_id = obs2.person_id
+                and v.visit_start_date >= obs2.observation_period_start_date
+                and v.visit_start_date <= obs2.observation_period_end_date
+                and lenPd >= 730
+                and cntPd = 1
 {@exclCohort != 0} ? { -- exclude subjects in the xSens cohort
           left join @cohort_database_schema.@cohort_database_table excl
             on v.person_id = excl.subject_id
@@ -122,6 +135,19 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 					    and v.visit_start_date <= dateadd(day, @mainPopnCohortEndDay, co.COHORT_START_DATE)
 					    and v.visit_start_date >= cast('@startDate' AS DATE)
 		          and v.visit_start_date <= cast('@endDate' AS DATE)
+		       join (
+              select person_id,
+                datediff(day, min(observation_period_start_date), min(observation_period_end_date)) lenPd,
+                min(observation_period_start_date) observation_period_start_date,
+                min(observation_period_end_date) observation_period_end_date,
+                count(observation_period_id) cntPd
+              from @cdm_database_schema.observation_period
+              group by person_id) obs2
+              on v.person_id = obs2.person_id
+                and v.visit_start_date >= obs2.observation_period_start_date
+                and v.visit_start_date <= obs2.observation_period_end_date
+                and lenPd >= 730
+                and cntPd = 1
 					join @cdm_database_schema.person p
 					  on co.subject_id = p.person_id
 						and  year(co.COHORT_START_DATE) - year_of_birth >= @ageLimit

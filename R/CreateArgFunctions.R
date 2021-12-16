@@ -68,7 +68,7 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              lowerAgeLimit = 0,
                                              upperAgeLimit = 120,
                                              visitLength = 0,
-                                             visitType = c(9201,9202,9203),
+                                             visitType = c(9201,9202,9203,581477),
                                              gender = c(8507, 8532),
                                              race = 0,
                                              ethnicity = 0,
@@ -105,9 +105,15 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
 #' @param phenotypeCohortId   The ID of the cohort to evaluate in the specified cohort table.
 #' @param washoutPeriod       The mininum required continuous observation time prior to indexdate for
 #'                            subjects within the cohort to test (Default = 0).
+#' @param splayPrior          The number of days to allow for test phenotype visit date prior to evaluation date
+#' @param splayPost           The number of days to allow for test phenotype visit date after evaluation date
 #'
 #' @export
-createTestPhenotypeAlgorithmArgs <- function(cutPoints = c("EV"), phenotypeCohortId, washoutPeriod = 0) {
+createTestPhenotypeAlgorithmArgs <- function(cutPoints = c("EV"),
+                                             phenotypeCohortId,
+                                             washoutPeriod = 0,
+                                             splayPrior = 7,
+                                             splayPost = 7) {
   # First: get default values:
   analysis <- list()
   for (name in names(formals(createTestPhenotypeAlgorithmArgs))) {

@@ -44,6 +44,7 @@
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
 
+  modelType <- "acute" #force to only using acute settings
 
   plpDataFile <- file.path(outFolder, sprintf("plpData_%s", modelId))
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
