@@ -23,161 +23,198 @@ library(PheValuator)
 \newpage
 # Introduction
 
-The `Phevaluator` package enables evaluating the performance characteristics of phenotype algorithms (PAs) using data from databases that are translated into the Observational Medical Outcomes Partnership Common Data Model (OMOP CDM).
+The `PheValuator` package enables evaluating the performance characteristics of phenotype algorithms (PAs) using data from databases that are translated into the Observational Medical Outcomes Partnership Common Data Model (OMOP CDM).
 
-This vignette describes how to run the PheValuator process from start to end in the `Phevaluator` package. 
+This vignette describes how to run the PheValuator process from start to end in the `PheValuator` package. 
 
 # Overview of Process 
 
 There are several steps in performing a PA evaluation:
-1. Creating the extremely specific (xSpec), extremely sensitive (xSens), and prevalence cohorts
-2. Creating the Diagnostic Predictive Model and the Evaluation Cohort using the PatientLevelPrediction (PLP) package
-5. Evaluating the PAs
-6. Examining the results of the evaluation
 
-Each of these steps is described in detail below.  For this vignette we will describe the evaluation of PAs for diabetes mellitus (DM).
+1. Creating the extremely specific (xSpec), extremely sensitive (xSens), prevalence, and evaluation cohorts
+2. Creating the Diagnostic Predictive Model and the Evaluation Cohort using the PatientLevelPrediction (PLP) package and evaluating the PAs
+3. Examining the results of the evaluation
 
-## Creating the Extremely Specific (xSpec), Extremely Sensitive (xSens), and Prevalence Cohorts
+Each of these steps is described in detail below.  For this vignette, we will describe the evaluation of PAs for type 2 diabetes mellitus (T2DM).
 
-The extremely specific (xSpec), extremely sensitive (xSens), and prevalence cohorts are developed using the ATLAS tool.  The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability.  This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record.  An [example](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1769699) of this for DM is included in the OHDSI ATLAS repository.  In this example each subject has an initial condition code for DM.  The cohort definition further specifies that each subject also has a second code for DM between 1 and 30 days after the initial DM code and 10 additional DM codes in the rest of the patient record.  This very specific algorithm for DM ensures that the subjects in this cohort have a very high probability for having the condition of DM.  This PA also specifies that subjects are required to have at least 365 days of observation in their patient record.
+## Creating the Extremely Specific (xSpec), Extremely Sensitive (xSens), Prevalence, and Evaluation Cohorts
 
-An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI.  The system uses the xSens cohort to create a set of "noisy" negative subjects, i.e., subjects with a high likelihood of not having the HOI.  This group of subjects will be used in the model building process and is described in detail below.  An [example](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770120) of an xSens cohort for DM is also in the OHDSI ATLAS repository.
+The extremely specific (xSpec), extremely sensitive (xSens), prevalence, and evaluation cohorts are developed using the ATLAS tool.  The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability.  This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record.  An [**example**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1769699) of this for T2DM is included in the OHDSI ATLAS repository.  In this example each subject has at least 2 diagnosis codes for T2DM in days 21 to 1 prior to an index clinical visit, the first of which is the the first diagnosis in the patients history.  The algorithm also excludes subjects with type 1 DM (T1DM) any time in their record.  This is a very specific algorithm for T2DM as it ensures that the subjects in this cohort have a very high probability for having the condition of T2DM.  This PA also specifies that subjects are required to have at least 365 days of prior and post-index observation in their patient record.
 
-The system uses the prevalence cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model.  The system will use the xSens cohort as the default if a prevalence cohort is not specified.  This group of subjects will be used in the model building process and is described in detail below.  An [example](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770119) of an prevalence cohort for DM is also in the OHDSI ATLAS repository.
+**Quick Tip:** When building the xSpec cohort, the days prior where you are looking for 2 or more diagnosis codes for the condition should be altered depending on the condition.  For very rare conditions you may need to expand it to 60 to 1 days prior to index.  For acute conditions such as myocardial infarction it is best to have a very short interval such as 1 to 1 day prior to index (i.e., the day prior to index)
+
+An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI.  The system uses the xSens cohort to create a set of "noisy" negative subjects, i.e., subjects with a high likelihood of not having the HOI.  This group of subjects will be used in the model building process and is described in detail below.  An [**example**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770120) of an xSens cohort for T2DM is also in the OHDSI ATLAS repository.
+
+The system uses the prevalence cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model.  This group of subjects will be used in the model building process and is described in detail below.  An [**example**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770119) of an prevalence cohort for T2DM is also in the OHDSI ATLAS repository.
+
+PheValuator uses the evaluation cohort to define a specific set of subjects to test for the outcome of interest and uses these subjects to evaluate the PAs.  An [**example**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1778258) of an evaluation cohort for T2DM is also in the OHDSI ATLAS repository.
+
+**Quick Tip:** You can build your required cohorts easily by exporting the JSON in the examples above and copying them into your repository.  The only changes you should need to make are changing the concept sets for the condition and the days prior to index for searching for multiple diagnosis codes in the xSpec cohort.
+
+For the example below, two more phenotype algorithms were created:
+
+1) An example of a prevalent algorithm for T2DM [**(Type 2 Diabetes Mellitus (prevalent))**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1778259)
+2) An example of a prevalent algorithm for T2DM requiring a second condition code for T2DM 31-365 days after index [**(Type 2 diabetes mellitus (prevalent) with second code 31-365 days after index)**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1778260)
 
 ## Evaluating phenotype algorithms for health conditions
+The basic steps in the process are as follows:
 
-The function createEvaluationCohort creates a diagnostic predictive model and an evaluation cohort that will allow the user to perform an analysis for determining the performance characteristics for one or more phenotype algorithms (cohort definitions) for health conditions. This function initiates the process for the first two steps in PheValuator, namely:   
-  1) Develop a diagnostic predictive model for the health condition.   
-  2) Select a large, random set of subjects from the dataset and use the model to determine the probability of each of the subjects having the health condition.    
-
-createEvaluationCohort should have as inputs:
-
- * connectionDetails \- connectionDetails created using the function createConnectionDetails in the DatabaseConnector package
- * oracleTempSchema \- A schema where temp tables can be created in Oracle (default==NULL)
- * xSpecCohortId \- The number of the "extremely specific (xSpec)" cohort definition id in the cohort table (for noisy positives)
- * xSensCohortId \- The number of the "extremely sensitive (xSens)" cohort definition id in the cohort table (used to estimate population prevalence and to exclude subjects from the noisy positives)
- * prevalenceCohortId \- The number of the cohort definition id to determine the disease prevalence, usually a super-set of the exclCohort
- * cdmDatabaseSchema \- The name of the database schema that contains the OMOP CDM instance. Requires read permissions to this database. On SQL Server, this should specify both the database and the schema, so for example 'cdm_instance.dbo'.
- * cohortDatabaseSchema \- The name of the database schema that is the location where the cohort data used to define the at risk cohort is available. If cohortTable = DRUG_ERA, cohortDatabaseSchema is not used by assumed to be cdmSchema. Requires read permissions to this database.
- * cohortTable  \- The tablename that contains the at risk cohort. If cohortTable <> DRUG_ERA, then expectation is cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.
- * workDatabaseSchema \- The name of a database schema where the user has write capability.  A temporary cohort table will be created here.
- * covariateSettings \- There are two choices for this setting depending on the type of halth outcome to be analyzed:  
-      1) For chronic health outcomes, supply the function **createDefaultChronicCovariateSettings()** with the parameters for this function being:  
-        a) excludedCovariateConceptIds \- A list of conceptIds to exclude from featureExtraction which should include all concept_ids used to create the xSpec and xSens cohorts  
-        b) addDescendantsToExclude \- Should descendants of excluded concepts also be excluded? (default=FALSE)  
-      2) For acute health outcomes, supply the function **createDefaultAcuteCovariateSettings()** with the parameters for this function the same as in the function for chronic health conditions, namely:  
-        a) excludedCovariateConceptIds \- A list of conceptIds to exclude from featureExtraction which should include all concept_ids used to create the xSpec and xSens cohorts  
-        b) addDescendantsToExclude \- Should descendants of excluded concepts also be excluded? (default=FALSE)  
- * mainPopulationCohortId \- The number of the cohort to be used as a base population for the model (default=0)
- * mainPopulationCohortIdStartDay \- When specifying a mainPopulationCohortId, the number of days relative to the mainPopulationCohortId cohort start date to begin including visits. (default=0, i.e., 0 days before the start of the mainPopulationCohortId cohort start date)
- * mainPopulationCohortIdEndtDay \- When specifying a mainPopulationCohortId, the number of days relative to the mainPopulationCohortId cohort start date to end including visits. (default=0, i.e., 0 days after the start of the mainPopulationCohortId cohort start date)
- * baseSampleSize \- The maximum number of subjects in the evaluation cohort (default=2M)
- * lowerAgeLimit \- The lower age for subjects in the model (default=NULL)
- * upperAgeLimit \- The upper age for subjects in the model (default=NULL)
- * visitLength \- The minimum length of index visit for noisy negative comparison for acute health conditions (default=3 days).  As a guideline, use the average length of a hospital visit for those with the health condition.
- * gender \- The gender(s) to be included (default c(8507, 8532))
- * startDate \- The starting date for including subjects in the model (default=NULL)
- * endDate \- The ending date for including subjects in the model (default=NULL)
- * cdmVersion \- The CDM version of the database (default=5)
- * outFolder \- The folder where the output files will be written (default=working directory)
- * evaluationCohortId \- A string designation for the evaluation cohort file (default = "main")  
- * removeSubjectsWithFutureDates \- Should observation end dates be checked to remove future dates (default=TRUE)
- * savePlpData \- Determines whether the large PLP data file is saved.  Setting this to FALSE will reduce the use of disk space (default=FALSE)
- * modelType \- The type of health condition to be analyzed either "chronic" (default) or "acute"
-
-The createEvaluationCohort function will produce the following artifacts:   
-  1) A Patient Level Prediction file (in .rds format) containg the information from the model building process   
-  2) A Patient Level Prediction file (in .rds format) containg the information from applying the model to the evaluation cohort   
+1) Use the createDefaultCovariateSettings() function to set the parameters for data extraction:
+* excludedCovariateConceptIds - set the concept Ids that should be excluded from the model building process.  Any concepts that are included in the xSpec or xSens cohorts in the feature extraction windows (see below) must be excluded.  In the T2DM example, based on the xSpec cohort definition, the T1DM concept and it's descendants will be excluded.
+* addDescendantsToExclude - set to TRUE/FALSE whether descendants of the excluded parameters should also be excluded
+* startDayWindow1 - sets the start of the first feature extraction window
+* endDayWindow1 - sets the end of the first feature extraction window
+* startDayWindow2 - sets the start of the second feature extraction window
+* endDayWindow2 - sets the end of the second feature extraction window
+* startDayWindow3 - sets the start of the third feature extraction window
+* endDayWindow3 - sets the end of the third feature extraction window
 
 For example:
 ```{r tidy=FALSE,eval=FALSE}
-options(fftempdir = "c:/temp/ff") #place to store large temporary files
+options(andromedaTempFolder = "c:/temp2/ff") #place to store large temporary files
 
-connectionDetails <- createConnectionDetails(dbms = "postgresql",
-                                              server = "localhost/ohdsi",
-                                              user = "joe",
-                                              password = "supersecret")
-
-phenoTest <- createEvaluationCohort(connectionDetails = connectionDetails,
-                                   xSpecCohortId = 1769699,
-                                   xSensCohortId = 1770120,
-                                   prevalenceCohortId = 1770119,
-                                   cdmDatabaseSchema = "my_cdm_data",
-                                   cohortDatabaseSchema = "my_results",
-                                   cohortTable  = "cohort",
-                                   workDatabaseSchema = "scratch.dbo",
-                                   covariateSettings = 
-                                    createDefaultChronicCovariateSettings(
-                                     excludedCovariateConceptIds = c(201826),
-                                     addDescendantsToExclude = TRUE),
-                                   baseSampleSize = 2000000,
-                                   lowerAgeLimit = 18,
-                                   upperAgeLimit = 90,
-                                   gender = c(8507, 8532),
-                                   startDate = "20101010",
-                                   endDate = "21000101",
-                                   cdmVersion = "5",
-                                   outFolder = "c:/phenotyping",
-                                   evaluationCohortId = "diabetes",
-                                   removeSubjectsWithFutureDates = TRUE,
-                                   saveEvaluationCohortPlpData = FALSE,
-                                   modelType = "chronic")
+CovSettings <- createDefaultCovariateSettings(excludedCovariateConceptIds = c(201254),
+                                              addDescendantsToExclude = TRUE,
+                                              startDayWindow1 = 0,
+                                              endDayWindow1 = 30,
+                                              startDayWindow2 = 31,
+                                              endDayWindow2 = 180,
+                                              startDayWindow3 = 181,
+                                              endDayWindow3 = 365)
 
 ```
-In this example, we used the cohorts developed in the "my_results" cdm, specifying the location of the cohort table (cohortDatabaseSchema, cohortTable  - "my_results.cohort") and where the model will find the conditions, drug exposures, etc. to inform the model (cdmDatabaseSchema - "my_cdm_data").  The subjects included in the model will be those whose first visit in the CDM is between January 1, 2010 and December 31, 2017.  We are also specifically excluding the concept ID 201826, "Type 2 diabetes mellitus", which was used to create the xSpec cohort as well as all of the descendants of that concept ID.  Their ages at the time of first visit will be between 18 and 90. 
 
-In this example, the parameters specify that the function will create the model file:   
-  "c:/phenotyping/model_diabetes.rds",
+**Quick Tip:** The feature extraction windows above are useful for chronic conditions.  For acute conditions, such as myocardial infarction, you should use:
+```{r tidy=FALSE,eval=FALSE}
+options(andromedaTempFolder = "c:/temp2/ff") #place to store large temporary files
 
-produce the evaluation cohort file:   
-  "c:/phenotyping/evaluationCohort_diabetes.rds"
+CovSettings <- createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
+                                              addDescendantsToExclude = TRUE,
+                                              startDayWindow1 = 0,
+                                              endDayWindow1 = 10,
+                                              startDayWindow2 = 11,
+                                              endDayWindow2 = 20,
+                                              startDayWindow3 = 21,
+                                              endDayWindow3 = 30)
 
-## Evaluating the phenotype algorithms to be used in studies
+```
 
-The function testPhenotypeAlgorithm allows the user to determine the performance characteristics of phenotype algorithms (cohort defintions) to be used in studies.  It uses the evaluation cohort developed in the previous step.  The same evaluation cohort may be used to test as many different phenotype algorithms as you wish that pertain to the same health condition.   
-  
-testPhenotypeAlgorithm should the following parameters:   
+2) Use the createCreateEvaluationCohortArgs() function to set the model building and evaluation parameters
+* xSpecCohortId - set the xSpec cohort ID
+* xSensCohortId - set the xSens cohort ID
+* prevalenceCohortId - set the prevalence cohort ID
+* evaluationPopulationCohortId - set the evaluation cohort ID
+* covariateSettings - use the covariate settings created with the createDefaultCovariateSettings() function above
+* baseSampleSize - set the size of the evaluation cohort (default = 2M)
+* lowerAgeLimit - set the lower age limit (default = 0)
+* upperAgeLimit - set the upper age limit (default = 120)
+* gender - set the gender (default = all genders)
+* race - set the races of the subjects to be evaluated (default = all races)
+* ethnicity - set the ethnicity of the subjects to be evaluated (default = all ethnicities)
+* startDate - set the start date for the analysis (default = "19001010")
+* endDate- set the end date for the analysis (default = "21000101")
 
- * connectionDetails \- connectionDetails created using the function createConnectionDetails in the DatabaseConnector package
- * cutPoints \- A list of threshold predictions for the evaluations.  Include "EV" for the expected value
- * outFolder \- The folder where the cohort evaluation output files are written
- * evaluationCohortId \- A string used to generate the file names for the evaluation cohort.  This will be the same name used in createEvaluationCohort described above.
- * cdmDatabaseSchema \- The name of the database schema that contains the OMOP CDM instance. Requires read permissions to this database. On SQL Server, this should specifiy both the database and the schema, so for example 'cdm_instance.dbo'.
- * cohortDatabaseSchema \- The name of the database schema that is the location where the cohort data used to define the at risk cohort is available. Requires read permissions to this database. 
- * cohortTable \- The tablename that contains the at risk cohort. The expectation is cohortTable has format of COHORT table: cohort_concept_id, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.
- * phenotypeCohortId \- The ID of the cohort to evaluate in the specified cohort table.
- * washoutPeriod \- The mininum required continuous observation time prior to index date for subjects within the cohort to test (Default = 0).
 For example:
-
 ```{r tidy=FALSE,eval=FALSE}
-options(fftempdir = "c:/temp/ff") #place to store large temporary files
+CohortArgs <- createCreateEvaluationCohortArgs(xSpecCohortId = 1769699,
+                                               xSensCohortId = 1770120,
+                                               prevalenceCohortId = 1770119,
+                                               evaluationPopulationCohortId = 1778258,
+                                               covariateSettings = CovSettings,
+                                               baseSampleSize = 2000000,
+                                               lowerAgeLimit = 18,
+                                               startDate = "20100101",
+                                               endDate = "21000101")
+```
 
+3) Use the createTestPhenotypeAlgorithmArgs() function to set the parameters for evaluating phenotype algorithms
+* phenotypeCohortId - set the phenotype algorithm (cohort) ID to evaluate
+
+For example:
+```{r tidy=FALSE,eval=FALSE}
+#First phenotype algorithm to test
+conditionAlg1TestArgs <- createTestPhenotypeAlgorithmArgs(phenotypeCohortId =  1778259) 
+```
+
+4) Use the createPheValuatorAnalysis() function to set up the phenotype algorithm analyses to run
+* analysisId - set a unique value for the analysis in the run
+* description - set a text string for the name of the analysis
+* createEvaluationCohortArgs - use the createCreateEvaluationCohortArgs() settings created above
+* testPhenotypeAlgorithmArgs - use the createTestPhenotypeAlgorithmArgs() settings created above
+
+For example:
+```{r tidy=FALSE,eval=FALSE}
+analysis1 <- createPheValuatorAnalysis(analysisId = 1,
+                                       description = "[PheValuator] Type 2 Diabetes Mellitus 
+                                                    (prevalent)",
+                                       createEvaluationCohortArgs = CohortArgs,
+                                       testPhenotypeAlgorithmArgs = conditionAlg1TestArgs)
+
+```
+Create as many analyses as needed:
+
+For example:
+```{r tidy=FALSE,eval=FALSE}
+#Second phenotype algorithm to test
+conditionAlg2TestArgs <- createTestPhenotypeAlgorithmArgs(phenotypeCohortId = 1778260,
+                                                          washoutPeriod = 0)
+
+analysis2 <- createPheValuatorAnalysis(analysisId = 2,
+                                       description = "[PheValuator] Type 2 diabetes mellitus 
+                                                    with second code 31-365 days after index",
+                                       createEvaluationCohortArgs = CohortArgs,
+                                       testPhenotypeAlgorithmArgs = conditionAlg2TestArgs)
+
+#save the analyses
+pheValuatorAnalysisList <- list(analysis1, analysis2)
+```
+
+5) Use the runPheValuatorAnalyses() function to start the analysis run
+* connectionDetails - set your connection details using the DatabaseConnector::createConnectionDetails()
+* cdmDatabaseSchema - set the location of your database schema
+* cohortDatabaseSchema - set the location of your cohort schema
+* cohortTable - set the name of your cohort table in your cohort schema
+* workDatabaseSchema - set the location of a database where you have write access for temporary tables
+* outputFolder - provide a name for an output folder to store your results
+* pheValuatorAnalysisList - create a list of your analysis IDs created using the createPheValuatorAnalysis() function above
+
+For example:
+```{r tidy=FALSE,eval=FALSE}
+#create database connection details
 connectionDetails <- createConnectionDetails(dbms = "postgresql",
-                                              server = "localhost/ohdsi",
-                                              user = "joe",
-                                              password = "supersecret")
+                                             server = "localhost/ohdsi",
+                                             user = "joe",
+                                             password = "supersecret")
 
-phenotypeResults <- testPhenotypeAlgorithm(connectionDetails,
-                                   cutPoints = c("EV"),
-                                   outFolder = "c:/phenotyping",
-                                   evaluationCohortId = "diabetes",
-                                   phenotypeCohortId = 7142,
-                                   cdmDatabaseSchema = "my_cdm_data",
-                                   cohortDatabaseSchema = "my_results",
-                                   cohortTable  = "cohort",
-                                   washoutPeriod = 365)
-
+#run the PheValuator process
+referenceTable <- runPheValuatorAnalyses(connectionDetails = connectionDetails,
+                                         cdmDatabaseSchema = "yourCDMSchema",
+                                         cohortDatabaseSchema = "yourCohortSchema",
+                                         cohortTable = "yourCohortTableSchema",
+                                         workDatabaseSchema = "yourWritableSchema",
+                                         outputFolder = "yourOutputFolderSchema",
+                                         pheValuatorAnalysisList = pheValuatorAnalysisList)
 ```
 
-In this example, we are using only the expected value ("EV").  Given that parameter setting, the output from this step will provide performance characteristics (i.e, sensitivity, specificity, etc.) at each prediction threshold as well as those using the expected value calculations as described in the [Step 2 diagram](vignettes/Figure3.png).  The evaluation uses the prediction information for the evaluation cohort developed in the prior step.  This function returns a dataframe with the performance characteristics of the phenotype algorithm that was tested.  The user can write this dataframe to a csv file using code such as:
+6) You can view the results from the analyses using the summarizePheValuatorAnalyses() function providing the results from the runPheValuatorAnalyses() function above
+
+For example:
 ```{r tidy=FALSE,eval=FALSE}
-
-      write.csv(phenotypeResults, "c:/phenotyping/diabetes_results.csv", row.names = FALSE)
-
+#view the results of the phenotype evaluation
+View(summarizePheValuatorAnalyses(referenceTable, "yourOutputFolderSchema"))
+write.csv(phenotypeResults, "c:/phenotyping/diabetes_results.csv", row.names = FALSE)
 ```
 
+The results from above will look like:
 
+![PheValuator results for Type 2 Diabetes Mellitus analysis](D:/git/PheValuator/vignettes/pheValuatorT2DMResults.png)
+
+## Output from the process
+The runPheValuatorAnalyses() function will produce the following artifacts:   
+
+1) A Patient Level Prediction file (in .rds format) containg the information from the model building process   
+2) A Patient Level Prediction file (in .rds format) containg the information from applying the model to the evaluation cohort
+3) All the results from the phenotype algorithm analyses (in .rds format)
 
 
 

@@ -115,6 +115,19 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
 						AND gender_concept_id in (@gender)
 						{@race != 0} ? {AND race_concept_id in (@race)}
 		        {@ethnicity != 0} ? {AND ethnicity_concept_id in (@ethnicity)}
+		      join (
+              select person_id,
+                datediff(day, min(observation_period_start_date), min(observation_period_end_date)) lenPd,
+                min(observation_period_start_date) observation_period_start_date,
+                min(observation_period_end_date) observation_period_end_date,
+                count(observation_period_id) cntPd
+              from @cdm_database_schema.observation_period
+              group by person_id) obs2
+              on v.person_id = obs2.person_id
+                and v.visit_start_date >= obs2.observation_period_start_date
+                and v.visit_start_date <= obs2.observation_period_end_date
+                and lenPd >= 730
+                and cntPd = 1
 					WHERE co.cohort_definition_id = @mainPopnCohort
 						{@exclCohort != 0} ? {AND co.subject_id not in (
 													SELECT subject_id

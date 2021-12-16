@@ -13,7 +13,9 @@ testPhenotypeAlgorithm(
   cdmDatabaseSchema,
   cohortDatabaseSchema,
   cohortTable,
-  washoutPeriod = 0
+  washoutPeriod = 0,
+  splayPrior = 7,
+  splayPost = 7
 )
 }
 \arguments{
@@ -44,6 +46,10 @@ SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE.}
 
 \item{washoutPeriod}{The mininum required continuous observation time prior to index
 date for subjects within the cohort to test (Default = 0).}
+
+\item{splayPrior}{The number of days to allow for test phenotype visit date prior to evaluation date}
+
+\item{splayPost}{The number of days to allow for test phenotype visit date after evaluation date}
 }
 \value{
 A dataframe with the results from the phenotype

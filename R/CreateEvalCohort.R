@@ -43,6 +43,8 @@
                                     savePlpData = FALSE,
                                     modelType = "acute") {
 
+  modelType <- "acute" #force to only using acute settings
+
   if (savePlpData == TRUE) {
     evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))
     if (file.exists(evaluationCohortPlpDataFileName))

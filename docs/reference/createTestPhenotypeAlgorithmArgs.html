@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
       </span>
     </div>
 
@@ -135,7 +135,9 @@
     <pre class="usage"><span class='fu'>createTestPhenotypeAlgorithmArgs</span>(
   <span class='kw'>cutPoints</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"EV"</span>),
   <span class='no'>phenotypeCohortId</span>,
-  <span class='kw'>washoutPeriod</span> <span class='kw'>=</span> <span class='fl'>0</span>
+  <span class='kw'>washoutPeriod</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>splayPrior</span> <span class='kw'>=</span> <span class='fl'>7</span>,
+  <span class='kw'>splayPost</span> <span class='kw'>=</span> <span class='fl'>7</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -154,6 +156,14 @@ expected value</p></td>
       <th>washoutPeriod</th>
       <td><p>The mininum required continuous observation time prior to indexdate for
 subjects within the cohort to test (Default = 0).</p></td>
+    </tr>
+    <tr>
+      <th>splayPrior</th>
+      <td><p>The number of days to allow for test phenotype visit date prior to evaluation date</p></td>
+    </tr>
+    <tr>
+      <th>splayPost</th>
+      <td><p>The number of days to allow for test phenotype visit date after evaluation date</p></td>
     </tr>
     </table>
 
