@@ -30,6 +30,7 @@ Imports:
     tibble
 Suggests:
     knitr,
+    rmarkdown,
     ROhdsiWebApi,
     shiny,
     shinydashboard,
