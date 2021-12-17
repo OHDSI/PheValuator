@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -140,7 +140,10 @@
   <span class='kw'>cohortToCreateFile</span> <span class='kw'>=</span> <span class='st'>"settings/CohortsToCreate.csv"</span>,
   <span class='kw'>baseUrl</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>cohortSetReference</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>minCellCount</span> <span class='kw'>=</span> <span class='fl'>5</span>
+  <span class='kw'>minCellCount</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>databaseId</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>databaseName</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>databaseDescription</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -181,6 +184,18 @@ the <code><a href='createPheValuatorAnalysis.html'>createPheValuatorAnalysis</a>
     <tr>
       <th>minCellCount</th>
       <td><p>The minimum cell count for fields contains person counts or fractions.</p></td>
+    </tr>
+    <tr>
+      <th>databaseId</th>
+      <td><p>ID of the database</p></td>
+    </tr>
+    <tr>
+      <th>databaseName</th>
+      <td><p>Name of the database</p></td>
+    </tr>
+    <tr>
+      <th>databaseDescription</th>
+      <td><p>Description of the database</p></td>
     </tr>
     </table>
 

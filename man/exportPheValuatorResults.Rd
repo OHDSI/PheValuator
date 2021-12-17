@@ -12,7 +12,10 @@ exportPheValuatorResults(
   cohortToCreateFile = "settings/CohortsToCreate.csv",
   baseUrl = NULL,
   cohortSetReference = NULL,
-  minCellCount = 5
+  minCellCount = 5,
+  databaseId = NULL,
+  databaseName = NULL,
+  databaseDescription = NULL
 )
 }
 \arguments{
@@ -35,6 +38,12 @@ the \code{\link{createPheValuatorAnalysis}} function.}
 \code{packageName} and \code{cohortToCreateFile} have been specified.}
 
 \item{minCellCount}{The minimum cell count for fields contains person counts or fractions.}
+
+\item{databaseId}{ID of the database}
+
+\item{databaseName}{Name of the database}
+
+\item{databaseDescription}{Description of the database}
 }
 \description{
 Export the PheValuator results to CSV files

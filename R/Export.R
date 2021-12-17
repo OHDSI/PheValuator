@@ -28,6 +28,9 @@
 #' @param cohortSetReference  A data frame with four columns, as described in the details. Can be left NULL if
 #'                            \code{packageName} and \code{cohortToCreateFile} have been specified.
 #' @param minCellCount                The minimum cell count for fields contains person counts or fractions.
+#' @param databaseId          ID of the database
+#' @param databaseName        Name of the database
+#' @param databaseDescription Description of the database
 #'
 #' @details
 #' Currently three ways of executing this function are supported, which determines how the meta-data on the cohorts is retrieved:
@@ -53,7 +56,11 @@ exportPheValuatorResults <- function(outputFolder,
                                      cohortToCreateFile = "settings/CohortsToCreate.csv",
                                      baseUrl = NULL,
                                      cohortSetReference = NULL,
-                                     minCellCount = 5) {
+                                     minCellCount = 5,
+                                     databaseId = NULL,
+                                     databaseName = NULL,
+                                     databaseDescription = NULL
+                                     ) {
   if (!file.exists(exportFolder)) {
     dir.create(exportFolder)
   }
