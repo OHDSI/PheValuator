@@ -1,8 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-.travis.yml
+.github
+examplePackage
 standalone
-^\.travis\.yml$
 man/CohortMethod.pdf
 man/balanceScatterPlot.png
 man/ps.png
