@@ -6,8 +6,7 @@ output:
 PheValuator
 ======================
 
-[![Build Status](https://travis-ci.org/OHDSI/PheValuator.svg?branch=master)](https://travis-ci.org/OHDSI/PheValuator)
-[![codecov.io](https://codecov.io/github/OHDSI/PheValuator/coverage.svg?branch=master)](https://codecov.io/github/OHDSI/PheValuator?branch=master)
+[![Build Status](https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check)
 
 An R package for evaluating phenotype algorithms,  
 
