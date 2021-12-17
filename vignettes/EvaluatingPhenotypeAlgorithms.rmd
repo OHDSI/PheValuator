@@ -207,7 +207,7 @@ write.csv(phenotypeResults, "c:/phenotyping/diabetes_results.csv", row.names = F
 
 The results from above will look like:
 
-![PheValuator results for Type 2 Diabetes Mellitus analysis](D:/git/PheValuator/vignettes/pheValuatorT2DMResults.png)
+![PheValuator results for Type 2 Diabetes Mellitus analysis](pheValuatorT2DMResults.png)
 
 ## Output from the process
 The runPheValuatorAnalyses() function will produce the following artifacts:   
