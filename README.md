@@ -36,7 +36,7 @@ PheValuator is an R package.
 
 System Requirements
 ===================
-Requires R (version 3.3.0 or higher). Installation on Windows requires [RTools](http://cran.r-project.org/bin/windows/Rtools/). Some of the packages used by PheValuator require Java.
+Requires R (version 3.3.0 or higher). Installation on Windows requires [RTools](https://cran.r-project.org/bin/windows/Rtools/). Some of the packages used by PheValuator require Java.
 
 Installation
 =============
