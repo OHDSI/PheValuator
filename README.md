@@ -1,14 +1,9 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
 PheValuator
-======================
+===========
 
 [![Build Status](https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check)
 
-An R package for evaluating phenotype algorithms,  
+An R package for evaluating phenotype algorithms.
 
 
 Introduction
@@ -41,41 +36,37 @@ PheValuator is an R package.
 
 System Requirements
 ===================
-Requires R (version 3.3.0 or higher). Installation on Windows requires [RTools](http://cran.r-project.org/bin/windows/Rtools/).
+Requires R (version 3.3.0 or higher). Installation on Windows requires [RTools](http://cran.r-project.org/bin/windows/Rtools/). Some of the packages used by PheValuator require Java.
 
 Installation
 =============
-1. On Windows, make sure [RTools](http://cran.r-project.org/bin/windows/Rtools/) is installed.
-2. The DatabaseConnector and SqlRender packages require Java. Java can be downloaded from
-<a href="http://www.java.com" target="_blank">http://www.java.com</a>. Once Java is installed, ensure that Java is being pathed correctly. Under environment variables in the control panel, ensure that the jvm.dll file is added correctly to the path.
-3. In R, use the following commands to download and install CohortMethod:
+1. See the instructions [here](https://ohdsi.github.io/Hades/rSetup.html) for configuring your R environment, including Java.
+2. In R, use the following commands to download and install PheValuator:
 
-  ```r
-  install.packages("drat")
-  drat::addRepo("OHDSI")
-  install.packages("PheValuator")
-  ```
+    ```r
+    install.packages("remotes")
+    remotes::install_github("ohdsi/PheValuator")
+    ```
 
 User Documentation
 ==================
+Documentation can be found on the [package website](https://ohdsi.github.io/PheValuator).
 
-Please read the main vignette for the package:
-
-- [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
-- [PheValuator Manual](https://github.com/OHDSI/PheValuator/blob/master/extras/PheValuator.pdf)
-
-Getting Involved
-===============
-We would like you to get involved in the development of this package through pull requests to our development branch.
-
+PDF versions of the documentation are also available:
 * Vignette: [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
 * Package manual: [PheValuator manual](https://raw.githubusercontent.com/OHDSI/PheValuator/master/extras/PheValuator.pdf) 
+
 
 Support
 =======
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
 * We use the <a href="https://github.com/OHDSI/PheValuator">GitHub issue tracker</a> for all bugs/issues/enhancements
  
+Contributing
+============
+
+Read [here](https://ohdsi.github.io/Hades/contribute.html) how you can contribute to this package.
+
 License
 =======
 PheValuator is licensed under Apache License 2.0
