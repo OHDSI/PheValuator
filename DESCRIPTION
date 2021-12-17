@@ -14,7 +14,6 @@ Description: A package for evaluating phenotype algorithms.  The package
     preditive value.
 License: Apache License 2.0
 VignetteBuilder: knitr
-LazyData: true
 Depends:
     R (>= 3.2.2),
     DatabaseConnector,
@@ -30,6 +29,7 @@ Imports:
     tibble
 Suggests:
     knitr,
+    rmarkdown,
     ROhdsiWebApi,
     shiny,
     shinydashboard,
@@ -41,5 +41,5 @@ Remotes:
     ohdsi/ROhdsiWebApi
 URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Encoding: UTF-8
