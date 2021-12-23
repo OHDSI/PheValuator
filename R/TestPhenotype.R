@@ -98,17 +98,6 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     modelType <- evaluationCohort$PheValuator$inputSetting$modelType
     if (modelType == "acute") {
       sql <- paste0("SELECT DISTINCT subject_id,
-                visit_start_date AS cohort_start_date_p
-              FROM @cohort_database_schema.@cohort_table
-              JOIN @cdm_database_schema.visit_occurrence
-                ON subject_id = person_id
-                  and cohort_start_date >= visit_start_date
-                  and cohort_start_date <= visit_end_date
-              WHERE cohort_definition_id = @cohort_id
-                and cohort_start_date >= cast('", minCohortStartDate, "' as date) ",
-              "and cohort_start_date <= cast('", maxCohortStartDate, "' as date) ;")
-
-      sql <- paste0("SELECT DISTINCT subject_id,
                 cohort_start_date AS cohort_start_date_p
               FROM @cohort_database_schema.@cohort_table
               JOIN @cdm_database_schema.observation_period
@@ -172,7 +161,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                              fullTable$cohortStartDate >= fullTable$cohortStartDateP + splayPrior)] <- FALSE
 
         ######
-        #write.csv(fullTable, paste0("p:/shared/",  phenotypeCohortId, splayPrior, ".csv"))
+        write.csv(fullTable, paste0("p:/shared/",  phenotypeCohortId, splayPrior, ".csv"))
         ######
 
       } else {
