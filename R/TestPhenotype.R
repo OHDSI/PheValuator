@@ -161,7 +161,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                              fullTable$cohortStartDate >= fullTable$cohortStartDateP + splayPrior)] <- FALSE
 
         ######
-        write.csv(fullTable, paste0("p:/shared/",  phenotypeCohortId, splayPrior, ".csv"))
+        #write.csv(fullTable, paste0("p:/shared/",  phenotypeCohortId, splayPrior, ".csv"))
         ######
 
       } else {
