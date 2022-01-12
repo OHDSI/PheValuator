@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.2</span>
       </span>
     </div>
 
@@ -85,7 +85,7 @@
       <h1 data-toc-skip>EvaluatingPhenotypeAlgorithms</h1>
                         <h4 class="author">Joel N. Swerdel</h4>
             
-            <h4 class="date">2021-12-17</h4>
+            <h4 class="date">2022-01-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/PheValuator/blob/master/vignettes/EvaluatingPhenotypeAlgorithms.rmd"><code>vignettes/EvaluatingPhenotypeAlgorithms.rmd</code></a></small>
       <div class="hidden name"><code>EvaluatingPhenotypeAlgorithms.rmd</code></div>
@@ -114,17 +114,17 @@
 <div id="creating-the-extremely-specific-xspec-extremely-sensitive-xsens-prevalence-and-evaluation-cohorts" class="section level2">
 <h2 class="hasAnchor">
 <a href="#creating-the-extremely-specific-xspec-extremely-sensitive-xsens-prevalence-and-evaluation-cohorts" class="anchor"></a>Creating the Extremely Specific (xSpec), Extremely Sensitive (xSens), Prevalence, and Evaluation Cohorts</h2>
-<p>The extremely specific (xSpec), extremely sensitive (xSens), prevalence, and evaluation cohorts are developed using the ATLAS tool. The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability. This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record. An <a href="http://www.ohdsi.org/web/atlas/#/cohortdefinition/1769699"><strong>example</strong></a> of this for T2DM is included in the OHDSI ATLAS repository. In this example each subject has at least 2 diagnosis codes for T2DM in days 21 to 1 prior to an index clinical visit, the first of which is the the first diagnosis in the patients history. The algorithm also excludes subjects with type 1 DM (T1DM) any time in their record. This is a very specific algorithm for T2DM as it ensures that the subjects in this cohort have a very high probability for having the condition of T2DM. This PA also specifies that subjects are required to have at least 365 days of prior and post-index observation in their patient record.</p>
+<p>The extremely specific (xSpec), extremely sensitive (xSens), prevalence, and evaluation cohorts are developed using the ATLAS tool. The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability. This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1769699"><strong>example</strong></a> of this for T2DM is included in the OHDSI ATLAS repository. In this example each subject has at least 2 diagnosis codes for T2DM in days 21 to 1 prior to an index clinical visit, the first of which is the the first diagnosis in the patients history. The algorithm also excludes subjects with type 1 DM (T1DM) any time in their record. This is a very specific algorithm for T2DM as it ensures that the subjects in this cohort have a very high probability for having the condition of T2DM. This PA also specifies that subjects are required to have at least 365 days of prior and post-index observation in their patient record.</p>
 <p><strong>Quick Tip:</strong> When building the xSpec cohort, the days prior where you are looking for 2 or more diagnosis codes for the condition should be altered depending on the condition. For very rare conditions you may need to expand it to 60 to 1 days prior to index. For acute conditions such as myocardial infarction it is best to have a very short interval such as 1 to 1 day prior to index (i.e., the day prior to index)</p>
-<p>An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI. The system uses the xSens cohort to create a set of “noisy” negative subjects, i.e., subjects with a high likelihood of not having the HOI. This group of subjects will be used in the model building process and is described in detail below. An <a href="http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770120"><strong>example</strong></a> of an xSens cohort for T2DM is also in the OHDSI ATLAS repository.</p>
-<p>The system uses the prevalence cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model. This group of subjects will be used in the model building process and is described in detail below. An <a href="http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770119"><strong>example</strong></a> of an prevalence cohort for T2DM is also in the OHDSI ATLAS repository.</p>
-<p>PheValuator uses the evaluation cohort to define a specific set of subjects to test for the outcome of interest and uses these subjects to evaluate the PAs. An <a href="http://www.ohdsi.org/web/atlas/#/cohortdefinition/1778258"><strong>example</strong></a> of an evaluation cohort for T2DM is also in the OHDSI ATLAS repository.</p>
+<p>An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI. The system uses the xSens cohort to create a set of “noisy” negative subjects, i.e., subjects with a high likelihood of not having the HOI. This group of subjects will be used in the model building process and is described in detail below. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1770120"><strong>example</strong></a> of an xSens cohort for T2DM is also in the OHDSI ATLAS repository.</p>
+<p>The system uses the prevalence cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model. This group of subjects will be used in the model building process and is described in detail below. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1770119"><strong>example</strong></a> of an prevalence cohort for T2DM is also in the OHDSI ATLAS repository.</p>
+<p>PheValuator uses the evaluation cohort to define a specific set of subjects to test for the outcome of interest and uses these subjects to evaluate the PAs. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778258"><strong>example</strong></a> of an evaluation cohort for T2DM is also in the OHDSI ATLAS repository.</p>
 <p><strong>Quick Tip:</strong> You can build your required cohorts easily by exporting the JSON in the examples above and copying them into your repository. The only changes you should need to make are changing the concept sets for the condition and the days prior to index for searching for multiple diagnosis codes in the xSpec cohort.</p>
 <p>For the example below, two more phenotype algorithms were created:</p>
 <ol style="list-style-type: decimal">
-<li>An example of a prevalent algorithm for T2DM <a href="http://www.ohdsi.org/web/atlas/#/cohortdefinition/1778259"><strong>(Type 2 Diabetes Mellitus (prevalent))</strong></a>
+<li>An example of a prevalent algorithm for T2DM <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778259"><strong>(Type 2 Diabetes Mellitus (prevalent))</strong></a>
 </li>
-<li>An example of a prevalent algorithm for T2DM requiring a second condition code for T2DM 31-365 days after index <a href="http://www.ohdsi.org/web/atlas/#/cohortdefinition/1778260"><strong>(Type 2 diabetes mellitus (prevalent) with second code 31-365 days after index)</strong></a>
+<li>An example of a prevalent algorithm for T2DM requiring a second condition code for T2DM 31-365 days after index <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778260"><strong>(Type 2 diabetes mellitus (prevalent) with second code 31-365 days after index)</strong></a>
 </li>
 </ol>
 </div>
@@ -159,9 +159,7 @@
 <p><strong>Quick Tip:</strong> The feature extraction windows above are useful for chronic conditions. For acute conditions, such as myocardial infarction, you should use:</p>
 <div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="kw">andromedaTempFolder</span> <span class="kw">=</span> <span class="st">"c:/temp2/ff"</span>) <span class="co">#place to store large temporary files</span>
 
-<span class="no">CovSettings</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span>(<span class="kw">excludedCovariateConceptIds</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(),
-                                              <span class="kw">addDescendantsToExclude</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-                                              <span class="kw">startDayWindow1</span> <span class="kw">=</span> <span class="fl">0</span>,
+<span class="no">CovSettings</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span>(<span class="kw">startDayWindow1</span> <span class="kw">=</span> <span class="fl">0</span>,
                                               <span class="kw">endDayWindow1</span> <span class="kw">=</span> <span class="fl">10</span>,
                                               <span class="kw">startDayWindow2</span> <span class="kw">=</span> <span class="fl">11</span>,
                                               <span class="kw">endDayWindow2</span> <span class="kw">=</span> <span class="fl">20</span>,
@@ -176,25 +174,13 @@
 <li>prevalenceCohortId - set the prevalence cohort ID</li>
 <li>evaluationPopulationCohortId - set the evaluation cohort ID</li>
 <li>covariateSettings - use the covariate settings created with the createDefaultCovariateSettings() function above</li>
-<li>baseSampleSize - set the size of the evaluation cohort (default = 2M)</li>
-<li>lowerAgeLimit - set the lower age limit (default = 0)</li>
-<li>upperAgeLimit - set the upper age limit (default = 120)</li>
-<li>gender - set the gender (default = all genders)</li>
-<li>race - set the races of the subjects to be evaluated (default = all races)</li>
-<li>ethnicity - set the ethnicity of the subjects to be evaluated (default = all ethnicities)</li>
-<li>startDate - set the start date for the analysis (default = “19001010”)</li>
-<li>endDate- set the end date for the analysis (default = “21000101”)</li>
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">CohortArgs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs</a></span>(<span class="kw">xSpecCohortId</span> <span class="kw">=</span> <span class="fl">1769699</span>,
                                                <span class="kw">xSensCohortId</span> <span class="kw">=</span> <span class="fl">1770120</span>,
                                                <span class="kw">prevalenceCohortId</span> <span class="kw">=</span> <span class="fl">1770119</span>,
                                                <span class="kw">evaluationPopulationCohortId</span> <span class="kw">=</span> <span class="fl">1778258</span>,
-                                               <span class="kw">covariateSettings</span> <span class="kw">=</span> <span class="no">CovSettings</span>,
-                                               <span class="kw">baseSampleSize</span> <span class="kw">=</span> <span class="fl">2000000</span>,
-                                               <span class="kw">lowerAgeLimit</span> <span class="kw">=</span> <span class="fl">18</span>,
-                                               <span class="kw">startDate</span> <span class="kw">=</span> <span class="st">"20100101"</span>,
-                                               <span class="kw">endDate</span> <span class="kw">=</span> <span class="st">"21000101"</span>)</pre></body></html></div>
+                                               <span class="kw">covariateSettings</span> <span class="kw">=</span> <span class="no">CovSettings</span>)</pre></body></html></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Use the createTestPhenotypeAlgorithmArgs() function to set the parameters for evaluating phenotype algorithms</li>
 </ol>
@@ -277,9 +263,9 @@
 <a href="#output-from-the-process" class="anchor"></a>Output from the process</h2>
 <p>The runPheValuatorAnalyses() function will produce the following artifacts:</p>
 <ol style="list-style-type: decimal">
-<li>A Patient Level Prediction file (in .rds format) containg the information from the model building process<br>
+<li>A Patient Level Prediction file (in .rds format) containing the information from the model building process<br>
 </li>
-<li>A Patient Level Prediction file (in .rds format) containg the information from applying the model to the evaluation cohort</li>
+<li>A Patient Level Prediction file (in .rds format) containing the information from applying the model to the evaluation cohort</li>
 <li>All the results from the phenotype algorithm analyses (in .rds format)</li>
 </ol>
 </div>
