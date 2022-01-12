@@ -150,12 +150,14 @@ testPhenotypeAlgorithm <- function(connectionDetails,
       # join the phenotype table with the prediction table
       if (modelType == "acute") {
         # join phenotype and evaluation cohort on subject_id and phenotype visit date +/- the splay
+        #first join by subject id only
         fullTable <- dplyr::left_join(modelAll,
                                       phenoPop[, c("subjectId", "cohortStartDateP", "inPhenotype")],
                                       by = c("subjectId"))
         fullTable$cohortStartDate <- as.Date(fullTable$cohortStartDate)
         fullTable$cohortStartDateP <- as.Date(fullTable$cohortStartDateP)
 
+        #now set match (inPhenotype) to false if the cohort and visit date do not match within splay setting
         fullTable$inPhenotype[!is.na(fullTable$cohortStartDateP) &
                                 (fullTable$cohortStartDate <= fullTable$cohortStartDateP - splayPost |
                              fullTable$cohortStartDate >= fullTable$cohortStartDateP + splayPrior)] <- FALSE
@@ -170,6 +172,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                                       by = c("subjectId"))
       }
 
+      #set all the rest of the non-matches to false
       fullTable$inPhenotype[is.na(fullTable$inPhenotype)] <- FALSE
 
       # a cut point = 'EV' indicates to calculate the expected values - using the probability to proportion

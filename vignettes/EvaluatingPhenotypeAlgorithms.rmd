@@ -39,22 +39,22 @@ Each of these steps is described in detail below.  For this vignette, we will de
 
 ## Creating the Extremely Specific (xSpec), Extremely Sensitive (xSens), Prevalence, and Evaluation Cohorts
 
-The extremely specific (xSpec), extremely sensitive (xSens), prevalence, and evaluation cohorts are developed using the ATLAS tool.  The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability.  This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record.  An [**example**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1769699) of this for T2DM is included in the OHDSI ATLAS repository.  In this example each subject has at least 2 diagnosis codes for T2DM in days 21 to 1 prior to an index clinical visit, the first of which is the the first diagnosis in the patients history.  The algorithm also excludes subjects with type 1 DM (T1DM) any time in their record.  This is a very specific algorithm for T2DM as it ensures that the subjects in this cohort have a very high probability for having the condition of T2DM.  This PA also specifies that subjects are required to have at least 365 days of prior and post-index observation in their patient record.
+The extremely specific (xSpec), extremely sensitive (xSens), prevalence, and evaluation cohorts are developed using the ATLAS tool.  The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability.  This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record.  An [**example**](https://atlas-demo.ohdsi.org/#/cohortdefinition/1769699) of this for T2DM is included in the OHDSI ATLAS repository.  In this example each subject has at least 2 diagnosis codes for T2DM in days 21 to 1 prior to an index clinical visit, the first of which is the the first diagnosis in the patients history.  The algorithm also excludes subjects with type 1 DM (T1DM) any time in their record.  This is a very specific algorithm for T2DM as it ensures that the subjects in this cohort have a very high probability for having the condition of T2DM.  This PA also specifies that subjects are required to have at least 365 days of prior and post-index observation in their patient record.
 
 **Quick Tip:** When building the xSpec cohort, the days prior where you are looking for 2 or more diagnosis codes for the condition should be altered depending on the condition.  For very rare conditions you may need to expand it to 60 to 1 days prior to index.  For acute conditions such as myocardial infarction it is best to have a very short interval such as 1 to 1 day prior to index (i.e., the day prior to index)
 
-An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI.  The system uses the xSens cohort to create a set of "noisy" negative subjects, i.e., subjects with a high likelihood of not having the HOI.  This group of subjects will be used in the model building process and is described in detail below.  An [**example**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770120) of an xSens cohort for T2DM is also in the OHDSI ATLAS repository.
+An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI.  The system uses the xSens cohort to create a set of "noisy" negative subjects, i.e., subjects with a high likelihood of not having the HOI.  This group of subjects will be used in the model building process and is described in detail below.  An [**example**](https://atlas-demo.ohdsi.org/#/cohortdefinition/1770120) of an xSens cohort for T2DM is also in the OHDSI ATLAS repository.
 
-The system uses the prevalence cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model.  This group of subjects will be used in the model building process and is described in detail below.  An [**example**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1770119) of an prevalence cohort for T2DM is also in the OHDSI ATLAS repository.
+The system uses the prevalence cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model.  This group of subjects will be used in the model building process and is described in detail below.  An [**example**](https://atlas-demo.ohdsi.org/#/cohortdefinition/1770119) of an prevalence cohort for T2DM is also in the OHDSI ATLAS repository.
 
-PheValuator uses the evaluation cohort to define a specific set of subjects to test for the outcome of interest and uses these subjects to evaluate the PAs.  An [**example**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1778258) of an evaluation cohort for T2DM is also in the OHDSI ATLAS repository.
+PheValuator uses the evaluation cohort to define a specific set of subjects to test for the outcome of interest and uses these subjects to evaluate the PAs.  An [**example**](https://atlas-demo.ohdsi.org/#/cohortdefinition/1778258) of an evaluation cohort for T2DM is also in the OHDSI ATLAS repository.
 
 **Quick Tip:** You can build your required cohorts easily by exporting the JSON in the examples above and copying them into your repository.  The only changes you should need to make are changing the concept sets for the condition and the days prior to index for searching for multiple diagnosis codes in the xSpec cohort.
 
 For the example below, two more phenotype algorithms were created:
 
-1) An example of a prevalent algorithm for T2DM [**(Type 2 Diabetes Mellitus (prevalent))**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1778259)
-2) An example of a prevalent algorithm for T2DM requiring a second condition code for T2DM 31-365 days after index [**(Type 2 diabetes mellitus (prevalent) with second code 31-365 days after index)**](http://www.ohdsi.org/web/atlas/#/cohortdefinition/1778260)
+1) An example of a prevalent algorithm for T2DM [**(Type 2 Diabetes Mellitus (prevalent))**](https://atlas-demo.ohdsi.org/#/cohortdefinition/1778259)
+2) An example of a prevalent algorithm for T2DM requiring a second condition code for T2DM 31-365 days after index [**(Type 2 diabetes mellitus (prevalent) with second code 31-365 days after index)**](https://atlas-demo.ohdsi.org/#/cohortdefinition/1778260)
 
 ## Evaluating phenotype algorithms for health conditions
 The basic steps in the process are as follows:
@@ -88,9 +88,7 @@ CovSettings <- createDefaultCovariateSettings(excludedCovariateConceptIds = c(20
 ```{r tidy=FALSE,eval=FALSE}
 options(andromedaTempFolder = "c:/temp2/ff") #place to store large temporary files
 
-CovSettings <- createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
-                                              addDescendantsToExclude = TRUE,
-                                              startDayWindow1 = 0,
+CovSettings <- createDefaultCovariateSettings(startDayWindow1 = 0,
                                               endDayWindow1 = 10,
                                               startDayWindow2 = 11,
                                               endDayWindow2 = 20,
@@ -105,14 +103,7 @@ CovSettings <- createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
 * prevalenceCohortId - set the prevalence cohort ID
 * evaluationPopulationCohortId - set the evaluation cohort ID
 * covariateSettings - use the covariate settings created with the createDefaultCovariateSettings() function above
-* baseSampleSize - set the size of the evaluation cohort (default = 2M)
-* lowerAgeLimit - set the lower age limit (default = 0)
-* upperAgeLimit - set the upper age limit (default = 120)
-* gender - set the gender (default = all genders)
-* race - set the races of the subjects to be evaluated (default = all races)
-* ethnicity - set the ethnicity of the subjects to be evaluated (default = all ethnicities)
-* startDate - set the start date for the analysis (default = "19001010")
-* endDate- set the end date for the analysis (default = "21000101")
+
 
 For example:
 ```{r tidy=FALSE,eval=FALSE}
@@ -120,11 +111,7 @@ CohortArgs <- createCreateEvaluationCohortArgs(xSpecCohortId = 1769699,
                                                xSensCohortId = 1770120,
                                                prevalenceCohortId = 1770119,
                                                evaluationPopulationCohortId = 1778258,
-                                               covariateSettings = CovSettings,
-                                               baseSampleSize = 2000000,
-                                               lowerAgeLimit = 18,
-                                               startDate = "20100101",
-                                               endDate = "21000101")
+                                               covariateSettings = CovSettings)
 ```
 
 3) Use the createTestPhenotypeAlgorithmArgs() function to set the parameters for evaluating phenotype algorithms
@@ -212,8 +199,8 @@ The results from above will look like:
 ## Output from the process
 The runPheValuatorAnalyses() function will produce the following artifacts:   
 
-1) A Patient Level Prediction file (in .rds format) containg the information from the model building process   
-2) A Patient Level Prediction file (in .rds format) containg the information from applying the model to the evaluation cohort
+1) A Patient Level Prediction file (in .rds format) containing the information from the model building process   
+2) A Patient Level Prediction file (in .rds format) containing the information from applying the model to the evaluation cohort
 3) All the results from the phenotype algorithm analyses (in .rds format)
 
 

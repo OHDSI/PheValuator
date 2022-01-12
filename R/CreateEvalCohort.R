@@ -29,7 +29,7 @@
                                     lowerAgeLimit = 0,
                                     upperAgeLimit = 120,
                                     visitLength = 0,
-                                    visitType = c(9201,9202,9203),
+                                    visitType = c(9201,9202,9203,262),
                                     gender = c(8507, 8532),
                                     race = 0,
                                     ethnicity = 0,

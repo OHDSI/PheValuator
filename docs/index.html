@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.2</span>
       </span>
     </div>
 
@@ -89,13 +89,15 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<hr>
-<p>output: pdf_document: default html_document: default — PheValuator ======================</p>
-<p><a href="https://travis-ci.org/OHDSI/PheValuator"><img src="https://travis-ci.org/OHDSI/PheValuator.svg?branch=master" alt="Build Status"></a> <a href="https://codecov.io/github/OHDSI/PheValuator?branch=master"><img src="https://codecov.io/github/OHDSI/PheValuator/coverage.svg?branch=master" alt="codecov.io"></a></p>
-<p>An R package for evaluating phenotype algorithms,</p>
-<div id="introduction" class="section level1">
+<div id="phevaluator" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1></div>
+<a href="#phevaluator" class="anchor"></a>PheValuator</h1></div>
+
+<p>An R package for evaluating phenotype algorithms.</p>
+</div>
+<div id="introduction" class="section level1">
+<h1 class="hasAnchor">
+<a href="#introduction" class="anchor"></a>Introduction</h1>
 <p>The goal of PheValuator is to produce a large cohort of subjects each with a predicted probability for a specified health outcome of interest (HOI). This is achieved by developing a diagnostic predictive model for the HOI using the PatientLevelPrediction (PLP) R package and applying the model to a large, randomly selected population. These subjects can be used to test one or more phenotype algorithms.</p>
 </div>
 <div id="process-steps" class="section level1">
@@ -117,33 +119,25 @@
 <div id="system-requirements" class="section level1">
 <h1 class="hasAnchor">
 <a href="#system-requirements" class="anchor"></a>System Requirements</h1>
-<p>Requires R (version 3.3.0 or higher). Installation on Windows requires <a href="http://cran.r-project.org/bin/windows/Rtools/">RTools</a>.</p>
+<p>Requires R (version 3.3.0 or higher). Installation on Windows requires <a href="https://cran.r-project.org/bin/windows/Rtools/">RTools</a>. Some of the packages used by PheValuator require Java.</p>
 </div>
 <div id="installation" class="section level1">
 <h1 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h1>
 <ol>
-<li>On Windows, make sure <a href="http://cran.r-project.org/bin/windows/Rtools/">RTools</a> is installed.</li>
-<li>The DatabaseConnector and SqlRender packages require Java. Java can be downloaded from <a href="http://www.java.com" target="_blank">http://www.java.com</a>. Once Java is installed, ensure that Java is being pathed correctly. Under environment variables in the control panel, ensure that the jvm.dll file is added correctly to the path.</li>
-<li>In R, use the following commands to download and install CohortMethod:</li>
+<li><p>See the instructions <a href="https://ohdsi.github.io/Hades/rSetup.html">here</a> for configuring your R environment, including Java.</p></li>
+<li>
+<p>In R, use the following commands to download and install PheValuator:</p>
+<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"remotes"</span>)
+<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"ohdsi/PheValuator"</span>)</pre></div>
+</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"drat"</span>)
-<span class="kw pkg">drat</span><span class="kw ns">::</span><span class="fu">addRepo</span>(<span class="st">"OHDSI"</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"PheValuator"</span>)</pre></div>
 </div>
 <div id="user-documentation" class="section level1">
 <h1 class="hasAnchor">
 <a href="#user-documentation" class="anchor"></a>User Documentation</h1>
-<p>Please read the main vignette for the package:</p>
-<ul>
-<li><a href="https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf">Performing a Phenotype Algorithm Evaluation using Phevaluator</a></li>
-<li><a href="https://github.com/OHDSI/PheValuator/blob/master/extras/PheValuator.pdf">PheValuator Manual</a></li>
-</ul>
-</div>
-<div id="getting-involved" class="section level1">
-<h1 class="hasAnchor">
-<a href="#getting-involved" class="anchor"></a>Getting Involved</h1>
-<p>We would like you to get involved in the development of this package through pull requests to our development branch.</p>
+<p>Documentation can be found on the <a href="https://ohdsi.github.io/PheValuator">package website</a>.</p>
+<p>PDF versions of the documentation are also available:</p>
 <ul>
 <li>Vignette: <a href="https://github.com/OHDSI/PheValuator/blob/master/inst/doc/EvaluatingPhenotypeAlgorithms.pdf">Performing a Phenotype Algorithm Evaluation using Phevaluator</a>
 </li>
@@ -159,6 +153,11 @@
 </li>
 <li>We use the <a href="https://github.com/OHDSI/PheValuator">GitHub issue tracker</a> for all bugs/issues/enhancements</li>
 </ul>
+</div>
+<div id="contributing" class="section level1">
+<h1 class="hasAnchor">
+<a href="#contributing" class="anchor"></a>Contributing</h1>
+<p>Read <a href="https://ohdsi.github.io/Hades/contribute.html">here</a> how you can contribute to this package.</p>
 </div>
 <div id="license" class="section level1">
 <h1 class="hasAnchor">
@@ -210,7 +209,13 @@
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check"><img src="https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg" alt="Build Status"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 
