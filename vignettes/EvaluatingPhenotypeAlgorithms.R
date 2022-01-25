@@ -17,9 +17,7 @@ library(PheValuator)
 ## ----tidy=FALSE,eval=FALSE----------------------------------------------------
 #  options(andromedaTempFolder = "c:/temp2/ff") #place to store large temporary files
 #  
-#  CovSettings <- createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
-#                                                addDescendantsToExclude = TRUE,
-#                                                startDayWindow1 = 0,
+#  CovSettings <- createDefaultCovariateSettings(startDayWindow1 = 0,
 #                                                endDayWindow1 = 10,
 #                                                startDayWindow2 = 11,
 #                                                endDayWindow2 = 20,
@@ -32,11 +30,7 @@ library(PheValuator)
 #                                                 xSensCohortId = 1770120,
 #                                                 prevalenceCohortId = 1770119,
 #                                                 evaluationPopulationCohortId = 1778258,
-#                                                 covariateSettings = CovSettings,
-#                                                 baseSampleSize = 2000000,
-#                                                 lowerAgeLimit = 18,
-#                                                 startDate = "20100101",
-#                                                 endDate = "21000101")
+#                                                 covariateSettings = CovSettings)
 
 ## ----tidy=FALSE,eval=FALSE----------------------------------------------------
 #  #First phenotype algorithm to test
