@@ -162,9 +162,10 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                                 (fullTable$cohortStartDate <= fullTable$cohortStartDateP - splayPost |
                              fullTable$cohortStartDate >= fullTable$cohortStartDateP + splayPrior)] <- FALSE
 
-        ######
-        #write.csv(fullTable, paste0("p:/shared/",  phenotypeCohortId, splayPrior, ".csv"))
-        ######
+        #remove the subjects in the phenotype algorithm that matched the eval cohort on subject id but didn't match the dates
+        #these are mis-matches due to the random selection of visit process and should not be counted
+        fullTable <- fullTable[fullTable$inPhenotype == TRUE | is.na(fullTable$inPhenotype),]
+
 
       } else {
         fullTable <- dplyr::left_join(modelAll,
@@ -174,6 +175,10 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
       #set all the rest of the non-matches to false
       fullTable$inPhenotype[is.na(fullTable$inPhenotype)] <- FALSE
+
+      ######
+      #write.csv(fullTable, paste0("p:/shared/",  phenotypeCohortId, splayPrior, ".csv"))
+      ######
 
       # a cut point = 'EV' indicates to calculate the expected values - using the probability to proportion
       # trues and falses
@@ -191,6 +196,10 @@ testPhenotypeAlgorithm <- function(connectionDetails,
       fullTable$tn[!fullTable$inPhenotype] <- 1 - fullTable$value[!fullTable$inPhenotype]
       fullTable$fp[fullTable$inPhenotype] <- 1 - fullTable$value[fullTable$inPhenotype]
       fullTable$fn[!fullTable$inPhenotype] <- fullTable$value[!fullTable$inPhenotype]
+
+      ######
+      #write.csv(fullTable, paste0("p:/shared/",  phenotypeCohortId, splayPrior, ".csv"))
+      ######
 
       # capture subject id's of mistakes if requested - only for the 0.5 or xSpecP cutpoint
       if (!is.null(xSpecP)) {
