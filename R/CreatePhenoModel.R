@@ -51,75 +51,109 @@
   plpResultsFileName <- file.path(outFolder, sprintf("plpResults_%s", modelId))
 
   if (!file.exists(modelFileName)) {
-  #get xSpec subjects to create a model
-  sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "GetxSpecCount.sql",
-                                           packageName = "PheValuator",
-                                           dbms = connection@dbms,
-                                           cdm_database_schema = cdmDatabaseSchema,
-                                           cohort_database_schema = cohortDatabaseSchema,
-                                           cohort_database_table = cohortTable,
-                                           x_spec_cohort = xSpecCohortId,
-                                           ageLimit = lowerAgeLimit,
-                                           upperAgeLimit = upperAgeLimit,
-                                           gender = gender,
-                                           race = race,
-                                           ethnicity = ethnicity,
-                                           startDate = startDate,
-                                           endDate = endDate)
+    #get xSpec subjects to create a model
+    sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "GetxSpecCount.sql",
+                                             packageName = "PheValuator",
+                                             dbms = connection@dbms,
+                                             cdm_database_schema = cdmDatabaseSchema,
+                                             cohort_database_schema = cohortDatabaseSchema,
+                                             cohort_database_table = cohortTable,
+                                             x_spec_cohort = xSpecCohortId,
+                                             ageLimit = lowerAgeLimit,
+                                             upperAgeLimit = upperAgeLimit,
+                                             gender = gender,
+                                             race = race,
+                                             ethnicity = ethnicity,
+                                             startDate = startDate,
+                                             endDate = endDate)
 
-  xSpecCount <- as.numeric(DatabaseConnector::querySql(connection = connection, sql = sql))
-  if (xSpecCount < 200) {
-    ParallelLogger::logInfo("Too few subjects in xSpec to produce model. (Outcome count = ", xSpecCount, ")")
-    ParallelLogger::logInfo("Saving null model summary to ", modelFileName)
-    lrResults <- NULL
-    lrResults$errorMessage <- "Error: Too few outcomes to produce model"
-    saveRDS(lrResults, modelFileName)
-  } else {
+    xSpecCount <- as.numeric(DatabaseConnector::querySql(connection = connection, sql = sql))
+    if (xSpecCount < 200) {
+      ParallelLogger::logInfo("Too few subjects in xSpec to produce model. (Outcome count = ", xSpecCount, ")")
+      ParallelLogger::logInfo("Saving null model summary to ", modelFileName)
+      lrResults <- NULL
+      lrResults$errorMessage <- "Error: Too few outcomes to produce model"
+      saveRDS(lrResults, modelFileName)
+    } else {
 
-    if (prevalenceCohortId >= 1) {
-      # determine population prevalence for correct xSpec/noisy negative popn ratio
-      sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "getPopnPrev.sql",
-                                               packageName = "PheValuator",
-                                               dbms = connection@dbms,
-                                               cdm_database_schema = cdmDatabaseSchema,
-                                               cohort_database_schema = cohortDatabaseSchema,
-                                               cohort_database_table = cohortTable,
-                                               lowerAgeLimit = lowerAgeLimit,
-                                               upperAgeLimit = upperAgeLimit,
-                                               gender = gender,
-                                               race = race,
-                                               ethnicity = ethnicity,
-                                               startDate = startDate,
-                                               endDate = endDate,
-                                               mainPopnCohort = mainPopulationCohortId,
-                                               prevCohort = prevalenceCohortId,
-                                               removeSubjectsWithFutureDates = removeSubjectsWithFutureDates)
-      popPrev <- as.numeric(DatabaseConnector::querySql(connection = connection, sql))
-    } else {popPrev <- prevalenceCohortId}
-
-    if (popPrev == 0)
-      stop("Unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
-
-    ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.2f%%", 100 * popPrev))
-
-    xspecSize <- min(c(xSpecCohortSize, xSpecCount)) #min value of pre-specified and available xSpec subjects
-    baseSampleSize <- max(c(xspecSize, 15000))  #use either a matching number of non-xspec subjects or 15K whichever is more
-    prevToUse <- xspecSize/(xspecSize + baseSampleSize) #calculate the prevalence of the model subjects - to be recalibrated
-
-    ParallelLogger::logInfo(sprintf("Using xSpec size of: %i", xspecSize))
-    ParallelLogger::logInfo(sprintf("Using base sample size of: %i", (xspecSize + baseSampleSize)))
-
-    if (!file.exists(plpDataFile)) {
-      # only pull the plp data if it doesn't already exist create a unique name for the temporary cohort table
-      testCohort <- paste0("test_model_",xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))
-      if (modelType == "acute") {
-        #first check number of eligible visits in db
-        sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
+      if (prevalenceCohortId >= 1) {
+        # determine population prevalence for correct xSpec/noisy negative popn ratio
+        sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "getPopnPrev.sql",
                                                  packageName = "PheValuator",
-                                                 dbms = connectionDetails$dbms,
+                                                 dbms = connection@dbms,
                                                  cdm_database_schema = cdmDatabaseSchema,
                                                  cohort_database_schema = cohortDatabaseSchema,
                                                  cohort_database_table = cohortTable,
+                                                 lowerAgeLimit = lowerAgeLimit,
+                                                 upperAgeLimit = upperAgeLimit,
+                                                 gender = gender,
+                                                 race = race,
+                                                 ethnicity = ethnicity,
+                                                 startDate = startDate,
+                                                 endDate = endDate,
+                                                 mainPopnCohort = mainPopulationCohortId,
+                                                 prevCohort = prevalenceCohortId,
+                                                 removeSubjectsWithFutureDates = removeSubjectsWithFutureDates)
+        popPrev <- as.numeric(DatabaseConnector::querySql(connection = connection, sql))
+      } else {popPrev <- prevalenceCohortId}
+
+      if (popPrev == 0)
+        stop("Unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
+
+      ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.2f%%", 100 * popPrev))
+
+      xspecSize <- min(c(xSpecCohortSize, xSpecCount)) #min value of pre-specified and available xSpec subjects
+      baseSampleSize <- max(c(xspecSize, 15000))  #use either a matching number of non-xspec subjects or 15K whichever is more
+      prevToUse <- xspecSize/(xspecSize + baseSampleSize) #calculate the prevalence of the model subjects - to be recalibrated
+
+      ParallelLogger::logInfo(sprintf("Using xSpec size of: %i", xspecSize))
+      ParallelLogger::logInfo(sprintf("Using base sample size of: %i", (xspecSize + baseSampleSize)))
+
+      if (!file.exists(plpDataFile)) {
+        # only pull the plp data if it doesn't already exist create a unique name for the temporary cohort table
+        testCohort <- paste0("test_model_",xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))
+        if (modelType == "acute") {
+          #first check number of eligible visits in db
+          sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
+                                                   packageName = "PheValuator",
+                                                   dbms = connectionDetails$dbms,
+                                                   cdm_database_schema = cdmDatabaseSchema,
+                                                   cohort_database_schema = cohortDatabaseSchema,
+                                                   cohort_database_table = cohortTable,
+                                                   ageLimit = lowerAgeLimit,
+                                                   upperAgeLimit = upperAgeLimit,
+                                                   gender = gender,
+                                                   race = race,
+                                                   ethnicity = ethnicity,
+                                                   startDate = startDate,
+                                                   endDate = endDate,
+                                                   visitType = visitType,
+                                                   visitLength = visitLength,
+                                                   exclCohort = xSensCohortId)
+          cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
+
+          #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
+          if (cntVisits > 100000000) {
+            firstCut <- TRUE
+          } else {
+            firstCut <- FALSE
+          }
+          sqlFileName <- "CreateCohortsAcuteModel.sql"
+        } else {
+          firstCut <- FALSE
+          sqlFileName <- "CreateCohortsV6.sql"
+        }
+        ParallelLogger::logInfo("Subsetting and sampling cohorts")
+        sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFileName,
+                                                 packageName = "PheValuator",
+                                                 dbms = connection@dbms,
+                                                 cdm_database_schema = cdmDatabaseSchema,
+                                                 cohort_database_schema = cohortDatabaseSchema,
+                                                 cohort_database_table = cohortTable,
+                                                 x_spec_cohort = xSpecCohortId,
+                                                 tempDB = workDatabaseSchema,
+                                                 test_cohort = testCohort,
+                                                 exclCohort = xSensCohortId,
                                                  ageLimit = lowerAgeLimit,
                                                  upperAgeLimit = upperAgeLimit,
                                                  gender = gender,
@@ -127,79 +161,45 @@
                                                  ethnicity = ethnicity,
                                                  startDate = startDate,
                                                  endDate = endDate,
-                                                 visitType = visitType,
+                                                 baseSampleSize = format(baseSampleSize, scientific = FALSE),
+                                                 xSpecSampleSize = xspecSize,
+                                                 mainPopnCohort = mainPopulationCohortId,
+                                                 mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
+                                                 mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
                                                  visitLength = visitLength,
-                                                 exclCohort = xSensCohortId)
-        cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
+                                                 visitType = c(visitType),
+                                                 firstCut = firstCut)
+        DatabaseConnector::executeSql(connection = connection, sql)
 
-        #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
-        if (cntVisits > 100000000) {
-          firstCut <- TRUE
-        } else {
-          firstCut <- FALSE
-        }
-        sqlFileName <- "CreateCohortsAcuteModel.sql"
+        ParallelLogger::logInfo("Getting data for prediction model from server")
+        plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
+                                                      cdmDatabaseSchema = cdmDatabaseSchema,
+                                                      cohortId = 0,
+                                                      outcomeIds = xSpecCohortId,
+                                                      outcomeDatabaseSchema = workDatabaseSchema,
+                                                      outcomeTable = testCohort,
+                                                      cohortDatabaseSchema = workDatabaseSchema,
+                                                      cohortTable = testCohort,
+                                                      cdmVersion = cdmVersion,
+                                                      washoutPeriod = 0,
+                                                      covariateSettings = covariateSettings)
+
+        # summary(plpData)
+        ParallelLogger::logInfo("Saving PLP Data to: ", plpDataFile)
+        PatientLevelPrediction::savePlpData(plpData, plpDataFile)
+
+        # remove temp cohort table
+        sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "DropTempTable.sql",
+                                                 packageName = "PheValuator",
+                                                 dbms = connection@dbms,
+                                                 tempDB = workDatabaseSchema,
+                                                 test_cohort = testCohort)
+        sql <- SqlRender::translate(sql, targetDialect = connection@dbms)
+        DatabaseConnector::executeSql(connection = connection, sql = sql, progressBar = FALSE, reportOverallTime = FALSE)
       } else {
-        firstCut <- FALSE
-        sqlFileName <- "CreateCohortsV6.sql"
+        ParallelLogger::logInfo("Loading ", plpDataFile, " from existing directory")
+        plpData <- PatientLevelPrediction::loadPlpData(plpDataFile)
       }
-      ParallelLogger::logInfo("Subsetting and sampling cohorts")
-      sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFileName,
-                                               packageName = "PheValuator",
-                                               dbms = connection@dbms,
-                                               cdm_database_schema = cdmDatabaseSchema,
-                                               cohort_database_schema = cohortDatabaseSchema,
-                                               cohort_database_table = cohortTable,
-                                               x_spec_cohort = xSpecCohortId,
-                                               tempDB = workDatabaseSchema,
-                                               test_cohort = testCohort,
-                                               exclCohort = xSensCohortId,
-                                               ageLimit = lowerAgeLimit,
-                                               upperAgeLimit = upperAgeLimit,
-                                               gender = gender,
-                                               race = race,
-                                               ethnicity = ethnicity,
-                                               startDate = startDate,
-                                               endDate = endDate,
-                                               baseSampleSize = format(baseSampleSize, scientific = FALSE),
-                                               xSpecSampleSize = xspecSize,
-                                               mainPopnCohort = mainPopulationCohortId,
-                                               mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
-                                               mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
-                                               visitLength = visitLength,
-                                               visitType = c(visitType),
-                                               firstCut = firstCut)
-      DatabaseConnector::executeSql(connection = connection, sql)
-
-      ParallelLogger::logInfo("Getting data for prediction model from server")
-      plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
-                                                    cdmDatabaseSchema = cdmDatabaseSchema,
-                                                    cohortId = 0,
-                                                    outcomeIds = xSpecCohortId,
-                                                    outcomeDatabaseSchema = workDatabaseSchema,
-                                                    outcomeTable = testCohort,
-                                                    cohortDatabaseSchema = workDatabaseSchema,
-                                                    cohortTable = testCohort,
-                                                    cdmVersion = cdmVersion,
-                                                    washoutPeriod = 0,
-                                                    covariateSettings = covariateSettings)
-
-      # summary(plpData)
-      ParallelLogger::logInfo("Saving PLP Data to: ", plpDataFile)
-      PatientLevelPrediction::savePlpData(plpData, plpDataFile)
-
-      # remove temp cohort table
-      sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "DropTempTable.sql",
-                                               packageName = "PheValuator",
-                                               dbms = connection@dbms,
-                                               tempDB = workDatabaseSchema,
-                                               test_cohort = testCohort)
-      sql <- SqlRender::translate(sql, targetDialect = connection@dbms)
-      DatabaseConnector::executeSql(connection = connection, sql = sql, progressBar = FALSE, reportOverallTime = FALSE)
-    } else {
-      ParallelLogger::logInfo("Loading ", plpDataFile, " from existing directory")
-      plpData <- PatientLevelPrediction::loadPlpData(plpDataFile)
-    }
 
       ParallelLogger::logInfo("Fitting predictive model")
       population <- PatientLevelPrediction::createStudyPopulation(plpData,
