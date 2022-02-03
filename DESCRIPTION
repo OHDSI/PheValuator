@@ -34,7 +34,8 @@ Suggests:
     shiny,
     shinydashboard,
     DT,
-    htmltools
+    htmltools,
+    testthat
 Remotes:
     ohdsi/PatientLevelPrediction,
     ohdsi/FeatureExtraction,

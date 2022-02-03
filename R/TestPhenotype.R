@@ -139,10 +139,11 @@ testPhenotypeAlgorithm <- function(connectionDetails,
       return(tibble::tibble('Cut Point' = cutPoints, check.names = FALSE))
     }
     ParallelLogger::logInfo("Computing evaluation statistics")
-    modelAll <- evaluationCohort$prediction[evaluationCohort$prediction$outcomeCount == 0, ]
-    if (washoutPeriod >= 0) {
-      modelAll <- modelAll[(modelAll$daysToXSens > washoutPeriod | is.na(modelAll$daysToXSens)), ]
-    }
+
+    #extract data from evaluation cohort that is not an outcome and has at least the number of days post obs start as washout period
+    modelAll <- evaluationCohort$prediction[evaluationCohort$prediction$outcomeCount == 0 &
+                                              evaluationCohort$prediction$daysFromObsStart >= washoutPeriod, ]
+
     modelAll <- modelAll[order(modelAll$value), ]
     modelAll$rownum <- 1:nrow(modelAll)
     phenoPop$inPhenotype <- rep(TRUE, nrow(phenoPop))
@@ -160,7 +161,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
         #now set match (inPhenotype) to false if the cohort and visit date do not match within splay setting
         fullTable$inPhenotype[!is.na(fullTable$cohortStartDateP) &
                                 (fullTable$cohortStartDate <= fullTable$cohortStartDateP - splayPost |
-                             fullTable$cohortStartDate >= fullTable$cohortStartDateP + splayPrior)] <- FALSE
+                                   fullTable$cohortStartDate >= fullTable$cohortStartDateP + splayPrior)] <- FALSE
 
         #remove the subjects in the phenotype algorithm that matched the eval cohort on subject id but didn't match the dates
         #these are mis-matches due to the random selection of visit process and should not be counted
