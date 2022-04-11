@@ -17,6 +17,7 @@ createCreateEvaluationCohortArgs(
   evaluationPopulationCohortId = 0,
   evaluationPopulationCohortIdStartDay = 0,
   evaluationPopulationCohortIdEndDay = 0,
+  modelBaseSampleSize = 1e+05,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
@@ -71,6 +72,8 @@ cohort start date to begin including visits.}
 
 \item{evaluationPopulationCohortIdEndDay}{The number of days relative to the evaluationPopulationCohortId
 cohort start date to end including visits.}
+
+\item{modelBaseSampleSize}{The number of non-xSpec subjects to include in the model}
 
 \item{baseSampleSize}{The maximum number of subjects in the evaluation cohort.}
 

@@ -27,6 +27,7 @@
                                   mainPopulationCohortId = 0,
                                   mainPopulationCohortIdStartDay = 0,
                                   mainPopulationCohortIdEndDay = 0,
+                                  modelBaseSampleSize = 100000,
                                   lowerAgeLimit = 0,
                                   upperAgeLimit = 120,
                                   visitLength = 0,
@@ -103,8 +104,7 @@
       ParallelLogger::logInfo(sprintf("Estimated population prevalence is %0.2f%%", 100 * popPrev))
 
       xspecSize <- min(c(xSpecCohortSize, xSpecCount)) #min value of pre-specified and available xSpec subjects
-      #baseSampleSize <- max(c(xspecSize, 15000))  #use either a matching number of non-xspec subjects or 15K whichever is more
-      baseSampleSize <- max(c(xspecSize, 100000))  #use either a matching number of non-xspec subjects or 15K whichever is more
+      baseSampleSize <- modelBaseSampleSize #how many non-cases to include in model development
       prevToUse <- xspecSize/(xspecSize + baseSampleSize) #calculate the prevalence of the model subjects - to be recalibrated
 
       ParallelLogger::logInfo(sprintf("Using xSpec size of: %i", xspecSize))
