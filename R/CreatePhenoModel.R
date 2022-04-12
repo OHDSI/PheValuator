@@ -27,7 +27,7 @@
                                   mainPopulationCohortId = 0,
                                   mainPopulationCohortIdStartDay = 0,
                                   mainPopulationCohortIdEndDay = 0,
-                                  modelBaseSampleSize = 100000,
+                                  modelBaseSampleSize = 15000,
                                   lowerAgeLimit = 0,
                                   upperAgeLimit = 120,
                                   visitLength = 0,
