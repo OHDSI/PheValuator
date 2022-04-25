@@ -30,6 +30,7 @@
 #'                                         cohort start date to begin including visits.
 #' @param evaluationPopulationCohortIdEndDay     The number of days relative to the evaluationPopulationCohortId
 #'                                         cohort start date to end including visits.
+#' @param modelBaseSampleSize              The number of non-xSpec subjects to include in the model
 #' @param baseSampleSize                   The maximum number of subjects in the evaluation cohort.
 #' @param lowerAgeLimit                    The lower age for subjects in the model.
 #' @param upperAgeLimit                    The upper age for subjects in the model.
@@ -64,6 +65,7 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              evaluationPopulationCohortId = 0,
                                              evaluationPopulationCohortIdStartDay = 0,
                                              evaluationPopulationCohortIdEndDay = 0,
+                                             modelBaseSampleSize = 100000,
                                              baseSampleSize = 2e+06,
                                              lowerAgeLimit = 0,
                                              upperAgeLimit = 120,

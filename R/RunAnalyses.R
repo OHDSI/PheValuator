@@ -67,23 +67,23 @@ runPheValuatorAnalyses <- function(connectionDetails,
   evaluationCohortFolders <- unique(referenceTable$evaluationCohortFolder)
   #evaluationCohortFolders <- evaluationCohortFolders[!file.exists(file.path(outputFolder, evaluationCohortFolders, "evaluationCohort_main.rds"))]
   #if (length(evaluationCohortFolders) > 0) {
-    createTask <- function(evaluationCohortFolder) {
-      analysisId <- referenceTable$analysisId[referenceTable$evaluationCohortFolder == evaluationCohortFolder][1]
-      matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
-      args <- matched[[1]]$createEvaluationCohortArgs
-      args$connectionDetails <- connectionDetails
-      args$cdmDatabaseSchema <- cdmDatabaseSchema
-      args$oracleTempSchema <- oracleTempSchema
-      args$cohortDatabaseSchema <- cohortDatabaseSchema
-      args$cohortTable <- cohortTable
-      args$workDatabaseSchema <- workDatabaseSchema
-      args$cdmVersion <- cdmVersion
-      args$outFolder <- file.path(outputFolder, evaluationCohortFolder)
-      task <- list(args = args)
-      return(task)
-    }
-    tasks <- lapply(evaluationCohortFolders, createTask)
-    lapply(tasks, doCreateEvaluationCohort)
+  createTask <- function(evaluationCohortFolder) {
+    analysisId <- referenceTable$analysisId[referenceTable$evaluationCohortFolder == evaluationCohortFolder][1]
+    matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
+    args <- matched[[1]]$createEvaluationCohortArgs
+    args$connectionDetails <- connectionDetails
+    args$cdmDatabaseSchema <- cdmDatabaseSchema
+    args$oracleTempSchema <- oracleTempSchema
+    args$cohortDatabaseSchema <- cohortDatabaseSchema
+    args$cohortTable <- cohortTable
+    args$workDatabaseSchema <- workDatabaseSchema
+    args$cdmVersion <- cdmVersion
+    args$outFolder <- file.path(outputFolder, evaluationCohortFolder)
+    task <- list(args = args)
+    return(task)
+  }
+  tasks <- lapply(evaluationCohortFolders, createTask)
+  lapply(tasks, doCreateEvaluationCohort)
   #}
 
   ParallelLogger::logInfo("Evaluating phenotypes")
@@ -99,7 +99,7 @@ runPheValuatorAnalyses <- function(connectionDetails,
       args$cohortDatabaseSchema <- cohortDatabaseSchema
       args$cohortTable <- cohortTable
       args$outFolder <- file.path(outputFolder,
-                                 referenceTable$evaluationCohortFolder[referenceTable$analysisId == analysisId])
+                                  referenceTable$evaluationCohortFolder[referenceTable$analysisId == analysisId])
       task <- list(args = args,
                    fileName = file.path(outputFolder, resultsFile))
       return(task)
@@ -155,5 +155,3 @@ summarizePheValuatorAnalyses <- function(referenceTable, outputFolder) {
   results <- suppressWarnings(dplyr::bind_rows(results))
   return(results)
 }
-
-

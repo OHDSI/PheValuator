@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • PheValuator</title>
+<title>Table ready summary of  results from PheValuator analyses — prettyPhenotypeOutput • PheValuator</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Table ready summary of  results from PheValuator analyses — prettyPhenotypeOutput" />
+<meta property="og:description" content="Table ready summary of  results from PheValuator analyses" />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -122,26 +123,40 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/OHDSI/PheValuator/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Table ready summary of  results from PheValuator analyses</h1>
+    <small class="dont-index">Source: <a href='https://github.com/OHDSI/PheValuator/blob/master/R/OutputFunctions.R'><code>R/OutputFunctions.R</code></a></small>
+    <div class="hidden name"><code>prettyPhenotypeOutput.Rd</code></div>
     </div>
 
-    <div id="phevaluator-200" class="section level1">
-<h1 class="page-header" data-toc-text="2.0.0">
-<a href="#phevaluator-200" class="anchor"></a>PheValuator 2.0.0</h1>
-<p>Changes:</p>
-<ol>
-<li>Major overhaul of the code base and functions, aimed at improving stability, consistency with other OHSDI packages, and usability.</li>
-</ol>
-</div>
-  </div>
+    <div class="ref-description">
+    <p>Table ready summary of  results from PheValuator analyses</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>prettyPhenotypeOutput</span>(<span class='no'>outputFolder</span>, <span class='kw'>label</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>outputFolder</th>
+      <td><p>Name of the folder where all the outputs was written to..</p></td>
+    </tr>
+    <tr>
+      <th>label</th>
+      <td><p>Optional string for the the Data Set column value.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A data frame of results.</p>
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 
