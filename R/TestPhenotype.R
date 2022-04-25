@@ -97,6 +97,17 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
     modelType <- evaluationCohort$PheValuator$inputSetting$modelType
     if (modelType == "acute") {
+      # sql <- paste0("SELECT DISTINCT subject_id,
+      #           cohort_start_date AS cohort_start_date_p
+      #         FROM @cohort_database_schema.@cohort_table
+      #         JOIN @cdm_database_schema.observation_period
+      #           ON subject_id = person_id
+      #             and cohort_start_date >= observation_period_start_date
+      #             and cohort_start_date <= observation_period_end_date
+      #         WHERE cohort_definition_id = @cohort_id
+      #           and cohort_start_date >= cast('", minCohortStartDate, "' as date) ",
+      #               "and cohort_start_date <= cast('", maxCohortStartDate, "' as date) ;")
+
       sql <- paste0("SELECT DISTINCT subject_id,
                 cohort_start_date AS cohort_start_date_p
               FROM @cohort_database_schema.@cohort_table
@@ -104,9 +115,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                 ON subject_id = person_id
                   and cohort_start_date >= observation_period_start_date
                   and cohort_start_date <= observation_period_end_date
-              WHERE cohort_definition_id = @cohort_id
-                and cohort_start_date >= cast('", minCohortStartDate, "' as date) ",
-                    "and cohort_start_date <= cast('", maxCohortStartDate, "' as date) ;")
+              WHERE cohort_definition_id = @cohort_id ;")
 
     } else {
       sql <- paste0("SELECT DISTINCT subject_id,
@@ -253,17 +262,52 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     countsTable <- computePerformanceMetricsFromCounts(countsTable)
 
     # Make pretty results table
-    results <- tibble::tibble(cutPoint = countsTable$cutPoint,
+
+    results <- tibble::tibble(cdm = cdmDatabaseSchema,
+                              cohortId = phenotypeCohortId,
+                              sensitivity95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Ub),
+                              ppv95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
+                              specificity95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
+                              npv95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
+                              # sensitivity9 = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Ub),
+                              # ppv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
+                              # specificity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
+                              # npv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
+                              estimatedPrevalence = sprintf("%0.3f", 100*countsTable$estimatedPrevalence),
+                              f1Score = sprintf("%0.3f", countsTable$f1Score),
                               truePositives = round(countsTable$truePositives, 0),
                               trueNegatives = round(countsTable$trueNegatives, 0),
                               falsePositives = round(countsTable$falsePositives, 0),
                               falseNegatives = round(countsTable$falseNegatives, 0),
-                              sensitivity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Ub),
-                              ppv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
-                              specificity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
-                              npv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
-                              estimatedPrevalence = sprintf("%0.3f", 100*countsTable$estimatedPrevalence),
-                              f1Score = sprintf("%0.3f", countsTable$f1Score))
+                              washoutPeriod = washoutPeriod,
+                              splayPrior = splayPrior,
+                              splayPost = splayPost,
+                              cutPoint = countsTable$cutPoint,
+                              sensitivity = sprintf("%0.6f", countsTable$sens),
+                              sensitivityCi95Lb = sprintf("%0.6f ", countsTable$sensCi95Lb),
+                              sensitivityCi95Ub = sprintf("%0.6f", countsTable$sensCi95Ub),
+                              ppv = sprintf("%0.6f", countsTable$ppv),
+                              ppvCi95Lb = sprintf("%0.6f", countsTable$ppvCi95Lb),
+                              ppvCi95Ub = sprintf("%0.6f", countsTable$ppvCi95Ub),
+                              specificity = sprintf("%0.6f", countsTable$spec),
+                              specificityCi95Lb = sprintf("%0.6f", countsTable$specCi95Lb),
+                              specificityCi95Ub = sprintf("%0.6f", countsTable$specCi95Ub),
+                              npv = sprintf("%0.6f", countsTable$npv),
+                              npvCi95Lb = sprintf("%0.6f", countsTable$npvCi95Lb),
+                              npvCi95Ub = sprintf("%0.6f", countsTable$npvCi95Ub),
+                              runDateTimeGMT = format(as.POSIXct(Sys.time()), tz="GMT",usetz=TRUE))
+
+    # results <- tibble::tibble(cutPoint = countsTable$cutPoint,
+    #                           truePositives = round(countsTable$truePositives, 0),
+    #                           trueNegatives = round(countsTable$trueNegatives, 0),
+    #                           falsePositives = round(countsTable$falsePositives, 0),
+    #                           falseNegatives = round(countsTable$falseNegatives, 0),
+    #                           sensitivity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Ub),
+    #                           ppv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
+    #                           specificity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
+    #                           npv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
+    #                           estimatedPrevalence = sprintf("%0.3f", 100*countsTable$estimatedPrevalence),
+    #                           f1Score = sprintf("%0.3f", countsTable$f1Score))
 
     if (nrow(misses) > 0) {
       attr(results, "misses") <- misses

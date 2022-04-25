@@ -86,7 +86,7 @@ CREATE TABLE @tempDB.@test_cohort (
   cohort_end_date date);
 
 insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE)
- (select 0 as COHORT_DEFINITION_ID,
+ select 0 as COHORT_DEFINITION_ID,
               person_id as SUBJECT_ID,
               dateadd(day, 0, observation_period_start_date) COHORT_START_DATE,
               dateadd(day, 1, observation_period_start_date) COHORT_END_DATE
@@ -149,4 +149,4 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
           and cp.COHORT_START_DATE >= o.observation_period_start_date
           and cp.COHORT_START_DATE <= o.observation_period_end_date
       where rn <= @xSpecSampleSize
-      );
+      ;
