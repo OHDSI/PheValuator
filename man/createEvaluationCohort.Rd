@@ -6,7 +6,7 @@
 \usage{
 createEvaluationCohort(
   connectionDetails,
-  oracleTempSchema = NULL,
+  tempEmulationSchema = NULL,
   xSpecCohortId,
   xSensCohortId,
   prevalenceCohortId,
@@ -23,7 +23,7 @@ createEvaluationCohort(
   evaluationPopulationCohortId = 0,
   evaluationPopulationCohortIdStartDay = 0,
   evaluationPopulationCohortIdEndDay = 0,
-  modelBaseSampleSize = 1e+05,
+  modelBaseSampleSize = 15000,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
@@ -48,7 +48,7 @@ createEvaluationCohort(
 \item{connectionDetails}{connectionDetails created using the function
 createConnectionDetails in the DatabaseConnector package.}
 
-\item{oracleTempSchema}{A schema where temp tables can be created in Oracle.}
+\item{tempEmulationSchema}{A schema where temp tables can be created in Oracle.}
 
 \item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort
 definition id in the cohort table (for noisy positives).}

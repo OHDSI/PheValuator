@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.7</span>
       </span>
     </div>
 
@@ -134,7 +134,7 @@
 
     <pre class="usage"><span class='fu'>createEvaluationCohort</span>(
   <span class='no'>connectionDetails</span>,
-  <span class='kw'>oracleTempSchema</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>tempEmulationSchema</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>xSpecCohortId</span>,
   <span class='no'>xSensCohortId</span>,
   <span class='no'>prevalenceCohortId</span>,
@@ -151,7 +151,7 @@
   <span class='kw'>evaluationPopulationCohortId</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>evaluationPopulationCohortIdStartDay</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>evaluationPopulationCohortIdEndDay</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>modelBaseSampleSize</span> <span class='kw'>=</span> <span class='fl'>1e+05</span>,
+  <span class='kw'>modelBaseSampleSize</span> <span class='kw'>=</span> <span class='fl'>15000</span>,
   <span class='kw'>baseSampleSize</span> <span class='kw'>=</span> <span class='fl'>2e+06</span>,
   <span class='kw'>lowerAgeLimit</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>upperAgeLimit</span> <span class='kw'>=</span> <span class='fl'>120</span>,
@@ -181,7 +181,7 @@
 createConnectionDetails in the DatabaseConnector package.</p></td>
     </tr>
     <tr>
-      <th>oracleTempSchema</th>
+      <th>tempEmulationSchema</th>
       <td><p>A schema where temp tables can be created in Oracle.</p></td>
     </tr>
     <tr>

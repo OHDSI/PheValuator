@@ -173,17 +173,27 @@
         DatabaseConnector::executeSql(connection = connection, sql)
 
         ParallelLogger::logInfo("Getting data for prediction model from server")
-        plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
-                                                      cdmDatabaseSchema = cdmDatabaseSchema,
-                                                      cohortId = 0,
-                                                      outcomeIds = xSpecCohortId,
-                                                      outcomeDatabaseSchema = workDatabaseSchema,
-                                                      outcomeTable = testCohort,
-                                                      cohortDatabaseSchema = workDatabaseSchema,
-                                                      cohortTable = testCohort,
-                                                      cdmVersion = cdmVersion,
-                                                      washoutPeriod = 0,
-                                                      covariateSettings = covariateSettings)
+        databaseDetails <- PatientLevelPrediction::createDatabaseDetails(connectionDetails = connectionDetails,
+                                                                         cdmDatabaseSchema = cdmDatabaseSchema,
+                                                                         cdmDatabaseName = "CDM",
+                                                                         tempEmulationSchema = cdmDatabaseSchema,
+                                                                         cohortDatabaseSchema = workDatabaseSchema,
+                                                                         cohortTable = testCohort,
+                                                                         outcomeDatabaseSchema = workDatabaseSchema,
+                                                                         outcomeTable = testCohort,
+                                                                         cohortId = 0,
+                                                                         outcomeIds = xSpecCohortId,
+                                                                         cdmVersion = 5)
+
+        restrictPlpDataSettings <- PatientLevelPrediction::createRestrictPlpDataSettings(studyStartDate = startDate,
+                                                                                         studyEndDate = endDate,
+                                                                                         firstExposureOnly = F,
+                                                                                         washoutPeriod = 0,
+                                                                                         sampleSize = NULL)
+
+        plpData <- PatientLevelPrediction::getPlpData(databaseDetails = databaseDetails,
+                                                      covariateSettings = covariateSettings,
+                                                      restrictPlpDataSettings = restrictPlpDataSettings)
 
         # summary(plpData)
         ParallelLogger::logInfo("Saving PLP Data to: ", plpDataFile)
@@ -203,19 +213,24 @@
       }
 
       ParallelLogger::logInfo("Fitting predictive model")
-      population <- PatientLevelPrediction::createStudyPopulation(plpData,
-                                                                  population = NULL,
+      populationSettings <- PatientLevelPrediction::createStudyPopulationSettings(binary = T,
+                                                                                  includeAllOutcomes = T,
+                                                                                  firstExposureOnly = FALSE,
+                                                                                  washoutPeriod = 0,
+                                                                                  removeSubjectsWithPriorOutcome = TRUE,
+                                                                                  priorOutcomeLookback = 99999,
+                                                                                  requireTimeAtRisk = FALSE,
+                                                                                  minTimeAtRisk = 0,
+                                                                                  riskWindowStart = 0,
+                                                                                  startAnchor = "cohort start",
+                                                                                  riskWindowEnd = 365,
+                                                                                  endAnchor = "cohort start",
+                                                                                  restrictTarToCohortEnd = F)
+
+      population <- PatientLevelPrediction::createStudyPopulation(plpData = plpData,
                                                                   outcomeId = xSpecCohortId,
-                                                                  firstExposureOnly = FALSE,
-                                                                  washoutPeriod = 0,
-                                                                  removeSubjectsWithPriorOutcome = TRUE,
-                                                                  priorOutcomeLookback = 1,
-                                                                  riskWindowStart = 0,
-                                                                  requireTimeAtRisk = FALSE,
-                                                                  minTimeAtRisk = 0,
-                                                                  addExposureDaysToStart = FALSE,
-                                                                  riskWindowEnd = 1,
-                                                                  addExposureDaysToEnd = TRUE)
+                                                                  populationSettings = populationSettings,
+                                                                  population = NULL)
 
       #test population file to see if the model process can proceed - based on population counts
       if (sum(population$outcomeCount) < 200) { #too few outcomes to produce viable model
@@ -226,24 +241,34 @@
         saveRDS(lrResults, modelFileName)
 
       } else {
-        # modelSettings <- PatientLevelPrediction::setLassoLogisticRegression(variance = 0.01, seed = 5,
-        #                                                                     useCrossValidation = FALSE,
-        #                                                                     )
-
-       modelSettings <- PatientLevelPrediction::setLassoLogisticRegression(variance = 0.01, seed = 5)
-
         tryCatch({
-          lrResults <- PatientLevelPrediction::runPlp(population,
-                                                      plpData,
+          splitSettings <- PatientLevelPrediction::createDefaultSplitSetting(type = "stratified", testFraction = 0.25,
+                                                                             trainFraction = 0.75, splitSeed = 123, nfold = 2)
+          sampleSettings <- PatientLevelPrediction::createSampleSettings(type = "none")
+          featureEngineeringSettings <- PatientLevelPrediction::createFeatureEngineeringSettings(type = "none")
+          preprocessSettings <- PatientLevelPrediction::createPreprocessSettings(minFraction = 0.001, normalize = T)
+          modelSettings <- PatientLevelPrediction::setLassoLogisticRegression(variance = 0.01, seed = 5)
+          logSettings <- PatientLevelPrediction::createLogSettings(verbosity = "INFO", timeStamp = T, logName = "runPlp Log")
+          executeSettings <- PatientLevelPrediction::createExecuteSettings(runSplitData = TRUE,
+                                                                           runSampleData = F,
+                                                                           runfeatureEngineering = F,
+                                                                           runPreprocessData = TRUE,
+                                                                           runModelDevelopment = TRUE,
+                                                                           runCovariateSummary = TRUE)
+
+
+          lrResults <- PatientLevelPrediction::runPlp(plpData = plpData,
+                                                      outcomeId = xSpecCohortId,
+                                                      analysisId = paste0(gsub("[^[:alnum:] ]", "", Sys.time())),
+                                                      analysisName = "Study details",
+                                                      populationSettings = populationSettings,
+                                                      splitSettings = splitSettings,
+                                                      sampleSettings = sampleSettings,
+                                                      featureEngineeringSettings = featureEngineeringSettings,
+                                                      preprocessSettings = preprocessSettings,
                                                       modelSettings = modelSettings,
-                                                      testSplit = "stratified",
-                                                      testFraction = 0.25,
-                                                      splitSeed = 5,
-                                                      nfold = 2, #5,
-                                                      savePlpData = FALSE,
-                                                      savePlpResult = FALSE,
-                                                      savePlpPlots = FALSE,
-                                                      saveEvaluation = FALSE,
+                                                      logSettings = logSettings,
+                                                      executeSettings = executeSettings,
                                                       saveDirectory = outFolder)
 
           #re-calibrate model
@@ -253,7 +278,6 @@
           delta <- log(prevToUseOdds) - log(popPrevOdds)
           yIntercept <- as.numeric(lrResults$model$model$coefficients[1])
           lrResults$model$model$coefficients[1] <- as.numeric(yIntercept - delta)  # Equation (7) in King and Zeng (2001)
-          lrResults$model$predict <- PatientLevelPrediction:::createTransform(lrResults$model)
 
           lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
           lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId

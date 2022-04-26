@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.7</span>
       </span>
     </div>
 
@@ -134,8 +134,8 @@
 
     <pre class="usage"><span class='fu'>runPheValuatorAnalyses</span>(
   <span class='no'>connectionDetails</span>,
+  <span class='kw'>tempEmulationSchema</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='no'>cdmDatabaseSchema</span>,
-  <span class='kw'>oracleTempSchema</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>cohortDatabaseSchema</span> <span class='kw'>=</span> <span class='no'>cdmDatabaseSchema</span>,
   <span class='kw'>cohortTable</span> <span class='kw'>=</span> <span class='st'>"cohort"</span>,
   <span class='kw'>workDatabaseSchema</span> <span class='kw'>=</span> <span class='no'>cdmDatabaseSchema</span>,
@@ -154,15 +154,15 @@ function <code>createConnectionDetails</code> in the
 <code>DatabaseConnector</code> package.</p></td>
     </tr>
     <tr>
+      <th>tempEmulationSchema</th>
+      <td><p>A schema where temp tables can be created in Oracle.</p></td>
+    </tr>
+    <tr>
       <th>cdmDatabaseSchema</th>
       <td><p>The name of the database schema that contains the OMOP CDM
 instance. Requires read permissions to this database. On SQL
 Server, this should specifiy both the database and the
 schema, so for example 'cdm_instance.dbo'.</p></td>
-    </tr>
-    <tr>
-      <th>oracleTempSchema</th>
-      <td><p>A schema where temp tables can be created in Oracle.</p></td>
     </tr>
     <tr>
       <th>cohortDatabaseSchema</th>
