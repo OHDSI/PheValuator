@@ -26,7 +26,7 @@
 #'                                       instance. Requires read permissions to this database. On SQL
 #'                                       Server, this should specifiy both the database and the
 #'                                       schema, so for example 'cdm_instance.dbo'.
-#' @param oracleTempSchema	             A schema where temp tables can be created in Oracle.
+#' @param tempEmulationSchema	             A schema where temp tables can be created in Oracle.
 #' @param cohortDatabaseSchema           The name of the database schema that is the location where
 #'                                       the cohort data used to define the at risk cohort is
 #'                                       available. Requires read permissions to this database.
@@ -48,8 +48,8 @@
 #'
 #' @export
 runPheValuatorAnalyses <- function(connectionDetails,
+                                   tempEmulationSchema = NULL,
                                    cdmDatabaseSchema,
-                                   oracleTempSchema = NULL,
                                    cohortDatabaseSchema = cdmDatabaseSchema,
                                    cohortTable = "cohort",
                                    workDatabaseSchema = cdmDatabaseSchema,
@@ -73,7 +73,7 @@ runPheValuatorAnalyses <- function(connectionDetails,
     args <- matched[[1]]$createEvaluationCohortArgs
     args$connectionDetails <- connectionDetails
     args$cdmDatabaseSchema <- cdmDatabaseSchema
-    args$oracleTempSchema <- oracleTempSchema
+    args$tempEmulationSchema <- getOption("sqlRenderTempEmulationSchema")
     args$cohortDatabaseSchema <- cohortDatabaseSchema
     args$cohortTable <- cohortTable
     args$workDatabaseSchema <- workDatabaseSchema

@@ -6,8 +6,8 @@
 \usage{
 runPheValuatorAnalyses(
   connectionDetails,
+  tempEmulationSchema = NULL,
   cdmDatabaseSchema,
-  oracleTempSchema = NULL,
   cohortDatabaseSchema = cdmDatabaseSchema,
   cohortTable = "cohort",
   workDatabaseSchema = cdmDatabaseSchema,
@@ -21,12 +21,12 @@ runPheValuatorAnalyses(
 function \code{createConnectionDetails} in the
 \code{DatabaseConnector} package.}
 
+\item{tempEmulationSchema}{A schema where temp tables can be created in Oracle.}
+
 \item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM
 instance. Requires read permissions to this database. On SQL
 Server, this should specifiy both the database and the
 schema, so for example 'cdm_instance.dbo'.}
-
-\item{oracleTempSchema}{A schema where temp tables can be created in Oracle.}
 
 \item{cohortDatabaseSchema}{The name of the database schema that is the location where
 the cohort data used to define the at risk cohort is

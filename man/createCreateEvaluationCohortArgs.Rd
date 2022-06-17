@@ -17,7 +17,7 @@ createCreateEvaluationCohortArgs(
   evaluationPopulationCohortId = 0,
   evaluationPopulationCohortIdStartDay = 0,
   evaluationPopulationCohortIdEndDay = 0,
-  modelBaseSampleSize = 1e+05,
+  modelBaseSampleSize = 15000,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,

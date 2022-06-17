@@ -155,7 +155,6 @@ recalibrateModel <- function(connectionDetails,
     delta <- log(prevToUseOdds) - log(popPrevOdds)
     yIntercept <- as.numeric(lrResults$model$model$coefficients[1])
     lrResults$model$model$coefficients[1] <- as.numeric(yIntercept - delta)  # Equation (7) in King and Zeng (2001)
-    lrResults$model$predict <- PatientLevelPrediction:::createTransform(lrResults$model)
 
     lrResults$PheValuator$runTimeValues$truePrevalencePopulation <- popPrev
     lrResults$PheValuator$runTimeValues$prevalenceModel <- originalModelPrevalence

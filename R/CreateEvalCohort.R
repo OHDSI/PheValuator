@@ -93,7 +93,7 @@
           dropTableIfExists = TRUE,
           createTable = TRUE,
           tempTable = FALSE,
-          oracleTempSchema = NULL,
+          tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
           bulkLoad = TRUE,
           progressBar = TRUE,
           camelCaseToSnakeCase = TRUE)
@@ -109,7 +109,7 @@
             dropTableIfExists = TRUE,
             createTable = TRUE,
             tempTable = FALSE,
-            oracleTempSchema = NULL,
+            tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
             bulkLoad = FALSE,
             progressBar = TRUE,
             camelCaseToSnakeCase = TRUE)
@@ -177,7 +177,7 @@
     }
 
     # will only use the covariates with non-zero betas
-    lrNonZeroCovs <- c(lrResults$model$varImp$covariateId[lrResults$model$varImp$covariateValue != 0])
+    lrNonZeroCovs <- c(lrResults$model$covariateImportance$covariateId[lrResults$model$covariateImportance$covariateValue != 0])
 
     if (is(covariateSettings, "covariateSettings"))
       covariateSettings <- list(covariateSettings)
@@ -191,17 +191,29 @@
       plpData <- PatientLevelPrediction::loadPlpData(evaluationCohortPlpDataFileName)
     } else {
       ParallelLogger::logInfo("Getting evaluation cohort data from server")
-      plpData <- PatientLevelPrediction::getPlpData(connectionDetails,
-                                                    cdmDatabaseSchema = cdmDatabaseSchema,
-                                                    cohortId = 0,
-                                                    outcomeIds = xSpecCohortId,
-                                                    outcomeDatabaseSchema = workDatabaseSchema,
-                                                    outcomeTable = testCohort,
-                                                    cohortDatabaseSchema = workDatabaseSchema,
-                                                    cohortTable = testCohort,
-                                                    cdmVersion = cdmVersion,
-                                                    washoutPeriod = 0,
-                                                    covariateSettings = covariateSettings)
+
+      databaseDetails <- PatientLevelPrediction::createDatabaseDetails(connectionDetails = connectionDetails,
+                                                                       cdmDatabaseSchema = cdmDatabaseSchema,
+                                                                       cdmDatabaseName = "CDM",
+                                                                       tempEmulationSchema = cdmDatabaseSchema,
+                                                                       cohortDatabaseSchema = workDatabaseSchema,
+                                                                       cohortTable = testCohort,
+                                                                       outcomeDatabaseSchema = workDatabaseSchema,
+                                                                       outcomeTable = testCohort,
+                                                                       cohortId = 0,
+                                                                       outcomeIds = xSpecCohortId,
+                                                                       cdmVersion = 5)
+
+      restrictPlpDataSettings <- PatientLevelPrediction::createRestrictPlpDataSettings(studyStartDate = startDate,
+                                                                                       studyEndDate = endDate,
+                                                                                       firstExposureOnly = F,
+                                                                                       washoutPeriod = 0,
+                                                                                       sampleSize = NULL)
+
+      plpData <- PatientLevelPrediction::getPlpData(databaseDetails = databaseDetails,
+                                                    covariateSettings = covariateSettings,
+                                                    restrictPlpDataSettings = restrictPlpDataSettings)
+
     }
 
     if (excludeModelFromEvaluation == TRUE) {
@@ -217,26 +229,31 @@
       PatientLevelPrediction::savePlpData(plpData, evaluationCohortPlpDataFileName)
     }
 
+    populationSettings <- PatientLevelPrediction::createStudyPopulationSettings(binary = T,
+                                                                                includeAllOutcomes = T,
+                                                                                firstExposureOnly = FALSE,
+                                                                                washoutPeriod = 0,
+                                                                                removeSubjectsWithPriorOutcome = TRUE,
+                                                                                priorOutcomeLookback = 99999,
+                                                                                requireTimeAtRisk = FALSE,
+                                                                                minTimeAtRisk = 0,
+                                                                                riskWindowStart = 0,
+                                                                                startAnchor = "cohort start",
+                                                                                riskWindowEnd = 365,
+                                                                                endAnchor = "cohort start",
+                                                                                restrictTarToCohortEnd = F)
 
-    population <- PatientLevelPrediction::createStudyPopulation(plpData,
-                                                                population = NULL,
+    population <- PatientLevelPrediction::createStudyPopulation(plpData = plpData,
                                                                 outcomeId = xSpecCohortId,
-                                                                firstExposureOnly = FALSE,
-                                                                washoutPeriod = 0,
-                                                                removeSubjectsWithPriorOutcome = TRUE,
-                                                                priorOutcomeLookback = 1,
-                                                                riskWindowStart = 0,
-                                                                requireTimeAtRisk = FALSE,
-                                                                minTimeAtRisk = 0,
-                                                                addExposureDaysToStart = FALSE,
-                                                                riskWindowEnd = 1,
-                                                                addExposureDaysToEnd = T)
+                                                                populationSettings = populationSettings,
+                                                                population = NULL)
 
     ParallelLogger::logInfo("Applying predictive model to evaluation cohort")
 
     # apply the model to the evaluation cohort
     appResults <- NULL
-    appResults$prediction <- PatientLevelPrediction::applyModel(population, plpData, lrResults$model, calculatePerformance = FALSE)
+    appResults$prediction <- PatientLevelPrediction::predictPlp(plpModel = lrResults$model, plpData = plpData,
+                                                                population = population)
 
     appResults$prediction$value <- round(appResults$prediction$value, digits = 3)
 

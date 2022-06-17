@@ -26,7 +26,7 @@
 prettyPhenotypeOutput <- function(outputFolder, label = NULL) {
 
   outputTable <- data.frame()
-  analysisFile <- PheValuator::loadPheValuatorAnalysisList(file.path(folder, "pheValuatorAnalysisSettings.json"))
+  analysisFile <- PheValuator::loadPheValuatorAnalysisList(file.path(outputFolder, "pheValuatorAnalysisSettings.json"))
   if(dir.exists(outputFolder)) {
     refFile <- readRDS(file.path(outputFolder,"reference.rds"))
     summary <- PheValuator::summarizePheValuatorAnalyses(readRDS(file.path(outputFolder, "reference.rds")), outputFolder)
