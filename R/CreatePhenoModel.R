@@ -274,10 +274,10 @@
           #re-calibrate model
           prevToUseOdds <- prevToUse/(1 - prevToUse) #uses prevalence for model building
           popPrevOdds <- popPrev/(1 - popPrev) #uses actual prevalence
-          modelYIntercept <- lrResults$model$model$coefficients[1]
+          modelYIntercept <- lrResults$model$model$coefficients$betas[1]
           delta <- log(prevToUseOdds) - log(popPrevOdds)
-          yIntercept <- as.numeric(lrResults$model$model$coefficients[1])
-          lrResults$model$model$coefficients[1] <- as.numeric(yIntercept - delta)  # Equation (7) in King and Zeng (2001)
+          yIntercept <- as.numeric(lrResults$model$model$coefficients$betas[1])
+          lrResults$model$model$coefficients$betas[1] <- as.numeric(yIntercept - delta)  # Equation (7) in King and Zeng (2001)
 
           lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
           lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId

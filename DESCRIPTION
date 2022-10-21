@@ -19,7 +19,7 @@ Depends:
     DatabaseConnector,
     FeatureExtraction (>= 2.1.5)
 Imports:
-    PatientLevelPrediction (>= 2.0.4),
+    PatientLevelPrediction (>= 6.0.4),
     SqlRender (>= 1.5.2),
     dplyr (>= 0.7.8),
     readr,
