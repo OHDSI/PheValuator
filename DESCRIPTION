@@ -1,7 +1,7 @@
 Package: PheValuator
 Type: Package
 Title: Rapid Phenotype Evaluation
-Version: 2.1.10
+Version: 2.1.11
 Author: Joel N. Swerdel
 Maintainer: Joel N. Swerdel <jswerdel@its.jnj.com>
 Description: A package for evaluating phenotype algorithms.  The package
@@ -19,7 +19,7 @@ Depends:
     DatabaseConnector,
     FeatureExtraction (>= 2.1.5)
 Imports:
-    PatientLevelPrediction (>= 2.0.4),
+    PatientLevelPrediction (>= 6.0.4),
     SqlRender (>= 1.5.2),
     dplyr (>= 0.7.8),
     readr,

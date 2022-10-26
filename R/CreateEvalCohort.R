@@ -195,12 +195,12 @@
       databaseDetails <- PatientLevelPrediction::createDatabaseDetails(connectionDetails = connectionDetails,
                                                                        cdmDatabaseSchema = cdmDatabaseSchema,
                                                                        cdmDatabaseName = "CDM",
-                                                                       tempEmulationSchema = cdmDatabaseSchema,
+                                                                       tempEmulationSchema = workDatabaseSchema,
                                                                        cohortDatabaseSchema = workDatabaseSchema,
                                                                        cohortTable = testCohort,
                                                                        outcomeDatabaseSchema = workDatabaseSchema,
                                                                        outcomeTable = testCohort,
-                                                                       cohortId = 0,
+                                                                       targetId = 0,
                                                                        outcomeIds = xSpecCohortId,
                                                                        cdmVersion = 5)
 
