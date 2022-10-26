@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,23 +33,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.11</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -64,7 +60,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/OHDSI/PheValuator/">
+  <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -79,15 +75,16 @@
 
       
 
-      </header><script src="EvaluatingPhenotypeAlgorithms_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>EvaluatingPhenotypeAlgorithms</h1>
-                        <h4 class="author">Joel N. Swerdel</h4>
+                        <h4 data-toc-skip class="author">Joel N.
+Swerdel</h4>
             
-            <h4 class="date">2022-06-17</h4>
+            <h4 data-toc-skip class="date">2022-10-26</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/OHDSI/PheValuator/blob/master/vignettes/EvaluatingPhenotypeAlgorithms.rmd"><code>vignettes/EvaluatingPhenotypeAlgorithms.rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/OHDSI/PheValuator/blob/HEAD/vignettes/EvaluatingPhenotypeAlgorithms.rmd" class="external-link"><code>vignettes/EvaluatingPhenotypeAlgorithms.rmd</code></a></small>
       <div class="hidden name"><code>EvaluatingPhenotypeAlgorithms.rmd</code></div>
 
     </div>
@@ -95,178 +92,274 @@
     
     
 <div style="page-break-after: always;"></div>
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
-<p>The <code>PheValuator</code> package enables evaluating the performance characteristics of phenotype algorithms (PAs) using data from databases that are translated into the Observational Medical Outcomes Partnership Common Data Model (OMOP CDM).</p>
-<p>This vignette describes how to run the PheValuator process from start to end in the <code>PheValuator</code> package.</p>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>The <code>PheValuator</code> package enables evaluating the
+performance characteristics of phenotype algorithms (PAs) using data
+from databases that are translated into the Observational Medical
+Outcomes Partnership Common Data Model (OMOP CDM).</p>
+<p>This vignette describes how to run the PheValuator process from start
+to end in the <code>PheValuator</code> package.</p>
 </div>
-<div id="overview-of-process" class="section level1">
-<h1 class="hasAnchor">
-<a href="#overview-of-process" class="anchor"></a>Overview of Process</h1>
+<div class="section level2">
+<h2 id="overview-of-process">Overview of Process<a class="anchor" aria-label="anchor" href="#overview-of-process"></a>
+</h2>
 <p>There are several steps in performing a PA evaluation:</p>
 <ol style="list-style-type: decimal">
-<li>Creating the extremely specific (xSpec), extremely sensitive (xSens), prevalence, and evaluation cohorts</li>
-<li>Creating the Diagnostic Predictive Model and the Evaluation Cohort using the PatientLevelPrediction (PLP) package and evaluating the PAs</li>
+<li>Creating the extremely specific (xSpec), extremely sensitive
+(xSens), prevalence, and evaluation cohorts</li>
+<li>Creating the Diagnostic Predictive Model and the Evaluation Cohort
+using the PatientLevelPrediction (PLP) package and evaluating the
+PAs</li>
 <li>Examining the results of the evaluation</li>
 </ol>
-<p>Each of these steps is described in detail below. For this vignette, we will describe the evaluation of PAs for type 2 diabetes mellitus (T2DM).</p>
-<div id="creating-the-extremely-specific-xspec-extremely-sensitive-xsens-prevalence-and-evaluation-cohorts" class="section level2">
-<h2 class="hasAnchor">
-<a href="#creating-the-extremely-specific-xspec-extremely-sensitive-xsens-prevalence-and-evaluation-cohorts" class="anchor"></a>Creating the Extremely Specific (xSpec), Extremely Sensitive (xSens), Prevalence, and Evaluation Cohorts</h2>
-<p>The extremely specific (xSpec), extremely sensitive (xSens), prevalence, and evaluation cohorts are developed using the ATLAS tool. The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability. This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1769699"><strong>example</strong></a> of this for T2DM is included in the OHDSI ATLAS repository. In this example each subject has at least 2 diagnosis codes for T2DM in days 21 to 1 prior to an index clinical visit, the first of which is the the first diagnosis in the patients history. The algorithm also excludes subjects with type 1 DM (T1DM) any time in their record. This is a very specific algorithm for T2DM as it ensures that the subjects in this cohort have a very high probability for having the condition of T2DM. This PA also specifies that subjects are required to have at least 365 days of prior and post-index observation in their patient record.</p>
-<p><strong>Quick Tip:</strong> When building the xSpec cohort, the days prior where you are looking for 2 or more diagnosis codes for the condition should be altered depending on the condition. For very rare conditions you may need to expand it to 60 to 1 days prior to index. For acute conditions such as myocardial infarction it is best to have a very short interval such as 1 to 1 day prior to index (i.e., the day prior to index)</p>
-<p>An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI. The system uses the xSens cohort to create a set of “noisy” negative subjects, i.e., subjects with a high likelihood of not having the HOI. This group of subjects will be used in the model building process and is described in detail below. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1770120"><strong>example</strong></a> of an xSens cohort for T2DM is also in the OHDSI ATLAS repository.</p>
-<p>The system uses the prevalence cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model. This group of subjects will be used in the model building process and is described in detail below. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1770119"><strong>example</strong></a> of an prevalence cohort for T2DM is also in the OHDSI ATLAS repository.</p>
-<p>PheValuator uses the evaluation cohort to define a specific set of subjects to test for the outcome of interest and uses these subjects to evaluate the PAs. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778258"><strong>example</strong></a> of an evaluation cohort for T2DM is also in the OHDSI ATLAS repository.</p>
-<p><strong>Quick Tip:</strong> You can build your required cohorts easily by exporting the JSON in the examples above and copying them into your repository. The only changes you should need to make are changing the concept sets for the condition and the days prior to index for searching for multiple diagnosis codes in the xSpec cohort.</p>
-<p>For the example below, two more phenotype algorithms were created:</p>
+<p>Each of these steps is described in detail below. For this vignette,
+we will describe the evaluation of PAs for type 2 diabetes mellitus
+(T2DM).</p>
+<div class="section level3">
+<h3 id="creating-the-extremely-specific-xspec-extremely-sensitive-xsens-prevalence-and-evaluation-cohorts">Creating the Extremely Specific (xSpec), Extremely Sensitive
+(xSens), Prevalence, and Evaluation Cohorts<a class="anchor" aria-label="anchor" href="#creating-the-extremely-specific-xspec-extremely-sensitive-xsens-prevalence-and-evaluation-cohorts"></a>
+</h3>
+<p>The extremely specific (xSpec), extremely sensitive (xSens),
+prevalence, and evaluation cohorts are developed using the ATLAS tool.
+The xSpec is a cohort where the subjects in the cohort are likely to be
+positive for the health outcome of interest (HOI) with a very high
+probability. This may be achieved by requiring that subjects have
+multiple condition codes for the HOI in their patient record. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1769699" class="external-link"><strong>example</strong></a>
+of this for T2DM is included in the OHDSI ATLAS repository. In this
+example each subject has at least 2 diagnosis codes for T2DM in days 21
+to 1 prior to an index clinical visit, the first of which is the the
+first diagnosis in the patients history. The algorithm also excludes
+subjects with type 1 DM (T1DM) any time in their record. This is a very
+specific algorithm for T2DM as it ensures that the subjects in this
+cohort have a very high probability for having the condition of T2DM.
+This PA also specifies that subjects are required to have at least 365
+days of prior and post-index observation in their patient record.</p>
+<p><strong>Quick Tip:</strong> When building the xSpec cohort, the days
+prior where you are looking for 2 or more diagnosis codes for the
+condition should be altered depending on the condition. For very rare
+conditions you may need to expand it to 60 to 1 days prior to index. For
+acute conditions such as myocardial infarction it is best to have a very
+short interval such as 1 to 1 day prior to index (i.e., the day prior to
+index)</p>
+<p>An example of an xSens cohort is created by developing a PA that is
+very sensitive for the HOI. The system uses the xSens cohort to create a
+set of “noisy” negative subjects, i.e., subjects with a high likelihood
+of not having the HOI. This group of subjects will be used in the model
+building process and is described in detail below. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1770120" class="external-link"><strong>example</strong></a>
+of an xSens cohort for T2DM is also in the OHDSI ATLAS repository.</p>
+<p>The system uses the prevalence cohort to provide a reasonable
+approximation of the prevalence of the HOI in the population. This
+improves the calibration of the predictive model. This group of subjects
+will be used in the model building process and is described in detail
+below. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1770119" class="external-link"><strong>example</strong></a>
+of an prevalence cohort for T2DM is also in the OHDSI ATLAS
+repository.</p>
+<p>PheValuator uses the evaluation cohort to define a specific set of
+subjects to test for the outcome of interest and uses these subjects to
+evaluate the PAs. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778258" class="external-link"><strong>example</strong></a>
+of an evaluation cohort for T2DM is also in the OHDSI ATLAS
+repository.</p>
+<p><strong>Quick Tip:</strong> You can build your required cohorts
+easily by exporting the JSON in the examples above and copying them into
+your repository. The only changes you should need to make are changing
+the concept sets for the condition and the days prior to index for
+searching for multiple diagnosis codes in the xSpec cohort.</p>
+<p>For the example below, two more phenotype algorithms were
+created:</p>
 <ol style="list-style-type: decimal">
-<li>An example of a prevalent algorithm for T2DM <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778259"><strong>(Type 2 Diabetes Mellitus (prevalent))</strong></a>
+<li>An example of a prevalent algorithm for T2DM <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778259" class="external-link"><strong>(Type
+2 Diabetes Mellitus (prevalent))</strong></a>
 </li>
-<li>An example of a prevalent algorithm for T2DM requiring a second condition code for T2DM 31-365 days after index <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778260"><strong>(Type 2 diabetes mellitus (prevalent) with second code 31-365 days after index)</strong></a>
+<li>An example of a prevalent algorithm for T2DM requiring a second
+condition code for T2DM 31-365 days after index <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778260" class="external-link"><strong>(Type
+2 diabetes mellitus (prevalent) with second code 31-365 days after
+index)</strong></a>
 </li>
 </ol>
 </div>
-<div id="evaluating-phenotype-algorithms-for-health-conditions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#evaluating-phenotype-algorithms-for-health-conditions" class="anchor"></a>Evaluating phenotype algorithms for health conditions</h2>
+<div class="section level3">
+<h3 id="evaluating-phenotype-algorithms-for-health-conditions">Evaluating phenotype algorithms for health conditions<a class="anchor" aria-label="anchor" href="#evaluating-phenotype-algorithms-for-health-conditions"></a>
+</h3>
 <p>The basic steps in the process are as follows:</p>
 <ol style="list-style-type: decimal">
-<li>Use the createDefaultCovariateSettings() function to set the parameters for data extraction:</li>
+<li>Use the createDefaultCovariateSettings() function to set the
+parameters for data extraction:</li>
 </ol>
 <ul>
-<li>excludedCovariateConceptIds - set the concept Ids that should be excluded from the model building process. Any concepts that are included in the xSpec or xSens cohorts in the feature extraction windows (see below) must be excluded. In the T2DM example, based on the xSpec cohort definition, the T1DM concept and it’s descendants will be excluded.</li>
-<li>addDescendantsToExclude - set to TRUE/FALSE whether descendants of the excluded parameters should also be excluded</li>
-<li>startDayWindow1 - sets the start of the first feature extraction window</li>
-<li>endDayWindow1 - sets the end of the first feature extraction window</li>
-<li>startDayWindow2 - sets the start of the second feature extraction window</li>
-<li>endDayWindow2 - sets the end of the second feature extraction window</li>
-<li>startDayWindow3 - sets the start of the third feature extraction window</li>
-<li>endDayWindow3 - sets the end of the third feature extraction window</li>
+<li>excludedCovariateConceptIds - set the concept Ids that should be
+excluded from the model building process. Any concepts that are included
+in the xSpec or xSens cohorts in the feature extraction windows (see
+below) must be excluded. In the T2DM example, based on the xSpec cohort
+definition, the T1DM concept and it’s descendants will be excluded.</li>
+<li>addDescendantsToExclude - set to TRUE/FALSE whether descendants of
+the excluded parameters should also be excluded</li>
+<li>startDayWindow1 - sets the start of the first feature extraction
+window</li>
+<li>endDayWindow1 - sets the end of the first feature extraction
+window</li>
+<li>startDayWindow2 - sets the start of the second feature extraction
+window</li>
+<li>endDayWindow2 - sets the end of the second feature extraction
+window</li>
+<li>startDayWindow3 - sets the start of the third feature extraction
+window</li>
+<li>endDayWindow3 - sets the end of the third feature extraction
+window</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="kw">andromedaTempFolder</span> <span class="kw">=</span> <span class="st">"c:/temp2/ff"</span>) <span class="co">#place to store large temporary files</span>
-
-<span class="no">CovSettings</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span>(<span class="kw">excludedCovariateConceptIds</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">201254</span>),
-                                              <span class="kw">addDescendantsToExclude</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-                                              <span class="kw">startDayWindow1</span> <span class="kw">=</span> <span class="fl">0</span>,
-                                              <span class="kw">endDayWindow1</span> <span class="kw">=</span> <span class="fl">30</span>,
-                                              <span class="kw">startDayWindow2</span> <span class="kw">=</span> <span class="fl">31</span>,
-                                              <span class="kw">endDayWindow2</span> <span class="kw">=</span> <span class="fl">180</span>,
-                                              <span class="kw">startDayWindow3</span> <span class="kw">=</span> <span class="fl">181</span>,
-                                              <span class="kw">endDayWindow3</span> <span class="kw">=</span> <span class="fl">365</span>)</pre></body></html></div>
-<p><strong>Quick Tip:</strong> The feature extraction windows above are useful for chronic conditions. For acute conditions, such as myocardial infarction, you should use:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="kw">andromedaTempFolder</span> <span class="kw">=</span> <span class="st">"c:/temp2/ff"</span>) <span class="co">#place to store large temporary files</span>
-
-<span class="no">CovSettings</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span>(<span class="kw">startDayWindow1</span> <span class="kw">=</span> <span class="fl">0</span>,
-                                              <span class="kw">endDayWindow1</span> <span class="kw">=</span> <span class="fl">10</span>,
-                                              <span class="kw">startDayWindow2</span> <span class="kw">=</span> <span class="fl">11</span>,
-                                              <span class="kw">endDayWindow2</span> <span class="kw">=</span> <span class="fl">20</span>,
-                                              <span class="kw">startDayWindow3</span> <span class="kw">=</span> <span class="fl">21</span>,
-                                              <span class="kw">endDayWindow3</span> <span class="kw">=</span> <span class="fl">30</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>andromedaTempFolder <span class="op">=</span> <span class="st">"c:/temp2/ff"</span><span class="op">)</span> <span class="co">#place to store large temporary files</span></span>
+<span></span>
+<span><span class="va">CovSettings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span>excludedCovariateConceptIds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">201254</span><span class="op">)</span>,</span>
+<span>                                              addDescendantsToExclude <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                                              startDayWindow1 <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                                              endDayWindow1 <span class="op">=</span> <span class="fl">30</span>,</span>
+<span>                                              startDayWindow2 <span class="op">=</span> <span class="fl">31</span>,</span>
+<span>                                              endDayWindow2 <span class="op">=</span> <span class="fl">180</span>,</span>
+<span>                                              startDayWindow3 <span class="op">=</span> <span class="fl">181</span>,</span>
+<span>                                              endDayWindow3 <span class="op">=</span> <span class="fl">365</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Quick Tip:</strong> The feature extraction windows above are
+useful for chronic conditions. For acute conditions, such as myocardial
+infarction, you should use:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>andromedaTempFolder <span class="op">=</span> <span class="st">"c:/temp2/ff"</span><span class="op">)</span> <span class="co">#place to store large temporary files</span></span>
+<span></span>
+<span><span class="va">CovSettings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span>startDayWindow1 <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                                              endDayWindow1 <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>                                              startDayWindow2 <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>                                              endDayWindow2 <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>                                              startDayWindow3 <span class="op">=</span> <span class="fl">21</span>,</span>
+<span>                                              endDayWindow3 <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
-<li>Use the createCreateEvaluationCohortArgs() function to set the model building and evaluation parameters</li>
+<li>Use the createCreateEvaluationCohortArgs() function to set the model
+building and evaluation parameters</li>
 </ol>
 <ul>
 <li>xSpecCohortId - set the xSpec cohort ID</li>
 <li>xSensCohortId - set the xSens cohort ID</li>
 <li>prevalenceCohortId - set the prevalence cohort ID</li>
 <li>evaluationPopulationCohortId - set the evaluation cohort ID</li>
-<li>covariateSettings - use the covariate settings created with the createDefaultCovariateSettings() function above</li>
+<li>covariateSettings - use the covariate settings created with the
+createDefaultCovariateSettings() function above</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">CohortArgs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs</a></span>(<span class="kw">xSpecCohortId</span> <span class="kw">=</span> <span class="fl">1769699</span>,
-                                               <span class="kw">xSensCohortId</span> <span class="kw">=</span> <span class="fl">1770120</span>,
-                                               <span class="kw">prevalenceCohortId</span> <span class="kw">=</span> <span class="fl">1770119</span>,
-                                               <span class="kw">evaluationPopulationCohortId</span> <span class="kw">=</span> <span class="fl">1778258</span>,
-                                               <span class="kw">covariateSettings</span> <span class="kw">=</span> <span class="no">CovSettings</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">CohortArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs</a></span><span class="op">(</span>xSpecCohortId <span class="op">=</span> <span class="fl">1769699</span>,</span>
+<span>                                               xSensCohortId <span class="op">=</span> <span class="fl">1770120</span>,</span>
+<span>                                               prevalenceCohortId <span class="op">=</span> <span class="fl">1770119</span>,</span>
+<span>                                               evaluationPopulationCohortId <span class="op">=</span> <span class="fl">1778258</span>,</span>
+<span>                                               covariateSettings <span class="op">=</span> <span class="va">CovSettings</span><span class="op">)</span></span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
-<li>Use the createTestPhenotypeAlgorithmArgs() function to set the parameters for evaluating phenotype algorithms</li>
+<li>Use the createTestPhenotypeAlgorithmArgs() function to set the
+parameters for evaluating phenotype algorithms</li>
 </ol>
 <ul>
-<li>phenotypeCohortId - set the phenotype algorithm (cohort) ID to evaluate</li>
+<li>phenotypeCohortId - set the phenotype algorithm (cohort) ID to
+evaluate</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co">#First phenotype algorithm to test</span>
-<span class="no">conditionAlg1TestArgs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span>(<span class="kw">phenotypeCohortId</span> <span class="kw">=</span>  <span class="fl">1778259</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#First phenotype algorithm to test</span></span>
+<span><span class="va">conditionAlg1TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span>  <span class="fl">1778259</span><span class="op">)</span> </span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
-<li>Use the createPheValuatorAnalysis() function to set up the phenotype algorithm analyses to run</li>
+<li>Use the createPheValuatorAnalysis() function to set up the phenotype
+algorithm analyses to run</li>
 </ol>
 <ul>
 <li>analysisId - set a unique value for the analysis in the run</li>
 <li>description - set a text string for the name of the analysis</li>
-<li>createEvaluationCohortArgs - use the createCreateEvaluationCohortArgs() settings created above</li>
-<li>testPhenotypeAlgorithmArgs - use the createTestPhenotypeAlgorithmArgs() settings created above</li>
+<li>createEvaluationCohortArgs - use the
+createCreateEvaluationCohortArgs() settings created above</li>
+<li>testPhenotypeAlgorithmArgs - use the
+createTestPhenotypeAlgorithmArgs() settings created above</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">analysis1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span>(<span class="kw">analysisId</span> <span class="kw">=</span> <span class="fl">1</span>,
-                                       <span class="kw">description</span> <span class="kw">=</span> <span class="st">"[PheValuator] Type 2 Diabetes Mellitus 
-                                                    (prevalent)"</span>,
-                                       <span class="kw">createEvaluationCohortArgs</span> <span class="kw">=</span> <span class="no">CohortArgs</span>,
-                                       <span class="kw">testPhenotypeAlgorithmArgs</span> <span class="kw">=</span> <span class="no">conditionAlg1TestArgs</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">analysis1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                                       description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 Diabetes Mellitus </span></span>
+<span><span class="st">                                                    (prevalent)"</span>,</span>
+<span>                                       createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
+<span>                                       testPhenotypeAlgorithmArgs <span class="op">=</span> <span class="va">conditionAlg1TestArgs</span><span class="op">)</span></span></code></pre></div>
 <p>Create as many analyses as needed:</p>
 <p>For example:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co">#Second phenotype algorithm to test</span>
-<span class="no">conditionAlg2TestArgs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span>(<span class="kw">phenotypeCohortId</span> <span class="kw">=</span> <span class="fl">1778260</span>,
-                                                          <span class="kw">washoutPeriod</span> <span class="kw">=</span> <span class="fl">0</span>)
-
-<span class="no">analysis2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span>(<span class="kw">analysisId</span> <span class="kw">=</span> <span class="fl">2</span>,
-                                       <span class="kw">description</span> <span class="kw">=</span> <span class="st">"[PheValuator] Type 2 diabetes mellitus 
-                                                    with second code 31-365 days after index"</span>,
-                                       <span class="kw">createEvaluationCohortArgs</span> <span class="kw">=</span> <span class="no">CohortArgs</span>,
-                                       <span class="kw">testPhenotypeAlgorithmArgs</span> <span class="kw">=</span> <span class="no">conditionAlg2TestArgs</span>)
-
-<span class="co">#save the analyses</span>
-<span class="no">pheValuatorAnalysisList</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">analysis1</span>, <span class="no">analysis2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#Second phenotype algorithm to test</span></span>
+<span><span class="va">conditionAlg2TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span> <span class="fl">1778260</span>,</span>
+<span>                                                          washoutPeriod <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">analysis2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>                                       description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 diabetes mellitus </span></span>
+<span><span class="st">                                                    with second code 31-365 days after index"</span>,</span>
+<span>                                       createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
+<span>                                       testPhenotypeAlgorithmArgs <span class="op">=</span> <span class="va">conditionAlg2TestArgs</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#save the analyses</span></span>
+<span><span class="va">pheValuatorAnalysisList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">analysis1</span>, <span class="va">analysis2</span><span class="op">)</span></span></code></pre></div>
 <ol start="5" style="list-style-type: decimal">
-<li>Use the runPheValuatorAnalyses() function to start the analysis run</li>
+<li>Use the runPheValuatorAnalyses() function to start the analysis
+run</li>
 </ol>
 <ul>
-<li>connectionDetails - set your connection details using the DatabaseConnector::createConnectionDetails()</li>
+<li>connectionDetails - set your connection details using the
+DatabaseConnector::createConnectionDetails()</li>
 <li>cdmDatabaseSchema - set the location of your database schema</li>
 <li>cohortDatabaseSchema - set the location of your cohort schema</li>
-<li>cohortTable - set the name of your cohort table in your cohort schema</li>
-<li>workDatabaseSchema - set the location of a database where you have write access for temporary tables</li>
-<li>outputFolder - provide a name for an output folder to store your results</li>
-<li>pheValuatorAnalysisList - create a list of your analysis IDs created using the createPheValuatorAnalysis() function above</li>
+<li>cohortTable - set the name of your cohort table in your cohort
+schema</li>
+<li>workDatabaseSchema - set the location of a database where you have
+write access for temporary tables</li>
+<li>outputFolder - provide a name for an output folder to store your
+results</li>
+<li>pheValuatorAnalysisList - create a list of your analysis IDs created
+using the createPheValuatorAnalysis() function above</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="co">#create database connection details</span>
-<span class="no">connectionDetails</span> <span class="kw">&lt;-</span> <span class="fu">createConnectionDetails</span>(<span class="kw">dbms</span> <span class="kw">=</span> <span class="st">"postgresql"</span>,
-                                             <span class="kw">server</span> <span class="kw">=</span> <span class="st">"localhost/ohdsi"</span>,
-                                             <span class="kw">user</span> <span class="kw">=</span> <span class="st">"joe"</span>,
-                                             <span class="kw">password</span> <span class="kw">=</span> <span class="st">"supersecret"</span>)
-
-<span class="co">#run the PheValuator process</span>
-<span class="no">referenceTable</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/runPheValuatorAnalyses.html">runPheValuatorAnalyses</a></span>(<span class="kw">connectionDetails</span> <span class="kw">=</span> <span class="no">connectionDetails</span>,
-                                         <span class="kw">cdmDatabaseSchema</span> <span class="kw">=</span> <span class="st">"yourCDMSchema"</span>,
-                                         <span class="kw">cohortDatabaseSchema</span> <span class="kw">=</span> <span class="st">"yourCohortSchema"</span>,
-                                         <span class="kw">cohortTable</span> <span class="kw">=</span> <span class="st">"yourCohortTableSchema"</span>,
-                                         <span class="kw">workDatabaseSchema</span> <span class="kw">=</span> <span class="st">"yourWritableSchema"</span>,
-                                         <span class="kw">outputFolder</span> <span class="kw">=</span> <span class="st">"yourOutputFolderSchema"</span>,
-                                         <span class="kw">pheValuatorAnalysisList</span> <span class="kw">=</span> <span class="no">pheValuatorAnalysisList</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#create database connection details</span></span>
+<span><span class="va">connectionDetails</span> <span class="op">&lt;-</span> <span class="fu">createConnectionDetails</span><span class="op">(</span>dbms <span class="op">=</span> <span class="st">"postgresql"</span>,</span>
+<span>                                             server <span class="op">=</span> <span class="st">"localhost/ohdsi"</span>,</span>
+<span>                                             user <span class="op">=</span> <span class="st">"joe"</span>,</span>
+<span>                                             password <span class="op">=</span> <span class="st">"supersecret"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#run the PheValuator process</span></span>
+<span><span class="va">referenceTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/runPheValuatorAnalyses.html">runPheValuatorAnalyses</a></span><span class="op">(</span>connectionDetails <span class="op">=</span> <span class="va">connectionDetails</span>,</span>
+<span>                                         cdmDatabaseSchema <span class="op">=</span> <span class="st">"yourCDMSchema"</span>,</span>
+<span>                                         cohortDatabaseSchema <span class="op">=</span> <span class="st">"yourCohortSchema"</span>,</span>
+<span>                                         cohortTable <span class="op">=</span> <span class="st">"yourCohortTableSchema"</span>,</span>
+<span>                                         workDatabaseSchema <span class="op">=</span> <span class="st">"yourWritableSchema"</span>,</span>
+<span>                                         outputFolder <span class="op">=</span> <span class="st">"yourOutputFolderSchema"</span>,</span>
+<span>                                         pheValuatorAnalysisList <span class="op">=</span> <span class="va">pheValuatorAnalysisList</span><span class="op">)</span></span></code></pre></div>
 <ol start="6" style="list-style-type: decimal">
-<li>You can view the results from the analyses using the summarizePheValuatorAnalyses() function providing the results from the runPheValuatorAnalyses() function above</li>
+<li>You can view the results from the analyses using the
+summarizePheValuatorAnalyses() function providing the results from the
+runPheValuatorAnalyses() function above</li>
 </ol>
 <p>For example:</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co">#view the results of the phenotype evaluation</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/View.html">View</a></span>(<span class="fu"><a href="../reference/summarizePheValuatorAnalyses.html">summarizePheValuatorAnalyses</a></span>(<span class="no">referenceTable</span>, <span class="st">"yourOutputFolderSchema"</span>))
-<span class="fu"><a href="https://rdrr.io/r/utils/write.table.html">write.csv</a></span>(<span class="no">phenotypeResults</span>, <span class="st">"c:/phenotyping/diabetes_results.csv"</span>, <span class="kw">row.names</span> <span class="kw">=</span> <span class="fl">FALSE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#view the results of the phenotype evaluation</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="fu"><a href="../reference/summarizePheValuatorAnalyses.html">summarizePheValuatorAnalyses</a></span><span class="op">(</span><span class="va">referenceTable</span>, <span class="st">"yourOutputFolderSchema"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">phenotypeResults</span>, <span class="st">"c:/phenotyping/diabetes_results.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>The results from above will look like:</p>
 <div class="figure">
-<img src="pheValuatorT2DMResults.png" alt=""><p class="caption">PheValuator results for Type 2 Diabetes Mellitus analysis</p>
+<img src="pheValuatorT2DMResults.png" alt=""><p class="caption">PheValuator results for Type 2 Diabetes Mellitus
+analysis</p>
 </div>
 </div>
-<div id="output-from-the-process" class="section level2">
-<h2 class="hasAnchor">
-<a href="#output-from-the-process" class="anchor"></a>Output from the process</h2>
-<p>The runPheValuatorAnalyses() function will produce the following artifacts:</p>
+<div class="section level3">
+<h3 id="output-from-the-process">Output from the process<a class="anchor" aria-label="anchor" href="#output-from-the-process"></a>
+</h3>
+<p>The runPheValuatorAnalyses() function will produce the following
+artifacts:</p>
 <ol style="list-style-type: decimal">
-<li>A Patient Level Prediction file (in .rds format) containing the information from the model building process<br>
+<li>A Patient Level Prediction file (in .rds format) containing the
+information from the model building process<br>
 </li>
-<li>A Patient Level Prediction file (in .rds format) containing the information from applying the model to the evaluation cohort</li>
-<li>All the results from the phenotype algorithm analyses (in .rds format)</li>
+<li>A Patient Level Prediction file (in .rds format) containing the
+information from applying the model to the evaluation cohort</li>
+<li>All the results from the phenotype algorithm analyses (in .rds
+format)</li>
 </ol>
 </div>
 </div>
@@ -283,11 +376,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Joel N. Swerdel.</p>
+  <p></p>
+<p>Developed by Joel N. Swerdel.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -295,6 +390,8 @@
 
   
 
+
+  
 
   </body>
 </html>

@@ -26,6 +26,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,23 +40,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.11</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -71,7 +67,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/OHDSI/PheValuator/">
+  <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -89,20 +85,20 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="phevaluator" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#phevaluator" class="anchor"></a>PheValuator</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="phevaluator">PheValuator<a class="anchor" aria-label="anchor" href="#phevaluator"></a>
+</h1></div>
 
 <p>An R package for evaluating phenotype algorithms.</p>
 </div>
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
+<div class="section level1">
+<h1 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h1>
 <p>The goal of PheValuator is to produce a large cohort of subjects each with a predicted probability for a specified health outcome of interest (HOI). This is achieved by developing a diagnostic predictive model for the HOI using the PatientLevelPrediction (PLP) R package and applying the model to a large, randomly selected population. These subjects can be used to test one or more phenotype algorithms.</p>
 </div>
-<div id="process-steps" class="section level1">
-<h1 class="hasAnchor">
-<a href="#process-steps" class="anchor"></a>Process Steps</h1>
+<div class="section level1">
+<h1 id="process-steps">Process Steps<a class="anchor" aria-label="anchor" href="#process-steps"></a>
+</h1>
 <p>The first step in the process, developing the evaluation cohort, is shown below: <img src="https://github.com/OHDSI/PheValuator/raw/main/vignettes/Figure1.png"></p>
 <p>The model is created using a cohort of subjects with a very high likelihood of having the HOI. These “noisy” positives (“noisy” in that they are very likely positive for the HOI but not a true gold standard) are called the “xSpec” cohort - extremely specific. This cohort will be the Outcome (O) cohort in the PLP model. There are several methods to create this cohort but the simplest would be to develop a cohort of subjects who have multiple condition codes for the HOI in their patient record. A typical number to use might be 5 or more condition codes for acute HOI’s, say myocardial infarction, or 10 or more condition codes for chronic HOI’s, say diabetes mellitus. We also define a noisy negatives cohort. This cohort is created by taking a random sample of the subjects in the database who have no evidence of the HOI. These would be determined by creating a very sensitive cohort, in most cases 1 or more condition codes for the HOI and excluding these subjects for the noisy negative cohort. The xSpec cohort and the noisy negative cohort are combined to for the Target (T) cohort for the PLP model. We then create a diagnostic predictive model with LASSO regularized regression using all the data in the subjects record. The data to inform this model is created using the FeatureExtraction package. The data includes conditions, drug exposures, procedures, and measurements. The developed model has a set of features with beta coefficients that can be used to discriminate between those with the HOI and those without.</p>
 <p>We next create and “evaluation” cohort - a large group of randomly selected subjects to be used to evaluate the phenotype algorithms (PA). The subjects are selected by pulling up to 1,000,000 subjects from the dataset. We extract the same covariates as we extracted form the T cohort in the model creation phase. We use the PLP function applyModel to apply the model to this large cohort producing probabilities for the HOI for each subject in the evaluation cohort. The subjects in this cohort with their associated probability of the HOI are used as a “gold” standard for the HOI. We save this output for use in the next step of the process</p>
@@ -111,72 +107,67 @@
 <p>The results from the evaluation for Opioid Abuse is shown below: <img src="https://github.com/OHDSI/PheValuator/raw/main/vignettes/Figure3.png"></p>
 <p>The diagram shows the complete performance evaluation for 5 PAs for the Expected Value as described above where the predicted value is used for summing the TP, FP, TN, and FN values. The full table created by the function also includes the performance characteristics based on the prediction thresholds specified when running the function.</p>
 </div>
-<div id="technology" class="section level1">
-<h1 class="hasAnchor">
-<a href="#technology" class="anchor"></a>Technology</h1>
+<div class="section level1">
+<h1 id="technology">Technology<a class="anchor" aria-label="anchor" href="#technology"></a>
+</h1>
 <p>PheValuator is an R package.</p>
 </div>
-<div id="system-requirements" class="section level1">
-<h1 class="hasAnchor">
-<a href="#system-requirements" class="anchor"></a>System Requirements</h1>
-<p>Requires R (version 3.3.0 or higher). Installation on Windows requires <a href="https://cran.r-project.org/bin/windows/Rtools/">RTools</a>. Some of the packages used by PheValuator require Java.</p>
+<div class="section level1">
+<h1 id="system-requirements">System Requirements<a class="anchor" aria-label="anchor" href="#system-requirements"></a>
+</h1>
+<p>Requires R (version 3.3.0 or higher). Installation on Windows requires <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">RTools</a>. Some of the packages used by PheValuator require Java.</p>
 </div>
-<div id="installation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h1>
-<ol>
-<li><p>See the instructions <a href="https://ohdsi.github.io/Hades/rSetup.html">here</a> for configuring your R environment, including Java.</p></li>
+<div class="section level1">
+<h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h1>
+<ol style="list-style-type: decimal">
+<li><p>See the instructions <a href="https://ohdsi.github.io/Hades/rSetup.html" class="external-link">here</a> for configuring your R environment, including Java.</p></li>
 <li>
 <p>In R, use the following commands to download and install PheValuator:</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"remotes"</span>)
-<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"ohdsi/PheValuator"</span>)</pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ohdsi/PheValuator"</span><span class="op">)</span></span></code></pre></div>
 </li>
 </ol>
 </div>
-<div id="user-documentation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#user-documentation" class="anchor"></a>User Documentation</h1>
-<p>Documentation can be found on the <a href="https://ohdsi.github.io/PheValuator">package website</a>.</p>
-<p>PDF versions of the documentation are also available:</p>
+<div class="section level1">
+<h1 id="user-documentation">User Documentation<a class="anchor" aria-label="anchor" href="#user-documentation"></a>
+</h1>
+<p>Documentation can be found on the <a href="https://ohdsi.github.io/PheValuator" class="external-link">package website</a>.</p>
+<p>PDF versions of the documentation are also available: * Vignette: <a href="https://github.com/OHDSI/PheValuator/blob/main/inst/doc/EvaluatingPhenotypeAlgorithms.pdf" class="external-link">Performing a Phenotype Algorithm Evaluation using Phevaluator</a> * Package manual: <a href="https://raw.githubusercontent.com/OHDSI/PheValuator/main/extras/PheValuator.pdf" class="external-link">PheValuator manual</a></p>
+</div>
+<div class="section level1">
+<h1 id="support">Support<a class="anchor" aria-label="anchor" href="#support"></a>
+</h1>
 <ul>
-<li>Vignette: <a href="https://github.com/OHDSI/PheValuator/blob/main/inst/doc/EvaluatingPhenotypeAlgorithms.pdf">Performing a Phenotype Algorithm Evaluation using Phevaluator</a>
+<li>Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers" class="external-link">OHDSI Forum</a>
 </li>
-<li>Package manual: <a href="https://raw.githubusercontent.com/OHDSI/PheValuator/main/extras/PheValuator.pdf">PheValuator manual</a>
-</li>
+<li>We use the <a href="https://github.com/OHDSI/PheValuator" class="external-link">GitHub issue tracker</a> for all bugs/issues/enhancements</li>
 </ul>
 </div>
-<div id="support" class="section level1">
-<h1 class="hasAnchor">
-<a href="#support" class="anchor"></a>Support</h1>
-<ul>
-<li>Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
-</li>
-<li>We use the <a href="https://github.com/OHDSI/PheValuator">GitHub issue tracker</a> for all bugs/issues/enhancements</li>
-</ul>
+<div class="section level1">
+<h1 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h1>
+<p>Read <a href="https://ohdsi.github.io/Hades/contribute.html" class="external-link">here</a> how you can contribute to this package.</p>
 </div>
-<div id="contributing" class="section level1">
-<h1 class="hasAnchor">
-<a href="#contributing" class="anchor"></a>Contributing</h1>
-<p>Read <a href="https://ohdsi.github.io/Hades/contribute.html">here</a> how you can contribute to this package.</p>
-</div>
-<div id="license" class="section level1">
-<h1 class="hasAnchor">
-<a href="#license" class="anchor"></a>License</h1>
+<div class="section level1">
+<h1 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h1>
 <p>PheValuator is licensed under Apache License 2.0</p>
 </div>
-<div id="development" class="section level1">
-<h1 class="hasAnchor">
-<a href="#development" class="anchor"></a>Development</h1>
+<div class="section level1">
+<h1 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
+</h1>
 <p>PheValuator is being developed in R Studio.</p>
-<div id="development-status" class="section level3">
-<h3 class="hasAnchor">
-<a href="#development-status" class="anchor"></a>Development status</h3>
+<div class="section level3">
+<h3 id="development-status">Development status<a class="anchor" aria-label="anchor" href="#development-status"></a>
+</h3>
 <p>Beta</p>
 </div>
 </div>
-<div id="acknowledgements" class="section level1">
-<h1 class="hasAnchor">
-<a href="#acknowledgements" class="anchor"></a>Acknowledgements</h1>
+<div class="section level1">
+<h1 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
+</h1>
 <ul>
 <li>The package is maintained by Joel Swerdel and has been developed with major contributions from Jenna Reps, Peter Rijnbeek, Martijn Schuemie, Patrick Ryan, and Marc Suchard.</li>
 </ul>
@@ -186,45 +177,55 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/OHDSI/PheValuator/">https://​github.com/​OHDSI/​PheValuator/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/OHDSI/PheValuator/issues">https://​github.com/​OHDSI/​PheValuator/​issues</a>
-</li>
-<li>Ask a question at <br><a href="http://forums.ohdsi.org">http://​forums.ohdsi.org</a>
-</li>
+<li><a href="https://github.com/OHDSI/PheValuator/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/OHDSI/PheValuator/issues" class="external-link">Report a bug</a></li>
+<li><a href="http://forums.ohdsi.org" class="external-link">Ask a question</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>Apache License 2.0</li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing PheValuator</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Joel N. Swerdel <br><small class="roles"> Maintainer </small>  </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check"><img src="https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg" alt="Build Status"></a></li>
+<li><a href="https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg" alt="Build Status"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Joel N. Swerdel.</p>
+  <p></p>
+<p>Developed by Joel N. Swerdel.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -232,6 +233,8 @@
 
   
 
+
+  
 
   </body>
 </html>
