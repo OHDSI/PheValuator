@@ -35,12 +35,14 @@ Suggests:
     DT,
     htmltools,
     testthat,
-    Eunomia
+    Eunomia,
+    CohortGenerator
 Remotes:
     ohdsi/PatientLevelPrediction,
     ohdsi/FeatureExtraction,
     ohdsi/ROhdsiWebApi,
-    ohdsi/Eunomia
+    ohdsi/Eunomia,
+    ohdsi/CohortGenerator
 URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
 RoxygenNote: 7.2.1
