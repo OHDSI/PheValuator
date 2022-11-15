@@ -34,11 +34,13 @@ Suggests:
     shinydashboard,
     DT,
     htmltools,
-    testthat
+    testthat,
+    Eunomia
 Remotes:
     ohdsi/PatientLevelPrediction,
     ohdsi/FeatureExtraction,
-    ohdsi/ROhdsiWebApi
+    ohdsi/ROhdsiWebApi,
+    ohdsi/Eunomia
 URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
 RoxygenNote: 7.2.1
