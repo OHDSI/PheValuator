@@ -34,9 +34,6 @@ createCohortSet <- function(connectionDetails = NULL) {
     jsonFolder = cohortPath,
     cohortFileNameValue = c("cohortId")
   )
-  if (!is.null(cohortIds)) {
-    cohortDefinitionSet <- cohortDefinitionSet %>% dplyr::filter(.data$cohortId %in% cohortIds)
-  }
 
   cohortTableNames <- CohortGenerator::getCohortTableNames(cohortTable = "cohort")
 
