@@ -109,7 +109,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
       #               "and cohort_start_date <= cast('", maxCohortStartDate, "' as date) ;")
 
       sql <- paste0("SELECT DISTINCT subject_id,
-                cohort_start_date AS cohort_start_date_p
+                cohort_start_date AS pheno_cohort_start_date
               FROM @cohort_database_schema.@cohort_table
               JOIN @cdm_database_schema.observation_period
                 ON subject_id = person_id
@@ -138,7 +138,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
     sql <- SqlRender::translate(sql = sql, targetDialect = connectionDetails$dbms)
     connection <- DatabaseConnector::connect(connectionDetails)
-    ParallelLogger::logInfo("Downloading cohort to evaluate. Assuming type is ", modelType, ".")
+    ParallelLogger::logInfo("Downloading cohort to evaluate: ", phenotypeCohortId)
     phenoPop <- DatabaseConnector::querySql(connection = connection, sql, snakeCaseToCamelCase = TRUE)
     DatabaseConnector::disconnect(connection)
 
@@ -156,21 +156,23 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     modelAll <- modelAll[order(modelAll$value), ]
     modelAll$rownum <- 1:nrow(modelAll)
     phenoPop$inPhenotype <- rep(TRUE, nrow(phenoPop))
+
     for (cpUp in 1:length(cutPoints)) {
       # join the phenotype table with the prediction table
       if (modelType == "acute") {
         # join phenotype and evaluation cohort on subject_id and phenotype visit date +/- the splay
         #first join by subject id only
         fullTable <- dplyr::left_join(modelAll,
-                                      phenoPop[, c("subjectId", "cohortStartDateP", "inPhenotype")],
+                                      phenoPop[, c("subjectId", "phenoCohortStartDate", "inPhenotype")],
                                       by = c("subjectId"))
+
         fullTable$cohortStartDate <- as.Date(fullTable$cohortStartDate)
-        fullTable$cohortStartDateP <- as.Date(fullTable$cohortStartDateP)
+        fullTable$phenophenoCohortStartDate <- as.Date(fullTable$phenoCohortStartDate)
 
         #now set match (inPhenotype) to false if the cohort and visit date do not match within splay setting
-        fullTable$inPhenotype[!is.na(fullTable$cohortStartDateP) &
-                                (fullTable$cohortStartDate <= fullTable$cohortStartDateP - splayPost |
-                                   fullTable$cohortStartDate >= fullTable$cohortStartDateP + splayPrior)] <- FALSE
+        fullTable$inPhenotype[!is.na(fullTable$phenoCohortStartDate) &
+                                (fullTable$cohortStartDate <= fullTable$phenoCohortStartDate - splayPost |
+                                   fullTable$cohortStartDate >= fullTable$phenoCohortStartDate + splayPrior)] <- FALSE
 
         #remove the subjects in the phenotype algorithm that matched the eval cohort on subject id but didn't match the dates
         #these are mis-matches due to the random selection of visit process and should not be counted
