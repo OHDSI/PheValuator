@@ -19,7 +19,7 @@ with_dbc_connection <- function(connection, code) {
 }
 
 # Create a cohort definition set from test cohorts
-createCohortSet <- function(cohortIds = NULL) {
+createCohortSet <- function(connectionDetails = NULL) {
 
   if (grepl("testthat", getwd())) {
     cohortPath <- "cohorts"
@@ -39,8 +39,6 @@ createCohortSet <- function(cohortIds = NULL) {
   }
 
   cohortTableNames <- CohortGenerator::getCohortTableNames(cohortTable = "cohort")
-
-  connectionDetails <- getEunomiaConnectionDetails()
 
   CohortGenerator::createCohortTables(connectionDetails = connectionDetails,
                                       cohortTableNames = cohortTableNames,

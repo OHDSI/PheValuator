@@ -1,6 +1,6 @@
 test_that("TestPhenotype - test PheValuator end to end", {
   Sys.setenv(EUNOMIA_DATA_FOLDER = tempdir())
-  connectionDetails <- getEunomiaConnectionDetails()
+  connectionDetails <- Eunomia::getEunomiaConnectionDetails()
   connection <- connect(connectionDetails)
 
   andromedaTempFolder <- tempdir() #change to a spot where you have some disk space for temporary files
@@ -22,7 +22,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
 
   dbList <- list(databaseDetails) #insert the db's you want to run in this list
 
-  cohorts <- createCohortSet()
+  cohorts <- createCohortSet(connectionDetails)
 
   #create the 4 cohorts below needed for the analysis
   xSpecCohort <- 1001
