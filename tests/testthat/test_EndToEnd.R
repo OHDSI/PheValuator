@@ -94,3 +94,4 @@ test_that("TestPhenotype - test PheValuator end to end", {
   expect_true(as.numeric(outputFile$sensitivity[[1]]) >= 0.1 & as.numeric(outputFile$sensitivity[[1]]) <= 0.9)
 
 })
+
