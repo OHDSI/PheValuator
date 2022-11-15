@@ -12,5 +12,5 @@ FROM @cdm_database_schema.condition_occurrence
 WHERE condition_concept_id IN (
 		SELECT descendant_concept_id
 		FROM @cdm_database_schema.concept_ancestor
-		WHERE ancestor_concept_id = 192671 -- Gastrointestinal haemorrhage
+		WHERE ancestor_concept_id = 260139
 		);

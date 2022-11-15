@@ -1,0 +1,35 @@
+DBMS:
+sqlite
+
+Error:
+near "ALL": syntax error
+
+SQL:
+CREATE TEMP TABLE Codesets   (codeset_id int NOT NULL,
+  concept_id bigint NOT NULL
+)
+DISTSTYLE ALL
+
+R version:
+R version 4.2.1 (2022-06-23 ucrt)
+
+Platform:
+x86_64-w64-mingw32
+
+Attached base packages:
+- stats
+- graphics
+- grDevices
+- utils
+- datasets
+- methods
+- base
+
+Other attached packages:
+- Eunomia (2.0)
+- PheValuator (2.1.12)
+- FeatureExtraction (3.2.0)
+- Andromeda (0.6.1)
+- dplyr (1.0.10)
+- DatabaseConnector (5.1.0)
+- testthat (3.1.4)

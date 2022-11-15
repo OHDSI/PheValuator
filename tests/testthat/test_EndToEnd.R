@@ -1,5 +1,3 @@
-library(Eunomia)
-
 test_that("TestPhenotype - test PheValuator end to end", {
   Sys.setenv(EUNOMIA_DATA_FOLDER = tempdir())
   connectionDetails <- getEunomiaConnectionDetails()
@@ -24,7 +22,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
 
   dbList <- list(databaseDetails) #insert the db's you want to run in this list
 
-  loadTestCohortDefinitionSet()
+  cohorts <- createCohortSet()
 
   #create the 4 cohorts below needed for the analysis
   xSpecCohort <- 1001

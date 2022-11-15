@@ -19,7 +19,7 @@ with_dbc_connection <- function(connection, code) {
 }
 
 # Create a cohort definition set from test cohorts
-loadTestCohortDefinitionSet <- function(cohortIds = NULL) {
+createCohortSet <- function(cohortIds = NULL) {
 
   if (grepl("testthat", getwd())) {
     cohortPath <- "cohorts"
@@ -28,9 +28,36 @@ loadTestCohortDefinitionSet <- function(cohortIds = NULL) {
   }
 
   creationFile <- file.path(cohortPath, "CohortsToCreate.csv")
+  cohortDefinitionSet <- CohortGenerator::getCohortDefinitionSet(
+    settingsFileName = creationFile,
+    sqlFolder = cohortPath,
+    jsonFolder = cohortPath,
+    cohortFileNameValue = c("cohortId")
+  )
+  if (!is.null(cohortIds)) {
+    cohortDefinitionSet <- cohortDefinitionSet %>% dplyr::filter(.data$cohortId %in% cohortIds)
+  }
 
-  cohortDefinitionSet <- createCohorts(connectionDetails = getEunomiaConnectionDetails())
+  cohortTableNames <- CohortGenerator::getCohortTableNames(cohortTable = "cohort")
 
-  return(cohortDefinitionSet)
+  connectionDetails <- getEunomiaConnectionDetails()
+
+  CohortGenerator::createCohortTables(connectionDetails = connectionDetails,
+                                      cohortTableNames = cohortTableNames,
+                                      cohortDatabaseSchema = "main",
+                                      incremental = FALSE)
+
+
+  cohortDefinitionSet$checksum <- CohortGenerator::computeChecksum(cohortDefinitionSet$sql)
+
+  cohortsGenerated <- CohortGenerator::generateCohortSet(connectionDetails = connectionDetails,
+                                                         cdmDatabaseSchema = "main",
+                                                         cohortDatabaseSchema = "main",
+                                                         cohortTableNames = cohortTableNames,
+                                                         cohortDefinitionSet = cohortDefinitionSet,
+                                                         incremental = FALSE)
+
+
+  return
 }
 
