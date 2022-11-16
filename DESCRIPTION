@@ -22,7 +22,6 @@ Imports:
     PatientLevelPrediction (>= 6.0.4),
     SqlRender (>= 1.5.2),
     dplyr (>= 0.7.8),
-    readr,
     methods,
     ParallelLogger,
     tibble

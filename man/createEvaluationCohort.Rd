@@ -15,8 +15,8 @@ createEvaluationCohort(
   cohortDatabaseSchema,
   cohortTable,
   workDatabaseSchema,
-  covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds =
-    c(), addDescendantsToExclude = TRUE),
+  covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
+    addDescendantsToExclude = TRUE),
   modelPopulationCohortId = 0,
   modelPopulationCohortIdStartDay = 0,
   modelPopulationCohortIdEndDay = 0,
