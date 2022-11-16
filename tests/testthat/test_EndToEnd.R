@@ -2,25 +2,16 @@ library(PheValuator)
 library(testthat)
 library(Eunomia)
 
-test_that("TestPhenotype - test PheValuator end to end", {
-  Sys.setenv(EUNOMIA_DATA_FOLDER = tempdir())
+runTest <- function(folder, databaseId) {
   connectionDetails <- Eunomia::getEunomiaConnectionDetails()
 
-  andromedaTempFolder <- tempdir() #change to a spot where you have some disk space for temporary files
-
-
-  options(andromedaTempFolder = andromedaTempFolder)
-
-  folder <- tempdir() #change to a spot where you have significant free space
-
   #databases are in the format:
-  databaseId <- "Eunomia"
   databaseDetails <- list(databaseId = databaseId,
-                           cdmDatabaseSchema = "main",
-                           cohortDatabaseSchema = "main",
-                           cohortTable = "cohort",
-                           workDatabaseSchema = "main",
-                           connectionDetails = connectionDetails)
+                          cdmDatabaseSchema = "main",
+                          cohortDatabaseSchema = "main",
+                          cohortTable = "cohort",
+                          workDatabaseSchema = "main",
+                          connectionDetails = connectionDetails)
 
 
   dbList <- list(databaseDetails) #insert the db's you want to run in this list
@@ -36,13 +27,13 @@ test_that("TestPhenotype - test PheValuator end to end", {
 
   # Create analysis settings ----------------------------------------------------------------------------------------
   CovSettingsAcute <- createDefaultCovariateSettings(excludedCovariateConceptIds = excludedCovariateConceptIds,
-                                                          addDescendantsToExclude = TRUE,
-                                                          startDayWindow1 = 0,
-                                                          endDayWindow1 = 10,
-                                                          startDayWindow2 = 11,
-                                                          endDayWindow2 = 20,
-                                                          startDayWindow3 = 21,
-                                                          endDayWindow3 = 9999)
+                                                     addDescendantsToExclude = TRUE,
+                                                     startDayWindow1 = 0,
+                                                     endDayWindow1 = 10,
+                                                     startDayWindow2 = 11,
+                                                     endDayWindow2 = 20,
+                                                     startDayWindow3 = 21,
+                                                     endDayWindow3 = 9999)
 
   CohortArgsAcute <- createCreateEvaluationCohortArgs(xSpecCohortId = xSpecCohort,
                                                       xSensCohortId = xSensCohort,
@@ -89,6 +80,31 @@ test_that("TestPhenotype - test PheValuator end to end", {
                                              outputFolder = outFolder,
                                              pheValuatorAnalysisList = pheValuatorAnalysisList)
 
+  }
+}
+
+test_that("TestPhenotype - test PheValuator end to end", {
+  fail <- 0
+
+  while(fail < 3) {
+    unlink(tempdir(), recursive = TRUE)
+
+    Sys.setenv(EUNOMIA_DATA_FOLDER = tempdir())
+
+    andromedaTempFolder <- tempdir() #change to a spot where you have some disk space for temporary files
+
+    options(andromedaTempFolder = andromedaTempFolder)
+
+    folder <- tempdir() #change to a spot where you have significant free space
+
+    databaseId <- "Eunomia"
+    results <- runTest(folder = folder, databaseId = databaseId)
+
+    if(file.exists(file.path(folder, databaseId, "TestResults_a1.rds"))) {
+      break
+    } else {
+      fail <- fail + 1
+    }
   }
 
   expect_true(file.exists(file.path(folder, databaseId, "TestResults_a1.rds")))
