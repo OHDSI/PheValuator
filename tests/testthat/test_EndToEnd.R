@@ -31,7 +31,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
   evaluationPopulationCohortId <- 5
 
   # Create analysis settings ----------------------------------------------------------------------------------------
-  CovSettingsAcute <- createDefaultAcuteCovariateSettings(excludedCovariateConceptIds = excludedCovariateConceptIds,
+  CovSettingsAcute <- createDefaultCovariateSettings(excludedCovariateConceptIds = excludedCovariateConceptIds,
                                                           addDescendantsToExclude = TRUE,
                                                           startDayWindow1 = 0,
                                                           endDayWindow1 = 10,
