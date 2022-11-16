@@ -56,12 +56,12 @@ test_that("TestPhenotype - test PheValuator end to end", {
                                                       baseSampleSize = 2000000,
                                                       startDate = "19000101", #can change these dates to suit your database
                                                       endDate = "21000101",
-                                                      saveEvaluationCohortPlpData = FALSE,
-                                                      excludeModelFromEvaluation = FALSE)
+                                                      saveEvaluationCohortPlpData = TRUE,
+                                                      excludeModelFromEvaluation = TRUE)
 
 
   ##### First phenotype algorithm to test ##############
-  conditionAlgTestArgs <- createTestPhenotypeAlgorithmArgs(cutPoints = c("EV"),
+  conditionAlgTestArgs <- createTestPhenotypeAlgorithmArgs(cutPoints = c("EV", 0.1),
                                                            phenotypeCohortId =  6, #CHANGE THIS: 1st phenotype algorithm to test
                                                            washoutPeriod = 0) #CHANGE THIS: to how many continuous observation days prior to index (e.g., 365)
 

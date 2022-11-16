@@ -96,18 +96,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     xSpecP3 <- -1
 
     modelType <- evaluationCohort$PheValuator$inputSetting$modelType
-    if (modelType == "acute") {
-      # sql <- paste0("SELECT DISTINCT subject_id,
-      #           cohort_start_date AS cohort_start_date_p
-      #         FROM @cohort_database_schema.@cohort_table
-      #         JOIN @cdm_database_schema.observation_period
-      #           ON subject_id = person_id
-      #             and cohort_start_date >= observation_period_start_date
-      #             and cohort_start_date <= observation_period_end_date
-      #         WHERE cohort_definition_id = @cohort_id
-      #           and cohort_start_date >= cast('", minCohortStartDate, "' as date) ",
-      #               "and cohort_start_date <= cast('", maxCohortStartDate, "' as date) ;")
-
+#    if (modelType == "acute") {
       sql <- paste0("SELECT DISTINCT subject_id,
                 cohort_start_date AS pheno_cohort_start_date
               FROM @cohort_database_schema.@cohort_table
@@ -117,18 +106,18 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                   and cohort_start_date <= observation_period_end_date
               WHERE cohort_definition_id = @cohort_id ;")
 
-    } else {
-      sql <- paste0("SELECT DISTINCT subject_id,
-                observation_period_start_date AS cohort_start_date
-              FROM @cohort_database_schema.@cohort_table
-              JOIN @cdm_database_schema.observation_period
-                ON subject_id = person_id
-                  and cohort_start_date >= observation_period_start_date
-                  and cohort_start_date <= observation_period_end_date
-              WHERE cohort_definition_id = @cohort_id
-                and cohort_start_date >= cast('", minCohortStartDate, "' as date) ",
-                    "and cohort_start_date <= cast('", maxCohortStartDate, "' as date) ;")
-    }
+    # } else {
+    #   sql <- paste0("SELECT DISTINCT subject_id,
+    #             observation_period_start_date AS cohort_start_date
+    #           FROM @cohort_database_schema.@cohort_table
+    #           JOIN @cdm_database_schema.observation_period
+    #             ON subject_id = person_id
+    #               and cohort_start_date >= observation_period_start_date
+    #               and cohort_start_date <= observation_period_end_date
+    #           WHERE cohort_definition_id = @cohort_id
+    #             and cohort_start_date >= cast('", minCohortStartDate, "' as date) ",
+    #                 "and cohort_start_date <= cast('", maxCohortStartDate, "' as date) ;")
+    # }
 
     sql <- SqlRender::render(sql = sql,
                              cohort_database_schema = cohortDatabaseSchema,
@@ -159,7 +148,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
     for (cpUp in 1:length(cutPoints)) {
       # join the phenotype table with the prediction table
-      if (modelType == "acute") {
+#      if (modelType == "acute") {
         # join phenotype and evaluation cohort on subject_id and phenotype visit date +/- the splay
         #first join by subject id only
         fullTable <- dplyr::left_join(modelAll,
@@ -179,11 +168,11 @@ testPhenotypeAlgorithm <- function(connectionDetails,
         fullTable <- fullTable[fullTable$inPhenotype == TRUE | is.na(fullTable$inPhenotype),]
 
 
-      } else {
-        fullTable <- dplyr::left_join(modelAll,
-                                      phenoPop[, c("subjectId", "inPhenotype")],
-                                      by = c("subjectId"))
-      }
+      # } else {
+      #   fullTable <- dplyr::left_join(modelAll,
+      #                                 phenoPop[, c("subjectId", "inPhenotype")],
+      #                                 by = c("subjectId"))
+      # }
 
       #set all the rest of the non-matches to false
       fullTable$inPhenotype[is.na(fullTable$inPhenotype)] <- FALSE
