@@ -1,3 +1,7 @@
+library(PheValuator)
+library(testthat)
+library(Eunomia)
+
 test_that("TestPhenotype - test PheValuator end to end", {
   Sys.setenv(EUNOMIA_DATA_FOLDER = tempdir())
   connectionDetails <- Eunomia::getEunomiaConnectionDetails()
