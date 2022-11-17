@@ -80,7 +80,4 @@ test_that("TestPhenotype - test PheValuator end to end", {
 
   expect_true(file.exists(file.path(folder, "TestResults_a1.rds")))
 
-  outputFile <- readRDS(file.path(folder, "TestResults_a1.rds"))
-
-  expect_true(as.numeric(outputFile$sensitivity[[1]]) >= 0.1 & as.numeric(outputFile$sensitivity[[1]]) <= 0.9)
 })
