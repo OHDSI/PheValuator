@@ -32,8 +32,7 @@ createCreateEvaluationCohortArgs(
   evaluationCohortId = "main",
   excludeModelFromEvaluation = FALSE,
   removeSubjectsWithFutureDates = TRUE,
-  saveEvaluationCohortPlpData = FALSE,
-  modelType = "acute"
+  saveEvaluationCohortPlpData = FALSE
 )
 }
 \arguments{
@@ -107,9 +106,6 @@ with dates in the future?}
 
 \item{saveEvaluationCohortPlpData}{Should the large PLP file for the evaluation cohort be
 saved? To be used for debugging purposes.}
-
-\item{modelType}{The type of health outcome in the model either "acute"
-or"chronic".}
 }
 \description{
 Create a parameter object for the function createEvaluationCohort

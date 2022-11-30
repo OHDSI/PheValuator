@@ -40,10 +40,7 @@
                                     modelId = "main",
                                     evaluationCohortId = "main",
                                     excludeModelFromEvaluation = FALSE,
-                                    savePlpData = FALSE,
-                                    modelType = "acute") {
-
-  modelType <- "acute" #force to only using acute settings
+                                    savePlpData = FALSE) {
 
   if (savePlpData == TRUE) {
     evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))
@@ -284,7 +281,6 @@
     appResults$PheValuator$inputSetting$startDate <- startDate
     appResults$PheValuator$inputSetting$endDate <- endDate
     appResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId
-    appResults$PheValuator$inputSetting$modelType <- modelType
     appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
 
     appResults$PheValuator$modelperformanceEvaluation <- lrResults$performanceEvaluation

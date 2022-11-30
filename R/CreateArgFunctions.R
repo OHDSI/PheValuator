@@ -49,8 +49,6 @@
 #'                                         with dates in the future?
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be
 #'                                         saved? To be used for debugging purposes.
-#' @param modelType                        The type of health outcome in the model either "acute"
-#'                                         or"chronic".
 #'
 #' @export
 createCreateEvaluationCohortArgs <- function(xSpecCohortId,
@@ -80,8 +78,7 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              evaluationCohortId = "main",
                                              excludeModelFromEvaluation = FALSE,
                                              removeSubjectsWithFutureDates = TRUE,
-                                             saveEvaluationCohortPlpData = FALSE,
-                                             modelType = "acute") {
+                                             saveEvaluationCohortPlpData = FALSE) {
   # First: get default values:
   analysis <- list()
   for (name in names(formals(createCreateEvaluationCohortArgs))) {

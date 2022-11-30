@@ -95,9 +95,7 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     xSpecP2 <- -1
     xSpecP3 <- -1
 
-    modelType <- evaluationCohort$PheValuator$inputSetting$modelType
-#    if (modelType == "acute") {
-      sql <- paste0("SELECT DISTINCT subject_id,
+    sql <- paste0("SELECT DISTINCT subject_id,
                 cohort_start_date AS pheno_cohort_start_date
               FROM @cohort_database_schema.@cohort_table
               JOIN @cdm_database_schema.observation_period
@@ -106,18 +104,6 @@ testPhenotypeAlgorithm <- function(connectionDetails,
                   and cohort_start_date <= observation_period_end_date
               WHERE cohort_definition_id = @cohort_id ;")
 
-    # } else {
-    #   sql <- paste0("SELECT DISTINCT subject_id,
-    #             observation_period_start_date AS cohort_start_date
-    #           FROM @cohort_database_schema.@cohort_table
-    #           JOIN @cdm_database_schema.observation_period
-    #             ON subject_id = person_id
-    #               and cohort_start_date >= observation_period_start_date
-    #               and cohort_start_date <= observation_period_end_date
-    #           WHERE cohort_definition_id = @cohort_id
-    #             and cohort_start_date >= cast('", minCohortStartDate, "' as date) ",
-    #                 "and cohort_start_date <= cast('", maxCohortStartDate, "' as date) ;")
-    # }
 
     sql <- SqlRender::render(sql = sql,
                              cohort_database_schema = cohortDatabaseSchema,
@@ -148,24 +134,23 @@ testPhenotypeAlgorithm <- function(connectionDetails,
 
     for (cpUp in 1:length(cutPoints)) {
       # join the phenotype table with the prediction table
-#      if (modelType == "acute") {
-        # join phenotype and evaluation cohort on subject_id and phenotype visit date +/- the splay
-        #first join by subject id only
-        fullTable <- dplyr::left_join(modelAll,
-                                      phenoPop[, c("subjectId", "phenoCohortStartDate", "inPhenotype")],
-                                      by = c("subjectId"))
+      # join phenotype and evaluation cohort on subject_id and phenotype visit date +/- the splay
+      #first join by subject id only
+      fullTable <- dplyr::left_join(modelAll,
+                                    phenoPop[, c("subjectId", "phenoCohortStartDate", "inPhenotype")],
+                                    by = c("subjectId"))
 
-        fullTable$cohortStartDate <- as.Date(fullTable$cohortStartDate)
-        fullTable$phenophenoCohortStartDate <- as.Date(fullTable$phenoCohortStartDate)
+      fullTable$cohortStartDate <- as.Date(fullTable$cohortStartDate)
+      fullTable$phenophenoCohortStartDate <- as.Date(fullTable$phenoCohortStartDate)
 
-        #now set match (inPhenotype) to false if the cohort and visit date do not match within splay setting
-        fullTable$inPhenotype[!is.na(fullTable$phenoCohortStartDate) &
-                                (fullTable$cohortStartDate <= fullTable$phenoCohortStartDate - splayPost |
-                                   fullTable$cohortStartDate >= fullTable$phenoCohortStartDate + splayPrior)] <- FALSE
+      #now set match (inPhenotype) to false if the cohort and visit date do not match within splay setting
+      fullTable$inPhenotype[!is.na(fullTable$phenoCohortStartDate) &
+                              (fullTable$cohortStartDate <= fullTable$phenoCohortStartDate - splayPost |
+                                 fullTable$cohortStartDate >= fullTable$phenoCohortStartDate + splayPrior)] <- FALSE
 
-        #remove the subjects in the phenotype algorithm that matched the eval cohort on subject id but didn't match the dates
-        #these are mis-matches due to the random selection of visit process and should not be counted
-        fullTable <- fullTable[fullTable$inPhenotype == TRUE | is.na(fullTable$inPhenotype),]
+      #remove the subjects in the phenotype algorithm that matched the eval cohort on subject id but didn't match the dates
+      #these are mis-matches due to the random selection of visit process and should not be counted
+      fullTable <- fullTable[fullTable$inPhenotype == TRUE | is.na(fullTable$inPhenotype),]
 
 
       # } else {
