@@ -83,8 +83,6 @@
 #'                                         dates in the future?
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be saved? To be
 #'                                         used for debugging purposes.
-#' @param modelType                        The type of health outcome in the model either "acute" or
-#'                                         "chronic".
 #'
 #' @export
 createEvaluationCohort <- function(connectionDetails,
@@ -97,8 +95,8 @@ createEvaluationCohort <- function(connectionDetails,
                                    cohortDatabaseSchema,
                                    cohortTable,
                                    workDatabaseSchema,
-                                   covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds = c(),
-                                                                                             addDescendantsToExclude = TRUE),
+                                   covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
+                                                                                      addDescendantsToExclude = TRUE),
                                    modelPopulationCohortId = 0,
                                    modelPopulationCohortIdStartDay = 0,
                                    modelPopulationCohortIdEndDay = 0,
@@ -122,10 +120,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    evaluationCohortId = "main",
                                    excludeModelFromEvaluation = FALSE,
                                    removeSubjectsWithFutureDates = TRUE,
-                                   saveEvaluationCohortPlpData = FALSE,
-                                   modelType = "acute") {
-  if (modelType != "chronic" & modelType != "acute")
-    stop("ModelType must be acute or chronic")
+                                   saveEvaluationCohortPlpData = FALSE) {
   if (length(connectionDetails) == 0)
     stop("Must supply a connection string")
   if (xSpecCohortId == "")
@@ -173,8 +168,7 @@ createEvaluationCohort <- function(connectionDetails,
                         removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
                         cdmVersion = cdmVersion,
                         outFolder = outFolder,
-                        modelId = modelId,
-                        modelType = modelType)
+                        modelId = modelId)
 
   .createEvaluationCohort(connectionDetails = connectionDetails,
                           xSpecCohortId = xSpecCohortId,
@@ -202,8 +196,7 @@ createEvaluationCohort <- function(connectionDetails,
                           modelId = modelId,
                           evaluationCohortId = evaluationCohortId,
                           excludeModelFromEvaluation = excludeModelFromEvaluation,
-                          savePlpData = saveEvaluationCohortPlpData,
-                          modelType = modelType)
+                          savePlpData = saveEvaluationCohortPlpData)
   delta <- Sys.time() - start
   ParallelLogger::logInfo("Creating evaluation cohort took ", signif(delta, 3), " ", attr(delta, "units"))
 }

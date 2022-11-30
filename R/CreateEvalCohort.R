@@ -40,10 +40,7 @@
                                     modelId = "main",
                                     evaluationCohortId = "main",
                                     excludeModelFromEvaluation = FALSE,
-                                    savePlpData = FALSE,
-                                    modelType = "acute") {
-
-  modelType <- "acute" #force to only using acute settings
+                                    savePlpData = FALSE) {
 
   if (savePlpData == TRUE) {
     evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))
@@ -119,34 +116,30 @@
       })
 
     } else { #otherwise create the evaluation cohort from an sql query
-      if (modelType == "acute") {
-        #first check number of eligible visits in db
-        sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
-                                                 packageName = "PheValuator",
-                                                 dbms = connectionDetails$dbms,
-                                                 cdm_database_schema = cdmDatabaseSchema,
-                                                 cohort_database_schema = cohortDatabaseSchema,
-                                                 cohort_database_table = cohortTable,
-                                                 ageLimit = lowerAgeLimit,
-                                                 upperAgeLimit = upperAgeLimit,
-                                                 gender = gender,
-                                                 race = race,
-                                                 ethnicity = ethnicity,
-                                                 startDate = startDate,
-                                                 endDate = endDate,
-                                                 visitType = visitType,
-                                                 visitLength = visitLength,
-                                                 exclCohort = xSensCohortId)
-        cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
+      #first check number of eligible visits in db
+      sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
+                                               packageName = "PheValuator",
+                                               dbms = connectionDetails$dbms,
+                                               cdm_database_schema = cdmDatabaseSchema,
+                                               cohort_database_schema = cohortDatabaseSchema,
+                                               cohort_database_table = cohortTable,
+                                               ageLimit = lowerAgeLimit,
+                                               upperAgeLimit = upperAgeLimit,
+                                               gender = gender,
+                                               race = race,
+                                               ethnicity = ethnicity,
+                                               startDate = startDate,
+                                               endDate = endDate,
+                                               visitType = visitType,
+                                               visitLength = visitLength,
+                                               exclCohort = xSensCohortId)
+      cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
 
-        #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
-        if (cntVisits > 100000000) {firstCut <- TRUE} else {firstCut <- FALSE}
+      #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
+      if (cntVisits > 100000000) {firstCut <- TRUE} else {firstCut <- FALSE}
 
-        sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
-      } else {
-        firstCut <- FALSE
-        sqlFilename <- "CreateCohortsV6.sql"
-      }
+      sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
+
       sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFilename,
                                                packageName = "PheValuator",
                                                dbms = connection@dbms,
@@ -288,7 +281,6 @@
     appResults$PheValuator$inputSetting$startDate <- startDate
     appResults$PheValuator$inputSetting$endDate <- endDate
     appResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId
-    appResults$PheValuator$inputSetting$modelType <- modelType
     appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
 
     appResults$PheValuator$modelperformanceEvaluation <- lrResults$performanceEvaluation

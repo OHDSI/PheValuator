@@ -49,7 +49,7 @@ Requires write permissions to this database.}
 the \code{\link{createPheValuatorAnalysis}} function.}
 }
 \value{
-A data frame specifiying where the constructed evaluation cohort and phenotype evaluation results can be found
+A data frame specifying where the constructed evaluation cohort and phenotype evaluation results can be found
 in the local file system.
 }
 \description{

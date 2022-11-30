@@ -15,8 +15,8 @@ createEvaluationCohort(
   cohortDatabaseSchema,
   cohortTable,
   workDatabaseSchema,
-  covariateSettings = createDefaultChronicCovariateSettings(excludedCovariateConceptIds =
-    c(), addDescendantsToExclude = TRUE),
+  covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
+    addDescendantsToExclude = TRUE),
   modelPopulationCohortId = 0,
   modelPopulationCohortIdStartDay = 0,
   modelPopulationCohortIdEndDay = 0,
@@ -40,8 +40,7 @@ createEvaluationCohort(
   evaluationCohortId = "main",
   excludeModelFromEvaluation = FALSE,
   removeSubjectsWithFutureDates = TRUE,
-  saveEvaluationCohortPlpData = FALSE,
-  modelType = "acute"
+  saveEvaluationCohortPlpData = FALSE
 )
 }
 \arguments{
@@ -139,9 +138,6 @@ dates in the future?}
 
 \item{saveEvaluationCohortPlpData}{Should the large PLP file for the evaluation cohort be saved? To be
 used for debugging purposes.}
-
-\item{modelType}{The type of health outcome in the model either "acute" or
-"chronic".}
 }
 \description{
 Create the evaluation cohort

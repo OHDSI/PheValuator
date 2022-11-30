@@ -43,7 +43,7 @@
 #'                                       the \code{\link{createPheValuatorAnalysis}} function.
 #'
 #' @return
-#' A data frame specifiying where the constructed evaluation cohort and phenotype evaluation results can be found
+#' A data frame specifying where the constructed evaluation cohort and phenotype evaluation results can be found
 #' in the local file system.
 #'
 #' @export
@@ -90,7 +90,7 @@ runPheValuatorAnalyses <- function(connectionDetails,
   resultsFiles <- unique(referenceTable$resultsFile)
   resultsFiles <- resultsFiles[!file.exists(file.path(outputFolder, resultsFiles))]
   if (length(resultsFiles) > 0) {
-    createTask <- function(resultsFile) {
+    createEvalTask <- function(resultsFile) {
       analysisId <- referenceTable$analysisId[referenceTable$resultsFile == resultsFile]
       matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
       args <- matched[[1]]$testPhenotypeAlgorithmArgs
@@ -104,7 +104,7 @@ runPheValuatorAnalyses <- function(connectionDetails,
                    fileName = file.path(outputFolder, resultsFile))
       return(task)
     }
-    tasks <- lapply(resultsFiles, createTask)
+    tasks <- lapply(resultsFiles, createEvalTask)
     lapply(tasks, doTestPhenotypeAlgorithm)
   }
   invisible(referenceTable)

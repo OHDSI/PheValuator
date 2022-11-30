@@ -1,7 +1,7 @@
 Package: PheValuator
 Type: Package
 Title: Rapid Phenotype Evaluation
-Version: 2.1.11
+Version: 2.1.12
 Author: Joel N. Swerdel
 Maintainer: Joel N. Swerdel <jswerdel@its.jnj.com>
 Description: A package for evaluating phenotype algorithms.  The package
@@ -22,7 +22,6 @@ Imports:
     PatientLevelPrediction (>= 6.0.4),
     SqlRender (>= 1.5.2),
     dplyr (>= 0.7.8),
-    readr,
     methods,
     ParallelLogger,
     tibble
@@ -34,13 +33,22 @@ Suggests:
     shinydashboard,
     DT,
     htmltools,
+<<<<<<< HEAD
     qpdf,
     testthat
+=======
+    testthat,
+    Eunomia,
+    CohortGenerator,
+    withr
+>>>>>>> develop
 Remotes:
     ohdsi/PatientLevelPrediction,
     ohdsi/FeatureExtraction,
-    ohdsi/ROhdsiWebApi
+    ohdsi/ROhdsiWebApi,
+    ohdsi/Eunomia,
+    ohdsi/CohortGenerator
 URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Encoding: UTF-8

@@ -40,12 +40,9 @@
                                   removeSubjectsWithFutureDates = TRUE,
                                   cdmVersion = "5",
                                   outFolder = getwd(),
-                                  modelId = "main",
-                                  modelType = "acute") {
+                                  modelId = "main") {
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
-
-  modelType <- "acute" #force to only using acute settings
 
   plpDataFile <- file.path(outFolder, sprintf("plpData_%s", modelId))
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
@@ -113,37 +110,33 @@
       if (!file.exists(plpDataFile)) {
         # only pull the plp data if it doesn't already exist create a unique name for the temporary cohort table
         testCohort <- paste0("test_model_",xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))
-        if (modelType == "acute") {
-          #first check number of eligible visits in db
-          sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
-                                                   packageName = "PheValuator",
-                                                   dbms = connectionDetails$dbms,
-                                                   cdm_database_schema = cdmDatabaseSchema,
-                                                   cohort_database_schema = cohortDatabaseSchema,
-                                                   cohort_database_table = cohortTable,
-                                                   ageLimit = lowerAgeLimit,
-                                                   upperAgeLimit = upperAgeLimit,
-                                                   gender = gender,
-                                                   race = race,
-                                                   ethnicity = ethnicity,
-                                                   startDate = startDate,
-                                                   endDate = endDate,
-                                                   visitType = visitType,
-                                                   visitLength = visitLength,
-                                                   exclCohort = xSensCohortId)
-          cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
+        #first check number of eligible visits in db
+        sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
+                                                 packageName = "PheValuator",
+                                                 dbms = connectionDetails$dbms,
+                                                 cdm_database_schema = cdmDatabaseSchema,
+                                                 cohort_database_schema = cohortDatabaseSchema,
+                                                 cohort_database_table = cohortTable,
+                                                 ageLimit = lowerAgeLimit,
+                                                 upperAgeLimit = upperAgeLimit,
+                                                 gender = gender,
+                                                 race = race,
+                                                 ethnicity = ethnicity,
+                                                 startDate = startDate,
+                                                 endDate = endDate,
+                                                 visitType = visitType,
+                                                 visitLength = visitLength,
+                                                 exclCohort = xSensCohortId)
+        cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
 
-          #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
-          if (cntVisits > 100000000) {
-            firstCut <- TRUE
-          } else {
-            firstCut <- FALSE
-          }
-          sqlFileName <- "CreateCohortsAcuteModel.sql"
+        #if number of visits is over 100M reduce down by factor of 12 to increase processing speed
+        if (cntVisits > 100000000) {
+          firstCut <- TRUE
         } else {
           firstCut <- FALSE
-          sqlFileName <- "CreateCohortsV6.sql"
         }
+        sqlFileName <- "CreateCohortsAcuteModel.sql"
+
         ParallelLogger::logInfo("Subsetting and sampling cohorts")
         sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFileName,
                                                  packageName = "PheValuator",
@@ -293,7 +286,6 @@
           lrResults$PheValuator$inputSetting$ethnicity <- paste(unlist(ethnicity), collapse = ", ")
           lrResults$PheValuator$inputSetting$startDate <- startDate
           lrResults$PheValuator$inputSetting$endDate <- endDate
-          lrResults$PheValuator$inputSetting$modelType <- modelType
           lrResults$PheValuator$runTimeValues$truePrevalencePopulation <- popPrev
           lrResults$PheValuator$runTimeValues$prevalenceModel <- prevToUse
           lrResults$PheValuator$runTimeValues$modelYIntercept <- modelYIntercept

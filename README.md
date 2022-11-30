@@ -1,7 +1,7 @@
 PheValuator
 ===========
 
-[![Build Status](https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check)
+[![Build Status](https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check) [![codecov](https://codecov.io/gh/OHDSI/PheValuator/branch/main/graph/badge.svg?token=BVneSqi2IO)](https://codecov.io/gh/OHDSI/PheValuator)
 
 An R package for evaluating phenotype algorithms.
 
