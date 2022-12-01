@@ -148,6 +148,6 @@ used for debugging purposes.}
 Create the evaluation cohort
 }
 \details{
-Fits a diagnostic pretiction model, and uses it to create an evaluation cohort with
+Fits a diagnostic prediction model, and uses it to create an evaluation cohort with
 probabilities for the health outcome of interest.
 }

@@ -1,4 +1,4 @@
-# Copyright 2020 Observational Health Data Sciences and Informatics
+# Copyright 2022 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -73,8 +73,8 @@ runPheValuatorAnalyses <- function(connectionDetails,
 
   ParallelLogger::logInfo("Generating evaluation cohorts")
   evaluationCohortFolders <- unique(referenceTable$evaluationCohortFolder)
-  #evaluationCohortFolders <- evaluationCohortFolders[!file.exists(file.path(outputFolder, evaluationCohortFolders, "evaluationCohort_main.rds"))]
-  #if (length(evaluationCohortFolders) > 0) {
+  # evaluationCohortFolders <- evaluationCohortFolders[!file.exists(file.path(outputFolder, evaluationCohortFolders, "evaluationCohort_main.rds"))]
+  # if (length(evaluationCohortFolders) > 0) {
   createTask <- function(evaluationCohortFolder) {
     analysisId <- referenceTable$analysisId[referenceTable$evaluationCohortFolder == evaluationCohortFolder][1]
     matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
@@ -92,7 +92,7 @@ runPheValuatorAnalyses <- function(connectionDetails,
   }
   tasks <- lapply(evaluationCohortFolders, createTask)
   lapply(tasks, doCreateEvaluationCohort)
-  #}
+  # }
 
   ParallelLogger::logInfo("Evaluating phenotypes")
   resultsFiles <- unique(referenceTable$resultsFile)
@@ -106,10 +106,14 @@ runPheValuatorAnalyses <- function(connectionDetails,
       args$cdmDatabaseSchema <- cdmDatabaseSchema
       args$cohortDatabaseSchema <- cohortDatabaseSchema
       args$cohortTable <- cohortTable
-      args$outFolder <- file.path(outputFolder,
-                                  referenceTable$evaluationCohortFolder[referenceTable$analysisId == analysisId])
-      task <- list(args = args,
-                   fileName = file.path(outputFolder, resultsFile))
+      args$outFolder <- file.path(
+        outputFolder,
+        referenceTable$evaluationCohortFolder[referenceTable$analysisId == analysisId]
+      )
+      task <- list(
+        args = args,
+        fileName = file.path(outputFolder, resultsFile)
+      )
       return(task)
     }
     tasks <- lapply(resultsFiles, createEvalTask)
@@ -128,8 +132,10 @@ doTestPhenotypeAlgorithm <- function(task) {
 }
 
 createReferenceTable <- function(pheValuatorAnalysisList) {
-  referenceTable <- data.frame(analysisId = unlist(ParallelLogger::selectFromList(pheValuatorAnalysisList, "analysisId")),
-                               description = unlist(ParallelLogger::selectFromList(pheValuatorAnalysisList, "description")))
+  referenceTable <- data.frame(
+    analysisId = unlist(ParallelLogger::selectFromList(pheValuatorAnalysisList, "analysisId")),
+    description = unlist(ParallelLogger::selectFromList(pheValuatorAnalysisList, "description"))
+  )
   evalCohortArgs <- ParallelLogger::selectFromList(pheValuatorAnalysisList, "createEvaluationCohortArgs")
   uniqueEvalCohortArgs <- unique(evalCohortArgs)
   referenceTable$evaluationCohortFolder <- ""

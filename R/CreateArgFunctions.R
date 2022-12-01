@@ -55,8 +55,10 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              xSensCohortId,
                                              prevalenceCohortId,
                                              xSpecCohortSize = 5000,
-                                             covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
-                                                                                                addDescendantsToExclude = TRUE),
+                                             covariateSettings = createDefaultCovariateSettings(
+                                               excludedCovariateConceptIds = c(),
+                                               addDescendantsToExclude = TRUE
+                                             ),
                                              modelPopulationCohortId = 0,
                                              modelPopulationCohortIdStartDay = 0,
                                              modelPopulationCohortIdEndDay = 0,
@@ -68,7 +70,7 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              lowerAgeLimit = 0,
                                              upperAgeLimit = 120,
                                              visitLength = 0,
-                                             visitType = c(9201,9202,9203,581477,262),
+                                             visitType = c(9201, 9202, 9203, 581477, 262),
                                              gender = c(8507, 8532),
                                              race = 0,
                                              ethnicity = 0,
@@ -87,8 +89,9 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
   # Second: overwrite defaults with actual values:
   values <- lapply(as.list(match.call())[-1], function(x) eval(x, envir = sys.frame(-3)))
   for (name in names(values)) {
-    if (name %in% names(analysis))
+    if (name %in% names(analysis)) {
       analysis[[name]] <- values[[name]]
+    }
   }
   class(analysis) <- "args"
   return(analysis)
@@ -121,8 +124,9 @@ createTestPhenotypeAlgorithmArgs <- function(cutPoints = c("EV"),
   # Second: overwrite defaults with actual values:
   values <- lapply(as.list(match.call())[-1], function(x) eval(x, envir = sys.frame(-3)))
   for (name in names(values)) {
-    if (name %in% names(analysis))
+    if (name %in% names(analysis)) {
       analysis[[name]] <- values[[name]]
+    }
   }
   class(analysis) <- "args"
   return(analysis)

@@ -1,4 +1,4 @@
-# Copyright 2020 Observational Health Data Sciences and Informatics
+# Copyright 2022 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -20,7 +20,7 @@
 #' Create the evaluation cohort
 #'
 #' @details
-#' Fits a diagnostic pretiction model, and uses it to create an evaluation cohort with
+#' Fits a diagnostic prediction model, and uses it to create an evaluation cohort with
 #' probabilities for the health outcome of interest.
 #'
 #' @param connectionDetails                connectionDetails created using the function
@@ -99,8 +99,10 @@ createEvaluationCohort <- function(connectionDetails,
                                    cohortDatabaseSchema,
                                    cohortTable,
                                    workDatabaseSchema,
-                                   covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
-                                                                                      addDescendantsToExclude = TRUE),
+                                   covariateSettings = createDefaultCovariateSettings(
+                                     excludedCovariateConceptIds = c(),
+                                     addDescendantsToExclude = TRUE
+                                   ),
                                    modelPopulationCohortId = 0,
                                    modelPopulationCohortIdStartDay = 0,
                                    modelPopulationCohortIdEndDay = 0,
@@ -112,7 +114,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    lowerAgeLimit = 0,
                                    upperAgeLimit = 120,
                                    visitLength = 0,
-                                   visitType = c(9201,9202,9203,262,581477),
+                                   visitType = c(9201, 9202, 9203, 262, 581477),
                                    gender = c(8507, 8532),
                                    race = 0,
                                    ethnicity = 0,
@@ -125,22 +127,30 @@ createEvaluationCohort <- function(connectionDetails,
                                    excludeModelFromEvaluation = FALSE,
                                    removeSubjectsWithFutureDates = TRUE,
                                    saveEvaluationCohortPlpData = FALSE) {
-  if (length(connectionDetails) == 0)
+  if (length(connectionDetails) == 0) {
     stop("Must supply a connection string")
-  if (xSpecCohortId == "")
+  }
+  if (xSpecCohortId == "") {
     stop("Must have an xSpec cohort id (e.g., 1234)")
-  if (xSensCohortId == "")
+  }
+  if (xSensCohortId == "") {
     stop("Must have an xSens cohort id (e.g., 1235)")
-  if (prevalenceCohortId == "")
+  }
+  if (prevalenceCohortId == "") {
     stop("Must have an prevalence cohort (prevCohort) (e.g., 1235)")
-  if (cdmDatabaseSchema == "")
+  }
+  if (cdmDatabaseSchema == "") {
     stop(".Must have a defined CDM schema (e.g., \"YourCDM.YourCDMSchema\")")
-  if (cohortDatabaseSchema == "")
+  }
+  if (cohortDatabaseSchema == "") {
     stop(".Must have a defined Cohort schema ((e.g., \"YourCDM.YourCohortSchema\")")
-  if (cohortTable == "")
+  }
+  if (cohortTable == "") {
     stop(".Must have a defined Cohort table (e.g., \"cohort\")")
-  if (workDatabaseSchema == "")
+  }
+  if (workDatabaseSchema == "") {
     stop(".Must have a defined Out Database schema (e.g., \"scratch.dbo\")")
+  }
   if (!is.null(oracleTempSchema) && oracleTempSchema != "") {
     warning("The 'oracleTempSchema' argument is deprecated. Use 'tempEmulationSchema' instead.")
     tempEmulationSchema <- oracleTempSchema
@@ -148,64 +158,68 @@ createEvaluationCohort <- function(connectionDetails,
   if (!file.exists(outFolder)) {
     dir.create(outFolder, recursive = TRUE)
   }
-  start <-  Sys.time()
-  .createPhenotypeModel(connectionDetails = connectionDetails,
-                        cdmDatabaseSchema = cdmDatabaseSchema,
-                        cohortDatabaseSchema = cohortDatabaseSchema,
-                        cohortTable = cohortTable,
-                        workDatabaseSchema = workDatabaseSchema,
-                        tempEmulationSchema = tempEmulationSchema,
-                        xSpecCohortId = xSpecCohortId,
-                        xSensCohortId = xSensCohortId,
-                        prevalenceCohortId = prevalenceCohortId,
-                        xSpecCohortSize = xSpecCohortSize,
-                        covariateSettings = covariateSettings,
-                        mainPopulationCohortId = modelPopulationCohortId,
-                        mainPopulationCohortIdStartDay = modelPopulationCohortIdStartDay,
-                        mainPopulationCohortIdEndDay = modelPopulationCohortIdEndDay,
-                        modelBaseSampleSize = modelBaseSampleSize,
-                        lowerAgeLimit = lowerAgeLimit,
-                        upperAgeLimit = upperAgeLimit,
-                        visitLength = visitLength,
-                        visitType = c(visitType),
-                        gender = gender,
-                        race = race,
-                        ethnicity = ethnicity,
-                        startDate = startDate,
-                        endDate = endDate,
-                        removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
-                        cdmVersion = cdmVersion,
-                        outFolder = outFolder,
-                        modelId = modelId)
+  start <- Sys.time()
+  .createPhenotypeModel(
+    connectionDetails = connectionDetails,
+    cdmDatabaseSchema = cdmDatabaseSchema,
+    cohortDatabaseSchema = cohortDatabaseSchema,
+    cohortTable = cohortTable,
+    workDatabaseSchema = workDatabaseSchema,
+    tempEmulationSchema = tempEmulationSchema,
+    xSpecCohortId = xSpecCohortId,
+    xSensCohortId = xSensCohortId,
+    prevalenceCohortId = prevalenceCohortId,
+    xSpecCohortSize = xSpecCohortSize,
+    covariateSettings = covariateSettings,
+    mainPopulationCohortId = modelPopulationCohortId,
+    mainPopulationCohortIdStartDay = modelPopulationCohortIdStartDay,
+    mainPopulationCohortIdEndDay = modelPopulationCohortIdEndDay,
+    modelBaseSampleSize = modelBaseSampleSize,
+    lowerAgeLimit = lowerAgeLimit,
+    upperAgeLimit = upperAgeLimit,
+    visitLength = visitLength,
+    visitType = c(visitType),
+    gender = gender,
+    race = race,
+    ethnicity = ethnicity,
+    startDate = startDate,
+    endDate = endDate,
+    removeSubjectsWithFutureDates = removeSubjectsWithFutureDates,
+    cdmVersion = cdmVersion,
+    outFolder = outFolder,
+    modelId = modelId
+  )
 
-  .createEvaluationCohort(connectionDetails = connectionDetails,
-                          xSpecCohortId = xSpecCohortId,
-                          xSensCohortId = xSensCohortId,
-                          cdmDatabaseSchema = cdmDatabaseSchema,
-                          cohortDatabaseSchema = cohortDatabaseSchema,
-                          cohortTable = cohortTable,
-                          workDatabaseSchema = workDatabaseSchema,
-                          tempEmulationSchema = tempEmulationSchema,
-                          covariateSettings = covariateSettings,
-                          mainPopulationCohortId = evaluationPopulationCohortId,
-                          mainPopulationCohortIdStartDay = evaluationPopulationCohortIdStartDay,
-                          mainPopulationCohortIdEndDay = evaluationPopulationCohortIdEndDay,
-                          baseSampleSize = baseSampleSize,
-                          lowerAgeLimit = lowerAgeLimit,
-                          upperAgeLimit = upperAgeLimit,
-                          visitLength = visitLength,
-                          visitType = c(visitType),
-                          gender = gender,
-                          race = race,
-                          ethnicity = ethnicity,
-                          startDate = startDate,
-                          endDate = endDate,
-                          cdmVersion = cdmVersion,
-                          outFolder = outFolder,
-                          modelId = modelId,
-                          evaluationCohortId = evaluationCohortId,
-                          excludeModelFromEvaluation = excludeModelFromEvaluation,
-                          savePlpData = saveEvaluationCohortPlpData)
+  .createEvaluationCohort(
+    connectionDetails = connectionDetails,
+    xSpecCohortId = xSpecCohortId,
+    xSensCohortId = xSensCohortId,
+    cdmDatabaseSchema = cdmDatabaseSchema,
+    cohortDatabaseSchema = cohortDatabaseSchema,
+    cohortTable = cohortTable,
+    workDatabaseSchema = workDatabaseSchema,
+    tempEmulationSchema = tempEmulationSchema,
+    covariateSettings = covariateSettings,
+    mainPopulationCohortId = evaluationPopulationCohortId,
+    mainPopulationCohortIdStartDay = evaluationPopulationCohortIdStartDay,
+    mainPopulationCohortIdEndDay = evaluationPopulationCohortIdEndDay,
+    baseSampleSize = baseSampleSize,
+    lowerAgeLimit = lowerAgeLimit,
+    upperAgeLimit = upperAgeLimit,
+    visitLength = visitLength,
+    visitType = c(visitType),
+    gender = gender,
+    race = race,
+    ethnicity = ethnicity,
+    startDate = startDate,
+    endDate = endDate,
+    cdmVersion = cdmVersion,
+    outFolder = outFolder,
+    modelId = modelId,
+    evaluationCohortId = evaluationCohortId,
+    excludeModelFromEvaluation = excludeModelFromEvaluation,
+    savePlpData = saveEvaluationCohortPlpData
+  )
   delta <- Sys.time() - start
   ParallelLogger::logInfo("Creating evaluation cohort took ", signif(delta, 3), " ", attr(delta, "units"))
 }

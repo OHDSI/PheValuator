@@ -79,5 +79,4 @@ test_that("TestPhenotype - test PheValuator end to end", {
   )
 
   expect_true(file.exists(file.path(folder, "TestResults_a1.rds")))
-
 })
