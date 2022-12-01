@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Joel N.
 Swerdel</h4>
             
-            <h4 data-toc-skip class="date">2022-11-30</h4>
+            <h4 data-toc-skip class="date">2022-12-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/PheValuator/blob/HEAD/vignettes/EvaluatingPhenotypeAlgorithms.rmd" class="external-link"><code>vignettes/EvaluatingPhenotypeAlgorithms.rmd</code></a></small>
       <div class="hidden name"><code>EvaluatingPhenotypeAlgorithms.rmd</code></div>
@@ -277,7 +277,7 @@ createTestPhenotypeAlgorithmArgs() settings created above</li>
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">analysis1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">1</span>,</span>
+<code class="sourceCode R"><span><span class="va">analysis1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPhevaluatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                                       description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 Diabetes Mellitus </span></span>
 <span><span class="st">                                                    (prevalent)"</span>,</span>
 <span>                                       createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
@@ -289,7 +289,7 @@ createTestPhenotypeAlgorithmArgs() settings created above</li>
 <span><span class="va">conditionAlg2TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span> <span class="fl">1778260</span>,</span>
 <span>                                                          washoutPeriod <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">analysis2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">2</span>,</span>
+<span><span class="va">analysis2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPhevaluatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                                       description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 diabetes mellitus </span></span>
 <span><span class="st">                                                    with second code 31-365 days after index"</span>,</span>
 <span>                                       createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
