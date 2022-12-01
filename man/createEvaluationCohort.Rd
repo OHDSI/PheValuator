@@ -6,7 +6,8 @@
 \usage{
 createEvaluationCohort(
   connectionDetails,
-  tempEmulationSchema = NULL,
+  oracleTempSchema = NULL,
+  tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
   xSpecCohortId,
   xSensCohortId,
   prevalenceCohortId,
@@ -47,7 +48,11 @@ createEvaluationCohort(
 \item{connectionDetails}{connectionDetails created using the function
 createConnectionDetails in the DatabaseConnector package.}
 
-\item{tempEmulationSchema}{A schema where temp tables can be created in Oracle.}
+\item{oracleTempSchema}{DEPRECATED: use \code{tempEmulationSchema} instead.}
+
+\item{tempEmulationSchema}{Some database platforms like Oracle and Impala do not truly support temp tables. To
+emulate temp tables, provide a schema with write privileges where temp tables
+can be created.}
 
 \item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort
 definition id in the cohort table (for noisy positives).}

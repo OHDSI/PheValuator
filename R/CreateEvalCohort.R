@@ -21,6 +21,7 @@
                                     cohortDatabaseSchema,
                                     cohortTable,
                                     workDatabaseSchema,
+                                    tempEmulationSchema,
                                     covariateSettings,
                                     mainPopulationCohortId = 0,
                                     mainPopulationCohortIdStartDay = 0,
@@ -90,7 +91,6 @@
           dropTableIfExists = TRUE,
           createTable = TRUE,
           tempTable = FALSE,
-          tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
           bulkLoad = TRUE,
           progressBar = TRUE,
           camelCaseToSnakeCase = TRUE)
@@ -106,7 +106,6 @@
             dropTableIfExists = TRUE,
             createTable = TRUE,
             tempTable = FALSE,
-            tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
             bulkLoad = FALSE,
             progressBar = TRUE,
             camelCaseToSnakeCase = TRUE)
@@ -142,12 +141,13 @@
 
       sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFilename,
                                                packageName = "PheValuator",
-                                               dbms = connection@dbms,
+                                               dbms = connectionDetails$dbms,
                                                cdm_database_schema = cdmDatabaseSchema,
                                                cohort_database_schema = cohortDatabaseSchema,
                                                cohort_database_table = cohortTable,
+                                               tempEmulationSchema = tempEmulationSchema,
                                                x_spec_cohort = xSpecCohortId,
-                                               tempDB = workDatabaseSchema,
+                                               work_database_schema = workDatabaseSchema,
                                                test_cohort = testCohort,
                                                exclCohort = 0,
                                                ageLimit = lowerAgeLimit,
@@ -188,7 +188,7 @@
       databaseDetails <- PatientLevelPrediction::createDatabaseDetails(connectionDetails = connectionDetails,
                                                                        cdmDatabaseSchema = cdmDatabaseSchema,
                                                                        cdmDatabaseName = "CDM",
-                                                                       tempEmulationSchema = workDatabaseSchema,
+                                                                       tempEmulationSchema = tempEmulationSchema,
                                                                        cohortDatabaseSchema = workDatabaseSchema,
                                                                        cohortTable = testCohort,
                                                                        outcomeDatabaseSchema = workDatabaseSchema,
@@ -255,12 +255,12 @@
     # pull in the xSens cohort
     sql <- SqlRender::loadRenderTranslateSql("GetXsensCohort.sql",
                                              packageName = "PheValuator",
-                                             dbms = connection@dbms,
+                                             dbms = connectionDetails$dbms,
                                              cohort_database_schema = cohortDatabaseSchema,
                                              cohort_table = cohortTable,
                                              cdm_database_schema = cdmDatabaseSchema,
                                              cohort_id = xSensCohortId)
-    sql <- SqlRender::translate(sql, connection@dbms)
+    sql <- SqlRender::translate(sql, connectionDetails$dbms)
     xSensPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
     # add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout
     # criteria during evaluation
@@ -294,8 +294,8 @@
     # remove temp cohort table
     sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "DropTempTable.sql",
                                              packageName = "PheValuator",
-                                             dbms = connection@dbms,
-                                             tempDB = workDatabaseSchema,
+                                             dbms = connectionDetails$dbms,
+                                             work_database_schema = workDatabaseSchema,
                                              test_cohort = testCohort)
     DatabaseConnector::executeSql(connection = connection, sql = sql, progressBar = FALSE, reportOverallTime = FALSE)
   }

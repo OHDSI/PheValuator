@@ -6,7 +6,8 @@
 \usage{
 runPheValuatorAnalyses(
   connectionDetails,
-  tempEmulationSchema = NULL,
+  oracleTempSchema = NULL,
+  tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
   cdmDatabaseSchema,
   cohortDatabaseSchema = cdmDatabaseSchema,
   cohortTable = "cohort",
@@ -21,7 +22,11 @@ runPheValuatorAnalyses(
 function \code{createConnectionDetails} in the
 \code{DatabaseConnector} package.}
 
-\item{tempEmulationSchema}{A schema where temp tables can be created in Oracle.}
+\item{oracleTempSchema}{DEPRECATED: use \code{tempEmulationSchema} instead.}
+
+\item{tempEmulationSchema}{Some database platforms like Oracle and Impala do not truly support temp tables. To
+emulate temp tables, provide a schema with write privileges where temp tables
+can be created.}
 
 \item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM
 instance. Requires read permissions to this database. On SQL

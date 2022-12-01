@@ -26,7 +26,10 @@
 #'                                       instance. Requires read permissions to this database. On SQL
 #'                                       Server, this should specifiy both the database and the
 #'                                       schema, so for example 'cdm_instance.dbo'.
-#' @param tempEmulationSchema	             A schema where temp tables can be created in Oracle.
+#' @param oracleTempSchema    DEPRECATED: use \code{tempEmulationSchema} instead.
+#' @param tempEmulationSchema Some database platforms like Oracle and Impala do not truly support temp tables. To
+#'                            emulate temp tables, provide a schema with write privileges where temp tables
+#'                            can be created.
 #' @param cohortDatabaseSchema           The name of the database schema that is the location where
 #'                                       the cohort data used to define the at risk cohort is
 #'                                       available. Requires read permissions to this database.
@@ -48,7 +51,8 @@
 #'
 #' @export
 runPheValuatorAnalyses <- function(connectionDetails,
-                                   tempEmulationSchema = NULL,
+                                   oracleTempSchema = NULL,
+                                   tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
                                    cdmDatabaseSchema,
                                    cohortDatabaseSchema = cdmDatabaseSchema,
                                    cohortTable = "cohort",
@@ -56,6 +60,10 @@ runPheValuatorAnalyses <- function(connectionDetails,
                                    cdmVersion = 5,
                                    outputFolder,
                                    pheValuatorAnalysisList) {
+  if (!is.null(oracleTempSchema) && oracleTempSchema != "") {
+    warning("The 'oracleTempSchema' argument is deprecated. Use 'tempEmulationSchema' instead.")
+    tempEmulationSchema <- oracleTempSchema
+  }
   if (!file.exists(outputFolder)) {
     dir.create(outputFolder, recursive = TRUE)
   }

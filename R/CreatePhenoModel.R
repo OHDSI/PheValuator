@@ -19,6 +19,7 @@
                                   cohortDatabaseSchema,
                                   cohortTable,
                                   workDatabaseSchema,
+                                  tempEmulationSchema,
                                   xSpecCohortId,
                                   xSensCohortId,
                                   prevalenceCohortId,
@@ -52,7 +53,7 @@
     #get xSpec subjects to create a model
     sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "GetxSpecCount.sql",
                                              packageName = "PheValuator",
-                                             dbms = connection@dbms,
+                                             dbms = connectionDetails$dbms,
                                              cdm_database_schema = cdmDatabaseSchema,
                                              cohort_database_schema = cohortDatabaseSchema,
                                              cohort_database_table = cohortTable,
@@ -78,7 +79,7 @@
         # determine population prevalence for correct xSpec/noisy negative popn ratio
         sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "getPopnPrev.sql",
                                                  packageName = "PheValuator",
-                                                 dbms = connection@dbms,
+                                                 dbms = connectionDetails$dbms,
                                                  cdm_database_schema = cdmDatabaseSchema,
                                                  cohort_database_schema = cohortDatabaseSchema,
                                                  cohort_database_table = cohortTable,
@@ -140,12 +141,12 @@
         ParallelLogger::logInfo("Subsetting and sampling cohorts")
         sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFileName,
                                                  packageName = "PheValuator",
-                                                 dbms = connection@dbms,
+                                                 dbms = connectionDetails$dbms,
                                                  cdm_database_schema = cdmDatabaseSchema,
                                                  cohort_database_schema = cohortDatabaseSchema,
                                                  cohort_database_table = cohortTable,
                                                  x_spec_cohort = xSpecCohortId,
-                                                 tempDB = workDatabaseSchema,
+                                                 work_database_schema = workDatabaseSchema,
                                                  test_cohort = testCohort,
                                                  exclCohort = xSensCohortId,
                                                  ageLimit = lowerAgeLimit,
@@ -169,7 +170,7 @@
         databaseDetails <- PatientLevelPrediction::createDatabaseDetails(connectionDetails = connectionDetails,
                                                                          cdmDatabaseSchema = cdmDatabaseSchema,
                                                                          cdmDatabaseName = "CDM",
-                                                                         tempEmulationSchema = workDatabaseSchema,
+                                                                         tempEmulationSchema = tempEmulationSchema,
                                                                          cohortDatabaseSchema = workDatabaseSchema,
                                                                          cohortTable = testCohort,
                                                                          outcomeDatabaseSchema = workDatabaseSchema,
@@ -195,10 +196,10 @@
         # remove temp cohort table
         sql <- SqlRender::loadRenderTranslateSql(sqlFilename = "DropTempTable.sql",
                                                  packageName = "PheValuator",
-                                                 dbms = connection@dbms,
-                                                 tempDB = workDatabaseSchema,
+                                                 dbms = connectionDetails$dbms,
+                                                 work_database_schema = workDatabaseSchema,
                                                  test_cohort = testCohort)
-        sql <- SqlRender::translate(sql, targetDialect = connection@dbms)
+        sql <- SqlRender::translate(sql, targetDialect = connectionDetails$dbms)
         DatabaseConnector::executeSql(connection = connection, sql = sql, progressBar = FALSE, reportOverallTime = FALSE)
       } else {
         ParallelLogger::logInfo("Loading ", plpDataFile, " from existing directory")

@@ -1,13 +1,8 @@
-/************************************************************************
-@file CreateCohortsAcuteModel.sql
-************************************************************************/
-
 {DEFAULT @cdm_database_schema = 'CDM_SIM' }
 {DEFAULT @cohort_database_schema = 'CDM_SIM' }
 {DEFAULT @cohort_database_table = 'cohort'
+{DEFAULT @work_database_schema = 'CDM_SIM' }
 {DEFAULT @x_spec_cohort = 0 }
-{DEFAULT @tempDB = "scratch.dbo" }
-{DEFAULT @test_cohort = "test_cohort" }
 {DEFAULT @ageLimit = 0}
 {DEFAULT @upperAgeLimit = 120}
 {DEFAULT @gender = c(8507, 8532)}
@@ -25,8 +20,7 @@
 {DEFAULT @visitType = c(9201) }
 {DEFAULT @firstCut = FALSE }
 
-IF OBJECT_ID('tempdb..#cohort_person', 'U') IS NOT NULL
-	DROP TABLE #cohort_person;
+DROP TABLE IF EXISTS #cohort_person;
 
 SELECT *
 into #cohort_person
@@ -45,18 +39,13 @@ FROM (SELECT co.*, p.*,
 	  AND co.COHORT_START_DATE <= cast('@endDate' AS DATE)) pos
 ;
 
-IF OBJECT_ID('@tempDB.@test_cohort', 'U') IS NOT NULL
-	DROP TABLE @tempDB.@test_cohort;
+DROP TABLE IF EXISTS @work_database_schema.@test_cohort;
 
-CREATE TABLE @tempDB.@test_cohort (
-  cohort_definition_id bigint NOT NULL,
-  subject_id bigint NOT NULL,
-  cohort_start_date date,
-  cohort_end_date date);
-
-insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START_DATE, COHORT_END_DATE)
- SELECT 0 as COHORT_DEFINITION_ID, person_id as SUBJECT_ID, dateadd(day, 0, visit_start_date) COHORT_START_DATE,
-            dateadd(day, 1, visit_start_date) COHORT_END_DATE
+SELECT CAST(0 AS BIGINT) as COHORT_DEFINITION_ID, 
+	person_id as SUBJECT_ID, 
+	dateadd(day, 0, visit_start_date) COHORT_START_DATE,
+	dateadd(day, 1, visit_start_date) COHORT_END_DATE
+INTO @work_database_schema.@test_cohort
       FROM (SELECT
 				{@mainPopnCohort == 0} ? {
 					v.person_id, visit_start_date,
@@ -154,3 +143,8 @@ insert into @tempDB.@test_cohort (COHORT_DEFINITION_ID, SUBJECT_ID, COHORT_START
           AND cp.COHORT_START_DATE <= o.observation_period_end_date
       WHERE rn <= @xSpecSampleSize
       ;
+
+	  TRUNCATE TABLE #cohort_person;
+	    
+TRUNCATE TABLE #cohort_person;
+DROP TABLE #cohort_person;

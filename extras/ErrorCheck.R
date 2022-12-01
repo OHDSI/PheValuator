@@ -138,7 +138,7 @@ getCohortCount <- function(connection, cohortDatabaseSchema, cohortTable, cohort
   sql <- SqlRender::render(sql = sql,
                            cohort_database_schema = cohortDatabaseSchema,
                            cohort_table = cohortTable)
-  sql <- SqlRender::translate(sql = sql, targetDialect = connection@dbms)
+  sql <- SqlRender::translate(sql = sql, targetDialect = DatabaseConnector::dbms(connection))
   count <- DatabaseConnector::querySql(connection = connection, sql, snakeCaseToCamelCase = TRUE)
   return(count$cohortCount)
 }

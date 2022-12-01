@@ -25,7 +25,10 @@
 #'
 #' @param connectionDetails                connectionDetails created using the function
 #'                                         createConnectionDetails in the DatabaseConnector package.
-#' @param tempEmulationSchema              A schema where temp tables can be created in Oracle.
+#' @param oracleTempSchema    DEPRECATED: use \code{tempEmulationSchema} instead.
+#' @param tempEmulationSchema Some database platforms like Oracle and Impala do not truly support temp tables. To
+#'                            emulate temp tables, provide a schema with write privileges where temp tables
+#'                            can be created.
 #' @param xSpecCohortId                    The number of the "extremely specific (xSpec)" cohort
 #'                                         definition id in the cohort table (for noisy positives).
 #' @param xSensCohortId                    The number of the "extremely sensitive (xSens)" cohort
@@ -86,7 +89,8 @@
 #'
 #' @export
 createEvaluationCohort <- function(connectionDetails,
-                                   tempEmulationSchema = NULL,
+                                   oracleTempSchema = NULL,
+                                   tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
                                    xSpecCohortId,
                                    xSensCohortId,
                                    prevalenceCohortId,
@@ -137,7 +141,10 @@ createEvaluationCohort <- function(connectionDetails,
     stop(".Must have a defined Cohort table (e.g., \"cohort\")")
   if (workDatabaseSchema == "")
     stop(".Must have a defined Out Database schema (e.g., \"scratch.dbo\")")
-
+  if (!is.null(oracleTempSchema) && oracleTempSchema != "") {
+    warning("The 'oracleTempSchema' argument is deprecated. Use 'tempEmulationSchema' instead.")
+    tempEmulationSchema <- oracleTempSchema
+  }
   if (!file.exists(outFolder)) {
     dir.create(outFolder, recursive = TRUE)
   }
@@ -147,6 +154,7 @@ createEvaluationCohort <- function(connectionDetails,
                         cohortDatabaseSchema = cohortDatabaseSchema,
                         cohortTable = cohortTable,
                         workDatabaseSchema = workDatabaseSchema,
+                        tempEmulationSchema = tempEmulationSchema,
                         xSpecCohortId = xSpecCohortId,
                         xSensCohortId = xSensCohortId,
                         prevalenceCohortId = prevalenceCohortId,
@@ -177,6 +185,7 @@ createEvaluationCohort <- function(connectionDetails,
                           cohortDatabaseSchema = cohortDatabaseSchema,
                           cohortTable = cohortTable,
                           workDatabaseSchema = workDatabaseSchema,
+                          tempEmulationSchema = tempEmulationSchema,
                           covariateSettings = covariateSettings,
                           mainPopulationCohortId = evaluationPopulationCohortId,
                           mainPopulationCohortIdStartDay = evaluationPopulationCohortIdStartDay,

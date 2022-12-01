@@ -1,7 +1,3 @@
-/************************************************************************
-@file getPopnPrev.sql
-************************************************************************/
-
 {DEFAULT @cdm_database_schema = 'CDM_SIM' }
 {DEFAULT @cohort_database_schema = 'CDM_SIM' }
 {DEFAULT @cohort_database_table = 'cohort' }
