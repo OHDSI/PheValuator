@@ -33,6 +33,7 @@ Suggests:
     shinydashboard,
     DT,
     htmltools,
+    qpdf,
     testthat,
     Eunomia,
     CohortGenerator,
