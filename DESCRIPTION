@@ -33,15 +33,11 @@ Suggests:
     shinydashboard,
     DT,
     htmltools,
-<<<<<<< HEAD
     qpdf,
-    testthat
-=======
     testthat,
     Eunomia,
     CohortGenerator,
     withr
->>>>>>> develop
 Remotes:
     ohdsi/PatientLevelPrediction,
     ohdsi/FeatureExtraction,

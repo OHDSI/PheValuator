@@ -33,15 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-<<<<<<< HEAD
-<<<<<<< HEAD
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.7</span>
-=======
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.11</span>
->>>>>>> develop
-=======
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.12</span>
->>>>>>> develop
       </span>
     </div>
 
@@ -83,15 +75,6 @@
 
       
 
-<<<<<<< HEAD
-      </header><script src="EvaluatingPhenotypeAlgorithms_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
-  <div class="col-md-9 contents">
-    <div class="page-header toc-ignore">
-      <h1 data-toc-skip>EvaluatingPhenotypeAlgorithms</h1>
-                        <h4 data-toc-skip class="author">Joel N. Swerdel</h4>
-            
-            <h4 data-toc-skip class="date">2022-08-12</h4>
-=======
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -99,12 +82,7 @@
                         <h4 data-toc-skip class="author">Joel N.
 Swerdel</h4>
             
-<<<<<<< HEAD
-            <h4 data-toc-skip class="date">2022-10-26</h4>
->>>>>>> develop
-=======
-            <h4 data-toc-skip class="date">2022-11-30</h4>
->>>>>>> develop
+            <h4 data-toc-skip class="date">2022-12-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/PheValuator/blob/HEAD/vignettes/EvaluatingPhenotypeAlgorithms.rmd" class="external-link"><code>vignettes/EvaluatingPhenotypeAlgorithms.rmd</code></a></small>
       <div class="hidden name"><code>EvaluatingPhenotypeAlgorithms.rmd</code></div>
@@ -117,17 +95,12 @@ Swerdel</h4>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<<<<<<< HEAD
-<p>The <code>PheValuator</code> package enables evaluating the performance characteristics of phenotype algorithms (PAs) using data from databases that are translated into the Observational Medical Outcomes Partnership Common Data Model (OMOP CDM).</p>
-<p>This vignette describes how to run the PheValuator process from start to end in the <code>PheValuator</code> package.</p>
-=======
 <p>The <code>PheValuator</code> package enables evaluating the
 performance characteristics of phenotype algorithms (PAs) using data
 from databases that are translated into the Observational Medical
 Outcomes Partnership Common Data Model (OMOP CDM).</p>
 <p>This vignette describes how to run the PheValuator process from start
 to end in the <code>PheValuator</code> package.</p>
->>>>>>> develop
 </div>
 <div class="section level2">
 <h2 id="overview-of-process">Overview of Process<a class="anchor" aria-label="anchor" href="#overview-of-process"></a>
@@ -141,23 +114,6 @@ using the PatientLevelPrediction (PLP) package and evaluating the
 PAs</li>
 <li>Examining the results of the evaluation</li>
 </ol>
-<<<<<<< HEAD
-<p>Each of these steps is described in detail below. For this vignette, we will describe the evaluation of PAs for type 2 diabetes mellitus (T2DM).</p>
-<div class="section level3">
-<h3 id="creating-the-extremely-specific-xspec-extremely-sensitive-xsens-prevalence-and-evaluation-cohorts">Creating the Extremely Specific (xSpec), Extremely Sensitive (xSens), Prevalence, and Evaluation Cohorts<a class="anchor" aria-label="anchor" href="#creating-the-extremely-specific-xspec-extremely-sensitive-xsens-prevalence-and-evaluation-cohorts"></a>
-</h3>
-<p>The extremely specific (xSpec), extremely sensitive (xSens), prevalence, and evaluation cohorts are developed using the ATLAS tool. The xSpec is a cohort where the subjects in the cohort are likely to be positive for the health outcome of interest (HOI) with a very high probability. This may be achieved by requiring that subjects have multiple condition codes for the HOI in their patient record. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1769699" class="external-link"><strong>example</strong></a> of this for T2DM is included in the OHDSI ATLAS repository. In this example each subject has at least 2 diagnosis codes for T2DM in days 21 to 1 prior to an index clinical visit, the first of which is the the first diagnosis in the patients history. The algorithm also excludes subjects with type 1 DM (T1DM) any time in their record. This is a very specific algorithm for T2DM as it ensures that the subjects in this cohort have a very high probability for having the condition of T2DM. This PA also specifies that subjects are required to have at least 365 days of prior and post-index observation in their patient record.</p>
-<p><strong>Quick Tip:</strong> When building the xSpec cohort, the days prior where you are looking for 2 or more diagnosis codes for the condition should be altered depending on the condition. For very rare conditions you may need to expand it to 60 to 1 days prior to index. For acute conditions such as myocardial infarction it is best to have a very short interval such as 1 to 1 day prior to index (i.e., the day prior to index)</p>
-<p>An example of an xSens cohort is created by developing a PA that is very sensitive for the HOI. The system uses the xSens cohort to create a set of “noisy” negative subjects, i.e., subjects with a high likelihood of not having the HOI. This group of subjects will be used in the model building process and is described in detail below. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1770120" class="external-link"><strong>example</strong></a> of an xSens cohort for T2DM is also in the OHDSI ATLAS repository.</p>
-<p>The system uses the prevalence cohort to provide a reasonable approximation of the prevalence of the HOI in the population. This improves the calibration of the predictive model. This group of subjects will be used in the model building process and is described in detail below. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1770119" class="external-link"><strong>example</strong></a> of an prevalence cohort for T2DM is also in the OHDSI ATLAS repository.</p>
-<p>PheValuator uses the evaluation cohort to define a specific set of subjects to test for the outcome of interest and uses these subjects to evaluate the PAs. An <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778258" class="external-link"><strong>example</strong></a> of an evaluation cohort for T2DM is also in the OHDSI ATLAS repository.</p>
-<p><strong>Quick Tip:</strong> You can build your required cohorts easily by exporting the JSON in the examples above and copying them into your repository. The only changes you should need to make are changing the concept sets for the condition and the days prior to index for searching for multiple diagnosis codes in the xSpec cohort.</p>
-<p>For the example below, two more phenotype algorithms were created:</p>
-<ol style="list-style-type: decimal">
-<li>An example of a prevalent algorithm for T2DM <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778259" class="external-link"><strong>(Type 2 Diabetes Mellitus (prevalent))</strong></a>
-</li>
-<li>An example of a prevalent algorithm for T2DM requiring a second condition code for T2DM 31-365 days after index <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778260" class="external-link"><strong>(Type 2 diabetes mellitus (prevalent) with second code 31-365 days after index)</strong></a>
-=======
 <p>Each of these steps is described in detail below. For this vignette,
 we will describe the evaluation of PAs for type 2 diabetes mellitus
 (T2DM).</p>
@@ -220,7 +176,6 @@ created:</p>
 condition code for T2DM 31-365 days after index <a href="https://atlas-demo.ohdsi.org/#/cohortdefinition/1778260" class="external-link"><strong>(Type
 2 diabetes mellitus (prevalent) with second code 31-365 days after
 index)</strong></a>
->>>>>>> develop
 </li>
 </ol>
 </div>
@@ -265,13 +220,9 @@ window</li>
 <span>                                              endDayWindow2 <span class="op">=</span> <span class="fl">180</span>,</span>
 <span>                                              startDayWindow3 <span class="op">=</span> <span class="fl">181</span>,</span>
 <span>                                              endDayWindow3 <span class="op">=</span> <span class="fl">365</span><span class="op">)</span></span></code></pre></div>
-<<<<<<< HEAD
-<p><strong>Quick Tip:</strong> The feature extraction windows above are useful for chronic conditions. For acute conditions, such as myocardial infarction, you should use:</p>
-=======
 <p><strong>Quick Tip:</strong> The feature extraction windows above are
 useful for chronic conditions. For acute conditions, such as myocardial
 infarction, you should use:</p>
->>>>>>> develop
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>andromedaTempFolder <span class="op">=</span> <span class="st">"c:/temp2/ff"</span><span class="op">)</span> <span class="co">#place to store large temporary files</span></span>
 <span></span>
@@ -326,7 +277,7 @@ createTestPhenotypeAlgorithmArgs() settings created above</li>
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">analysis1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">1</span>,</span>
+<code class="sourceCode R"><span><span class="va">analysis1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPhevaluatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                                       description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 Diabetes Mellitus </span></span>
 <span><span class="st">                                                    (prevalent)"</span>,</span>
 <span>                                       createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
@@ -338,7 +289,7 @@ createTestPhenotypeAlgorithmArgs() settings created above</li>
 <span><span class="va">conditionAlg2TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span> <span class="fl">1778260</span>,</span>
 <span>                                                          washoutPeriod <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">analysis2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">2</span>,</span>
+<span><span class="va">analysis2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPhevaluatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                                       description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 diabetes mellitus </span></span>
 <span><span class="st">                                                    with second code 31-365 days after index"</span>,</span>
 <span>                                       createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
@@ -399,12 +350,8 @@ analysis</p>
 <div class="section level3">
 <h3 id="output-from-the-process">Output from the process<a class="anchor" aria-label="anchor" href="#output-from-the-process"></a>
 </h3>
-<<<<<<< HEAD
-<p>The runPheValuatorAnalyses() function will produce the following artifacts:</p>
-=======
 <p>The runPheValuatorAnalyses() function will produce the following
 artifacts:</p>
->>>>>>> develop
 <ol style="list-style-type: decimal">
 <li>A Patient Level Prediction file (in .rds format) containing the
 information from the model building process<br>
