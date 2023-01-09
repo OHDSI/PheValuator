@@ -143,7 +143,10 @@
         } else {
           firstCut <- FALSE
         }
+
         sqlFileName <- "CreateCohortsAcuteModel.sql"
+
+        ParallelLogger::logInfo("Tranforming xSpec for correct format")
 
         ParallelLogger::logInfo("Subsetting and sampling cohorts")
         sql <- SqlRender::loadRenderTranslateSql(

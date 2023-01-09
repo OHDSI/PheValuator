@@ -17,6 +17,7 @@
 .createEvaluationCohort <- function(connectionDetails,
                                     xSpecCohortId,
                                     xSensCohortId,
+                                    prevalenceCohortId,
                                     cdmDatabaseSchema,
                                     cohortDatabaseSchema,
                                     cohortTable,
@@ -149,6 +150,10 @@
 
       sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
 
+      if (mainPopulationCohortId == 0) {
+        ParallelLogger::logInfo("Creating evaluation cohort subjects without population cohort")
+      }
+
       sql <- SqlRender::loadRenderTranslateSql(
         sqlFilename = sqlFilename,
         packageName = "PheValuator",
@@ -158,6 +163,7 @@
         cohort_database_table = cohortTable,
         tempEmulationSchema = tempEmulationSchema,
         x_spec_cohort = xSpecCohortId,
+        prevalenceCohortId = prevalenceCohortId,
         work_database_schema = workDatabaseSchema,
         test_cohort = testCohort,
         exclCohort = 0,

@@ -19,6 +19,26 @@
 {DEFAULT @visitLength = 0 }
 {DEFAULT @visitType = c(9201) }
 {DEFAULT @firstCut = FALSE }
+{DEFAULT @max_forward_days = 14 }
+
+DROP TABLE IF EXISTS #new_xspec;
+
+SELECT @x_spec_cohort as cohort_definition_id, subject_id, minVisit as cohort_start_date, dateadd(day, 1, minVisit) cohort_end_date
+into #new_xspec
+FROM (select distinct cohort_definition_id, subject_id, cohort_start_date, minVisit
+    from (
+      SELECT co.cohort_definition_id, co.subject_id, co.cohort_start_date,
+        min(v.visit_start_date) OVER (partition by co.subject_id, co.cohort_start_date) minVisit
+    	FROM @cohort_database_schema.@cohort_database_table co
+    	JOIN @cdm_database_schema.observation_period o
+    	  on co.subject_id = o.person_id
+    		AND COHORT_START_DATE >= o.observation_period_start_date
+    		and dateadd(day, 365, COHORT_START_DATE) <= o.observation_period_end_date
+    	join @cdm_database_schema.visit_occurrence v
+    	 on co.subject_id = v.person_id
+        and v.visit_start_date >= dateadd(day, 1, co.cohort_start_date)
+        and v.visit_start_date <= dateadd(day, @max_forward_days, co.cohort_start_date)
+    	WHERE cohort_definition_id = @x_spec_cohort) pos);
 
 DROP TABLE IF EXISTS #cohort_person;
 
@@ -26,7 +46,7 @@ SELECT *
 into #cohort_person
 FROM (SELECT co.*, p.*,
 	  row_number() over (order by NewId()) rn
-	FROM @cohort_database_schema.@cohort_database_table co
+	FROM #new_xspec co
 	JOIN @cdm_database_schema.person p
 	  on co.subject_id = p.person_id
 		AND  year(COHORT_START_DATE) - year_of_birth >= @ageLimit
@@ -41,8 +61,8 @@ FROM (SELECT co.*, p.*,
 
 DROP TABLE IF EXISTS @work_database_schema.@test_cohort;
 
-SELECT CAST(0 AS BIGINT) as COHORT_DEFINITION_ID, 
-	person_id as SUBJECT_ID, 
+SELECT CAST(0 AS BIGINT) as COHORT_DEFINITION_ID,
+	person_id as SUBJECT_ID,
 	dateadd(day, 0, visit_start_date) COHORT_START_DATE,
 	dateadd(day, 1, visit_start_date) COHORT_END_DATE
 INTO @work_database_schema.@test_cohort
@@ -144,7 +164,8 @@ INTO @work_database_schema.@test_cohort
       WHERE rn <= @xSpecSampleSize
       ;
 
-	  TRUNCATE TABLE #cohort_person;
-	    
+TRUNCATE TABLE #new_xspec;
+DROP TABLE #new_xspec;
+
 TRUNCATE TABLE #cohort_person;
 DROP TABLE #cohort_person;
