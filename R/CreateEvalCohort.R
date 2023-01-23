@@ -273,10 +273,53 @@
 
     # apply the model to the evaluation cohort
     appResults <- NULL
-    appResults$prediction <- PatientLevelPrediction::predictPlp(
-      plpModel = lrResults$model, plpData = plpData,
-      population = population
-    )
+
+
+    # appResults$prediction <- PatientLevelPrediction::predictPlp(
+    #   plpModel = lrResults$model, plpData = plpData,
+    #   population = population
+    # )
+
+    ####################
+    ParallelLogger::logInfo("Applying predictive model to evaluation cohort using rapid method")
+
+    startTime <- Sys.time()
+
+    # extract the normalization and stuff
+    covs <- lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue !=0,]
+
+    intercept <- lrResults$model$model$coefficients$betas[1]
+
+    covariate <- data.frame(
+      coefficient = covs$covariateValue,
+      covariateId = covs$covariateId)
+
+    norm <- as.data.frame(lrResults$model$preprocessing$tidyCovariates$normFactors)
+    covNorm <- merge(covariate, norm, by = 'covariateId', all.x = T)
+
+    allCovData <- as.data.frame(plpData$covariateData$covariates)
+
+    #allCovData <- merge(allCovData, covNorm, by = 'covariateId', all.x = T)
+
+    allCovData <- dplyr::left_join(allCovData, covNorm, by = 'covariateId')
+
+    allCovData$coeffValue <- allCovData$covariateValue*allCovData$coefficient/allCovData$maxValue
+    allCovData$coeffValue[is.na(allCovData$coeffValue)] <- 0
+
+    sumData <- aggregate(allCovData$coeffValue, by=list(Category=allCovData$rowId), FUN=sum)
+
+    sumData$x[is.na(sumData$x)] <- 0
+    sumData$x <- sumData$x + intercept
+    sumData$probability <- 1/(1+exp(-1*sumData$x))
+    sumData$probability <- round(sumData$probability, digits = 3)
+    names(sumData)[1] <- "rowId"
+    names(sumData)[3] <- "value"
+
+    sumData <- sumData[,c(1,3)]
+    appResults$prediction <- merge(population, sumData, by = 'rowId')
+
+    ParallelLogger::logInfo("Time to apply model was ", round(difftime(Sys.time(), startTime, units = c("mins")), digits = 3), " min.")
+    ###################
 
     appResults$prediction$value <- round(appResults$prediction$value, digits = 3)
 

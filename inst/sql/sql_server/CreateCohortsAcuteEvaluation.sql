@@ -37,7 +37,7 @@ with #persons as ( --subset a random set of subjects
   limit 10 * @baseSampleSize),
 #visits as ( --and a random visit from each subject selected
 select distinct v.person_id, first_value(visit_start_date)
-over (partition by v.person_id order by RANDOM() rows between unbounded preceding and unbounded following) visit_start_date
+  over (partition by v.person_id ORDER BY NewId()) visit_start_date
 from @cdm_database_schema.visit_occurrence v
 join @cdm_database_schema.observation_period o
   on v.person_id = o.person_id
@@ -45,7 +45,9 @@ join @cdm_database_schema.observation_period o
     and dateadd(d, 365, v.visit_start_date) <= o.observation_period_end_date
 where v.person_id in (
   select person_id
-  from #persons))
+  from #persons)
+  and v.visit_start_date >= cast('@startDate' AS DATE)
+	and v.visit_start_date <= cast('@endDate' AS DATE))
 select *
 into #finalCohort
 from (
@@ -91,7 +93,7 @@ FROM (
 
 DROP TABLE IF EXISTS @work_database_schema.@test_cohort;
 
-select CAST(0 AS BIGINT) as COHORT_DEFINITION_ID, person_id as SUBJECT_ID,
+select distinct CAST(0 AS BIGINT) as COHORT_DEFINITION_ID, person_id as SUBJECT_ID,
 	dateadd(day, 0, visit_start_date) COHORT_START_DATE,
 	dateadd(day, 1, visit_start_date) COHORT_END_DATE
 INTO @work_database_schema.@test_cohort

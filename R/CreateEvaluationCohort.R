@@ -31,6 +31,7 @@
 #'                            can be created.
 #' @param xSpecCohortId                    The number of the "extremely specific (xSpec)" cohort
 #'                                         definition id in the cohort table (for noisy positives).
+#' @param daysFromxSpec                    Number of days from xSpec condition until analyzed visit
 #' @param xSensCohortId                    The number of the "extremely sensitive (xSens)" cohort
 #'                                         definition id in the cohort table (for noisy negatives).
 #' @param prevalenceCohortId               The number of the cohort definition id to determine the
@@ -92,6 +93,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    oracleTempSchema = NULL,
                                    tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
                                    xSpecCohortId,
+                                   daysFromxSpec = 14,
                                    xSensCohortId,
                                    prevalenceCohortId,
                                    xSpecCohortSize = 5000,
@@ -167,6 +169,7 @@ createEvaluationCohort <- function(connectionDetails,
     workDatabaseSchema = workDatabaseSchema,
     tempEmulationSchema = tempEmulationSchema,
     xSpecCohortId = xSpecCohortId,
+    daysFromxSpec = daysFromxSpec,
     xSensCohortId = xSensCohortId,
     prevalenceCohortId = prevalenceCohortId,
     xSpecCohortSize = xSpecCohortSize,

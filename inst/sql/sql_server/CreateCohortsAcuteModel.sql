@@ -19,7 +19,7 @@
 {DEFAULT @visitLength = 0 }
 {DEFAULT @visitType = c(9201) }
 {DEFAULT @firstCut = FALSE }
-{DEFAULT @max_forward_days = 14 }
+{DEFAULT @daysFromxSpec = 14 }
 
 DROP TABLE IF EXISTS #new_xspec;
 
@@ -37,7 +37,7 @@ FROM (select distinct cohort_definition_id, subject_id, cohort_start_date, minVi
     	join @cdm_database_schema.visit_occurrence v
     	 on co.subject_id = v.person_id
         and v.visit_start_date >= dateadd(day, 1, co.cohort_start_date)
-        and v.visit_start_date <= dateadd(day, @max_forward_days, co.cohort_start_date)
+        and v.visit_start_date <= dateadd(day, @daysFromxSpec, co.cohort_start_date)
     	WHERE cohort_definition_id = @x_spec_cohort) pos);
 
 DROP TABLE IF EXISTS #cohort_person;

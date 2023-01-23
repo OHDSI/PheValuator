@@ -21,6 +21,7 @@
                                   workDatabaseSchema,
                                   tempEmulationSchema,
                                   xSpecCohortId,
+                                  daysFromxSpec = 14,
                                   xSensCohortId,
                                   prevalenceCohortId,
                                   xSpecCohortSize = 5000,
@@ -42,6 +43,7 @@
                                   cdmVersion = "5",
                                   outFolder = getwd(),
                                   modelId = "main") {
+
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
 
@@ -69,6 +71,7 @@
     )
 
     xSpecCount <- as.numeric(DatabaseConnector::querySql(connection = connection, sql = sql))
+
     if (xSpecCount < 200) {
       ParallelLogger::logInfo("Too few subjects in xSpec to produce model. (Outcome count = ", xSpecCount, ")")
       ParallelLogger::logInfo("Saving null model summary to ", modelFileName)
@@ -157,6 +160,7 @@
           cohort_database_schema = cohortDatabaseSchema,
           cohort_database_table = cohortTable,
           x_spec_cohort = xSpecCohortId,
+          daysFromxSpec = daysFromxSpec,
           work_database_schema = workDatabaseSchema,
           test_cohort = testCohort,
           exclCohort = xSensCohortId,

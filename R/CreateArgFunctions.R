@@ -8,6 +8,7 @@
 #' @param xSpecCohortId                    The number of the "extremely specific (xSpec)"
 #'                                         cohortdefinition id in the cohort table (for noisy
 #'                                         positives).
+#' @param daysFromxSpec                    Number of days from xSpec condition until analyzed visit
 #' @param xSensCohortId                    The number of the "extremely sensitive (xSens)"
 #'                                         cohortdefinition id in the cohort table (for noisy
 #'                                         negatives).
@@ -52,6 +53,7 @@
 #'
 #' @export
 createCreateEvaluationCohortArgs <- function(xSpecCohortId,
+                                             daysFromxSpec = 14,
                                              xSensCohortId,
                                              prevalenceCohortId,
                                              xSpecCohortSize = 5000,

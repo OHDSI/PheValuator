@@ -29,12 +29,21 @@ select p.person_id, p.gender_concept_id, p.race_concept_id, p.ethnicity_concept_
                     and cohort_definition_id = @mainPopnCohort}
         group by p.person_id, p.gender_concept_id, p.race_concept_id, p.ethnicity_concept_id, p.year_of_birth
 ),
+midYear as ( --get the middle year of the cohort - will only include subjects in population who were observed during mid-year
+select minYear + ((maxYear-minYear)/2) as midYear
+from (
+  select max(EXTRACT(YEAR FROM CAST(cohort_end_date AS DATE))) as maxYear,  min(EXTRACT(YEAR FROM CAST(cohort_start_date AS DATE))) as minYear
+  from @cohort_database_schema.@cohort_database_table co
+  where cohort_definition_id = @prevCohort
+    and cohort_start_date >= CAST('@startDate' AS DATE) --cohort subjects must be within analysis period
+    and cohort_start_date <= CAST('@endDate' AS DATE))),
 popn as (
   select distinct person_id
   from init_popn
-  where endYear = (
-					select max(endYear)
-					from init_popn)
+  join midYear
+    on 1 = 1
+  where endYear >=  midYear.midYear --denominator - subjects observed during middle year of cohort population
+    and startYear <= midYear.midYear
 	and startYear - year_of_birth >=  @lowerAgeLimit
 		and startYear - year_of_birth <=  @upperAgeLimit
     and gender_concept_id in (@gender)
