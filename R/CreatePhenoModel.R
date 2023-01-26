@@ -300,6 +300,7 @@
             )
 
             # re-calibrate model
+            ParallelLogger::logInfo("Recalibrating model")
             prevToUseOdds <- prevToUse / (1 - prevToUse) # uses prevalence for model building
             popPrevOdds <- popPrev / (1 - popPrev) # uses actual prevalence
             modelYIntercept <- lrResults$model$model$coefficients$betas[1]
