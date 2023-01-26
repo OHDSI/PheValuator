@@ -23,19 +23,17 @@
 {DEFAULT @visitType = c(9201) }
 {DEFAULT @firstCut = FALSE }
 
-DROP TABLE IF EXISTS #persons;
-DROP TABLE IF EXISTS #visits;
 DROP TABLE IF EXISTS #finalCohort;
 
 {@mainPopnCohort == 0} ? { -- create cohort using prevalence cohort and visit table - else use population cohort specified
-with #persons as ( --subset a random set of subjects
+with persons as ( --subset a random set of subjects
   select *
   from (
-    select person_id, row_number() over (order by random()) rn
+    select person_id, row_number() over (order by NewId()) rn
     from @cdm_database_schema.person)
   order by rn
   limit 10 * @baseSampleSize),
-#visits as ( --and a random visit from each subject selected
+visits as ( --and a random visit from each subject selected
 select distinct v.person_id, first_value(visit_start_date)
   over (partition by v.person_id ORDER BY NewId()) visit_start_date
 from @cdm_database_schema.visit_occurrence v
@@ -45,7 +43,7 @@ join @cdm_database_schema.observation_period o
     and dateadd(d, 365, v.visit_start_date) <= o.observation_period_end_date
 where v.person_id in (
   select person_id
-  from #persons)
+  from persons)
   and v.visit_start_date >= cast('@startDate' AS DATE)
 	and v.visit_start_date <= cast('@endDate' AS DATE))
 select *
@@ -53,20 +51,19 @@ into #finalCohort
 from (
   select @prevalenceCohortId as cohort_definition_id, person_id as subject_id, visit_start_date as cohort_start_date,
     dateadd(day, 1, visit_start_date) as cohort_end_date
-  from #visits
+  from visits
   where person_id not in ( --noncases from those not in prevalence cohort
     select subject_id
     from @cohort_database_schema.@cohort_database_table
     where cohort_definition_id = @prevalenceCohortId)
   union
   select c.* --cases from those also in prevalence cohort
-  from #visits v
+  from visits v
   join @cohort_database_schema.@cohort_database_table c
     on v.person_id = c.subject_id
   where c.cohort_definition_id = @prevalenceCohortId
 )
 ;}
-
 DROP TABLE IF EXISTS #cohort_person;
 
 SELECT *
