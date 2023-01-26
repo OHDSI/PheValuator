@@ -2,14 +2,9 @@
 ^\.Rproj\.user$
 .github
 examplePackage
-standalone
-man/CohortMethod.pdf
-man/balanceScatterPlot.png
-man/ps.png
 deploy.sh
 extras
 man-roxygen
-xgboost
 compare_versions
 _pkgdown.yml
 docs

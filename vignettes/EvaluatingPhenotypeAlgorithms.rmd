@@ -3,13 +3,13 @@ title: "EvaluatingPhenotypeAlgorithms"
 author: "Joel N. Swerdel"
 date: '`r Sys.Date()`'
 output:
-  word_document:
-    toc: yes
   pdf_document:
     number_sections: yes
     toc: yes
   html_document:
     number_sections: yes
+    toc: yes
+  word_document:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{Evaluating Phenotype Algorithms Using Phevaluator}

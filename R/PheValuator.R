@@ -20,6 +20,8 @@
 #' @importFrom stats quantile runif binom.test
 #' @importFrom utils capture.output write.csv install.packages menu unzip
 #' @importFrom methods is
+#' @importFrom stats aggregate
 #' @import DatabaseConnector
 #' @import FeatureExtraction
+#' @import PatientLevelPrediction
 NULL
