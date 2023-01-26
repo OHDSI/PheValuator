@@ -16,7 +16,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
   daysFromxSpec <- 0
   excludedCovariateConceptIds <- c()
   xSensCohort <- 2
-  prevalenceCohort <- 0.5
+  prevalenceCohort <- 5
   evaluationPopulationCohortId <- 5
 
   connectionDetails <- Eunomia::getEunomiaConnectionDetails()
