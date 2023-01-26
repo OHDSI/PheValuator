@@ -11,8 +11,10 @@ output:
   html_document:
     number_sections: yes
     toc: yes
-vignette: "%\\VignetteIndexEntry{Evaluating Phenotype Algorithms Using Phevaluator}
-  %\\VignetteEncoding{UTF-8} %\\VignetteEngine{knitr::rmarkdown}\n"
+vignette: >
+  %\VignetteIndexEntry{Evaluating Phenotype Algorithms Using Phevaluator}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 
