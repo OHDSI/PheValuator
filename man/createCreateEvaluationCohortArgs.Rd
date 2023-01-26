@@ -6,6 +6,7 @@
 \usage{
 createCreateEvaluationCohortArgs(
   xSpecCohortId,
+  daysFromxSpec = 0,
   xSensCohortId,
   prevalenceCohortId,
   xSpecCohortSize = 5000,
@@ -39,6 +40,8 @@ createCreateEvaluationCohortArgs(
 \item{xSpecCohortId}{The number of the "extremely specific (xSpec)"
 cohortdefinition id in the cohort table (for noisy
 positives).}
+
+\item{daysFromxSpec}{Number of days from xSpec condition until analyzed visit}
 
 \item{xSensCohortId}{The number of the "extremely sensitive (xSens)"
 cohortdefinition id in the cohort table (for noisy

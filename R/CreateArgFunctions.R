@@ -53,7 +53,7 @@
 #'
 #' @export
 createCreateEvaluationCohortArgs <- function(xSpecCohortId,
-                                             daysFromxSpec = 14,
+                                             daysFromxSpec = 0,
                                              xSensCohortId,
                                              prevalenceCohortId,
                                              xSpecCohortSize = 5000,

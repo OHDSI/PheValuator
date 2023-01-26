@@ -19,8 +19,9 @@
 {DEFAULT @visitLength = 0 }
 {DEFAULT @visitType = c(9201) }
 {DEFAULT @firstCut = FALSE }
-{DEFAULT @daysFromxSpec = 14 }
+{DEFAULT @daysFromxSpec = 0 }
 
+{@daysFromxSpec != 0} ? {
 DROP TABLE IF EXISTS #new_xspec;
 
 SELECT @x_spec_cohort as cohort_definition_id, subject_id, minVisit as cohort_start_date, dateadd(day, 1, minVisit) cohort_end_date
@@ -39,6 +40,7 @@ FROM (select distinct cohort_definition_id, subject_id, cohort_start_date, minVi
         and v.visit_start_date >= dateadd(day, 1, co.cohort_start_date)
         and v.visit_start_date <= dateadd(day, @daysFromxSpec, co.cohort_start_date)
     	WHERE cohort_definition_id = @x_spec_cohort) pos);
+}
 
 DROP TABLE IF EXISTS #cohort_person;
 
@@ -46,7 +48,8 @@ SELECT *
 into #cohort_person
 FROM (SELECT co.*, p.*,
 	  row_number() over (order by NewId()) rn
-	FROM #new_xspec co
+{@daysFromxSpec != 0} ? {FROM #new_xspec co}
+{@daysFromxSpec == 0} ? {FROM @cohort_database_schema.@cohort_database_table co}
 	JOIN @cdm_database_schema.person p
 	  on co.subject_id = p.person_id
 		AND  year(COHORT_START_DATE) - year_of_birth >= @ageLimit
@@ -164,8 +167,10 @@ INTO @work_database_schema.@test_cohort
       WHERE rn <= @xSpecSampleSize
       ;
 
-TRUNCATE TABLE #new_xspec;
-DROP TABLE #new_xspec;
+{@daysFromxSpec != 0} ? {
+  TRUNCATE TABLE #new_xspec;
+  DROP TABLE #new_xspec;
+}
 
 TRUNCATE TABLE #cohort_person;
 DROP TABLE #cohort_person;

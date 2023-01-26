@@ -9,6 +9,7 @@ createEvaluationCohort(
   oracleTempSchema = NULL,
   tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
   xSpecCohortId,
+  daysFromxSpec = 0,
   xSensCohortId,
   prevalenceCohortId,
   xSpecCohortSize = 5000,
@@ -56,6 +57,8 @@ can be created.}
 
 \item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort
 definition id in the cohort table (for noisy positives).}
+
+\item{daysFromxSpec}{Number of days from xSpec condition until analyzed visit}
 
 \item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort
 definition id in the cohort table (for noisy negatives).}

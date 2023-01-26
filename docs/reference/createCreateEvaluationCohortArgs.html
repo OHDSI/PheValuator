@@ -39,7 +39,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
 </li>
 <li>
   <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
@@ -68,6 +68,7 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">createCreateEvaluationCohortArgs</span><span class="op">(</span></span>
 <span>  <span class="va">xSpecCohortId</span>,</span>
+<span>  daysFromxSpec <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  <span class="va">xSensCohortId</span>,</span>
 <span>  <span class="va">prevalenceCohortId</span>,</span>
 <span>  xSpecCohortSize <span class="op">=</span> <span class="fl">5000</span>,</span>
@@ -104,6 +105,10 @@
 <dd><p>The number of the "extremely specific (xSpec)"
 cohortdefinition id in the cohort table (for noisy
 positives).</p></dd>
+
+
+<dt>daysFromxSpec</dt>
+<dd><p>Number of days from xSpec condition until analyzed visit</p></dd>
 
 
 <dt>xSensCohortId</dt>

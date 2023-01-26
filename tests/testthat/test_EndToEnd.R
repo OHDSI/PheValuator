@@ -13,10 +13,14 @@ test_that("TestPhenotype - test PheValuator end to end", {
   cohortTable <- "cohort"
   workDatabaseSchema <- "main"
   xSpecCohort <- 1001
+  daysFromxSpec <- 0
   excludedCovariateConceptIds <- c()
   xSensCohort <- 2
-  prevalenceCohort <- 2
+  prevalenceCohort <- 0.5
   evaluationPopulationCohortId <- 5
+
+  connectionDetails <- Eunomia::getEunomiaConnectionDetails()
+  connection <- connect(connectionDetails)
 
   # Create analysis settings ---------------------------------------------------
   CovSettingsAcute <- createDefaultCovariateSettings(
@@ -32,6 +36,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
 
   CohortArgsAcute <- createCreateEvaluationCohortArgs(
     xSpecCohortId = xSpecCohort,
+    daysFromxSpec = daysFromxSpec,
     xSensCohortId = xSensCohort,
     prevalenceCohortId = prevalenceCohort,
     evaluationPopulationCohortId = evaluationPopulationCohortId,
@@ -78,5 +83,5 @@ test_that("TestPhenotype - test PheValuator end to end", {
     pheValuatorAnalysisList = pheValuatorAnalysisList
   )
 
-  expect_true(file.exists(file.path(folder, "TestResults_a1.rds")))
+  testthat::expect_true(file.exists(file.path(folder, "TestResults_a1.rds")))
 })
