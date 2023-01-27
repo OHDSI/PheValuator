@@ -122,21 +122,21 @@
         testCohort <- paste0("test_model_", xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))
         # first check number of eligible visits in db
         sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
-          packageName = "PheValuator",
-          dbms = connectionDetails$dbms,
-          cdm_database_schema = cdmDatabaseSchema,
-          cohort_database_schema = cohortDatabaseSchema,
-          cohort_database_table = cohortTable,
-          ageLimit = lowerAgeLimit,
-          upperAgeLimit = upperAgeLimit,
-          gender = gender,
-          race = race,
-          ethnicity = ethnicity,
-          startDate = startDate,
-          endDate = endDate,
-          visitType = visitType,
-          visitLength = visitLength,
-          exclCohort = xSensCohortId
+                                                 packageName = "PheValuator",
+                                                 dbms = connectionDetails$dbms,
+                                                 cdm_database_schema = cdmDatabaseSchema,
+                                                 cohort_database_schema = cohortDatabaseSchema,
+                                                 cohort_database_table = cohortTable,
+                                                 ageLimit = lowerAgeLimit,
+                                                 upperAgeLimit = upperAgeLimit,
+                                                 gender = gender,
+                                                 race = race,
+                                                 ethnicity = ethnicity,
+                                                 startDate = startDate,
+                                                 endDate = endDate,
+                                                 visitType = visitType,
+                                                 visitLength = visitLength,
+                                                 exclCohort = xSensCohortId
         )
         cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
 
@@ -149,7 +149,11 @@
 
         sqlFileName <- "CreateCohortsAcuteModel.sql"
 
-        ParallelLogger::logInfo("Tranforming xSpec for correct format")
+        if(daysFromxSpec != 0) {
+          ParallelLogger::logInfo("Tranforming xSpec cohort using daysFromxSpec parameter")
+        } else {
+          ParallelLogger::logInfo("Using xSpec cohort verbatim (daysFromxSpec = 0)")
+        }
 
         ParallelLogger::logInfo("Subsetting and sampling cohorts")
         sql <- SqlRender::loadRenderTranslateSql(
