@@ -67,7 +67,8 @@
       race = race,
       ethnicity = ethnicity,
       startDate = startDate,
-      endDate = endDate
+      endDate = endDate,
+      daysFromxSpec = daysFromxSpec
     )
 
     xSpecCount <- as.numeric(DatabaseConnector::querySql(connection = connection, sql = sql))
