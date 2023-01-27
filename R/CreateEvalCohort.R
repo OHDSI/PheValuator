@@ -226,10 +226,12 @@
         sampleSize = NULL
       )
 
-      plpData <- PatientLevelPrediction::getPlpData(
-        databaseDetails = databaseDetails,
-        covariateSettings = covariateSettings,
-        restrictPlpDataSettings = restrictPlpDataSettings
+      suppressWarnings(
+        plpData <- PatientLevelPrediction::getPlpData(
+          databaseDetails = databaseDetails,
+          covariateSettings = covariateSettings,
+          restrictPlpDataSettings = restrictPlpDataSettings
+        )
       )
     }
 
