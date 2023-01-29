@@ -101,8 +101,6 @@
           removeSubjectsWithFutureDates = removeSubjectsWithFutureDates
         )
 
-        browser()
-
         popPrev <- as.numeric(DatabaseConnector::querySql(connection = connection, sql))
       } else {
         popPrev <- prevalenceCohortId
