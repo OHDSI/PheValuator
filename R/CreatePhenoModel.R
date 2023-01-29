@@ -51,6 +51,8 @@
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
   plpResultsFileName <- file.path(outFolder, sprintf("plpResults_%s", modelId))
 
+  visitType <- c(9201, 9202, 9203, 262, 581477) # model is run is all inpatient/outpatient visits
+
   if (!file.exists(modelFileName)) {
     # get xSpec subjects to create a model
     sql <- SqlRender::loadRenderTranslateSql(
