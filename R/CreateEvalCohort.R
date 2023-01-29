@@ -72,9 +72,9 @@
     exclSubjectList <- c(lrResults$prediction$subjectId)
 
     testCohort <- gsub(".",
-      "",
-      (paste0("test_eval_", xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))),
-      fixed = TRUE
+                       "",
+                       (paste0("test_eval_", xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))),
+                       fixed = TRUE
     ) # unique new cohort name to use
 
     connection <- DatabaseConnector::connect(connectionDetails)
@@ -123,21 +123,21 @@
     } else { # otherwise create the evaluation cohort from an sql query
       # first check number of eligible visits in db
       sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
-        packageName = "PheValuator",
-        dbms = connectionDetails$dbms,
-        cdm_database_schema = cdmDatabaseSchema,
-        cohort_database_schema = cohortDatabaseSchema,
-        cohort_database_table = cohortTable,
-        ageLimit = lowerAgeLimit,
-        upperAgeLimit = upperAgeLimit,
-        gender = gender,
-        race = race,
-        ethnicity = ethnicity,
-        startDate = startDate,
-        endDate = endDate,
-        visitType = visitType,
-        visitLength = visitLength,
-        exclCohort = xSensCohortId
+                                               packageName = "PheValuator",
+                                               dbms = connectionDetails$dbms,
+                                               cdm_database_schema = cdmDatabaseSchema,
+                                               cohort_database_schema = cohortDatabaseSchema,
+                                               cohort_database_table = cohortTable,
+                                               ageLimit = lowerAgeLimit,
+                                               upperAgeLimit = upperAgeLimit,
+                                               gender = gender,
+                                               race = race,
+                                               ethnicity = ethnicity,
+                                               startDate = startDate,
+                                               endDate = endDate,
+                                               visitType = visitType,
+                                               visitLength = visitLength,
+                                               exclCohort = xSensCohortId
       )
       cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
 
@@ -330,11 +330,11 @@
 
     # pull in the xSens cohort
     sql <- SqlRender::loadRenderTranslateSql("GetComparisonCohort.sql",
-      packageName = "PheValuator",
-      dbms = connectionDetails$dbms,
-      cohort_database_schema = cohortDatabaseSchema,
-      cohort_table = cohortTable,
-      cohort_id = prevalenceCohortId
+                                             packageName = "PheValuator",
+                                             dbms = connectionDetails$dbms,
+                                             cohort_database_schema = cohortDatabaseSchema,
+                                             cohort_table = cohortTable,
+                                             cohort_id = prevalenceCohortId
     )
     sql <- SqlRender::translate(sql, connectionDetails$dbms)
     comparisonPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
@@ -365,22 +365,26 @@
     fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
     fullSubjectList <- tibble(fullTestCases)
-    subjectCovariates <- data.frame()
-    for(subjectUp in 1:nrow(fullTestCases)) {
-      rowId <- fullTestCases$rowId[[subjectUp]]
-      covs <- allCovData[allCovData$rowId == rowId,]
-      modelCovs <- lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,]
-      covs <- merge(covs, modelCovs, by="covariateId", all.x = TRUE)
-      covs <- covs[!(is.na(covs$analysisId)),]
+    if(nrow(fullTestCases) > 0) { #no test cases found
+      subjectCovariates <- data.frame()
+      for(subjectUp in 1:nrow(fullTestCases)) {
+        rowId <- fullTestCases$rowId[[subjectUp]]
+        covs <- allCovData[allCovData$rowId == rowId,]
+        modelCovs <- lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,]
+        covs <- merge(covs, modelCovs, by="covariateId", all.x = TRUE)
+        covs <- covs[!(is.na(covs$analysisId)),]
 
-      covs$subjectId <- fullTestCases$subjectId[[subjectUp]]
-      covs$type <- fullTestCases$type[[subjectUp]]
+        covs$subjectId <- fullTestCases$subjectId[[subjectUp]]
+        covs$type <- fullTestCases$type[[subjectUp]]
 
-      if(nrow(subjectCovariates) == 0) {
-        subjectCovariates <- covs[!is.na(covs$subjectId),]
-      } else {
-        subjectCovariates <- rbind(subjectCovariates, covs[!is.na(covs$subjectId),])
+        if(nrow(subjectCovariates) == 0) {
+          subjectCovariates <- covs[!is.na(covs$subjectId),]
+        } else {
+          subjectCovariates <- rbind(subjectCovariates, covs[!is.na(covs$subjectId),])
+        }
       }
+    } else {
+      ParallelLogger::logInfo("No test cases found")
     }
 
     # add other parameters to the input settings list
@@ -400,8 +404,14 @@
     appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
 
     appResults$PheValuator$modelperformanceEvaluation <- lrResults$performanceEvaluation
-    appResults$PheValuator$testCases <- as.data.frame(fullTestCases)
-    appResults$PheValuator$testCaseCovariates <- subjectCovariates[,c(11,12,9,6,7)]
+
+    if(nrow(fullTestCases) > 0) { #no test cases found
+      appResults$PheValuator$testCases <- as.data.frame(fullTestCases)
+      appResults$PheValuator$testCaseCovariates <- subjectCovariates[,c(11,12,9,6,7)]
+    } else {
+      appResults$PheValuator$testCases <- NULL
+      appResults$PheValuator$testCaseCovariates <- NULL
+    }
 
     # save the full data set to the model
     appResults$prediction <- finalPopn
