@@ -1,9 +1,12 @@
-PheValuator 2.1.14
+PheValuator 2.2.0
 =================
 
 Changes:
 
-1. 
+1. Add capability to create simpler xSpec cohorts not based on visit dates
+2. Add capability to have PheValuator generate the evaluation cohort automatically
+3. Use a faster method to develop predicted probabilities for evaluation cohort
+4. Include a set of subjects designated as true and false positives and negatives in output
 
 PheValuator 2.1.13
 =================

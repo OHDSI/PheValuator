@@ -183,6 +183,7 @@
         visitType = c(visitType),
         firstCut = firstCut
       )
+
       ParallelLogger::logInfo("Creating evaluation cohort on server from sql")
       DatabaseConnector::executeSql(connection = connection, sql)
     }
@@ -328,20 +329,59 @@
     pred <- appResults$prediction
 
     # pull in the xSens cohort
-    sql <- SqlRender::loadRenderTranslateSql("GetXsensCohort.sql",
+    sql <- SqlRender::loadRenderTranslateSql("GetComparisonCohort.sql",
       packageName = "PheValuator",
       dbms = connectionDetails$dbms,
       cohort_database_schema = cohortDatabaseSchema,
       cohort_table = cohortTable,
-      cdm_database_schema = cdmDatabaseSchema,
-      cohort_id = xSensCohortId
+      cohort_id = prevalenceCohortId
     )
     sql <- SqlRender::translate(sql, connectionDetails$dbms)
-    xSensPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
-    # add the start dates from the xSens cohort to the evaluation cohort to be able to apply washout
-    # criteria during evaluation
-    finalPopn <- merge(pred, xSensPopn, all.x = TRUE)
-    finalPopn$daysToXSens <- as.integer(finalPopn$daysToXsens)
+    comparisonPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
+    # add the start dates from the comparison cohort to the evaluation cohort to be able to create
+    # dataframe of TP, FP, TN, FN
+    finalPopn <- merge(pred, comparisonPopn, all.x = TRUE)
+
+    #determine TP, FP, TN, FN
+    fullTestCases <- NULL
+    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.8,]
+    testCases <- testCases[order(-testCases[,14]),][1:10,]
+    testCases$type <- "FN"
+    fullTestCases <- testCases[!is.na(testCases$subjectId),]
+
+    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value < 0.1,]
+    testCases <- testCases[order(testCases[,14]),][1:10,]
+    testCases$type <- "FP"
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
+
+    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.8,]
+    testCases <- testCases[order(-testCases[,14]),][1:10,]
+    testCases$type <- "TP"
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
+
+    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value < 0.1,]
+    testCases <- testCases[order(testCases[,14]),][1:10,]
+    testCases$type <- "TN"
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
+
+    fullSubjectList <- tibble(fullTestCases)
+    subjectCovariates <- data.frame()
+    for(subjectUp in 1:nrow(fullTestCases)) {
+      rowId <- fullTestCases$rowId[[subjectUp]]
+      covs <- allCovData[allCovData$rowId == rowId,]
+      modelCovs <- lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,]
+      covs <- merge(covs, modelCovs, by="covariateId", all.x = TRUE)
+      covs <- covs[!(is.na(covs$analysisId)),]
+
+      covs$subjectId <- fullTestCases$subjectId[[subjectUp]]
+      covs$type <- fullTestCases$type[[subjectUp]]
+
+      if(nrow(subjectCovariates) == 0) {
+        subjectCovariates <- covs[!is.na(covs$subjectId),]
+      } else {
+        subjectCovariates <- rbind(subjectCovariates, covs[!is.na(covs$subjectId),])
+      }
+    }
 
     # add other parameters to the input settings list
     appResults$PheValuator$inputSetting$startDays <- covariateSettings[[1]]$longTermStartDays
@@ -360,6 +400,8 @@
     appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
 
     appResults$PheValuator$modelperformanceEvaluation <- lrResults$performanceEvaluation
+    appResults$PheValuator$testCases <- as.data.frame(fullTestCases)
+    appResults$PheValuator$testCaseCovariates <- subjectCovariates[,c(11,12,9,6,7)]
 
     # save the full data set to the model
     appResults$prediction <- finalPopn
