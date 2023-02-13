@@ -108,7 +108,7 @@
         popPrev <- prevalenceCohortId
       }
 
-      if (is.na(popPrev)) {popPrev <- 0.1}
+      if (is.na(popPrev)) {popPrev <- 0.01} #set default for eunomia data
 
       if (popPrev == 0) {
         stop("Unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
