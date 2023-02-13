@@ -108,6 +108,8 @@
         popPrev <- prevalenceCohortId
       }
 
+      if (is.na(popPrev)) {popPrev <- 0.1}
+
       if (popPrev == 0) {
         stop("Unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
       }

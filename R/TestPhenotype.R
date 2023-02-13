@@ -317,7 +317,7 @@ computePerformanceMetricsFromCounts <- function(counts) {
   # Note: negative counts indicate the cell counts was below the specified minimum for sharing.
 
   computeSingleProportion <- function(i, x, n) {
-    if(n[i] < x[i] | n[i] == 0) {n[i] <- 1; x[i] <- 0} #set to 0 if n < x or n = 0 to avoid error
+    if(as.integer(n[i]) < as.integer(x[i]) | as.integer(n[i]) == 0) {n[i] <- 1; x[i] <- 0} #set to 0 if n < x or n = 0 to avoid error
     exact <- binom.test(as.integer(x[i]), as.integer(n[i]), conf.level = 0.95)
     return(tibble::tibble(
       estimate = exact$estimate,

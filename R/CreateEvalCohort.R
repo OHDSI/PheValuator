@@ -135,8 +135,6 @@
         ParallelLogger::logInfo("Creating evaluation cohort subjects excluding visits from cohort Id: ", exclusionEvaluationCohortId)
       }
 
-      if(prevalenceCohortId < 1) {prevalenceCohortId <= 5}
-
       sql <- SqlRender::loadRenderTranslateSql(
         sqlFilename = sqlFilename,
         packageName = "PheValuator",

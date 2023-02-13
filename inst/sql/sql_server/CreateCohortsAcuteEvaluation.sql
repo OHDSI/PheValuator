@@ -126,6 +126,7 @@ FROM (
 
 DROP TABLE IF EXISTS @work_database_schema.@test_cohort;
 
+
 select distinct CAST(0 AS BIGINT) as COHORT_DEFINITION_ID, person_id as SUBJECT_ID,
 	dateadd(day, 0, visit_start_date) COHORT_START_DATE,
 	dateadd(day, 1, visit_start_date) COHORT_END_DATE

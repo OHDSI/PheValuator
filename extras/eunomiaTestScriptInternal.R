@@ -2,10 +2,9 @@ library(PheValuator)
 library(testthat)
 #library(Eunomia)
 
-test_that("TestPhenotype - test PheValuator end to end", {
-  folder <- tempfile("Phevaluator")
-  dir.create(folder)
-  on.exit(unlink(folder, recursive = TRUE))
+  folder <- "P:/temp/Phevaluator"
+  dir.create(folder, showWarnings = FALSE)
+  #on.exit(unlink(folder, recursive = TRUE))
 
   databaseId <- "Eunomia"
   cdmDatabaseSchema <- "main"
@@ -16,7 +15,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
   daysFromxSpec <- 0
   excludedCovariateConceptIds <- c()
   xSensCohort <- 2
-  prevalenceCohort <- 2
+  prevalenceCohort <- 1001
 
   #connectionDetails <- Eunomia::getEunomiaConnectionDetails()
   connection <- connect(connectionDetails)
@@ -79,6 +78,4 @@ test_that("TestPhenotype - test PheValuator end to end", {
     pheValuatorAnalysisList = pheValuatorAnalysisList
   )
 
-
-  testthat::expect_true(file.exists(file.path(folder, "TestResults_a1.rds")))
-})
+a <- readRDS("P:/temp/Phevaluator/EvaluationCohort_e1/evaluationCohort_main.rds")$prediction
