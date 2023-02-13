@@ -79,5 +79,6 @@ test_that("TestPhenotype - test PheValuator end to end", {
     pheValuatorAnalysisList = pheValuatorAnalysisList
   )
 
-  testthat::expect_true(file.exists(file.path(folder, "EvaluationCohort_e1", "evaluationCohort_main.rds")))
+
+  testthat::expect_true(file.exists(file.path(folder, "TestResults_a1.rds")))
 })
