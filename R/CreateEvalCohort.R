@@ -24,9 +24,12 @@
                                     workDatabaseSchema,
                                     tempEmulationSchema,
                                     covariateSettings,
-                                    mainPopulationCohortId = 0,
-                                    mainPopulationCohortIdStartDay = 0,
-                                    mainPopulationCohortIdEndDay = 0,
+                                    inclusionEvaluationCohortId = 0,
+                                    inclusionEvaluationDaysFromStart = 0,
+                                    inclusionEvaluationDaysFromEnd = 0,
+                                    exclusionEvaluationCohortId = 0,
+                                    exclusionEvaluationDaysFromStart = 0,
+                                    exclusionEvaluationDaysFromEnd = 0,
                                     baseSampleSize = 2e+06,
                                     lowerAgeLimit = 0,
                                     upperAgeLimit = 120,
@@ -37,6 +40,7 @@
                                     ethnicity = 0,
                                     startDate = "19001010",
                                     endDate = "21000101",
+                                    falsePositiveNegativeSubjects = 10,
                                     cdmVersion = "5",
                                     outFolder = getwd(),
                                     modelId = "main",
@@ -121,37 +125,14 @@
         }
       )
     } else { # otherwise create the evaluation cohort from an sql query
-      # first check number of eligible visits in db
-      sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
-                                               packageName = "PheValuator",
-                                               dbms = connectionDetails$dbms,
-                                               cdm_database_schema = cdmDatabaseSchema,
-                                               cohort_database_schema = cohortDatabaseSchema,
-                                               cohort_database_table = cohortTable,
-                                               ageLimit = lowerAgeLimit,
-                                               upperAgeLimit = upperAgeLimit,
-                                               gender = gender,
-                                               race = race,
-                                               ethnicity = ethnicity,
-                                               startDate = startDate,
-                                               endDate = endDate,
-                                               visitType = visitType,
-                                               visitLength = visitLength,
-                                               exclCohort = xSensCohortId
-      )
-      cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
-
-      # if number of visits is over 100M reduce down by factor of 12 to increase processing speed
-      if (cntVisits > 100000000) {
-        firstCut <- TRUE
-      } else {
-        firstCut <- FALSE
-      }
 
       sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
 
-      if (mainPopulationCohortId == 0) {
-        ParallelLogger::logInfo("Creating evaluation cohort subjects without population cohort")
+      if (inclusionEvaluationCohortId != 0) {
+        ParallelLogger::logInfo("Creating evaluation cohort subjects using visits from cohort Id: ", inclusionEvaluationCohortId)
+      }
+      if (exclusionEvaluationCohortId != 0) {
+        ParallelLogger::logInfo("Creating evaluation cohort subjects excluding visits from cohort Id: ", exclusionEvaluationCohortId)
       }
 
       sql <- SqlRender::loadRenderTranslateSql(
@@ -176,12 +157,14 @@
         endDate = endDate,
         baseSampleSize = format(baseSampleSize, scientific = FALSE),
         xSpecSampleSize = 100,
-        mainPopnCohort = mainPopulationCohortId,
-        mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
-        mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
+        inclusionEvaluationCohortId = inclusionEvaluationCohortId,
+        inclusionEvaluationDaysFromStart = inclusionEvaluationDaysFromStart,
+        inclusionEvaluationDaysFromEnd = inclusionEvaluationDaysFromEnd,
+        exclusionEvaluationCohortId = exclusionEvaluationCohortId,
+        exclusionEvaluationDaysFromStart = exclusionEvaluationDaysFromStart,
+        exclusionEvaluationDaysFromEnd = exclusionEvaluationDaysFromEnd,
         visitLength = visitLength,
-        visitType = c(visitType),
-        firstCut = firstCut
+        visitType = c(visitType)
       )
 
       ParallelLogger::logInfo("Creating evaluation cohort on server from sql")
@@ -345,12 +328,12 @@
     #determine TP, FP, TN, FN
     fullTestCases <- NULL
     testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.8,]
-    testCases <- testCases[order(-testCases[,14]),][1:10,]
+    testCases <- testCases[order(-testCases[,14]),][1:falsePositiveNegativeSubjects,]
     testCases$type <- "FN"
     fullTestCases <- testCases[!is.na(testCases$subjectId),]
 
     testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value < 0.1,]
-    testCases <- testCases[order(testCases[,14]),][1:10,]
+    testCases <- testCases[order(testCases[,14]),][1:falsePositiveNegativeSubjects,]
     testCases$type <- "FP"
     fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
@@ -364,7 +347,7 @@
     testCases$type <- "TN"
     fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
-    fullSubjectList <- tibble(fullTestCases)
+    fullSubjectList <- tibble::tibble(fullTestCases)
     if(nrow(fullTestCases) > 0) { #no test cases found
       subjectCovariates <- data.frame()
       for(subjectUp in 1:nrow(fullTestCases)) {
@@ -400,7 +383,12 @@
     appResults$PheValuator$inputSetting$ethnicity <- paste(unlist(ethnicity), collapse = ", ")
     appResults$PheValuator$inputSetting$startDate <- startDate
     appResults$PheValuator$inputSetting$endDate <- endDate
-    appResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId
+    appResults$PheValuator$inputSetting$inclusionEvaluationCohortId <- inclusionEvaluationCohortId
+    appResults$PheValuator$inputSetting$inclusionEvaluationDaysFromStart <- inclusionEvaluationDaysFromStart
+    appResults$PheValuator$inputSetting$inclusionEvaluationDaysFromEnd <- inclusionEvaluationDaysFromEnd
+    appResults$PheValuator$inputSetting$exclusionEvaluationCohortId <- exclusionEvaluationCohortId
+    appResults$PheValuator$inputSetting$exclusionEvaluationDaysFromStart <- exclusionEvaluationDaysFromStart
+    appResults$PheValuator$inputSetting$exclusionEvaluationDaysFromEnd <- exclusionEvaluationDaysFromEnd
     appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
 
     appResults$PheValuator$modelperformanceEvaluation <- lrResults$performanceEvaluation

@@ -15,24 +15,31 @@
 {DEFAULT @endDate = '21000101' }
 {DEFAULT @baseSampleSize = 150000 }
 {DEFAULT @xSpecSampleSize = 1500 }
-{DEFAULT @mainPopnCohort = 0 }
-{DEFAULT @mainPopnCohortStartDay = 0 }
-{DEFAULT @mainPopnCohortEndDay = 0 }
+{DEFAULT @inclusionEvaluationCohortId = 0 }
+{DEFAULT @inclusionEvaluationDaysFromStart = 0 }
+{DEFAULT @inclusionEvaluationDaysFromEnd = 0 }
+{DEFAULT @exclusionEvaluationCohortId = 0 }
+{DEFAULT @exclusionEvaluationDaysFromStart = 0 }
+{DEFAULT @exclusionEvaluationDaysFromEnd = 0 }
 {DEFAULT @exclCohort = 0 }
 {DEFAULT @visitLength = 0 }
 {DEFAULT @visitType = c(9201) }
-{DEFAULT @firstCut = FALSE }
 
 DROP TABLE IF EXISTS #finalCohort;
 
-{@mainPopnCohort == 0} ? { -- create cohort using prevalence cohort and visit table - else use population cohort specified
+-- create cohort using prevalence cohort and visit table
 with persons as ( --subset a random set of subjects
   select *
   from (
     select person_id, row_number() over (order by NewId()) rn
-    from @cdm_database_schema.person)
+    from @cdm_database_schema.person p
+{@inclusionEvaluationCohortId != 0} ? { --subjects must be from base evaluation cohort if specified
+    join @cohort_database_schema.@cohort_database_table co
+      on co.cohort_definition_id = @inclusionEvaluationCohortId
+        and co.subject_id = p.person_id})
   order by rn
   limit 10 * @baseSampleSize),
+
 visits as ( --and a random visit from each subject selected
 select distinct v.person_id, first_value(visit_start_date)
   over (partition by v.person_id ORDER BY NewId()) visit_start_date
@@ -41,11 +48,34 @@ join @cdm_database_schema.observation_period o
   on v.person_id = o.person_id
     and v.visit_start_date >= o.observation_period_start_date
     and dateadd(d, 365, v.visit_start_date) <= o.observation_period_end_date
+{@inclusionEvaluationCohortId != 0} ? { --visits must be within designated period from inclusion evaluation cohort if specified
+join @cohort_database_schema.@cohort_database_table co
+  on co.cohort_definition_id = @inclusionEvaluationCohortId
+    and co.subject_id = v.person_id
+    and v.visit_start_date >= dateadd(day, @inclusionEvaluationDaysFromStart, co.cohort_start_date)
+    and v.visit_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_end_date)}
 where v.person_id in (
   select person_id
   from persons)
+  and v.visit_concept_id in (@visitType)
   and v.visit_start_date >= cast('@startDate' AS DATE)
-	and v.visit_start_date <= cast('@endDate' AS DATE))
+	and v.visit_start_date <= cast('@endDate' AS DATE)
+
+{@exclusionEvaluationCohortId != 0} ? { --visits must NOT be within designated period from exclusion evaluation cohort if specified
+minus
+select distinct v.person_id, visit_start_date
+from @cdm_database_schema.visit_occurrence v
+join @cohort_database_schema.@cohort_database_table coExcl
+  on coExcl.cohort_definition_id = @exclusionEvaluationCohortId
+    and coExcl.subject_id = v.person_id
+    and v.visit_start_date >= dateadd(day, @exclusionEvaluationDaysFromStart, coExcl.cohort_start_date)
+    and v.visit_start_date <= dateadd(day, @exclusionEvaluationDaysFromEnd, coExcl.cohort_end_date)
+where v.person_id in (
+  select person_id
+  from persons)
+  }
+
+	)
 select *
 into #finalCohort
 from (
@@ -61,9 +91,15 @@ from (
   from visits v
   join @cohort_database_schema.@cohort_database_table c
     on v.person_id = c.subject_id
+{@inclusionEvaluationCohortId != 0} ? { --cases must be within designated period from inclusion evaluation cohort if specified
+  join @cohort_database_schema.@cohort_database_table co
+    on co.cohort_definition_id = @inclusionEvaluationCohortId
+      and co.subject_id = c.subject_id
+      and c.cohort_start_date >= dateadd(day, @inclusionEvaluationDaysFromStart, co.cohort_start_date)
+      and c.cohort_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_end_date)}
   where c.cohort_definition_id = @prevalenceCohortId
 )
-;}
+;
 DROP TABLE IF EXISTS #cohort_person;
 
 SELECT *
@@ -96,15 +132,16 @@ select distinct CAST(0 AS BIGINT) as COHORT_DEFINITION_ID, person_id as SUBJECT_
 INTO @work_database_schema.@test_cohort
 from (select co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (PARTITION BY v.person_id ORDER BY NewId()) visit_start_date,
 					row_number() over (order by NewId()) rn
-    	from {@mainPopnCohort == 0} ? {#finalCohort}
-    	     {@mainPopnCohort != 0} ? {@cohort_database_schema.@cohort_database_table} co
+    	from #finalCohort co
 				join @cdm_database_schema.visit_occurrence v
 				  on v.person_id = co.subject_id
 					and v.visit_concept_id in (@visitType)
-					and v.visit_start_date >= dateadd(day, @mainPopnCohortStartDay, co.COHORT_START_DATE)
-					and v.visit_start_date <= dateadd(day, @mainPopnCohortEndDay, co.COHORT_START_DATE)
+
+					and v.visit_start_date >= dateadd(day, 0, co.COHORT_START_DATE)
+					and v.visit_start_date <= dateadd(day, 0, co.COHORT_START_DATE)
+
 					and v.visit_start_date >= cast('@startDate' AS DATE)
-			  and v.visit_start_date <= cast('@endDate' AS DATE)
+			    and v.visit_start_date <= cast('@endDate' AS DATE)
 		   join (
 		  select person_id,
 			datediff(day, min(observation_period_start_date), min(observation_period_end_date)) lenPd,
@@ -130,9 +167,7 @@ from (select co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (P
 		on v.person_id = excl.subject_id
 		  and v.visit_start_date = excl.COHORT_START_DATE
 	  }
-				where co.cohort_definition_id =
-					{@mainPopnCohort == 0} ? {@prevalenceCohortId}
-	        {@mainPopnCohort != 0} ? {@mainPopnCohort}
+				where co.cohort_definition_id = @prevalenceCohortId
 {@exclCohort != 0} ? {
 					and excl.subject_id is NULL
 }

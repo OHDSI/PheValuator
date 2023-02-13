@@ -26,9 +26,9 @@
                                   prevalenceCohortId,
                                   xSpecCohortSize = 5000,
                                   covariateSettings,
-                                  mainPopulationCohortId = 0,
-                                  mainPopulationCohortIdStartDay = 0,
-                                  mainPopulationCohortIdEndDay = 0,
+                                  modelPopulationCohortId = 0,
+                                  modelPopulationCohortIdStartDay = 0,
+                                  modelPopulationCohortIdEndDay = 0,
                                   modelBaseSampleSize = 15000,
                                   lowerAgeLimit = 0,
                                   upperAgeLimit = 120,
@@ -98,7 +98,7 @@
           ethnicity = ethnicity,
           startDate = startDate,
           endDate = endDate,
-          mainPopnCohort = mainPopulationCohortId,
+          mainPopnCohort = modelPopulationCohortId,
           prevCohort = prevalenceCohortId,
           removeSubjectsWithFutureDates = removeSubjectsWithFutureDates
         )
@@ -181,9 +181,9 @@
           endDate = endDate,
           baseSampleSize = format(baseSampleSize, scientific = FALSE),
           xSpecSampleSize = xspecSize,
-          mainPopnCohort = mainPopulationCohortId,
-          mainPopnCohortStartDay = mainPopulationCohortIdStartDay,
-          mainPopnCohortEndDay = mainPopulationCohortIdEndDay,
+          mainPopnCohort = modelPopulationCohortId,
+          mainPopnCohortStartDay = modelPopulationCohortIdStartDay,
+          mainPopnCohortEndDay = modelPopulationCohortIdEndDay,
           visitLength = visitLength,
           visitType = c(visitType),
           firstCut = firstCut
@@ -319,7 +319,7 @@
             lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
             lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
             lrResults$PheValuator$inputSetting$prevalenceCohortId <- prevalenceCohortId
-            lrResults$PheValuator$inputSetting$mainPopulationCohortId <- mainPopulationCohortId
+            lrResults$PheValuator$inputSetting$modelPopulationCohortId <- modelPopulationCohortId
             lrResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
             lrResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
             lrResults$PheValuator$inputSetting$startDays <- covariateSettings$longTermStartDays

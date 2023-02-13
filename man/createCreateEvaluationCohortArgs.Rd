@@ -15,9 +15,12 @@ createCreateEvaluationCohortArgs(
   modelPopulationCohortId = 0,
   modelPopulationCohortIdStartDay = 0,
   modelPopulationCohortIdEndDay = 0,
-  evaluationPopulationCohortId = 0,
-  evaluationPopulationCohortIdStartDay = 0,
-  evaluationPopulationCohortIdEndDay = 0,
+  inclusionEvaluationCohortId = 0,
+  inclusionEvaluationDaysFromStart = 0,
+  inclusionEvaluationDaysFromEnd = 0,
+  exclusionEvaluationCohortId = 0,
+  exclusionEvaluationDaysFromStart = 0,
+  exclusionEvaluationDaysFromEnd = 0,
   modelBaseSampleSize = 15000,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
@@ -29,6 +32,7 @@ createCreateEvaluationCohortArgs(
   ethnicity = 0,
   startDate = "19001010",
   endDate = "21000101",
+  falsePositiveNegativeSubjects = 10,
   modelId = "main",
   evaluationCohortId = "main",
   excludeModelFromEvaluation = FALSE,
@@ -65,15 +69,23 @@ cohort start date to begin including visits.}
 \item{modelPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId
 cohort start date to end including visits.}
 
-\item{evaluationPopulationCohortId}{The number of the cohort to be used as a base population for
-the evalution cohort. If set to 0, the entire database population will be
-used.}
+\item{inclusionEvaluationCohortId}{The number of the cohort of the population to be used to designate which visits
+are are eligible to be in the evaluation cohort}
 
-\item{evaluationPopulationCohortIdStartDay}{The number of days relative to the evaluationPopulationCohortId
-cohort start date to begin including visits.}
+\item{inclusionEvaluationDaysFromStart}{The number of days from the cohort start date of the inclusionEvaluationCohortId
+to start eligible included visits}
 
-\item{evaluationPopulationCohortIdEndDay}{The number of days relative to the evaluationPopulationCohortId
-cohort start date to end including visits.}
+\item{inclusionEvaluationDaysFromEnd}{The number of days from the cohort end date of the inclusionEvaluationCohortId
+to end eligible included visits}
+
+\item{exclusionEvaluationCohortId}{The number of the cohort of the population to be used to designate which visits
+are NOT eligible to be in the evaluation cohort}
+
+\item{exclusionEvaluationDaysFromStart}{The number of days from the cohort start date of the exclusionEvaluationCohortId
+to start ineligible included visits}
+
+\item{exclusionEvaluationDaysFromEnd}{The number of days from the cohort end date of the exclusionEvaluationCohortId
+to end ineligible included visits}
 
 \item{modelBaseSampleSize}{The number of non-xSpec subjects to include in the model}
 
@@ -96,6 +108,8 @@ cohort start date to end including visits.}
 \item{startDate}{The starting date for including subjects in the model.}
 
 \item{endDate}{The ending date for including subjects in the model.}
+
+\item{falsePositiveNegativeSubjects}{Number of subjects to include for evaluating false positives and negatives}
 
 \item{modelId}{A string used to generate the file names for this model.}
 

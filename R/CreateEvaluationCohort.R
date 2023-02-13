@@ -53,20 +53,25 @@
 #'                                         Requires write permissions to this database.
 #' @param covariateSettings                A covariateSettings object as generated using
 #'                                         createCovariateSettings().
-#' @param modelPopulationCohortId           The number of the cohort to be used as a base population for
+#' @param modelPopulationCohortId          The number of the cohort to be used as a base population for
 #'                                         the model. If set to 0, the entire database population will be
 #'                                         used.
 #' @param modelPopulationCohortIdStartDay   The number of days relative to the mainPopulationCohortId
 #'                                         cohort start date to begin including visits.
 #' @param modelPopulationCohortIdEndDay     The number of days relative to the mainPopulationCohortId
 #'                                         cohort start date to end including visits.
-#' @param evaluationPopulationCohortId           The number of the cohort to be used as a base population for
-#'                                         the evalution cohort. If set to 0, the entire database population will be
-#'                                         used.
-#' @param evaluationPopulationCohortIdStartDay   The number of days relative to the evaluationPopulationCohortId
-#'                                         cohort start date to begin including visits.
-#' @param evaluationPopulationCohortIdEndDay     The number of days relative to the evaluationPopulationCohortId
-#'                                         cohort start date to end including visits.
+#' @param inclusionEvaluationCohortId      The number of the cohort of the population to be used to designate which visits
+#'                                         are eligible to be in the evaluation cohort
+#' @param inclusionEvaluationDaysFromStart The number of days from the cohort start date of the inclusionEvaluationCohortId
+#'                                         to start eligible included visits
+#' @param inclusionEvaluationDaysFromEnd   The number of days from the cohort end date of the inclusionEvaluationCohortId
+#'                                         to end eligible included visits
+#' @param exclusionEvaluationCohortId      The number of the cohort of the population to be used to designate which visits
+#'                                         are NOT eligible to be in the evaluation cohort
+#' @param exclusionEvaluationDaysFromStart The number of days from the cohort start date of the exclusionEvaluationCohortId
+#'                                         to start ineligible included visits
+#' @param exclusionEvaluationDaysFromEnd   The number of days from the cohort end date of the exclusionEvaluationCohortId
+#'                                         to end ineligible included visits
 #' @param modelBaseSampleSize              The number of non-xSpec subjects to include in the model
 #' @param baseSampleSize                   The maximum number of subjects in the evaluation cohort.
 #' @param lowerAgeLimit                    The lower age for subjects in the model.
@@ -78,6 +83,7 @@
 #' @param ethnicity                        The ethnicity(s) to be included.
 #' @param startDate                        The starting date for including subjects in the model.
 #' @param endDate                          The ending date for including subjects in the model.
+#' @param falsePositiveNegativeSubjects    Number of subjects to include for evaluating false positives and negatives
 #' @param cdmVersion                       The CDM version of the database.
 #' @param outFolder                        The folder where the output files will be written.
 #' @param modelId                          A string used to generate the file names for this model.
@@ -108,9 +114,12 @@ createEvaluationCohort <- function(connectionDetails,
                                    modelPopulationCohortId = 0,
                                    modelPopulationCohortIdStartDay = 0,
                                    modelPopulationCohortIdEndDay = 0,
-                                   evaluationPopulationCohortId = 0,
-                                   evaluationPopulationCohortIdStartDay = 0,
-                                   evaluationPopulationCohortIdEndDay = 0,
+                                   inclusionEvaluationCohortId = 0,
+                                   inclusionEvaluationDaysFromStart = 0,
+                                   inclusionEvaluationDaysFromEnd = 0,
+                                   exclusionEvaluationCohortId = 0,
+                                   exclusionEvaluationDaysFromStart = 0,
+                                   exclusionEvaluationDaysFromEnd = 0,
                                    modelBaseSampleSize = 15000,
                                    baseSampleSize = 2e+06,
                                    lowerAgeLimit = 0,
@@ -122,6 +131,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    ethnicity = 0,
                                    startDate = "19001010",
                                    endDate = "21000101",
+                                   falsePositiveNegativeSubjects = 10,
                                    cdmVersion = "5",
                                    outFolder = getwd(),
                                    modelId = "main",
@@ -174,9 +184,9 @@ createEvaluationCohort <- function(connectionDetails,
     prevalenceCohortId = prevalenceCohortId,
     xSpecCohortSize = xSpecCohortSize,
     covariateSettings = covariateSettings,
-    mainPopulationCohortId = modelPopulationCohortId,
-    mainPopulationCohortIdStartDay = modelPopulationCohortIdStartDay,
-    mainPopulationCohortIdEndDay = modelPopulationCohortIdEndDay,
+    modelPopulationCohortId = modelPopulationCohortId,
+    modelPopulationCohortIdStartDay = modelPopulationCohortIdStartDay,
+    modelPopulationCohortIdEndDay = modelPopulationCohortIdEndDay,
     modelBaseSampleSize = modelBaseSampleSize,
     lowerAgeLimit = lowerAgeLimit,
     upperAgeLimit = upperAgeLimit,
@@ -204,9 +214,12 @@ createEvaluationCohort <- function(connectionDetails,
     workDatabaseSchema = workDatabaseSchema,
     tempEmulationSchema = tempEmulationSchema,
     covariateSettings = covariateSettings,
-    mainPopulationCohortId = evaluationPopulationCohortId,
-    mainPopulationCohortIdStartDay = evaluationPopulationCohortIdStartDay,
-    mainPopulationCohortIdEndDay = evaluationPopulationCohortIdEndDay,
+    inclusionEvaluationCohortId = inclusionEvaluationCohortId,
+    inclusionEvaluationDaysFromStart = inclusionEvaluationDaysFromStart,
+    inclusionEvaluationDaysFromEnd = inclusionEvaluationDaysFromEnd,
+    exclusionEvaluationCohortId = exclusionEvaluationCohortId,
+    exclusionEvaluationDaysFromStart = exclusionEvaluationDaysFromStart,
+    exclusionEvaluationDaysFromEnd = exclusionEvaluationDaysFromEnd,
     baseSampleSize = baseSampleSize,
     lowerAgeLimit = lowerAgeLimit,
     upperAgeLimit = upperAgeLimit,
@@ -217,6 +230,7 @@ createEvaluationCohort <- function(connectionDetails,
     ethnicity = ethnicity,
     startDate = startDate,
     endDate = endDate,
+    falsePositiveNegativeSubjects = falsePositiveNegativeSubjects,
     cdmVersion = cdmVersion,
     outFolder = outFolder,
     modelId = modelId,

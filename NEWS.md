@@ -1,3 +1,15 @@
+PheValuator 2.2.2
+=================
+
+Changes:
+
+1. Eliminate evaluation population as an input parameter
+2. Add capability to input special inclusion rules for evaluation cohort
+3. Add capability to input special exclusion rules for evaluation cohort
+4. Add parameter to set the number of false positive and negative examples saved for analysis
+
+
+
 PheValuator 2.2.0
 =================
 
