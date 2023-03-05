@@ -153,44 +153,87 @@
           firstCut <- FALSE
         }
 
-        sqlFileName <- "CreateCohortsAcuteModel.sql"
+        if (file.exists(file.path(outFolder, "modelCohortSubjects.rds"))) {
+          # use existing subjects from local file to create a cohort table on server
+          cohort <- readRDS(file.path(outFolder, "modelCohortSubjects.rds"))
+          ParallelLogger::logInfo("Creating model cohort on server from cohort file")
 
-        if(daysFromxSpec != 0) {
-          ParallelLogger::logInfo("Tranforming xSpec cohort using daysFromxSpec parameter")
-        } else {
-          ParallelLogger::logInfo("Using xSpec cohort verbatim (daysFromxSpec = 0)")
+          tryCatch(
+            {
+              insertTable(
+                connection = connection,
+                databaseSchema = workDatabaseSchema,
+                tableName = testCohort,
+                data = cohort,
+                dropTableIfExists = TRUE,
+                createTable = TRUE,
+                tempTable = FALSE,
+                bulkLoad = TRUE,
+                progressBar = TRUE,
+                camelCaseToSnakeCase = TRUE
+              )
+            },
+            error = function(cond) {
+              if (grepl("Bulk load credentials", cond, fixed = TRUE)) {
+                message(paste0("...bulk load failed...trying without bulk load...this may be slow"))
+                insertTable(
+                  connection = connection,
+                  databaseSchema = workDatabaseSchema,
+                  tableName = testCohort,
+                  data = cohort,
+                  dropTableIfExists = TRUE,
+                  createTable = TRUE,
+                  tempTable = FALSE,
+                  bulkLoad = FALSE,
+                  progressBar = TRUE,
+                  camelCaseToSnakeCase = TRUE
+                )
+              } else {
+                stop(cond)
+              }
+            }
+          )
+        } else { # otherwise create the model cohort from an sql query
+
+          sqlFileName <- "CreateCohortsAcuteModel.sql"
+
+          if(daysFromxSpec != 0) {
+            ParallelLogger::logInfo("Tranforming xSpec cohort using daysFromxSpec parameter")
+          } else {
+            ParallelLogger::logInfo("Using xSpec cohort verbatim (daysFromxSpec = 0)")
+          }
+
+          ParallelLogger::logInfo("Subsetting and sampling cohorts")
+          sql <- SqlRender::loadRenderTranslateSql(
+            sqlFilename = sqlFileName,
+            packageName = "PheValuator",
+            dbms = connectionDetails$dbms,
+            cdm_database_schema = cdmDatabaseSchema,
+            cohort_database_schema = cohortDatabaseSchema,
+            cohort_database_table = cohortTable,
+            x_spec_cohort = xSpecCohortId,
+            daysFromxSpec = daysFromxSpec,
+            work_database_schema = workDatabaseSchema,
+            test_cohort = testCohort,
+            exclCohort = xSensCohortId,
+            ageLimit = lowerAgeLimit,
+            upperAgeLimit = upperAgeLimit,
+            gender = gender,
+            race = race,
+            ethnicity = ethnicity,
+            startDate = startDate,
+            endDate = endDate,
+            baseSampleSize = format(baseSampleSize, scientific = FALSE),
+            xSpecSampleSize = xspecSize,
+            mainPopnCohort = modelPopulationCohortId,
+            mainPopnCohortStartDay = modelPopulationCohortIdStartDay,
+            mainPopnCohortEndDay = modelPopulationCohortIdEndDay,
+            visitLength = visitLength,
+            visitType = c(visitType),
+            firstCut = firstCut
+          )
+          DatabaseConnector::executeSql(connection = connection, sql)
         }
-
-        ParallelLogger::logInfo("Subsetting and sampling cohorts")
-        sql <- SqlRender::loadRenderTranslateSql(
-          sqlFilename = sqlFileName,
-          packageName = "PheValuator",
-          dbms = connectionDetails$dbms,
-          cdm_database_schema = cdmDatabaseSchema,
-          cohort_database_schema = cohortDatabaseSchema,
-          cohort_database_table = cohortTable,
-          x_spec_cohort = xSpecCohortId,
-          daysFromxSpec = daysFromxSpec,
-          work_database_schema = workDatabaseSchema,
-          test_cohort = testCohort,
-          exclCohort = xSensCohortId,
-          ageLimit = lowerAgeLimit,
-          upperAgeLimit = upperAgeLimit,
-          gender = gender,
-          race = race,
-          ethnicity = ethnicity,
-          startDate = startDate,
-          endDate = endDate,
-          baseSampleSize = format(baseSampleSize, scientific = FALSE),
-          xSpecSampleSize = xspecSize,
-          mainPopnCohort = modelPopulationCohortId,
-          mainPopnCohortStartDay = modelPopulationCohortIdStartDay,
-          mainPopnCohortEndDay = modelPopulationCohortIdEndDay,
-          visitLength = visitLength,
-          visitType = c(visitType),
-          firstCut = firstCut
-        )
-        DatabaseConnector::executeSql(connection = connection, sql)
 
         ParallelLogger::logInfo("Getting data for prediction model from server")
         databaseDetails <- PatientLevelPrediction::createDatabaseDetails(

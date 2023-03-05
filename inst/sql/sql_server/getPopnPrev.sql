@@ -24,9 +24,9 @@ select p.person_id, p.gender_concept_id, p.race_concept_id, p.ethnicity_concept_
         from @cdm_database_schema.person p
         join @cdm_database_schema.observation_period o
           on p.person_id = o.person_id
-{@mainPopnCohort != 0} ? {join @cohort_database_schema.@cohort_database_table co
-                  on p.person_id = co.subject_id
-                    and cohort_definition_id = @mainPopnCohort}
+--{@mainPopnCohort != 0} ? {join @cohort_database_schema.@cohort_database_table co
+--                  on p.person_id = co.subject_id
+--                    and cohort_definition_id = @mainPopnCohort}
         group by p.person_id, p.gender_concept_id, p.race_concept_id, p.ethnicity_concept_id, p.year_of_birth
 ),
 midYear as ( --get the middle year of the cohort - will only include subjects in population who were observed during mid-year
