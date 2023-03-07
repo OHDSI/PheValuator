@@ -1,4 +1,4 @@
-PheValuator 2.2.2.2
+PheValuator 2.2.2
 =================
 
 Changes:
