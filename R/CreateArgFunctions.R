@@ -64,7 +64,8 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              prevalenceCohortId,
                                              xSpecCohortSize = 5000,
                                              covariateSettings = createDefaultCovariateSettings(
-                                               excludedCovariateConceptIds = c(),
+                                               excludedPreIndexCovariateConceptIds = c(),
+                                               excludedPostIndexCovariateConceptIds = c(),
                                                addDescendantsToExclude = TRUE
                                              ),
                                              modelPopulationCohortId = 0,

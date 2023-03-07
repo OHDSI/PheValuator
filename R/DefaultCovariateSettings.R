@@ -22,9 +22,12 @@
 #' @details
 #' Function to create the default covariate settings for acute or chronic diseases
 #'
-#' @param excludedCovariateConceptIds   A list of conceptIds to exclude from featureExtraction.  These
+#' @param excludedPreIndexCovariateConceptIds   A list of conceptIds to exclude from featureExtraction for windows prior to index.  These
 #'                                      should include all concept_ids that were used to define the
-#'                                      xSpec model (default=NULL)
+#'                                      xSpec model prior to index (default=NULL)
+#' @param excludedPostIndexCovariateConceptIds   A list of conceptIds to exclude from featureExtraction for windows after index.  These
+#'                                      should include all concept_ids that were used to define the
+#'                                      xSpec model after index (default=NULL)
 #' @param includedCovariateIds          A list of covariate IDs that should be restricted to.
 #' @param includedCovariateConceptIds   A list of covariate concept IDs that should be restricted to.
 #' @param addDescendantsToExclude       Should descendants of excluded concepts also be excluded?
@@ -37,7 +40,8 @@
 #' @param endDayWindow3                The day to end time window 3 for feature extraction #'
 #'
 #' @export
-createDefaultCovariateSettings <- function(excludedCovariateConceptIds = c(),
+createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds = c(),
+                                           excludedPostIndexCovariateConceptIds = c(),
                                            includedCovariateIds = c(),
                                            includedCovariateConceptIds = c(),
                                            addDescendantsToExclude = FALSE,
@@ -47,6 +51,12 @@ createDefaultCovariateSettings <- function(excludedCovariateConceptIds = c(),
                                            endDayWindow2 = NULL,
                                            startDayWindow3 = NULL,
                                            endDayWindow3 = NULL) {
+
+  if(startDayWindow1 < 0) { #set the correct excluded covariates depending if the start window is before or after 0
+    excludedCovariateConceptIds <- excludedPreIndexCovariateConceptIds
+  } else {
+    excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
+  }
   covariateSettings1 <- FeatureExtraction::createCovariateSettings(
     useDemographicsGender = TRUE,
     useDemographicsAgeGroup = TRUE,
@@ -77,6 +87,11 @@ createDefaultCovariateSettings <- function(excludedCovariateConceptIds = c(),
     includedCovariateIds = c(includedCovariateIds)
   )
 
+  if(!(is.null(startDayWindow2)) & startDayWindow2 < 0) { #set the correct excluded covariates depending if the start window is before or after 0
+    excludedCovariateConceptIds <- excludedPreIndexCovariateConceptIds
+  } else {
+    excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
+  }
   if (!(is.null(startDayWindow2))) {
     covariateSettings2 <- FeatureExtraction::createCovariateSettings(
       useConditionGroupEraShortTerm = TRUE,
@@ -105,6 +120,11 @@ createDefaultCovariateSettings <- function(excludedCovariateConceptIds = c(),
     )
   }
 
+  if(!(is.null(startDayWindow3)) & startDayWindow3 < 0) { #set the correct excluded covariates depending if the start window is before or after 0
+    excludedCovariateConceptIds <- excludedPreIndexCovariateConceptIds
+  } else {
+    excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
+  }
   if (!(is.null(startDayWindow3))) {
     covariateSettings3 <- FeatureExtraction::createCovariateSettings(
       useConditionGroupEraMediumTerm = TRUE,
