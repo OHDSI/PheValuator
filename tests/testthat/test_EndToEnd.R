@@ -14,7 +14,8 @@ test_that("TestPhenotype - test PheValuator end to end", {
   workDatabaseSchema <- "main"
   xSpecCohort <- 1001
   daysFromxSpec <- 0
-  excludedCovariateConceptIds <- c()
+  excludedPreIndexCovariateConceptIds <- c()
+  excludedPostIndexCovariateConceptIds <- c()
   xSensCohort <- 2
   prevalenceCohort <- 2
 
@@ -23,7 +24,8 @@ test_that("TestPhenotype - test PheValuator end to end", {
 
   # Create analysis settings ---------------------------------------------------
   CovSettingsAcute <- createDefaultCovariateSettings(
-    excludedCovariateConceptIds = excludedCovariateConceptIds,
+    excludedPreIndexCovariateConceptIds = excludedPreIndexCovariateConceptIds,
+    excludedPostIndexCovariateConceptIds = excludedPostIndexCovariateConceptIds,
     addDescendantsToExclude = TRUE,
     startDayWindow1 = 0,
     endDayWindow1 = 10,
