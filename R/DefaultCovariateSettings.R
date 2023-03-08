@@ -162,7 +162,7 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
     excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
   }
   if (!(is.null(startDayWindow4))) {
-    covariateSettings4 <- FeatureExtraction::createCovariateSettings(
+    covariateSettings4 <- FeatureExtraction::createTemporalCovariateSettings(
       useConditionEraGroupStart = TRUE,
       useDrugEraGroupStart = TRUE,
       useProcedureOccurrence = TRUE,
@@ -177,8 +177,8 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
       useDistinctMeasurementCount = TRUE,
       useVisitCount = TRUE,
       useVisitConceptCount = TRUE,
-      temporalStartDays = startDayWindow3,
-      temporalEndDays = endDayWindow3,
+      temporalStartDays = startDayWindow4,
+      temporalEndDays = endDayWindow4,
       includedCovariateConceptIds = c(includedCovariateConceptIds),
       addDescendantsToInclude = addDescendantsToExclude,
       excludedCovariateConceptIds = excludedCovariateConceptIds,
