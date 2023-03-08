@@ -156,14 +156,11 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
     )
   }
 
-  # if(!(is.null(startDayWindow4)) & startDayWindow4 < 0) { #set the correct excluded covariates depending if the start window is before or after 0
-  #   excludedCovariateConceptIds <- excludedPreIndexCovariateConceptIds
-  # } else {
-  #   excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
-  # }
-
-  excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
-
+  if(!(is.null(startDayWindow4)) & startDayWindow4 < 0) { #set the correct excluded covariates depending if the start window is before or after 0
+    excludedCovariateConceptIds <- excludedPreIndexCovariateConceptIds
+  } else {
+    excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
+  }
 
   if (!(is.null(startDayWindow4))) {
     covariateSettings4 <- FeatureExtraction::createTemporalCovariateSettings(
