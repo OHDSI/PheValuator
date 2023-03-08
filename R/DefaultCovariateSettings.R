@@ -156,11 +156,15 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
     )
   }
 
-  if(!(is.null(startDayWindow4)) & startDayWindow4 < 0) { #set the correct excluded covariates depending if the start window is before or after 0
-    excludedCovariateConceptIds <- excludedPreIndexCovariateConceptIds
-  } else {
-    excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
-  }
+  # if(!(is.null(startDayWindow4)) & startDayWindow4 < 0) { #set the correct excluded covariates depending if the start window is before or after 0
+  #   excludedCovariateConceptIds <- excludedPreIndexCovariateConceptIds
+  # } else {
+  #   excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
+  # }
+
+  excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
+
+
   if (!(is.null(startDayWindow4))) {
     covariateSettings4 <- FeatureExtraction::createTemporalCovariateSettings(
       useConditionEraGroupStart = TRUE,
@@ -177,8 +181,8 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
       useDistinctMeasurementCount = TRUE,
       useVisitCount = TRUE,
       useVisitConceptCount = TRUE,
-      temporalStartDays = c(startDayWindow4),
-      temporalEndDays = c(endDayWindow4),
+      temporalStartDays = startDayWindow4,
+      temporalEndDays = endDayWindow4,
       includedCovariateConceptIds = c(includedCovariateConceptIds),
       addDescendantsToInclude = addDescendantsToExclude,
       excludedCovariateConceptIds = excludedCovariateConceptIds,
@@ -201,7 +205,6 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
 
   if (!(is.null(startDayWindow4))) {
     covariateSettings <- list(covariateSettings1, covariateSettings2, covariateSettings3, covariateSettings4)
-    covariateSettings <- list(covariateSettings4)
   }
 
   return(covariateSettings)
