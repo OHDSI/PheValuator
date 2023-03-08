@@ -169,8 +169,8 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
       useDistinctMeasurementCount = TRUE,
       useVisitCount = TRUE,
       useVisitConceptCount = TRUE,
-      temporalStartDays = c(startDayWindow4, 9999),
-      temporalEndDays = c(endDayWindow4, 9999),
+      temporalStartDays = c(startDayWindow1, startDayWindow2, startDayWindow3, startDayWindow4),
+      temporalEndDays = c(endDayWindow1, endDayWindow2, endDayWindow3, endDayWindow4),
       includedCovariateConceptIds = c(includedCovariateConceptIds),
       addDescendantsToInclude = addDescendantsToExclude,
       excludedCovariateConceptIds = excludedCovariateConceptIds,
@@ -193,6 +193,7 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
 
   if (!(is.null(startDayWindow4))) {
     covariateSettings <- list(covariateSettings4, covariateSettings1, covariateSettings2, covariateSettings3)
+    covariateSettings <- list(covariateSettings4)
   }
 
   return(covariateSettings)
