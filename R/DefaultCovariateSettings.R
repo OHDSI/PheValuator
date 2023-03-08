@@ -205,7 +205,6 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
 
   if (!(is.null(startDayWindow4))) {
     covariateSettings <- list(covariateSettings1, covariateSettings2, covariateSettings3, covariateSettings4)
-    covariateSettings <- list(covariateSettings4)
   }
 
   return(covariateSettings)
