@@ -37,7 +37,9 @@
 #' @param startDayWindow2              The day to start time window 2 for feature extraction
 #' @param endDayWindow2                The day to end time window 2 for feature extraction
 #' @param startDayWindow3              The day to start time window 3 for feature extraction
-#' @param endDayWindow3                The day to end time window 3 for feature extraction #'
+#' @param endDayWindow3                The day to end time window 3 for feature extraction
+#' @param startDayWindow4              The day to start time window 4 for feature extraction
+#' @param endDayWindow4                The day to end time window 4 for feature extraction
 #'
 #' @export
 createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds = c(),
@@ -50,7 +52,9 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
                                            startDayWindow2 = NULL,
                                            endDayWindow2 = NULL,
                                            startDayWindow3 = NULL,
-                                           endDayWindow3 = NULL) {
+                                           endDayWindow3 = NULL,
+                                           startDayWindow4 = NULL,
+                                           endDayWindow4 = NULL) {
 
   if(startDayWindow1 < 0) { #set the correct excluded covariates depending if the start window is before or after 0
     excludedCovariateConceptIds <- excludedPreIndexCovariateConceptIds
@@ -152,6 +156,37 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
     )
   }
 
+  if(!(is.null(startDayWindow4)) & startDayWindow4 < 0) { #set the correct excluded covariates depending if the start window is before or after 0
+    excludedCovariateConceptIds <- excludedPreIndexCovariateConceptIds
+  } else {
+    excludedCovariateConceptIds <- excludedPostIndexCovariateConceptIds
+  }
+  if (!(is.null(startDayWindow4))) {
+    covariateSettings4 <- FeatureExtraction::createCovariateSettings(
+      useConditionEraGroupStart = TRUE,
+      useDrugEraGroupStart = TRUE,
+      useProcedureOccurrence = TRUE,
+      useDeviceExposure = TRUE,
+      useMeasurement = TRUE,
+      useMeasurementValue = TRUE,
+      useMeasurementRangeGroup = TRUE,
+      useObservation = TRUE,
+      useDistinctCondition = TRUE,
+      useDistinctIngredient = TRUE,
+      useDistinctProcedure = TRUE,
+      useDistinctMeasurementCount = TRUE,
+      useVisitCount = TRUE,
+      useVisitConceptCount = TRUE,
+      temporalStartDays = startDayWindow3,
+      temporalEndDays = endDayWindow3,
+      includedCovariateConceptIds = c(includedCovariateConceptIds),
+      addDescendantsToInclude = addDescendantsToExclude,
+      excludedCovariateConceptIds = excludedCovariateConceptIds,
+      addDescendantsToExclude = addDescendantsToExclude,
+      includedCovariateIds = c(includedCovariateIds)
+    )
+  }
+
   if (is.null(startDayWindow1)) {
     stop("The first time window must not be null")
   } else if (is.null(startDayWindow2) & is.null(startDayWindow3)) {
@@ -162,6 +197,10 @@ createDefaultCovariateSettings <- function(excludedPreIndexCovariateConceptIds =
     covariateSettings <- list(covariateSettings1, covariateSettings3)
   } else {
     covariateSettings <- list(covariateSettings1, covariateSettings2, covariateSettings3)
+  }
+
+  if (!(is.null(startDayWindow4))) {
+    covariateSettings <- c(covariateSettings4, list(covariateSettings))
   }
 
   return(covariateSettings)

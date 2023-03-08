@@ -5,7 +5,8 @@
 \title{Create the default covariate settings}
 \usage{
 createDefaultCovariateSettings(
-  excludedCovariateConceptIds = c(),
+  excludedPreIndexCovariateConceptIds = c(),
+  excludedPostIndexCovariateConceptIds = c(),
   includedCovariateIds = c(),
   includedCovariateConceptIds = c(),
   addDescendantsToExclude = FALSE,
@@ -18,9 +19,13 @@ createDefaultCovariateSettings(
 )
 }
 \arguments{
-\item{excludedCovariateConceptIds}{A list of conceptIds to exclude from featureExtraction.  These
+\item{excludedPreIndexCovariateConceptIds}{A list of conceptIds to exclude from featureExtraction for windows prior to index.  These
 should include all concept_ids that were used to define the
-xSpec model (default=NULL)}
+xSpec model prior to index (default=NULL)}
+
+\item{excludedPostIndexCovariateConceptIds}{A list of conceptIds to exclude from featureExtraction for windows after index.  These
+should include all concept_ids that were used to define the
+xSpec model after index (default=NULL)}
 
 \item{includedCovariateIds}{A list of covariate IDs that should be restricted to.}
 

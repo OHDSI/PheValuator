@@ -10,8 +10,8 @@ createCreateEvaluationCohortArgs(
   xSensCohortId,
   prevalenceCohortId,
   xSpecCohortSize = 5000,
-  covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
-    addDescendantsToExclude = TRUE),
+  covariateSettings = createDefaultCovariateSettings(excludedPreIndexCovariateConceptIds
+    = c(), excludedPostIndexCovariateConceptIds = c(), addDescendantsToExclude = TRUE),
   modelPopulationCohortId = 0,
   modelPopulationCohortIdStartDay = 0,
   modelPopulationCohortIdEndDay = 0,
