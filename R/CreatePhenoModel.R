@@ -198,7 +198,7 @@
           sqlFileName <- "CreateCohortsAcuteModel.sql"
 
           if(daysFromxSpec != 0) {
-            ParallelLogger::logInfo("Tranforming xSpec cohort using daysFromxSpec parameter")
+            ParallelLogger::logInfo("Transforming xSpec cohort using daysFromxSpec parameter")
           } else {
             ParallelLogger::logInfo("Using xSpec cohort verbatim (daysFromxSpec = 0)")
           }
