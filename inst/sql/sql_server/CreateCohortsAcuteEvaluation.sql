@@ -24,6 +24,8 @@
 {DEFAULT @exclCohort = 0 }
 {DEFAULT @visitLength = 0 }
 {DEFAULT @visitType = c(9201) }
+{DEFAULT @minimumOffsetFromStart = 365}
+{DEFAULT @minimumOffsetFromEnd = 365}
 
 DROP TABLE IF EXISTS #finalCohort;
 
@@ -46,8 +48,8 @@ select distinct v.person_id, first_value(visit_start_date)
 from @cdm_database_schema.visit_occurrence v
 join @cdm_database_schema.observation_period o
   on v.person_id = o.person_id
-    and v.visit_start_date >= o.observation_period_start_date
-    and dateadd(d, 365, v.visit_start_date) <= o.observation_period_end_date
+    AND v.visit_start_date >= dateadd(d, @minimumOffsetFromStart, o.observation_period_start_date)
+    and dateadd(d, @minimumOffsetFromEnd, v.visit_start_date) <= o.observation_period_end_date
 {@inclusionEvaluationCohortId != 0} ? { --visits must be within designated period from inclusion evaluation cohort if specified
 join @cohort_database_schema.@cohort_database_table co
   on co.cohort_definition_id = @inclusionEvaluationCohortId
@@ -152,9 +154,9 @@ from (select co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (P
 		  from @cdm_database_schema.observation_period
 		  group by person_id) obs2
 		  on v.person_id = obs2.person_id
-			and v.visit_start_date >= obs2.observation_period_start_date
-			and v.visit_start_date <= obs2.observation_period_end_date
-			and lenPd >= 730
+			AND v.visit_start_date >= dateadd(d, @minimumOffsetFromStart, obs2.observation_period_start_date)
+			and dateadd(d, @minimumOffsetFromEnd, v.visit_start_date) <= obs2.observation_period_end_date
+			--and lenPd >= 730
 			and cntPd = 1
 				join @cdm_database_schema.person p
 				  on co.subject_id = p.person_id
@@ -180,7 +182,7 @@ union --add in some xSpec subjects due to PLP constraint - will be ignored in an
   from #cohort_person cp
   join @cdm_database_schema.observation_period o
 	on cp.SUBJECT_ID = o.person_id
-	  and cp.COHORT_START_DATE >= o.observation_period_start_date
+	  AND cp.COHORT_START_DATE >= dateadd(d, @minimumOffsetFromStart, o.observation_period_start_date)
 	  and cp.COHORT_START_DATE <= o.observation_period_end_date
   where rn <= @xSpecSampleSize
   union
@@ -189,8 +191,8 @@ union --add in some xSpec subjects due to PLP constraint - will be ignored in an
   from #cohort_person cp
   join @cdm_database_schema.observation_period o
 	on cp.SUBJECT_ID = o.person_id
-	  and cp.COHORT_START_DATE >= o.observation_period_start_date
-	  and cp.COHORT_START_DATE <= o.observation_period_end_date
+	  AND cp.COHORT_START_DATE >= dateadd(d, @minimumOffsetFromStart, o.observation_period_start_date)
+	  and dateadd(d, @minimumOffsetFromEnd, cp.COHORT_START_DATE) <= o.observation_period_end_date
   where rn <= @xSpecSampleSize
   ;
 

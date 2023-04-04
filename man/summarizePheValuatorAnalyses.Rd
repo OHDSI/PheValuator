@@ -12,7 +12,7 @@ summarizePheValuatorAnalyses(referenceTable, outputFolder)
 \item{outputFolder}{The output folder used when calling \code{\link{runPheValuatorAnalyses}}.}
 }
 \value{
-A data frame of resuts.
+A data frame of results.
 }
 \description{
 Summarize results of PheValuator analyses

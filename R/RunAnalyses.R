@@ -40,6 +40,7 @@
 #' @param workDatabaseSchema             The name of the database schema that is the location where
 #'                                       a table can be created and afterwards removed.
 #'                                       Requires write permissions to this database.
+#' @param databaseId                     Name of the database in the analysis
 #' @param cdmVersion                     Define the OMOP CDM version used: currently supports "5".
 #' @param outputFolder                   Name of the folder where all the outputs will be written to.
 #' @param pheValuatorAnalysisList        A list of objects of type \code{pheValuatorAnalysis} as created using
@@ -50,13 +51,15 @@
 #' in the local file system.
 #'
 #' @export
-runPheValuatorAnalyses <- function(connectionDetails,
+runPheValuatorAnalyses <- function(phenotype,
+                                   connectionDetails,
                                    oracleTempSchema = NULL,
                                    tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
                                    cdmDatabaseSchema,
                                    cohortDatabaseSchema = cdmDatabaseSchema,
                                    cohortTable = "cohort",
                                    workDatabaseSchema = cdmDatabaseSchema,
+                                   databaseId = cdmDatabaseSchema,
                                    cdmVersion = 5,
                                    outputFolder,
                                    pheValuatorAnalysisList) {
@@ -67,6 +70,10 @@ runPheValuatorAnalyses <- function(connectionDetails,
   if (!file.exists(outputFolder)) {
     dir.create(outputFolder, recursive = TRUE)
   }
+
+  #create export folder for csv output
+  exportFolder <- file.path(outputFolder, "exportFolder")
+  dir.create(exportFolder, showWarnings = FALSE)
 
   referenceTable <- createReferenceTable(pheValuatorAnalysisList)
   saveRDS(referenceTable, file.path(outputFolder, "reference.rds"))
@@ -79,6 +86,8 @@ runPheValuatorAnalyses <- function(connectionDetails,
     analysisId <- referenceTable$analysisId[referenceTable$evaluationCohortFolder == evaluationCohortFolder][1]
     matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
     args <- matched[[1]]$createEvaluationCohortArgs
+    args$phenotype <- phenotype
+    args$databaseId <- databaseId
     args$connectionDetails <- connectionDetails
     args$cdmDatabaseSchema <- cdmDatabaseSchema
     args$tempEmulationSchema <- getOption("sqlRenderTempEmulationSchema")
@@ -87,6 +96,7 @@ runPheValuatorAnalyses <- function(connectionDetails,
     args$workDatabaseSchema <- workDatabaseSchema
     args$cdmVersion <- cdmVersion
     args$outFolder <- file.path(outputFolder, evaluationCohortFolder)
+    args$exportFolder <- exportFolder
     task <- list(args = args)
     return(task)
   }
@@ -102,6 +112,8 @@ runPheValuatorAnalyses <- function(connectionDetails,
       analysisId <- referenceTable$analysisId[referenceTable$resultsFile == resultsFile]
       matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
       args <- matched[[1]]$testPhenotypeAlgorithmArgs
+      args$phenotype <- phenotype
+      args$databaseId <- databaseId
       args$connectionDetails <- connectionDetails
       args$cdmDatabaseSchema <- cdmDatabaseSchema
       args$cohortDatabaseSchema <- cohortDatabaseSchema
@@ -110,6 +122,7 @@ runPheValuatorAnalyses <- function(connectionDetails,
         outputFolder,
         referenceTable$evaluationCohortFolder[referenceTable$analysisId == analysisId]
       )
+      args$exportFolder <- exportFolder
       task <- list(
         args = args,
         fileName = file.path(outputFolder, resultsFile)
@@ -119,7 +132,15 @@ runPheValuatorAnalyses <- function(connectionDetails,
     tasks <- lapply(resultsFiles, createEvalTask)
     lapply(tasks, doTestPhenotypeAlgorithm)
   }
+
+  ParallelLogger::logInfo("Saving phenotype algorithm evaluation results to ", exportFolder)
+
+  output <- data.frame(summarizePheValuatorAnalyses(referenceTable, outputFolder))
+
+  write.csv(output, file.path(exportFolder, "pv_algorithm_performance_results.csv"), row.names = FALSE)
+
   invisible(referenceTable)
+
 }
 
 doCreateEvaluationCohort <- function(task) {
@@ -155,7 +176,7 @@ createReferenceTable <- function(pheValuatorAnalysisList) {
 #' @param outputFolder    The output folder used when calling \code{\link{runPheValuatorAnalyses}}.
 #'
 #' @return
-#' A data frame of resuts.
+#' A data frame of results.
 #'
 #' @export
 summarizePheValuatorAnalyses <- function(referenceTable, outputFolder) {

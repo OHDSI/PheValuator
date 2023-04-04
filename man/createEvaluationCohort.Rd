@@ -8,6 +8,8 @@ createEvaluationCohort(
   connectionDetails,
   oracleTempSchema = NULL,
   tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
+  phenotype,
+  databaseId,
   xSpecCohortId,
   daysFromxSpec = 0,
   xSensCohortId,
@@ -28,7 +30,9 @@ createEvaluationCohort(
   exclusionEvaluationCohortId = 0,
   exclusionEvaluationDaysFromStart = 0,
   exclusionEvaluationDaysFromEnd = 0,
-  modelBaseSampleSize = 15000,
+  minimumOffsetFromStart = 365,
+  minimumOffsetFromEnd = 365,
+  modelBaseSampleSize = 25000,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
@@ -42,6 +46,7 @@ createEvaluationCohort(
   falsePositiveNegativeSubjects = 10,
   cdmVersion = "5",
   outFolder = getwd(),
+  exportFolder,
   modelId = "main",
   evaluationCohortId = "main",
   excludeModelFromEvaluation = FALSE,
@@ -59,10 +64,14 @@ createConnectionDetails in the DatabaseConnector package.}
 emulate temp tables, provide a schema with write privileges where temp tables
 can be created.}
 
+\item{phenotype}{Name of the phenotype for analysis}
+
+\item{databaseId}{Name of the database in the analysis}
+
 \item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort
 definition id in the cohort table (for noisy positives).}
 
-\item{daysFromxSpec}{Number of days from xSpec condition until analyzed visit}
+\item{daysFromxSpec}{Number of days allowed from xSpec condition until analyzed visit}
 
 \item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort
 definition id in the cohort table (for noisy negatives).}
@@ -121,6 +130,10 @@ to start ineligible included visits}
 \item{exclusionEvaluationDaysFromEnd}{The number of days from the cohort end date of the exclusionEvaluationCohortId
 to end ineligible included visits}
 
+\item{minimumOffsetFromStart}{Minimum number of days to offset for the analysis visit from the start of the observation period}
+
+\item{minimumOffsetFromEnd}{Minimum number of days to offset for the analysis visit from the end of the observation period}
+
 \item{modelBaseSampleSize}{The number of non-xSpec subjects to include in the model}
 
 \item{baseSampleSize}{The maximum number of subjects in the evaluation cohort.}
@@ -148,6 +161,8 @@ to end ineligible included visits}
 \item{cdmVersion}{The CDM version of the database.}
 
 \item{outFolder}{The folder where the output files will be written.}
+
+\item{exportFolder}{The folder where the csv output files will be written.}
 
 \item{modelId}{A string used to generate the file names for this model.}
 

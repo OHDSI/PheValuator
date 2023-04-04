@@ -15,6 +15,8 @@
 # limitations under the License.
 
 .createEvaluationCohort <- function(connectionDetails,
+                                    phenotype,
+                                    databaseId,
                                     xSpecCohortId,
                                     xSensCohortId,
                                     prevalenceCohortId,
@@ -30,6 +32,8 @@
                                     exclusionEvaluationCohortId = 0,
                                     exclusionEvaluationDaysFromStart = 0,
                                     exclusionEvaluationDaysFromEnd = 0,
+                                    minimumOffsetFromStart,
+                                    minimumOffsetFromEnd,
                                     baseSampleSize = 2e+06,
                                     lowerAgeLimit = 0,
                                     upperAgeLimit = 120,
@@ -43,6 +47,7 @@
                                     falsePositiveNegativeSubjects = 10,
                                     cdmVersion = "5",
                                     outFolder = getwd(),
+                                    exportFolder,
                                     modelId = "main",
                                     evaluationCohortId = "main",
                                     excludeModelFromEvaluation = FALSE,
@@ -163,6 +168,8 @@
         exclusionEvaluationCohortId = exclusionEvaluationCohortId,
         exclusionEvaluationDaysFromStart = exclusionEvaluationDaysFromStart,
         exclusionEvaluationDaysFromEnd = exclusionEvaluationDaysFromEnd,
+        minimumOffsetFromStart = minimumOffsetFromStart,
+        minimumOffsetFromEnd = minimumOffsetFromEnd,
         visitLength = visitLength,
         visitType = c(visitType)
       )
@@ -311,7 +318,7 @@
 
     pred <- appResults$prediction
 
-    # pull in the xSens cohort
+    # pull in the prevalence cohort to mark the cases
     sql <- SqlRender::loadRenderTranslateSql("GetComparisonCohort.sql",
                                              packageName = "PheValuator",
                                              dbms = connectionDetails$dbms,
@@ -370,7 +377,34 @@
       ParallelLogger::logInfo("No test cases found")
     }
 
+
+    # save the full data set to the model
+    appResults$prediction <- finalPopn
+
+    #create diagnostics to later assess analysis performance
+    count30And70pct <- round(sum(appResults$prediction$value[appResults$prediction$value >= 0.3 & appResults$prediction$value <= 0.7 &
+                                                               appResults$prediction$outcomeCount == 0]), 0)
+    prop30And70pct <- round(count30And70pct/sum(appResults$prediction$value), 3)
+
+    count0And1pct <- round(sum(appResults$prediction$value[appResults$prediction$value >= 0 & appResults$prediction$value <= 0.01 &
+                                                             appResults$prediction$outcomeCount == 0]), 0)
+    prop0And1pct <- round(count0And1pct/sum(appResults$prediction$value), 3)
+
+    countGT80pct <- round(sum(appResults$prediction$value[appResults$prediction$value >= 0.8 &
+                                                            appResults$prediction$outcomeCount == 0]), 0)
+    propGT80pct <- round(countGT80pct/sum(appResults$prediction$value), 3)
+
+    predictionCases <- appResults$prediction[appResults$prediction$outcomeCount == 0 & !(is.na(appResults$prediction$comparisonCohortStartDate)),]
+    predictionNonCases <- appResults$prediction[appResults$prediction$outcomeCount == 0 & (is.na(appResults$prediction$comparisonCohortStartDate)),]
+
+    Noncases <- round(sum(predictionNonCases$value), 0)
+    cases <- round(sum(predictionCases$value), 0)
+
     # add other parameters to the input settings list
+    runDateTime <- format(Sys.time(), "%b %d %Y %X")
+    appResults$PheValuator$inputSetting$phenotype <- phenotype
+    appResults$PheValuator$inputSetting$databaseId <- databaseId
+    appResults$PheValuator$inputSetting$runDateTime <- runDateTime
     appResults$PheValuator$inputSetting$startDays <- covariateSettings[[1]]$longTermStartDays
     appResults$PheValuator$inputSetting$endDays <- covariateSettings[[1]]$endDays
     appResults$PheValuator$inputSetting$visitLength <- visitLength
@@ -391,6 +425,18 @@
     appResults$PheValuator$inputSetting$exclusionEvaluationDaysFromEnd <- exclusionEvaluationDaysFromEnd
     appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
 
+    appResults$PheValuator$diagnostics$Noncases <- Noncases
+    appResults$PheValuator$diagnostics$cases <- cases
+
+    appResults$PheValuator$diagnostics$count30And70pct <- count30And70pct
+    appResults$PheValuator$diagnostics$prop30And70pct <- prop30And70pct
+
+    appResults$PheValuator$diagnostics$count0And1pct <- count0And1pct
+    appResults$PheValuator$diagnostics$prop0And1pct <- prop0And1pct
+
+    appResults$PheValuator$diagnostics$countGT80pct <- countGT80pct
+    appResults$PheValuator$diagnostics$propGT80pct <- propGT80pct
+
     appResults$PheValuator$modelperformanceEvaluation <- lrResults$performanceEvaluation
 
     if(nrow(fullTestCases) > 0) { #no test cases found
@@ -401,11 +447,39 @@
       appResults$PheValuator$testCaseCovariates <- NULL
     }
 
-    # save the full data set to the model
-    appResults$prediction <- finalPopn
-
     ParallelLogger::logInfo("Saving evaluation cohort to: ", evaluationCohortFileName)
     saveRDS(appResults, evaluationCohortFileName)
+
+    ParallelLogger::logInfo("Saving evaluation results to ", exportFolder)
+
+    df <- NULL
+    df$phenotype <- phenotype
+    df$databaseId <- databaseId
+    df$inputSetting$runDateTime <- runDateTime
+    df <- cbind(df, data.frame(appResults$PheValuator$inputSetting))
+    write.csv(df, file.path(exportFolder, "pv_evaluation_input_parameters.csv"), row.names = FALSE)
+
+    df <- NULL
+    df$phenotype <- phenotype
+    df$databaseId <- databaseId
+    df$inputSetting$runDateTime <- runDateTime
+    df <- cbind(df, data.frame(appResults$PheValuator$testCases[,c(1,4,5,7:9,14:16)]))
+    write.csv(df, file.path(exportFolder, "pv_test_subjects.csv"), row.names = FALSE)
+
+    df <- NULL
+    df$phenotype <- phenotype
+    df$databaseId <- databaseId
+    df$inputSetting$runDateTime <- runDateTime
+    df <- cbind(df, data.frame(appResults$PheValuator$testCaseCovariates))
+    write.csv(df, file.path(exportFolder, "pv_test_subjects_covariates.csv"), row.names = FALSE)
+
+    df <- NULL
+    df$phenotype <- phenotype
+    df$databaseId <- databaseId
+    df$inputSetting$runDateTime <- runDateTime
+    df <- cbind(df, data.frame(appResults$PheValuator$diagnostics))
+    write.csv(df, file.path(exportFolder, "pv_diagnostics.csv"), row.names = FALSE)
+
 
     # remove temp cohort table
     sql <- SqlRender::loadRenderTranslateSql(

@@ -21,7 +21,9 @@ createCreateEvaluationCohortArgs(
   exclusionEvaluationCohortId = 0,
   exclusionEvaluationDaysFromStart = 0,
   exclusionEvaluationDaysFromEnd = 0,
-  modelBaseSampleSize = 15000,
+  minimumOffsetFromStart = 365,
+  minimumOffsetFromEnd = 365,
+  modelBaseSampleSize = 25000,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
@@ -86,6 +88,10 @@ to start ineligible included visits}
 
 \item{exclusionEvaluationDaysFromEnd}{The number of days from the cohort end date of the exclusionEvaluationCohortId
 to end ineligible included visits}
+
+\item{minimumOffsetFromStart}{Minimum number of days to offset for the analysis visit from the start of the observation period}
+
+\item{minimumOffsetFromEnd}{Minimum number of days to offset for the analysis visit from the end of the observation period}
 
 \item{modelBaseSampleSize}{The number of non-xSpec subjects to include in the model}
 

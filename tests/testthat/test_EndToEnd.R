@@ -70,6 +70,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
   pheValuatorAnalysisList <- loadPheValuatorAnalysisList(file.path(folder, "pheValuatorAnalysisSettings.json"))
 
   referenceTable <- runPheValuatorAnalyses(
+    phenotype = "any condition",
     connectionDetails = connectionDetails,
     cdmDatabaseSchema = cdmDatabaseSchema,
     cohortDatabaseSchema = cohortDatabaseSchema,

@@ -15,6 +15,8 @@
 # limitations under the License.
 
 .createPhenotypeModel <- function(connectionDetails,
+                                  phenotype,
+                                  databaseId,
                                   cdmDatabaseSchema,
                                   cohortDatabaseSchema,
                                   cohortTable,
@@ -29,6 +31,8 @@
                                   modelPopulationCohortId = 0,
                                   modelPopulationCohortIdStartDay = 0,
                                   modelPopulationCohortIdEndDay = 0,
+                                  minimumOffsetFromStart = 365,
+                                  minimumOffsetFromEnd = 365,
                                   modelBaseSampleSize = 15000,
                                   lowerAgeLimit = 0,
                                   upperAgeLimit = 120,
@@ -42,6 +46,7 @@
                                   removeSubjectsWithFutureDates = TRUE,
                                   cdmVersion = "5",
                                   outFolder = getwd(),
+                                  exportFolder,
                                   modelId = "main") {
 
   connection <- DatabaseConnector::connect(connectionDetails)
@@ -75,7 +80,7 @@
 
     xSpecCount <- as.numeric(DatabaseConnector::querySql(connection = connection, sql = sql))
 
-    if (xSpecCount < 200) {
+    if (xSpecCount < 100) { #set to 100 as minimum
       ParallelLogger::logInfo("Too few subjects in xSpec to produce model. (Outcome count = ", xSpecCount, ")")
       ParallelLogger::logInfo("Saving null model summary to ", modelFileName)
       lrResults <- NULL
@@ -228,6 +233,8 @@
             mainPopnCohort = modelPopulationCohortId,
             mainPopnCohortStartDay = modelPopulationCohortIdStartDay,
             mainPopnCohortEndDay = modelPopulationCohortIdEndDay,
+            minimumOffsetFromStart = minimumOffsetFromStart,
+            minimumOffsetFromEnd = minimumOffsetFromEnd,
             visitLength = visitLength,
             visitType = c(visitType),
             firstCut = firstCut
@@ -308,7 +315,7 @@
       )
 
       # test population file to see if the model process can proceed - based on population counts
-      if (sum(population$outcomeCount) < 200) { # too few outcomes to produce viable model
+      if (sum(population$outcomeCount) < 100) { # too few outcomes to produce viable model
         ParallelLogger::logInfo("Too few outcomes to produce model. (Outcome count = ", sum(population$outcomeCount), ")")
         ParallelLogger::logInfo("Saving null model summary to ", modelFileName)
         lrResults <- NULL
@@ -359,32 +366,93 @@
             modelYIntercept <- lrResults$model$model$coefficients$betas[1]
             delta <- log(prevToUseOdds) - log(popPrevOdds)
             yIntercept <- as.numeric(lrResults$model$model$coefficients$betas[1])
+
+            #save analysis parameters
+            runDateTime <- format(Sys.time(), "%b %d %Y %X")
             lrResults$model$model$coefficients$betas[1] <- as.numeric(yIntercept - delta) # Equation (7) in King and Zeng (2001)
 
+            lrResults$PheValuator$inputSetting$phenotype <- phenotype
+            lrResults$PheValuator$inputSetting$databaseId <- databaseId
+            lrResults$PheValuator$inputSetting$runDateTime <- runDateTime
             lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
+            lrResults$PheValuator$inputSetting$daysFromxSpec <- daysFromxSpec
+            lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
+
             lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
             lrResults$PheValuator$inputSetting$prevalenceCohortId <- prevalenceCohortId
             lrResults$PheValuator$inputSetting$modelPopulationCohortId <- modelPopulationCohortId
+            lrResults$PheValuator$inputSetting$modelPopulationCohortIdStartDay = modelPopulationCohortIdStartDay
+            lrResults$PheValuator$inputSetting$modelPopulationCohortIdEndDay = modelPopulationCohortIdEndDay
+            lrResults$PheValuator$inputSetting$minimumOffsetFromStart = minimumOffsetFromStart
+            lrResults$PheValuator$inputSetting$minimumOffsetFromEnd = minimumOffsetFromEnd
             lrResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
             lrResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
-            lrResults$PheValuator$inputSetting$startDays <- covariateSettings$longTermStartDays
-            lrResults$PheValuator$inputSetting$endDays <- covariateSettings$endDays
+
+            lrResults$PheValuator$inputSetting$startDayWindow1 <- covariateSettings[[1]]$longTermStartDays
+            lrResults$PheValuator$inputSetting$endDayWindow1 <- covariateSettings[[1]]$endDays
+
+            if(length(covariateSettings) > 1) {
+              lrResults$PheValuator$inputSetting$startDayWindow2 <- covariateSettings[[2]]$shortTermStartDays
+              lrResults$PheValuator$inputSetting$endDayWindow2 <- covariateSettings[[2]]$endDays
+            } else {
+              lrResults$PheValuator$inputSetting$startDayWindow2 <- NULL
+              lrResults$PheValuator$inputSetting$endDayWindow2 <- NULL
+            }
+
+            if(length(covariateSettings) > 2) {
+              lrResults$PheValuator$inputSetting$startDayWindow3 <- covariateSettings[[3]]$mediumTermStartDays
+              lrResults$PheValuator$inputSetting$endDayWindow3 <- covariateSettings[[3]]$endDays
+            } else {
+              lrResults$PheValuator$inputSetting$startDayWindow3 <- NULL
+              lrResults$PheValuator$inputSetting$endDayWindow3 <- NULL
+            }
+
+            lrResults$PheValuator$inputSetting$visitType <- paste(unlist(visitType), collapse = ", ")
             lrResults$PheValuator$inputSetting$visitLength <- visitLength
             lrResults$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse = ", ")
             lrResults$PheValuator$inputSetting$race <- paste(unlist(race), collapse = ", ")
             lrResults$PheValuator$inputSetting$ethnicity <- paste(unlist(ethnicity), collapse = ", ")
             lrResults$PheValuator$inputSetting$startDate <- startDate
             lrResults$PheValuator$inputSetting$endDate <- endDate
+
             lrResults$PheValuator$runTimeValues$truePrevalencePopulation <- popPrev
             lrResults$PheValuator$runTimeValues$prevalenceModel <- prevToUse
             lrResults$PheValuator$runTimeValues$modelYIntercept <- modelYIntercept
-            lrResults$PheValuator$runTimeValues$recalibratedYIntercept <- lrResults$model$model$coefficients[1]
+            lrResults$PheValuator$runTimeValues$recalibratedYIntercept <- lrResults$model$model$coefficients[1,1]
 
             ParallelLogger::logInfo("Saving model summary to ", modelFileName)
             saveRDS(lrResults, modelFileName)
 
             ParallelLogger::logInfo("Saving PLP results to ", plpResultsFileName)
             PatientLevelPrediction::savePlpResult(lrResults, plpResultsFileName)
+
+            ParallelLogger::logInfo("Saving model results to ", exportFolder)
+            write.csv(lrResults$PheValuator$inputSetting, file.path(exportFolder, "pv_model_input_parameters.csv"), row.names = FALSE)
+
+            df <- NULL
+            df$phenotype <- phenotype
+            df$databaseId <- databaseId
+            df$inputSetting$runDateTime <- runDateTime
+            df <- cbind(df, data.frame(lrResults$PheValuator$runTimeValues))
+            write.csv(df, file.path(exportFolder, "pv_model_run_time_values.csv"), row.names = FALSE)
+
+            df <- NULL
+            df$phenotype <- phenotype
+            df$databaseId <- databaseId
+            df$inputSetting$runDateTime <- runDateTime
+            df <- cbind(df, lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,c(4,5,2,1,3)])
+            write.csv(df, file.path(exportFolder, "pv_model_covariates.csv"), row.names = FALSE)
+
+            df <- NULL
+            df$phenotype <- phenotype
+            df$databaseId <- databaseId
+            df$inputSetting$runDateTime <- runDateTime
+            df$evaluation <- unlist(lrResults$performanceEvaluation$evaluationStatistics$evaluation)
+            df$metric <- unlist(lrResults$performanceEvaluation$evaluationStatistics$metric)
+            df$value <- unlist(lrResults$performanceEvaluation$evaluationStatistics$value)
+            df <- data.frame(df)
+            write.csv(df, file.path(exportFolder, "pv_model_performances.csv"),
+                      row.names = FALSE)
           },
           error = function(e) {
             message("error found: ")

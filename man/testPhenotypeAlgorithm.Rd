@@ -5,12 +5,15 @@
 \title{Test phenotype algorithms}
 \usage{
 testPhenotypeAlgorithm(
+  phenotype,
   connectionDetails,
   cutPoints = c("EV"),
   outFolder,
+  exportFolder,
   evaluationCohortId = "main",
   phenotypeCohortId,
   cdmDatabaseSchema,
+  databaseId,
   cohortDatabaseSchema,
   cohortTable,
   washoutPeriod = 0,
@@ -19,6 +22,8 @@ testPhenotypeAlgorithm(
 )
 }
 \arguments{
+\item{phenotype}{Name of the phenotype for analysis}
+
 \item{connectionDetails}{ConnectionDetails created using the function
 createConnectionDetails in the DatabaseConnector package.}
 
@@ -26,6 +31,8 @@ createConnectionDetails in the DatabaseConnector package.}
 for the expected value}
 
 \item{outFolder}{The folder where the cohort evaluation output files are written}
+
+\item{exportFolder}{The folder where the csv output files will be written.}
 
 \item{evaluationCohortId}{A string used to generate the file names for the evaluation cohort.}
 
@@ -35,6 +42,8 @@ for the expected value}
 instance. Requires read permissions to this database. On SQL
 Server, this should specifiy both the database and the
 schema, so for example 'cdm_instance.dbo'.}
+
+\item{databaseId}{Name of the database in the analysis}
 
 \item{cohortDatabaseSchema}{The name of the database schema that is the location where the
 cohort data used to define the at risk cohort is available.

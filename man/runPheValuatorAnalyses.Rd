@@ -5,6 +5,7 @@
 \title{Run a list of analyses}
 \usage{
 runPheValuatorAnalyses(
+  phenotype,
   connectionDetails,
   oracleTempSchema = NULL,
   tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
@@ -12,6 +13,7 @@ runPheValuatorAnalyses(
   cohortDatabaseSchema = cdmDatabaseSchema,
   cohortTable = "cohort",
   workDatabaseSchema = cdmDatabaseSchema,
+  databaseId = cdmDatabaseSchema,
   cdmVersion = 5,
   outputFolder,
   pheValuatorAnalysisList
@@ -45,6 +47,8 @@ COHORT_END_DATE.}
 \item{workDatabaseSchema}{The name of the database schema that is the location where
 a table can be created and afterwards removed.
 Requires write permissions to this database.}
+
+\item{databaseId}{Name of the database in the analysis}
 
 \item{cdmVersion}{Define the OMOP CDM version used: currently supports "5".}
 

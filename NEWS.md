@@ -1,3 +1,12 @@
+PheValuator 2.2.3
+=================
+
+Changes:
+
+1. Added capability to supply designated model cohort instead of using xSpec
+2. Added parameters to ensure correct offset from start and end of observation period
+3. Created output csv files to be used in shiny applications as well as for easier access to results
+
 PheValuator 2.2.2
 =================
 

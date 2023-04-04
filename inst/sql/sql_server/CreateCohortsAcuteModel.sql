@@ -20,6 +20,8 @@
 {DEFAULT @visitType = c(9201) }
 {DEFAULT @firstCut = FALSE }
 {DEFAULT @daysFromxSpec = 0 }
+{DEFAULT @minimumOffsetFromStart = 0 }
+{DEFAULT @minimumOffsetFromEnd = 365}
 
 {@daysFromxSpec != 0} ? {
 DROP TABLE IF EXISTS #new_xspec;
@@ -33,8 +35,8 @@ FROM (select distinct cohort_definition_id, subject_id, cohort_start_date, minVi
     	FROM @cohort_database_schema.@cohort_database_table co
     	JOIN @cdm_database_schema.observation_period o
     	  on co.subject_id = o.person_id
-    		AND COHORT_START_DATE >= o.observation_period_start_date
-    		and dateadd(day, 365, COHORT_START_DATE) <= o.observation_period_end_date
+    		AND COHORT_START_DATE >= dateadd(d, @minimumOffsetFromStart, o.observation_period_start_date)
+		    AND COHORT_START_DATE <= dateadd(d, -@minimumOffsetFromEnd, o.observation_period_end_date)
     	join @cdm_database_schema.visit_occurrence v
     	 on co.subject_id = v.person_id
         and v.visit_start_date >= dateadd(day, 1, co.cohort_start_date)
@@ -76,8 +78,8 @@ INTO @work_database_schema.@test_cohort
 					FROM @cdm_database_schema.visit_occurrence v
 	        JOIN @cdm_database_schema.observation_period obs
 	          on v.person_id = obs.person_id
-	            AND v.visit_start_date >= dateadd(d, 365, obs.observation_period_start_date)
-		          AND v.visit_start_date <= dateadd(d, -30, obs.observation_period_end_date)
+	            AND v.visit_start_date >= dateadd(d, @minimumOffsetFromStart, obs.observation_period_start_date)
+		          AND v.visit_start_date <= dateadd(d, -@minimumOffsetFromEnd, obs.observation_period_end_date)
           join (
                 select person_id,
                   datediff(day, min(observation_period_start_date), min(observation_period_end_date)) lenPd,
@@ -89,7 +91,7 @@ INTO @work_database_schema.@test_cohort
                 on v.person_id = obs2.person_id
                   and v.visit_start_date >= obs2.observation_period_start_date
                   and v.visit_start_date <= obs2.observation_period_end_date
-                  and lenPd >= 730
+                  --and lenPd >= 730
                   and cntPd = 1
           JOIN @cdm_database_schema.person p
 					  on v.person_id = p.person_id
@@ -138,7 +140,7 @@ INTO @work_database_schema.@test_cohort
               on v.person_id = obs2.person_id
                 and v.visit_start_date >= obs2.observation_period_start_date
                 and v.visit_start_date <= obs2.observation_period_end_date
-                and lenPd >= 730
+                --and lenPd >= 730
                 and cntPd = 1
 					WHERE co.cohort_definition_id = @mainPopnCohort
 						{@exclCohort != 0} ? {AND co.subject_id not in (

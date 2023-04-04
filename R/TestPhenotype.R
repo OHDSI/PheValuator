@@ -23,12 +23,15 @@
 #' This function will perform the phenotype algorithm evaluation using the evaluation cohort returned
 #' from createEvalCohort and the phenotype algorithm cohort specified
 #'
+#' @param phenotype                  Name of the phenotype for analysis
 #' @param connectionDetails          ConnectionDetails created using the function
 #'                                   createConnectionDetails in the DatabaseConnector package.
 #' @param cutPoints                  A list of threshold predictions for the evaluations.  Include "EV"
 #'                                   for the expected value
 #' @param outFolder                  The folder where the cohort evaluation output files are written
+#' @param exportFolder               The folder where the csv output files will be written.
 #' @param evaluationCohortId         A string used to generate the file names for the evaluation cohort.
+#' @param databaseId                 Name of the database in the analysis
 #' @param cdmDatabaseSchema          The name of the database schema that contains the OMOP CDM
 #'                                   instance. Requires read permissions to this database. On SQL
 #'                                   Server, this should specifiy both the database and the
@@ -53,12 +56,15 @@
 #' with a sample of subject ids for TPs, FPs, TNs, and FNs for the 50 percent and over prediction threshold.
 #'
 #' @export
-testPhenotypeAlgorithm <- function(connectionDetails,
+testPhenotypeAlgorithm <- function(phenotype,
+                                   connectionDetails,
                                    cutPoints = c("EV"),
                                    outFolder,
+                                   exportFolder,
                                    evaluationCohortId = "main",
                                    phenotypeCohortId,
                                    cdmDatabaseSchema,
+                                   databaseId,
                                    cohortDatabaseSchema,
                                    cohortTable,
                                    washoutPeriod = 0,
@@ -249,16 +255,13 @@ testPhenotypeAlgorithm <- function(connectionDetails,
     # Make pretty results table
 
     results <- tibble::tibble(
-      cdm = cdmDatabaseSchema,
+      phenotype = phenotype,
+      cdm = databaseId,
       cohortId = phenotypeCohortId,
       sensitivity95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Ub),
       ppv95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
       specificity95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
       npv95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
-      # sensitivity9 = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Ub),
-      # ppv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
-      # specificity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
-      # npv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
       estimatedPrevalence = sprintf("%0.3f", 100 * countsTable$estimatedPrevalence),
       f1Score = sprintf("%0.3f", countsTable$f1Score),
       truePositives = round(countsTable$truePositives, 0),
@@ -281,20 +284,8 @@ testPhenotypeAlgorithm <- function(connectionDetails,
       npv = sprintf("%0.6f", countsTable$npv),
       npvCi95Lb = sprintf("%0.6f", countsTable$npvCi95Lb),
       npvCi95Ub = sprintf("%0.6f", countsTable$npvCi95Ub),
-      runDateTimeGMT = format(as.POSIXct(Sys.time()), tz = "GMT", usetz = TRUE)
+      runDateTime = format(as.POSIXct(Sys.time()), tz = "GMT", usetz = TRUE)
     )
-
-    # results <- tibble::tibble(cutPoint = countsTable$cutPoint,
-    #                           truePositives = round(countsTable$truePositives, 0),
-    #                           trueNegatives = round(countsTable$trueNegatives, 0),
-    #                           falsePositives = round(countsTable$falsePositives, 0),
-    #                           falseNegatives = round(countsTable$falseNegatives, 0),
-    #                           sensitivity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Ub),
-    #                           ppv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
-    #                           specificity = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
-    #                           npv = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
-    #                           estimatedPrevalence = sprintf("%0.3f", 100*countsTable$estimatedPrevalence),
-    #                           f1Score = sprintf("%0.3f", countsTable$f1Score))
 
     if (nrow(misses) > 0) {
       attr(results, "misses") <- misses
