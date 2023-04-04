@@ -20,6 +20,8 @@ runPheValuatorAnalyses(
 )
 }
 \arguments{
+\item{phenotype}{Name of the phenotype for analysis}
+
 \item{connectionDetails}{An R object of type \code{connectionDetails} created using the
 function \code{createConnectionDetails} in the
 \code{DatabaseConnector} package.}
