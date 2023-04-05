@@ -457,6 +457,7 @@
     df$databaseId <- databaseId
     df$inputSetting$runDateTime <- runDateTime
     df <- cbind(df, data.frame(appResults$PheValuator$inputSetting))
+    colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
     write.csv(df, file.path(exportFolder, "pv_evaluation_input_parameters.csv"), row.names = FALSE)
 
     df <- NULL
@@ -464,6 +465,7 @@
     df$databaseId <- databaseId
     df$inputSetting$runDateTime <- runDateTime
     df <- cbind(df, data.frame(appResults$PheValuator$testCases[,c(1,4,5,7:9,14:16)]))
+    colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
     write.csv(df, file.path(exportFolder, "pv_test_subjects.csv"), row.names = FALSE)
 
     df <- NULL
@@ -471,6 +473,7 @@
     df$databaseId <- databaseId
     df$inputSetting$runDateTime <- runDateTime
     df <- cbind(df, data.frame(appResults$PheValuator$testCaseCovariates))
+    colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
     write.csv(df, file.path(exportFolder, "pv_test_subjects_covariates.csv"), row.names = FALSE)
 
     df <- NULL
@@ -478,6 +481,7 @@
     df$databaseId <- databaseId
     df$inputSetting$runDateTime <- runDateTime
     df <- cbind(df, data.frame(appResults$PheValuator$diagnostics))
+    colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
     write.csv(df, file.path(exportFolder, "pv_diagnostics.csv"), row.names = FALSE)
 
 

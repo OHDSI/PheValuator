@@ -137,7 +137,7 @@ runPheValuatorAnalyses <- function(phenotype,
   ParallelLogger::logInfo("Saving phenotype algorithm evaluation results to ", exportFolder)
 
   output <- data.frame(summarizePheValuatorAnalyses(referenceTable, outputFolder))
-
+  colnames(output) <- SqlRender::camelCaseToSnakeCase(colnames(output))
   write.csv(output, file.path(exportFolder, "pv_algorithm_performance_results.csv"), row.names = FALSE)
 
   invisible(referenceTable)

@@ -427,13 +427,17 @@
             PatientLevelPrediction::savePlpResult(lrResults, plpResultsFileName)
 
             ParallelLogger::logInfo("Saving model results to ", exportFolder)
-            write.csv(lrResults$PheValuator$inputSetting, file.path(exportFolder, "pv_model_input_parameters.csv"), row.names = FALSE)
+
+            df <- data.frame(lrResults$PheValuator$inputSetting)
+            colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
+            write.csv(df, file.path(exportFolder, "pv_model_input_parameters.csv"), row.names = FALSE)
 
             df <- NULL
             df$phenotype <- phenotype
             df$databaseId <- databaseId
             df$inputSetting$runDateTime <- runDateTime
             df <- cbind(df, data.frame(lrResults$PheValuator$runTimeValues))
+            colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_run_time_values.csv"), row.names = FALSE)
 
             df <- NULL
@@ -441,6 +445,7 @@
             df$databaseId <- databaseId
             df$inputSetting$runDateTime <- runDateTime
             df <- cbind(df, lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,c(4,5,2,1,3)])
+            colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_covariates.csv"), row.names = FALSE)
 
             df <- NULL
@@ -451,6 +456,7 @@
             df$metric <- unlist(lrResults$performanceEvaluation$evaluationStatistics$metric)
             df$value <- unlist(lrResults$performanceEvaluation$evaluationStatistics$value)
             df <- data.frame(df)
+            colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_performances.csv"),
                       row.names = FALSE)
           },
