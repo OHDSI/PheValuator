@@ -33,6 +33,17 @@ test_that("TestPhenotype - test PheValuator end to end", {
     endDayWindow3 = 9999
   )
 
+  CovSettingsAcute <- createDefaultCovariateSettings(
+    excludedCovariateConceptIds = excludedCovariateConceptIds,
+    addDescendantsToExclude = TRUE,
+    startDayWindow1 = 0,
+    endDayWindow1 = 9999,
+    startDayWindow2 = 11,
+    endDayWindow2 = 9999,
+    startDayWindow3 = 21,
+    endDayWindow3 = 9999
+  )
+
   CohortArgsAcute <- createCreateEvaluationCohortArgs(
     xSpecCohortId = xSpecCohort,
     daysFromxSpec = daysFromxSpec,
@@ -49,7 +60,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
   )
 
   conditionAlgTestArgs <- createTestPhenotypeAlgorithmArgs(
-    cutPoints = c("EV", 0.0005),
+    cutPoints = c("EV", 0.05),
     phenotypeCohortId = 6,
     washoutPeriod = 0
   )
