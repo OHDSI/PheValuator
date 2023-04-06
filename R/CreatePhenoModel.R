@@ -457,7 +457,7 @@
             df$value <- unlist(lrResults$performanceEvaluation$evaluationStatistics$value)
             df <- data.frame(df)
             colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
-            write.csv(df, file.path(exportFolder, "pv_model_performances.csv"),
+            write.csv(df, file.path(exportFolder, "pv_model_performance.csv"),
                       row.names = FALSE)
           },
           error = function(e) {
