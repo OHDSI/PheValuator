@@ -307,37 +307,19 @@ testPhenotypeAlgorithm <- function(phenotype,
 computePerformanceMetricsFromCounts <- function(counts) {
   # Note: negative counts indicate the cell counts was below the specified minimum for sharing.
 
-  # computeSingleProportion <- function(i, x, n) {
-  #   if(as.integer(n[i]) < as.integer(x[i]) | as.integer(n[i]) == 0) {n[i] <- 1; x[i] <- 0} #set to 0 if n < x or n = 0 to avoid error
-  #   exact <- binom.test(as.integer(x[i]), as.integer(n[i]), conf.level = 0.95)
-  #   return(tibble::tibble(
-  #     estimate = exact$estimate,
-  #     ci95Lb = exact$conf.int[1],
-  #     ci95Ub = exact$conf.int[2]
-  #   ))
-  # }
-
   computeSingleProportion <- function(i, x, n) {
-    # if(as.integer(n[i]) < as.integer(x[i]) | as.integer(n[i]) == 0) {n[i] <- 1; x[i] <- 0} #set to 0 if n < x or n = 0 to avoid error
-    # exact <- binom.test(as.integer(x[i]), as.integer(n[i]), conf.level = 0.95)
-    return(tibble::tibble(
-      estimate = 0.5,
-      ci95Lb = 0.4,
-      ci95Ub = 0.3
-    ))
-  }
-
-  # computeProportions <- function(x, n, name) {
-  #   proportions <- lapply(1:length(x), computeSingleProportion, x = abs(x), n = n)
-  #   proportions <- dplyr::bind_rows(proportions)
-  #   names(proportions) <- paste0(name, c("", "Ci95Lb", "Ci95Ub"))
-  #   proportions[x < 0, ] <- -proportions[x < 0, ]
-  #   return(proportions)
-  # }
+     if(as.integer(n[i]) < as.integer(x[i]) | as.integer(n[i]) == 0) {n[i] <- 1; x[i] <- 0} #set to 0 if n < x or n = 0 to avoid error
+     exact <- binom.test(as.integer(x[i]), as.integer(n[i]), conf.level = 0.95)
+     return(tibble::tibble(
+       estimate = exact$estimate,
+       ci95Lb = exact$conf.int[1],
+       ci95Ub = exact$conf.int[2]
+     ))
+   }
 
   computeProportions <- function(x, n, name) {
     proportions <- lapply(1:length(x), computeSingleProportion, x = abs(x), n = n)
-    #proportions <- dplyr::bind_rows(proportions)
+    proportions <- dplyr::bind_rows(proportions)
     names(proportions) <- paste0(name, c("", "Ci95Lb", "Ci95Ub"))
     proportions[x < 0, ] <- -proportions[x < 0, ]
     return(proportions)
