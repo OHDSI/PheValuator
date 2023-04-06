@@ -49,7 +49,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
   )
 
   conditionAlgTestArgs <- createTestPhenotypeAlgorithmArgs(
-    cutPoints = c("EV", 0.05),
+    cutPoints = c("EV", 0.0005),
     phenotypeCohortId = 6,
     washoutPeriod = 0
   )
