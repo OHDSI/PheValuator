@@ -38,9 +38,9 @@ test_that("TestPhenotype - test PheValuator end to end", {
     addDescendantsToExclude = TRUE,
     startDayWindow1 = 0,
     endDayWindow1 = 9999,
-    startDayWindow2 = 11,
+    startDayWindow2 = 0,
     endDayWindow2 = 9999,
-    startDayWindow3 = 21,
+    startDayWindow3 = 0,
     endDayWindow3 = 9999
   )
 
@@ -61,13 +61,13 @@ test_that("TestPhenotype - test PheValuator end to end", {
 
   conditionAlgTestArgs <- createTestPhenotypeAlgorithmArgs(
     cutPoints = c("EV", 0.05),
-    phenotypeCohortId = 6,
+    phenotypeCohortId = 5, #6
     washoutPeriod = 0
   )
 
   analysis1 <- createPheValuatorAnalysis(
     analysisId = 1,
-    description = "6",
+    description = "5",
     createEvaluationCohortArgs = CohortArgsAcute,
     testPhenotypeAlgorithmArgs = conditionAlgTestArgs
   )
