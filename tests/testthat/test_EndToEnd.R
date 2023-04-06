@@ -13,7 +13,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
   cohortTable <- "cohort"
   workDatabaseSchema <- "main"
   xSpecCohort <- 1001
-  daysFromxSpec <- 0
+  daysFromxSpec <- 9999
   excludedCovariateConceptIds <- c()
   xSensCohort <- 2
   prevalenceCohort <- 2
