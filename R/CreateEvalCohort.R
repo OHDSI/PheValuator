@@ -405,11 +405,10 @@
     appResults$PheValuator$inputSetting$phenotype <- phenotype
     appResults$PheValuator$inputSetting$databaseId <- databaseId
     appResults$PheValuator$inputSetting$runDateTime <- runDateTime
-    appResults$PheValuator$inputSetting$startDays <- covariateSettings[[1]]$longTermStartDays
-    appResults$PheValuator$inputSetting$endDays <- covariateSettings[[1]]$endDays
     appResults$PheValuator$inputSetting$visitLength <- visitLength
     appResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
     appResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
+    appResults$PheValuator$inputSetting$prevalenceCohortId <- prevalenceCohortId
     appResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
     appResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
     appResults$PheValuator$inputSetting$gender <- paste(unlist(gender), collapse = ", ")
@@ -423,6 +422,8 @@
     appResults$PheValuator$inputSetting$exclusionEvaluationCohortId <- exclusionEvaluationCohortId
     appResults$PheValuator$inputSetting$exclusionEvaluationDaysFromStart <- exclusionEvaluationDaysFromStart
     appResults$PheValuator$inputSetting$exclusionEvaluationDaysFromEnd <- exclusionEvaluationDaysFromEnd
+    appResults$PheValuator$inputSetting$minimumOffsetFromStart <- minimumOffsetFromStart
+    appResults$PheValuator$inputSetting$minimumOffsetFromEnd <- minimumOffsetFromEnd
     appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
 
     appResults$PheValuator$diagnostics$Noncases <- Noncases
@@ -453,10 +454,7 @@
     ParallelLogger::logInfo("Saving evaluation results to ", exportFolder)
 
     df <- NULL
-    df$phenotype <- phenotype
-    df$databaseId <- databaseId
-    df$inputSetting$runDateTime <- runDateTime
-    df <- cbind(df, data.frame(appResults$PheValuator$inputSetting))
+    df <- data.frame(appResults$PheValuator$inputSetting)
     colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
     write.csv(df, file.path(exportFolder, "pv_evaluation_input_parameters.csv"), row.names = FALSE)
 

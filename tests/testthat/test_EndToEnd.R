@@ -55,6 +55,8 @@ test_that("TestPhenotype - test PheValuator end to end", {
     baseSampleSize = 2000000,
     startDate = "19000101",
     endDate = "21000101",
+    minimumOffsetFromStart = 0,
+    minimumOffsetFromEnd = 0,
     saveEvaluationCohortPlpData = FALSE,
     excludeModelFromEvaluation = TRUE
   )

@@ -256,7 +256,7 @@ testPhenotypeAlgorithm <- function(phenotype,
 
     results <- tibble::tibble(
       phenotype = phenotype,
-      cdm = databaseId,
+      databaseId = databaseId,
       cohortId = phenotypeCohortId,
       sensitivity95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$sens, countsTable$sensCi95Lb, countsTable$sensCi95Ub),
       ppv95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
