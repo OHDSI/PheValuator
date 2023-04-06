@@ -327,9 +327,17 @@ computePerformanceMetricsFromCounts <- function(counts) {
     ))
   }
 
+  # computeProportions <- function(x, n, name) {
+  #   proportions <- lapply(1:length(x), computeSingleProportion, x = abs(x), n = n)
+  #   proportions <- dplyr::bind_rows(proportions)
+  #   names(proportions) <- paste0(name, c("", "Ci95Lb", "Ci95Ub"))
+  #   proportions[x < 0, ] <- -proportions[x < 0, ]
+  #   return(proportions)
+  # }
+
   computeProportions <- function(x, n, name) {
     proportions <- lapply(1:length(x), computeSingleProportion, x = abs(x), n = n)
-    proportions <- dplyr::bind_rows(proportions)
+    #proportions <- dplyr::bind_rows(proportions)
     names(proportions) <- paste0(name, c("", "Ci95Lb", "Ci95Ub"))
     proportions[x < 0, ] <- -proportions[x < 0, ]
     return(proportions)
