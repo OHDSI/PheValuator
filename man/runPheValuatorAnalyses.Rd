@@ -6,6 +6,8 @@
 \usage{
 runPheValuatorAnalyses(
   phenotype,
+  analysisName = "Main",
+  runDateTime = format(Sys.time(), "\%b \%d \%Y \%X"),
   connectionDetails,
   oracleTempSchema = NULL,
   tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
@@ -21,6 +23,10 @@ runPheValuatorAnalyses(
 }
 \arguments{
 \item{phenotype}{Name of the phenotype for analysis}
+
+\item{analysisName}{Name of the analysis}
+
+\item{runDateTime}{Starting date and time of the PheValuator run}
 
 \item{connectionDetails}{An R object of type \code{connectionDetails} created using the
 function \code{createConnectionDetails} in the

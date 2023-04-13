@@ -1,3 +1,10 @@
+PheValuator 2.2.6
+=================
+
+Changes:
+1. add in additional parameters for output csv models
+2. add default value for xSens cohort as prevalence cohort
+
 PheValuator 2.2.3
 =================
 

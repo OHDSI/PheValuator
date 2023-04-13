@@ -9,6 +9,8 @@ createEvaluationCohort(
   oracleTempSchema = NULL,
   tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
   phenotype,
+  analysisName,
+  runDateTime,
   databaseId,
   xSpecCohortId,
   daysFromxSpec = 0,
@@ -65,6 +67,10 @@ emulate temp tables, provide a schema with write privileges where temp tables
 can be created.}
 
 \item{phenotype}{Name of the phenotype for analysis}
+
+\item{analysisName}{Name of the analysis}
+
+\item{runDateTime}{Starting date and time of the PheValuator run}
 
 \item{databaseId}{Name of the database in the analysis}
 

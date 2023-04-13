@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.6</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
 </li>
 <li>
   <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
@@ -69,7 +69,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">createCreateEvaluationCohortArgs</span><span class="op">(</span></span>
 <span>  <span class="va">xSpecCohortId</span>,</span>
 <span>  daysFromxSpec <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  <span class="va">xSensCohortId</span>,</span>
+<span>  xSensCohortId <span class="op">=</span> <span class="va">prevalenceCohortId</span>,</span>
 <span>  <span class="va">prevalenceCohortId</span>,</span>
 <span>  xSpecCohortSize <span class="op">=</span> <span class="fl">5000</span>,</span>
 <span>  covariateSettings <span class="op">=</span> <span class="fu"><a href="createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span>excludedCovariateConceptIds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -77,10 +77,15 @@
 <span>  modelPopulationCohortId <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  modelPopulationCohortIdStartDay <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  modelPopulationCohortIdEndDay <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  evaluationPopulationCohortId <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  evaluationPopulationCohortIdStartDay <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  evaluationPopulationCohortIdEndDay <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  modelBaseSampleSize <span class="op">=</span> <span class="fl">15000</span>,</span>
+<span>  inclusionEvaluationCohortId <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  inclusionEvaluationDaysFromStart <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  inclusionEvaluationDaysFromEnd <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  exclusionEvaluationCohortId <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  exclusionEvaluationDaysFromStart <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  exclusionEvaluationDaysFromEnd <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  minimumOffsetFromStart <span class="op">=</span> <span class="fl">365</span>,</span>
+<span>  minimumOffsetFromEnd <span class="op">=</span> <span class="fl">365</span>,</span>
+<span>  modelBaseSampleSize <span class="op">=</span> <span class="fl">25000</span>,</span>
 <span>  baseSampleSize <span class="op">=</span> <span class="fl">2e+06</span>,</span>
 <span>  lowerAgeLimit <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  upperAgeLimit <span class="op">=</span> <span class="fl">120</span>,</span>
@@ -91,6 +96,7 @@
 <span>  ethnicity <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  startDate <span class="op">=</span> <span class="st">"19001010"</span>,</span>
 <span>  endDate <span class="op">=</span> <span class="st">"21000101"</span>,</span>
+<span>  falsePositiveNegativeSubjects <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  modelId <span class="op">=</span> <span class="st">"main"</span>,</span>
 <span>  evaluationCohortId <span class="op">=</span> <span class="st">"main"</span>,</span>
 <span>  excludeModelFromEvaluation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -147,20 +153,42 @@ cohort start date to begin including visits.</p></dd>
 cohort start date to end including visits.</p></dd>
 
 
-<dt>evaluationPopulationCohortId</dt>
-<dd><p>The number of the cohort to be used as a base population for
-the evalution cohort. If set to 0, the entire database population will be
-used.</p></dd>
+<dt>inclusionEvaluationCohortId</dt>
+<dd><p>The number of the cohort of the population to be used to designate which visits
+are are eligible to be in the evaluation cohort</p></dd>
 
 
-<dt>evaluationPopulationCohortIdStartDay</dt>
-<dd><p>The number of days relative to the evaluationPopulationCohortId
-cohort start date to begin including visits.</p></dd>
+<dt>inclusionEvaluationDaysFromStart</dt>
+<dd><p>The number of days from the cohort start date of the inclusionEvaluationCohortId
+to start eligible included visits</p></dd>
 
 
-<dt>evaluationPopulationCohortIdEndDay</dt>
-<dd><p>The number of days relative to the evaluationPopulationCohortId
-cohort start date to end including visits.</p></dd>
+<dt>inclusionEvaluationDaysFromEnd</dt>
+<dd><p>The number of days from the cohort end date of the inclusionEvaluationCohortId
+to end eligible included visits</p></dd>
+
+
+<dt>exclusionEvaluationCohortId</dt>
+<dd><p>The number of the cohort of the population to be used to designate which visits
+are NOT eligible to be in the evaluation cohort</p></dd>
+
+
+<dt>exclusionEvaluationDaysFromStart</dt>
+<dd><p>The number of days from the cohort start date of the exclusionEvaluationCohortId
+to start ineligible included visits</p></dd>
+
+
+<dt>exclusionEvaluationDaysFromEnd</dt>
+<dd><p>The number of days from the cohort end date of the exclusionEvaluationCohortId
+to end ineligible included visits</p></dd>
+
+
+<dt>minimumOffsetFromStart</dt>
+<dd><p>Minimum number of days to offset for the analysis visit from the start of the observation period</p></dd>
+
+
+<dt>minimumOffsetFromEnd</dt>
+<dd><p>Minimum number of days to offset for the analysis visit from the end of the observation period</p></dd>
 
 
 <dt>modelBaseSampleSize</dt>
@@ -205,6 +233,10 @@ cohort start date to end including visits.</p></dd>
 
 <dt>endDate</dt>
 <dd><p>The ending date for including subjects in the model.</p></dd>
+
+
+<dt>falsePositiveNegativeSubjects</dt>
+<dd><p>Number of subjects to include for evaluating false positives and negatives</p></dd>
 
 
 <dt>modelId</dt>

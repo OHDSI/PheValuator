@@ -6,6 +6,8 @@
 \usage{
 testPhenotypeAlgorithm(
   phenotype,
+  analysisName,
+  runDateTime,
   connectionDetails,
   cutPoints = c("EV"),
   outFolder,
@@ -23,6 +25,10 @@ testPhenotypeAlgorithm(
 }
 \arguments{
 \item{phenotype}{Name of the phenotype for analysis}
+
+\item{analysisName}{Name of the analysis}
+
+\item{runDateTime}{Starting date and time of the PheValuator run}
 
 \item{connectionDetails}{ConnectionDetails created using the function
 createConnectionDetails in the DatabaseConnector package.}

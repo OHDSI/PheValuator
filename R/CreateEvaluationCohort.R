@@ -30,6 +30,8 @@
 #'                            emulate temp tables, provide a schema with write privileges where temp tables
 #'                            can be created.
 #' @param phenotype                        Name of the phenotype for analysis
+#' @param analysisName                     Name of the analysis
+#' @param runDateTime                      Starting date and time of the PheValuator run
 #' @param databaseId                       Name of the database in the analysis
 #' @param xSpecCohortId                    The number of the "extremely specific (xSpec)" cohort
 #'                                         definition id in the cohort table (for noisy positives).
@@ -104,6 +106,8 @@ createEvaluationCohort <- function(connectionDetails,
                                    oracleTempSchema = NULL,
                                    tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
                                    phenotype,
+                                   analysisName,
+                                   runDateTime,
                                    databaseId,
                                    xSpecCohortId,
                                    daysFromxSpec = 0,
@@ -184,6 +188,8 @@ createEvaluationCohort <- function(connectionDetails,
   .createPhenotypeModel(
     connectionDetails = connectionDetails,
     phenotype = phenotype,
+    analysisName = analysisName,
+    runDateTime = runDateTime,
     databaseId = databaseId,
     cdmDatabaseSchema = cdmDatabaseSchema,
     cohortDatabaseSchema = cohortDatabaseSchema,
@@ -221,6 +227,8 @@ createEvaluationCohort <- function(connectionDetails,
   .createEvaluationCohort(
     connectionDetails = connectionDetails,
     phenotype = phenotype,
+    analysisName = analysisName,
+    runDateTime = runDateTime,
     databaseId = databaseId,
     xSpecCohortId = xSpecCohortId,
     xSensCohortId = xSensCohortId,

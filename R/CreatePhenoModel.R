@@ -16,6 +16,8 @@
 
 .createPhenotypeModel <- function(connectionDetails,
                                   phenotype,
+                                  analysisName,
+                                  runDateTime,
                                   databaseId,
                                   cdmDatabaseSchema,
                                   cohortDatabaseSchema,
@@ -368,10 +370,10 @@
             yIntercept <- as.numeric(lrResults$model$model$coefficients$betas[1])
 
             #save analysis parameters
-            runDateTime <- format(Sys.time(), "%b %d %Y %X")
             lrResults$model$model$coefficients$betas[1] <- as.numeric(yIntercept - delta) # Equation (7) in King and Zeng (2001)
 
             lrResults$PheValuator$inputSetting$phenotype <- phenotype
+            lrResults$PheValuator$inputSetting$analysisName <- analysisName
             lrResults$PheValuator$inputSetting$databaseId <- databaseId
             lrResults$PheValuator$inputSetting$runDateTime <- runDateTime
             lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
@@ -434,24 +436,27 @@
 
             df <- NULL
             df$phenotype <- phenotype
+            df$analysisName <- analysisName
             df$databaseId <- databaseId
-            df$inputSetting$runDateTime <- runDateTime
+            df$runDateTime <- runDateTime
             df <- cbind(df, data.frame(lrResults$PheValuator$runTimeValues))
             colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_run_time_values.csv"), row.names = FALSE)
 
             df <- NULL
             df$phenotype <- phenotype
+            df$analysisName <- analysisName
             df$databaseId <- databaseId
-            df$inputSetting$runDateTime <- runDateTime
+            df$runDateTime <- runDateTime
             df <- cbind(df, lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,c(4,5,2,1,3)])
             colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_covariates.csv"), row.names = FALSE)
 
             df <- NULL
             df$phenotype <- phenotype
+            df$analysisName <- analysisName
             df$databaseId <- databaseId
-            df$inputSetting$runDateTime <- runDateTime
+            df$runDateTime <- runDateTime
             df$evaluation <- unlist(lrResults$performanceEvaluation$evaluationStatistics$evaluation)
             df$metric <- unlist(lrResults$performanceEvaluation$evaluationStatistics$metric)
             df$value <- unlist(lrResults$performanceEvaluation$evaluationStatistics$value)
