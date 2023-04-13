@@ -7,7 +7,7 @@
 createCreateEvaluationCohortArgs(
   xSpecCohortId,
   daysFromxSpec = 0,
-  xSensCohortId,
+  xSensCohortId = prevalenceCohortId,
   prevalenceCohortId,
   xSpecCohortSize = 5000,
   covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),

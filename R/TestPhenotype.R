@@ -24,6 +24,8 @@
 #' from createEvalCohort and the phenotype algorithm cohort specified
 #'
 #' @param phenotype                  Name of the phenotype for analysis
+#' @param analysisName               Name of the analysis
+#' @param runDateTime                Starting date and time of the PheValuator run
 #' @param connectionDetails          ConnectionDetails created using the function
 #'                                   createConnectionDetails in the DatabaseConnector package.
 #' @param cutPoints                  A list of threshold predictions for the evaluations.  Include "EV"
@@ -57,6 +59,8 @@
 #'
 #' @export
 testPhenotypeAlgorithm <- function(phenotype,
+                                   analysisName,
+                                   runDateTime,
                                    connectionDetails,
                                    cutPoints = c("EV"),
                                    outFolder,
@@ -284,7 +288,8 @@ testPhenotypeAlgorithm <- function(phenotype,
       npv = sprintf("%0.6f", countsTable$npv),
       npvCi95Lb = sprintf("%0.6f", countsTable$npvCi95Lb),
       npvCi95Ub = sprintf("%0.6f", countsTable$npvCi95Ub),
-      runDateTime = format(as.POSIXct(Sys.time()), tz = "GMT", usetz = TRUE)
+      analysisName = analysisName,
+      runDateTime = runDateTime
     )
 
     if (nrow(misses) > 0) {

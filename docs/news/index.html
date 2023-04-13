@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.6</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
 </li>
 <li>
   <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
@@ -61,10 +61,32 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="2.1.14" id="phevaluator-2114">PheValuator 2.1.14<a class="anchor" aria-label="anchor" href="#phevaluator-2114"></a></h2>
+<h2 class="page-header" data-toc-text="2.2.6" id="phevaluator-226">PheValuator 2.2.6<a class="anchor" aria-label="anchor" href="#phevaluator-226"></a></h2>
+<p>Changes: 1. add in additional parameters for output csv models 2. add default value for xSens cohort as prevalence cohort</p>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.3" id="phevaluator-223">PheValuator 2.2.3<a class="anchor" aria-label="anchor" href="#phevaluator-223"></a></h2>
 <p>Changes:</p>
-<ol style="list-style-type: decimal"><li>
-</li></ol></div>
+<ol style="list-style-type: decimal"><li>Added capability to supply designated model cohort instead of using xSpec</li>
+<li>Added parameters to ensure correct offset from start and end of observation period</li>
+<li>Created output csv files to be used in shiny applications as well as for easier access to results</li>
+</ol></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.2" id="phevaluator-222">PheValuator 2.2.2<a class="anchor" aria-label="anchor" href="#phevaluator-222"></a></h2>
+<p>Changes:</p>
+<ol style="list-style-type: decimal"><li>Eliminate evaluation population as an input parameter</li>
+<li>Add capability to input special inclusion rules for evaluation cohort</li>
+<li>Add capability to input special exclusion rules for evaluation cohort</li>
+<li>Add parameter to set the number of false positive and negative examples saved for analysis</li>
+</ol></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.0" id="phevaluator-220">PheValuator 2.2.0<a class="anchor" aria-label="anchor" href="#phevaluator-220"></a></h2>
+<p>Changes:</p>
+<ol style="list-style-type: decimal"><li>Add capability to create simpler xSpec cohorts not based on visit dates</li>
+<li>Add capability to have PheValuator generate the evaluation cohort automatically</li>
+<li>Use a faster method to develop predicted probabilities for evaluation cohort</li>
+<li>Include a set of subjects designated as true and false positives and negatives in output</li>
+</ol></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.1.13" id="phevaluator-2113">PheValuator 2.1.13<a class="anchor" aria-label="anchor" href="#phevaluator-2113"></a></h2>
 <p>Changes:</p>

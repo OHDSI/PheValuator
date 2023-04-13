@@ -16,6 +16,8 @@
 
 .createEvaluationCohort <- function(connectionDetails,
                                     phenotype,
+                                    analysisName,
+                                    runDateTime,
                                     databaseId,
                                     xSpecCohortId,
                                     xSensCohortId,
@@ -355,7 +357,7 @@
     fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
     fullSubjectList <- tibble::tibble(fullTestCases)
-    if(nrow(fullTestCases) > 0) { #no test cases found
+    if(nrow(fullTestCases) > 0) { #test cases found
       subjectCovariates <- data.frame()
       for(subjectUp in 1:nrow(fullTestCases)) {
         rowId <- fullTestCases$rowId[[subjectUp]]
@@ -401,8 +403,8 @@
     cases <- round(sum(predictionCases$value), 0)
 
     # add other parameters to the input settings list
-    runDateTime <- format(Sys.time(), "%b %d %Y %X")
     appResults$PheValuator$inputSetting$phenotype <- phenotype
+    appResults$PheValuator$inputSetting$analysisName <- analysisName
     appResults$PheValuator$inputSetting$databaseId <- databaseId
     appResults$PheValuator$inputSetting$runDateTime <- runDateTime
     appResults$PheValuator$inputSetting$visitLength <- visitLength
@@ -424,7 +426,7 @@
     appResults$PheValuator$inputSetting$exclusionEvaluationDaysFromEnd <- exclusionEvaluationDaysFromEnd
     appResults$PheValuator$inputSetting$minimumOffsetFromStart <- minimumOffsetFromStart
     appResults$PheValuator$inputSetting$minimumOffsetFromEnd <- minimumOffsetFromEnd
-    appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- excludeModelFromEvaluation
+    appResults$PheValuator$inputSetting$excludeModelFromEvaluation <- as.character(excludeModelFromEvaluation)
 
     appResults$PheValuator$diagnostics$Noncases <- Noncases
     appResults$PheValuator$diagnostics$cases <- cases
@@ -460,24 +462,30 @@
 
     df <- NULL
     df$phenotype <- phenotype
+    df$analysisName <- analysisName
     df$databaseId <- databaseId
-    df$inputSetting$runDateTime <- runDateTime
-    df <- cbind(df, data.frame(appResults$PheValuator$testCases[,c(1,4,5,7:9,14:16)]))
-    colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
-    write.csv(df, file.path(exportFolder, "pv_test_subjects.csv"), row.names = FALSE)
+    df$runDateTime <- runDateTime
+
+    if(nrow(data.frame(appResults$PheValuator$testCases)) > 0) {
+      df <- cbind(df, data.frame(appResults$PheValuator$testCases[,c(1,4,5,7:9,14:16)]))
+      colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
+      write.csv(df, file.path(exportFolder, "pv_test_subjects.csv"), row.names = FALSE)
+
+      df <- NULL
+      df$phenotype <- phenotype
+      df$analysisName <- analysisName
+      df$databaseId <- databaseId
+      df$runDateTime <- runDateTime
+      df <- cbind(df, data.frame(appResults$PheValuator$testCaseCovariates))
+      colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
+      write.csv(df, file.path(exportFolder, "pv_test_subjects_covariates.csv"), row.names = FALSE)
+    }
 
     df <- NULL
     df$phenotype <- phenotype
+    df$analysisName <- analysisName
     df$databaseId <- databaseId
-    df$inputSetting$runDateTime <- runDateTime
-    df <- cbind(df, data.frame(appResults$PheValuator$testCaseCovariates))
-    colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
-    write.csv(df, file.path(exportFolder, "pv_test_subjects_covariates.csv"), row.names = FALSE)
-
-    df <- NULL
-    df$phenotype <- phenotype
-    df$databaseId <- databaseId
-    df$inputSetting$runDateTime <- runDateTime
+    df$runDateTime <- runDateTime
     df <- cbind(df, data.frame(appResults$PheValuator$diagnostics))
     colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
     write.csv(df, file.path(exportFolder, "pv_diagnostics.csv"), row.names = FALSE)

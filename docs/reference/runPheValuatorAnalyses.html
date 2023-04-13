@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.6</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
 </li>
 <li>
   <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
@@ -67,6 +67,9 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">runPheValuatorAnalyses</span><span class="op">(</span></span>
+<span>  <span class="va">phenotype</span>,</span>
+<span>  analysisName <span class="op">=</span> <span class="st">"Main"</span>,</span>
+<span>  runDateTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"%b %d %Y %X"</span><span class="op">)</span>,</span>
 <span>  <span class="va">connectionDetails</span>,</span>
 <span>  oracleTempSchema <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tempEmulationSchema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"sqlRenderTempEmulationSchema"</span><span class="op">)</span>,</span>
@@ -74,6 +77,7 @@
 <span>  cohortDatabaseSchema <span class="op">=</span> <span class="va">cdmDatabaseSchema</span>,</span>
 <span>  cohortTable <span class="op">=</span> <span class="st">"cohort"</span>,</span>
 <span>  workDatabaseSchema <span class="op">=</span> <span class="va">cdmDatabaseSchema</span>,</span>
+<span>  databaseId <span class="op">=</span> <span class="va">cdmDatabaseSchema</span>,</span>
 <span>  cdmVersion <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  <span class="va">outputFolder</span>,</span>
 <span>  <span class="va">pheValuatorAnalysisList</span></span>
@@ -82,7 +86,19 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>connectionDetails</dt>
+    <dl><dt>phenotype</dt>
+<dd><p>Name of the phenotype for analysis</p></dd>
+
+
+<dt>analysisName</dt>
+<dd><p>Name of the analysis</p></dd>
+
+
+<dt>runDateTime</dt>
+<dd><p>Starting date and time of the PheValuator run</p></dd>
+
+
+<dt>connectionDetails</dt>
 <dd><p>An R object of type <code>connectionDetails</code> created using the
 function <code>createConnectionDetails</code> in the
 <code>DatabaseConnector</code> package.</p></dd>
@@ -122,6 +138,10 @@ COHORT_END_DATE.</p></dd>
 <dd><p>The name of the database schema that is the location where
 a table can be created and afterwards removed.
 Requires write permissions to this database.</p></dd>
+
+
+<dt>databaseId</dt>
+<dd><p>Name of the database in the analysis</p></dd>
 
 
 <dt>cdmVersion</dt>

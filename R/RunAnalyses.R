@@ -20,6 +20,8 @@
 #' Run a list of analyses.
 #'
 #' @param phenotype                      Name of the phenotype for analysis
+#' @param analysisName                   Name of the analysis
+#' @param runDateTime                    Starting date and time of the PheValuator run
 #' @param connectionDetails              An R object of type \code{connectionDetails} created using the
 #'                                       function \code{createConnectionDetails} in the
 #'                                       \code{DatabaseConnector} package.
@@ -53,6 +55,8 @@
 #'
 #' @export
 runPheValuatorAnalyses <- function(phenotype,
+                                   analysisName = "Main",
+                                   runDateTime = format(Sys.time(), "%b %d %Y %X"),
                                    connectionDetails,
                                    oracleTempSchema = NULL,
                                    tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
@@ -88,6 +92,8 @@ runPheValuatorAnalyses <- function(phenotype,
     matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
     args <- matched[[1]]$createEvaluationCohortArgs
     args$phenotype <- phenotype
+    args$analysisName <- analysisName
+    args$runDateTime <- runDateTime
     args$databaseId <- databaseId
     args$connectionDetails <- connectionDetails
     args$cdmDatabaseSchema <- cdmDatabaseSchema
@@ -114,6 +120,8 @@ runPheValuatorAnalyses <- function(phenotype,
       matched <- ParallelLogger::matchInList(pheValuatorAnalysisList, list(analysisId = analysisId))
       args <- matched[[1]]$testPhenotypeAlgorithmArgs
       args$phenotype <- phenotype
+      args$analysisName <- analysisName
+      args$runDateTime <- runDateTime
       args$databaseId <- databaseId
       args$connectionDetails <- connectionDetails
       args$cdmDatabaseSchema <- cdmDatabaseSchema
