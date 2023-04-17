@@ -142,11 +142,16 @@ runPheValuatorAnalyses <- function(phenotype,
     lapply(tasks, doTestPhenotypeAlgorithm)
   }
 
-  ParallelLogger::logInfo("Saving phenotype algorithm evaluation results to ", exportFolder)
 
   output <- data.frame(summarizePheValuatorAnalyses(referenceTable, outputFolder))
   colnames(output) <- SqlRender::camelCaseToSnakeCase(colnames(output))
-  write.csv(output, file.path(exportFolder, "pv_algorithm_performance_results.csv"), row.names = FALSE)
+
+  if(ncol(output) > 10) {
+    ParallelLogger::logInfo("Saving phenotype algorithm evaluation results to ", exportFolder)
+    write.csv(output, file.path(exportFolder, "pv_algorithm_performance_results.csv"), row.names = FALSE)
+  } else {
+    ParallelLogger::logInfo("Not saving phenotype algorithm evaluation results - too few outcomes.")
+  }
 
   invisible(referenceTable)
 

@@ -134,9 +134,11 @@ testPhenotypeAlgorithm <- function(phenotype,
     DatabaseConnector::disconnect(connection)
 
     if (nrow(phenoPop) == 0) {
-      warning("Phenotype cohort is empty")
+      #warning("Phenotype cohort is empty")
+      ParallelLogger::logInfo("NOTE: ", phenotypeCohortId, " has 0 counts")
       cutPoints[cutPoints == "EV"] <- "Expected Value"
-      return(tibble::tibble("Cut Point" = cutPoints, check.names = FALSE))
+      #return(tibble::tibble("Cut Point" = cutPoints, check.names = FALSE))
+      return(tibble::tibble())
     }
     ParallelLogger::logInfo("Computing evaluation statistics")
 
