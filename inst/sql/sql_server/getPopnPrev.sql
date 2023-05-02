@@ -36,7 +36,7 @@ from (
   from @cohort_database_schema.@cohort_database_table co
   where cohort_definition_id = @prevCohort
     and cohort_start_date >= CAST('@startDate' AS DATE) --cohort subjects must be within analysis period
-    and cohort_start_date <= CAST('@endDate' AS DATE))),
+    and cohort_start_date <= CAST('@endDate' AS DATE)) a),
 popn as (
   select distinct person_id
   from init_popn

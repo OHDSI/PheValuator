@@ -1,3 +1,10 @@
+PheValuator 2.2.7
+=================
+
+Changes:
+1. Add capability to use exisitng model for a run
+2. Bug fix for getPopnPrev.sql needed in sql server
+
 PheValuator 2.2.6
 =================
 

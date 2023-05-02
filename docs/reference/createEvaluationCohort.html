@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.7</span>
       </span>
     </div>
 
@@ -94,6 +94,7 @@
 <span>  exclusionEvaluationCohortId <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  exclusionEvaluationDaysFromStart <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  exclusionEvaluationDaysFromEnd <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  priorModelToUse <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  minimumOffsetFromStart <span class="op">=</span> <span class="fl">365</span>,</span>
 <span>  minimumOffsetFromEnd <span class="op">=</span> <span class="fl">365</span>,</span>
 <span>  modelBaseSampleSize <span class="op">=</span> <span class="fl">25000</span>,</span>
@@ -250,6 +251,10 @@ to start ineligible included visits</p></dd>
 <dt>exclusionEvaluationDaysFromEnd</dt>
 <dd><p>The number of days from the cohort end date of the exclusionEvaluationCohortId
 to end ineligible included visits</p></dd>
+
+
+<dt>priorModelToUse</dt>
+<dd><p>folder where a previously developed model to use in analysis will be found</p></dd>
 
 
 <dt>minimumOffsetFromStart</dt>

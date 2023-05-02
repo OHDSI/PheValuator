@@ -46,6 +46,7 @@
 #' @param databaseId                     Name of the database in the analysis
 #' @param cdmVersion                     Define the OMOP CDM version used: currently supports "5".
 #' @param outputFolder                   Name of the folder where all the outputs will be written to.
+#' @param priorModelToUse                folder where a previously developed model to use in analysis will be found
 #' @param pheValuatorAnalysisList        A list of objects of type \code{pheValuatorAnalysis} as created using
 #'                                       the \code{\link{createPheValuatorAnalysis}} function.
 #'
@@ -67,6 +68,7 @@ runPheValuatorAnalyses <- function(phenotype,
                                    databaseId = cdmDatabaseSchema,
                                    cdmVersion = 5,
                                    outputFolder,
+                                   priorModelToUse = NULL,
                                    pheValuatorAnalysisList) {
   if (!is.null(oracleTempSchema) && oracleTempSchema != "") {
     warning("The 'oracleTempSchema' argument is deprecated. Use 'tempEmulationSchema' instead.")
@@ -103,6 +105,18 @@ runPheValuatorAnalyses <- function(phenotype,
     args$workDatabaseSchema <- workDatabaseSchema
     args$cdmVersion <- cdmVersion
     args$outFolder <- file.path(outputFolder, evaluationCohortFolder)
+    if(!is.null(priorModelToUse)) {
+      args$priorModelToUse <- file.path(priorModelToUse, evaluationCohortFolder)
+    } else {
+      args$priorModelToUse <- NULL
+    }
+
+    if(!is.null(priorModelToUse)) { #previously created model to use in the analysis
+      args$priorModelToUse <- file.path(priorModelToUse, evaluationCohortFolder)
+    } else {
+      args$priorModelToUse <- NULL
+    }
+
     args$exportFolder <- exportFolder
     task <- list(args = args)
     return(task)

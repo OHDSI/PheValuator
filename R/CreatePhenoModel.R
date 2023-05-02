@@ -33,6 +33,7 @@
                                   modelPopulationCohortId = 0,
                                   modelPopulationCohortIdStartDay = 0,
                                   modelPopulationCohortIdEndDay = 0,
+                                  priorModelToUse = NULL,
                                   minimumOffsetFromStart = 365,
                                   minimumOffsetFromEnd = 365,
                                   modelBaseSampleSize = 15000,
@@ -58,9 +59,13 @@
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
   plpResultsFileName <- file.path(outFolder, sprintf("plpResults_%s", modelId))
 
+  if(!is.null(priorModelToUse)) {
+    priorModelToUse <- file.path(priorModelToUse, sprintf("model_%s.rds", modelId))
+  }
+
   visitType <- c(9201, 9202, 9203, 262, 581477) # model is run is all inpatient/outpatient visits
 
-  if (!file.exists(modelFileName)) {
+  if (!file.exists(modelFileName) & is.null(priorModelToUse)) {
     # get xSpec subjects to create a model
     sql <- SqlRender::loadRenderTranslateSql(
       sqlFilename = "GetxSpecCount.sql",
@@ -477,6 +482,17 @@
       }
     }
   } else {
-    ParallelLogger::logInfo("Skipping creation of ", modelFileName, " because it already exists")
+    if(!is.null(priorModelToUse)) {
+      if(!file.exists(priorModelToUse)){
+        stop("Error: priorModelToUse does not exist")
+      } else {
+        ParallelLogger::logInfo("Using previously created model file ", priorModelToUse)
+        fileCopy <- file.copy(file.path(priorModelToUse),
+                              file.path(outFolder, sprintf("model_%s.rds", modelId)),
+                              copy.date = TRUE, overwrite = TRUE)
+      }
+    } else {
+      ParallelLogger::logInfo("Skipping creation of ", modelFileName, " because it already exists")
+    }
   }
 }

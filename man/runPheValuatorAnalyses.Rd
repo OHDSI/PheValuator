@@ -18,6 +18,7 @@ runPheValuatorAnalyses(
   databaseId = cdmDatabaseSchema,
   cdmVersion = 5,
   outputFolder,
+  priorModelToUse = NULL,
   pheValuatorAnalysisList
 )
 }
@@ -61,6 +62,8 @@ Requires write permissions to this database.}
 \item{cdmVersion}{Define the OMOP CDM version used: currently supports "5".}
 
 \item{outputFolder}{Name of the folder where all the outputs will be written to.}
+
+\item{priorModelToUse}{folder where a previously developed model to use in analysis will be found}
 
 \item{pheValuatorAnalysisList}{A list of objects of type \code{pheValuatorAnalysis} as created using
 the \code{\link{createPheValuatorAnalysis}} function.}
