@@ -1,5 +1,8 @@
+{DEFAULT @randomVisitTable = ''}
+
 SELECT COUNT_BIG(*)
-FROM @cdm_database_schema.visit_occurrence v
+{@randomVisitTable == ''} ? {FROM @cdm_database_schema.visit_occurrence v}
+{@randomVisitTable != ''} ? {FROM @work_database_schema.@randomVisitTable v}
 JOIN @cdm_database_schema.observation_period obs
 	ON v.person_id = obs.person_id
 		AND v.visit_start_date >= dateadd(d, 365, obs.observation_period_start_date)

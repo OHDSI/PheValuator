@@ -26,6 +26,7 @@
 {DEFAULT @visitType = c(9201) }
 {DEFAULT @minimumOffsetFromStart = 365}
 {DEFAULT @minimumOffsetFromEnd = 365}
+{DEFAULT @randomVisitTable = ''}
 
 DROP TABLE IF EXISTS #finalCohort;
 
@@ -38,14 +39,15 @@ with persons as ( --subset a random set of subjects
 {@inclusionEvaluationCohortId != 0} ? { --subjects must be from base evaluation cohort if specified
     join @cohort_database_schema.@cohort_database_table co
       on co.cohort_definition_id = @inclusionEvaluationCohortId
-        and co.subject_id = p.person_id})
+        and co.subject_id = p.person_id}) a
   order by rn
   limit 10 * @baseSampleSize),
 
 visits as ( --and a random visit from each subject selected
 select distinct v.person_id, first_value(visit_start_date)
   over (partition by v.person_id ORDER BY NewId()) visit_start_date
-from @cdm_database_schema.visit_occurrence v
+{@randomVisitTable == ''} ? {FROM @cdm_database_schema.visit_occurrence v}
+{@randomVisitTable != ''} ? {FROM @work_database_schema.@randomVisitTable v}
 join @cdm_database_schema.observation_period o
   on v.person_id = o.person_id
     AND v.visit_start_date >= dateadd(d, @minimumOffsetFromStart, o.observation_period_start_date)
@@ -100,7 +102,7 @@ from (
       and c.cohort_start_date >= dateadd(day, @inclusionEvaluationDaysFromStart, co.cohort_start_date)
       and c.cohort_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_end_date)}
   where c.cohort_definition_id = @prevalenceCohortId
-)
+) a
 ;
 DROP TABLE IF EXISTS #cohort_person;
 
@@ -136,7 +138,7 @@ INTO @work_database_schema.@test_cohort
 from (select co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (PARTITION BY v.person_id ORDER BY NewId()) visit_start_date,
 					row_number() over (order by NewId()) rn
     	from #finalCohort co
-				join @cdm_database_schema.visit_occurrence v
+			join @cdm_database_schema.visit_occurrence v
 				  on v.person_id = co.subject_id
 					and v.visit_concept_id in (@visitType)
 
@@ -156,7 +158,6 @@ from (select co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (P
 		  on v.person_id = obs2.person_id
 			AND v.visit_start_date >= dateadd(d, @minimumOffsetFromStart, obs2.observation_period_start_date)
 			and dateadd(d, @minimumOffsetFromEnd, v.visit_start_date) <= obs2.observation_period_end_date
-			--and lenPd >= 730
 			and cntPd = 1
 				join @cdm_database_schema.person p
 				  on co.subject_id = p.person_id

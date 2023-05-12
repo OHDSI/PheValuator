@@ -50,6 +50,7 @@
                                   cdmVersion = "5",
                                   outFolder = getwd(),
                                   exportFolder,
+                                  randomVisitTable = "",
                                   modelId = "main") {
 
   connection <- DatabaseConnector::connect(connectionDetails)
@@ -138,13 +139,20 @@
       if (!file.exists(plpDataFile)) {
         # only pull the plp data if it doesn't already exist create a unique name for the temporary cohort table
         testCohort <- paste0("test_model_", xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))
-        # first check number of eligible visits in db
+
+        if (randomVisitTable != "") {
+          ParallelLogger::logInfo("Creating model cohort subjects using supplied random visit table: ",
+                                  paste0(workDatabaseSchema, ".", randomVisitTable))
+        }
+
+        #first check number of eligible visits in db
         sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
                                                  packageName = "PheValuator",
                                                  dbms = connectionDetails$dbms,
                                                  cdm_database_schema = cdmDatabaseSchema,
                                                  cohort_database_schema = cohortDatabaseSchema,
                                                  cohort_database_table = cohortTable,
+                                                 work_database_schema = workDatabaseSchema,
                                                  ageLimit = lowerAgeLimit,
                                                  upperAgeLimit = upperAgeLimit,
                                                  gender = gender,
@@ -154,6 +162,7 @@
                                                  endDate = endDate,
                                                  visitType = visitType,
                                                  visitLength = visitLength,
+                                                 randomVisitTable = randomVisitTable,
                                                  exclCohort = xSensCohortId
         )
         cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
@@ -244,6 +253,7 @@
             minimumOffsetFromEnd = minimumOffsetFromEnd,
             visitLength = visitLength,
             visitType = c(visitType),
+            randomVisitTable = randomVisitTable,
             firstCut = firstCut
           )
           DatabaseConnector::executeSql(connection = connection, sql)

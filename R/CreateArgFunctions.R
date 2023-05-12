@@ -52,6 +52,7 @@
 #' @param falsePositiveNegativeSubjects    Number of subjects to include for evaluating false positives and negatives
 #' @param modelId                          A string used to generate the file names for this model.
 #' @param evaluationCohortId               A string used to generate the file names for this evaluation cohort.
+#' @param randomVisitTable                 Table stored in work directory with pre-selected random visits in format of visit_occurrence table
 #' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the
 #'                                         evaluation cohort?
 #' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects
@@ -94,6 +95,7 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              falsePositiveNegativeSubjects = 10,
                                              modelId = "main",
                                              evaluationCohortId = "main",
+                                             randomVisitTable = "",
                                              excludeModelFromEvaluation = FALSE,
                                              removeSubjectsWithFutureDates = TRUE,
                                              saveEvaluationCohortPlpData = FALSE) {

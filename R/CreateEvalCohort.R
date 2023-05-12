@@ -53,6 +53,7 @@
                                     modelId = "main",
                                     evaluationCohortId = "main",
                                     excludeModelFromEvaluation = FALSE,
+                                    randomVisitTable = "",
                                     savePlpData = FALSE) {
   if (savePlpData == TRUE) {
     evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))
@@ -142,6 +143,11 @@
         ParallelLogger::logInfo("Creating evaluation cohort subjects excluding visits from cohort Id: ", exclusionEvaluationCohortId)
       }
 
+      if (randomVisitTable != "") {
+        ParallelLogger::logInfo("Creating evaluation cohort subjects using supplied random visit table: ",
+                                paste0(workDatabaseSchema, ".", randomVisitTable))
+      }
+
       sql <- SqlRender::loadRenderTranslateSql(
         sqlFilename = sqlFilename,
         packageName = "PheValuator",
@@ -172,6 +178,7 @@
         exclusionEvaluationDaysFromEnd = exclusionEvaluationDaysFromEnd,
         minimumOffsetFromStart = minimumOffsetFromStart,
         minimumOffsetFromEnd = minimumOffsetFromEnd,
+        randomVisitTable = randomVisitTable,
         visitLength = visitLength,
         visitType = c(visitType)
       )

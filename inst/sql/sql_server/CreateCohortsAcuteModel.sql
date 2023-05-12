@@ -22,6 +22,7 @@
 {DEFAULT @daysFromxSpec = 0 }
 {DEFAULT @minimumOffsetFromStart = 0 }
 {DEFAULT @minimumOffsetFromEnd = 365}
+{DEFAULT @randomVisitTable = ''}
 
 {@daysFromxSpec != 0} ? {
 DROP TABLE IF EXISTS #new_xspec;
@@ -41,7 +42,7 @@ FROM (select distinct cohort_definition_id, subject_id, cohort_start_date, minVi
     	 on co.subject_id = v.person_id
         and v.visit_start_date >= dateadd(day, 1, co.cohort_start_date)
         and v.visit_start_date <= dateadd(day, @daysFromxSpec, co.cohort_start_date)
-    	WHERE cohort_definition_id = @x_spec_cohort) pos);
+    	WHERE cohort_definition_id = @x_spec_cohort) pos) a;
 }
 
 DROP TABLE IF EXISTS #cohort_person;
@@ -75,7 +76,8 @@ INTO @work_database_schema.@test_cohort
 				{@mainPopnCohort == 0} ? {
 					v.person_id, visit_start_date,
 						row_number() over (order by NewId()) rn
-					FROM @cdm_database_schema.visit_occurrence v
+					{@randomVisitTable == ''} ? {FROM @cdm_database_schema.visit_occurrence v}
+					{@randomVisitTable != ''} ? {FROM @work_database_schema.@randomVisitTable v}
 	        JOIN @cdm_database_schema.observation_period obs
 	          on v.person_id = obs.person_id
 	            AND v.visit_start_date >= dateadd(d, @minimumOffsetFromStart, obs.observation_period_start_date)

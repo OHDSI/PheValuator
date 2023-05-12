@@ -1,3 +1,10 @@
+PheValuator 2.2.8
+=================
+
+Changes:
+1. Add capability to supply custom visit occurrence table to increase speed of processing for extremely large visit occurrence tables
+2. Bug fix in sql files needed in sql server
+
 PheValuator 2.2.7
 =================
 

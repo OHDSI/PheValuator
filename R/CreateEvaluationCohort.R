@@ -97,6 +97,7 @@
 #' @param modelId                          A string used to generate the file names for this model.
 #' @param evaluationCohortId               A string used to generate the file names for this evaluation cohort.
 #' @param excludeModelFromEvaluation       Should subjects used in the model be excluded from the evaluation cohort?
+#' @param randomVisitTable                 Table stored in work directory with pre-selected random visits in format of visit_occurrence table
 #' @param removeSubjectsWithFutureDates    For buggy data with data in the future: ignore subjects with
 #'                                         dates in the future?
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be saved? To be
@@ -153,6 +154,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    modelId = "main",
                                    evaluationCohortId = "main",
                                    excludeModelFromEvaluation = FALSE,
+                                   randomVisitTable = "",
                                    removeSubjectsWithFutureDates = TRUE,
                                    saveEvaluationCohortPlpData = FALSE) {
   if (length(connectionDetails) == 0) {
@@ -224,6 +226,7 @@ createEvaluationCohort <- function(connectionDetails,
     cdmVersion = cdmVersion,
     outFolder = outFolder,
     exportFolder = exportFolder,
+    randomVisitTable = randomVisitTable,
     modelId = modelId
   )
 
@@ -267,6 +270,7 @@ createEvaluationCohort <- function(connectionDetails,
     modelId = modelId,
     evaluationCohortId = evaluationCohortId,
     excludeModelFromEvaluation = excludeModelFromEvaluation,
+    randomVisitTable = randomVisitTable,
     savePlpData = saveEvaluationCohortPlpData
   )
   delta <- Sys.time() - start

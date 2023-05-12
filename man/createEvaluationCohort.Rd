@@ -53,6 +53,7 @@ createEvaluationCohort(
   modelId = "main",
   evaluationCohortId = "main",
   excludeModelFromEvaluation = FALSE,
+  randomVisitTable = "",
   removeSubjectsWithFutureDates = TRUE,
   saveEvaluationCohortPlpData = FALSE
 )
@@ -178,6 +179,8 @@ to end ineligible included visits}
 \item{evaluationCohortId}{A string used to generate the file names for this evaluation cohort.}
 
 \item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort?}
+
+\item{randomVisitTable}{Table stored in work directory with pre-selected random visits}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects with
 dates in the future?}

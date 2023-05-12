@@ -37,6 +37,7 @@ createCreateEvaluationCohortArgs(
   falsePositiveNegativeSubjects = 10,
   modelId = "main",
   evaluationCohortId = "main",
+  randomVisitTable = "",
   excludeModelFromEvaluation = FALSE,
   removeSubjectsWithFutureDates = TRUE,
   saveEvaluationCohortPlpData = FALSE
@@ -120,6 +121,8 @@ to end ineligible included visits}
 \item{modelId}{A string used to generate the file names for this model.}
 
 \item{evaluationCohortId}{A string used to generate the file names for this evaluation cohort.}
+
+\item{randomVisitTable}{Table stored in work directory with pre-selected random visits}
 
 \item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the
 evaluation cohort?}

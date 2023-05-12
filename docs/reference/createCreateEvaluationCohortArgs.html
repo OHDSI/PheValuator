@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.8</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
 </li>
 <li>
   <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
@@ -99,6 +99,7 @@
 <span>  falsePositiveNegativeSubjects <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  modelId <span class="op">=</span> <span class="st">"main"</span>,</span>
 <span>  evaluationCohortId <span class="op">=</span> <span class="st">"main"</span>,</span>
+<span>  randomVisitTable <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  excludeModelFromEvaluation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  removeSubjectsWithFutureDates <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  saveEvaluationCohortPlpData <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -245,6 +246,10 @@ to end ineligible included visits</p></dd>
 
 <dt>evaluationCohortId</dt>
 <dd><p>A string used to generate the file names for this evaluation cohort.</p></dd>
+
+
+<dt>randomVisitTable</dt>
+<dd><p>Table stored in work directory with pre-selected random visits</p></dd>
 
 
 <dt>excludeModelFromEvaluation</dt>

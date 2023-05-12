@@ -1,0 +1,148 @@
+table_name,column_name,data_type,is_required,primary_key,min_cell_count,display_name,description
+pv_algorithm_performance_results,database_id,varchar,yes,yes,no,Database Id,Database name
+pv_algorithm_performance_results,phenotype,varchar,yes,yes,no,Phenotype,Phenotype name
+pv_algorithm_performance_results,analysis_name,varchar,yes,yes,no,Analysis Name,Analysis name
+pv_algorithm_performance_results,run_date_time,varchar,yes,no,no,Run Datetime,Analysis run date/time
+pv_algorithm_performance_results,cohort_id,int,yes,yes,no,Cohort Id,ATLAS cohort id
+pv_algorithm_performance_results,sensitivity_95_ci,varchar,yes,no,no,Sensitivity (95 Ci),Sensitivity with 95% CIs
+pv_algorithm_performance_results,ppv_95_ci,varchar,yes,no,no,PPV  (95 Ci),Positive predictive value with 95% CIs
+pv_algorithm_performance_results,specificity_95_ci,varchar,yes,no,no,Specificity (95 Ci),Specificity with 95% CIs
+pv_algorithm_performance_results,npv_95_ci,varchar,yes,no,no,NPV (95 Ci),Negative predictive value with 95% Cis
+pv_algorithm_performance_results,estimated_prevalence,float,yes,no,no,Estimated Prevalence,"Estimated prevalence based on true positives, true negatives, false positives, false negatives"
+pv_algorithm_performance_results,f_1_score,float,yes,no,no,F1 Score,Estimated F1 score
+pv_algorithm_performance_results,true_positives,int,yes,no,yes,True Positives,Estimated true positive count
+pv_algorithm_performance_results,true_negatives,int,yes,no,yes,True Negatives,Estimated true negative count
+pv_algorithm_performance_results,false_positives,int,yes,no,yes,False Positives,Estimated False positive count
+pv_algorithm_performance_results,false_negatives,int,yes,no,yes,False Negatives,Estimate false negative count
+pv_algorithm_performance_results,washout_period,int,yes,no,no,Washout Period,The mininum required continuous observation time prior to index  date for subjects within the cohort to test
+pv_algorithm_performance_results,splay_prior,int,yes,no,no,Splay Prior,The number of days to allow for testing phenotype visit date prior to evaluation date
+pv_algorithm_performance_results,splay_post,int,yes,no,no,Splay Post,The number of days to allow for testing phenotype visit date after evaluation date
+pv_algorithm_performance_results,cut_point,varchar,yes,no,no,Cut Point,"A list of threshold predictions for the evaluations.  Includes EV"" for the expected value"""
+pv_algorithm_performance_results,sensitivity,float,yes,no,no,Sensitivity,Estimated sensitivity
+pv_algorithm_performance_results,sensitivity_ci_95_lb,float,yes,no,no,Sensitivity CI 95 LB,Estimated sensitvity 95% CI lower bound
+pv_algorithm_performance_results,sensitivity_ci_95_ub,float,yes,no,no,Sensitivity CI 95 UB,Estimated sensitvity 95% CI upper bound
+pv_algorithm_performance_results,ppv,float,yes,no,no,PPV,Estimated positive predicted value
+pv_algorithm_performance_results,ppv_ci_95_lb,float,yes,no,no,PPV CI 95 LB,Estimated positive predicted value 95% CI lower bound
+pv_algorithm_performance_results,ppv_ci_95_ub,float,yes,no,no,PPV CI 95 UB,Estimated positive predicted value 95% CI upper bound
+pv_algorithm_performance_results,specificity,float,yes,no,no,Specificity,Estimated specificity
+pv_algorithm_performance_results,specificity_ci_95_lb,float,yes,no,no,Specificity CI 95 LB,Estimated specificity 95% CI lower bound
+pv_algorithm_performance_results,specificity_ci_95_ub,float,yes,no,no,Specificity CI 95 UB,Estimated specificity 95% CI upper bound
+pv_algorithm_performance_results,npv,float,yes,no,no,NPV,Estimated negative predicted value
+pv_algorithm_performance_results,npv_ci_95_lb,float,yes,no,no,NPV CI 95 LB,Estimated negative predicted value 95% CI lower bound
+pv_algorithm_performance_results,npv_ci_95_ub,float,yes,no,no,NPV CI 95 UB,Estimated negative predicted value 95% CI upper bound
+pv_algorithm_performance_results,run_date_time_g_m_t,varchar,yes,no,no,Run Date Time GMT,The date and time (GMT) of the PheValuator run
+pv_algorithm_performance_results,analysis_id,int,yes,yes,no,Analysis Id,The number of the analysis within the run
+pv_algorithm_performance_results,description,varchar,yes,no,no,Description,Description of the cohort
+pv_model_covariates,database_id,varchar,yes,yes,no,Database Id,Database name
+pv_model_covariates,phenotype,varchar,yes,yes,no,Phenotype,Phenotype name
+pv_model_covariates,analysis_name,varchar,yes,yes,no,Analysis Name,Analysis name
+pv_model_covariates,run_date_time,varchar,yes,no,no,Run Datetime,Analysis run date/time
+pv_model_covariates,concept_id,bigint,yes,yes,no,Concept Id,Concept id
+pv_model_covariates,covariate_value,float,yes,no,no,Covariate Value,Beta coefficient of the covariate in the model
+pv_model_covariates,covariate_name,varchar,yes,no,no,Covariate Name,Name of the covariate
+pv_model_covariates,covariate_id,bigint,yes,yes,no,Covariate Id,Covariate Id (concept id plus analysis id)
+pv_model_covariates,analysis_id,int,yes,yes,no,Analysis Id,"Type of analysis, e.g., 201 - condition group era during first time window"
+pv_model_input_parameters,database_id,varchar,yes,yes,no,Database Id,Database name
+pv_model_input_parameters,phenotype,varchar,yes,yes,no,Phenotype,Phenotype name
+pv_model_input_parameters,analysis_name,varchar,yes,yes,no,Analysis Name,Analysis name
+pv_model_input_parameters,run_date_time,varchar,yes,no,no,Run Datetime,Analysis run date/time
+pv_model_input_parameters,x_spec_cohort_id,int,yes,no,no,xSpec Cohort Id,Id of the xSpec cohort
+pv_model_input_parameters,days_fromx_spec,int,yes,no,no,Days From xSpec,Number of allowed days from xSpec condition until analyzed visit
+pv_model_input_parameters,x_sens_cohort_id,int,yes,no,no,xSens Cohort Id,Id if the xSens cohort
+pv_model_input_parameters,prevalence_cohort_id,int,yes,no,no,Prevalence Cohort Id,Id of the prevalence cohort
+pv_model_input_parameters,model_population_cohort_id,int,yes,no,no,Model Population Cohort Id,Id of the cohort used for cohort used as the base population for the model
+pv_model_input_parameters,model_population_cohort_id_start_day,int,yes,no,no,Model Population Cohort Id Start Day,The number of days relative to the mainPopulationCohortId cohort start date to begin including visits.
+pv_model_input_parameters,model_population_cohort_id_end_day,int,yes,no,no,Model Population Cohort Id End Day,The number of days relative to the mainPopulationCohortId cohort end date to begin including visits.
+pv_model_input_parameters,lower_age_limit,int,yes,no,no,Lower Age Limit,Lower age limit for subjects included in the model
+pv_model_input_parameters,upper_age_limit,int,yes,no,no,Upper Age Limit,Upper age limit for subjects included in the model
+pv_model_input_parameters,start_day_window_1,int,yes,no,no,Start Day Window 1,Start day for prediction window 1
+pv_model_input_parameters,end_day_window_1,int,yes,no,no,End Day Window 1,End day for prediction window 1
+pv_model_input_parameters,start_day_window_2,int,no,no,no,Start Day Window 2,Start day for prediction window 2
+pv_model_input_parameters,end_day_window_2,int,no,no,no,End Day Window 2,End day for prediction window 2
+pv_model_input_parameters,start_day_window_3,int,no,no,no,Start Day Window 3,Start day for prediction window 3
+pv_model_input_parameters,end_day_window_3,int,no,no,no,End Day Window 3,End day for prediction window 3
+pv_model_input_parameters,visit_type,varchar,yes,no,no,Visit Type,List of allowed visit types in analysis
+pv_model_input_parameters,visit_length,int,yes,no,no,Visit Length,Visit length in days (0 = no specified visit length)
+pv_model_input_parameters,gender,varchar,yes,no,no,Gender,List of sexes included in the model
+pv_model_input_parameters,race,varchar,yes,no,no,Race,List of races included in the model
+pv_model_input_parameters,ethnicity,varchar,yes,no,no,Ethnicity,List of ethnicities included in the model
+pv_model_input_parameters,minimum_offset_from_start,int,yes,no,no,Minimum Offset From Start,Minimum number of days to offset for the analysis visit from the start of the observation period
+pv_model_input_parameters,minimum_offset_from_end ,int,yes,no,no,Minimum Offset From End ,Minimum number of days to offset for the analysis visit from the end of the observation period
+pv_model_input_parameters,start_date,varchar,yes,no,no,Start Date,Start date for model subjects
+pv_model_input_parameters,end_date,varchar,yes,no,no,End Date,End date for model subjects
+pv_evaluation_input_parameters,database_id,varchar,yes,yes,no,Database Id,Database name
+pv_evaluation_input_parameters,phenotype,varchar,yes,yes,no,Phenotype,Phenotype name
+pv_evaluation_input_parameters,analysis_name,varchar,yes,yes,no,Analysis Name,Analysis name
+pv_evaluation_input_parameters,run_date_time,varchar,yes,no,no,Run Datetime,Analysis run date/time
+pv_evaluation_input_parameters,inclusion_evaluation_cohort_id ,int,yes,no,no,Inclusion Evaluation Cohort Id ,The number of the cohort of the population to be used to designate which visits are eligible to be in the evaluation cohort
+pv_evaluation_input_parameters,inclusion_evaluation_days_from_start,int,yes,no,no,Inclusion Evaluation Days From Start,The number of days from the cohort start date of the inclusionEvaluationCohortId to start eligible included visits
+pv_evaluation_input_parameters,inclusion_evaluation_days_from_end ,int,yes,no,no,Inclusion Evaluation Days From End ,The number of days from the cohort start date of the inclusionEvaluationCohortId to end eligible included visits
+pv_evaluation_input_parameters,exclusion_evaluation_cohort_id,int,yes,no,no,Exclusion Evaluation Cohort Id,The number of the cohort of the population to be used to designate which visits are NOT eligible to be in the evaluation cohort
+pv_evaluation_input_parameters,exclusion_evaluation_days_from_start,int,yes,no,no,Exclusion Evaluation Days From Start,The number of days from the cohort start date of the exclusionEvaluationCohortId to start ineligible included visits
+pv_evaluation_input_parameters,exclusion_evaluation_days_from_end,int,yes,no,no,Exclusion Evaluation Days From End,The number of days from the cohort end date of the exclusionEvaluationCohortId to end ineligible included visits
+pv_evaluation_input_parameters,visit_type,varchar,yes,no,no,Visit Type,List of allowed visit types in analysis
+pv_evaluation_input_parameters,visit_length,int,yes,no,no,Visit Length,Visit length in days (0 = no specified visit length)
+pv_evaluation_input_parameters,x_spec_cohort_id,int,yes,no,no,xSpec Cohort Id,Id of the xSpec cohort
+pv_evaluation_input_parameters,x_sens_cohort_id,int,yes,no,no,xSens Cohort Id,Id if the xSens cohort
+pv_evaluation_input_parameters,prevalence_cohort_id,int,yes,no,no,Prevalence Cohort Id,Id of the prevalence cohort
+pv_evaluation_input_parameters,lower_age_limit,int,yes,no,no,Lower Age Limit,Lower age limit for subjects included in the model
+pv_evaluation_input_parameters,upper_age_limit,int,yes,no,no,Upper Age Limit,Upper age limit for subjects included in the model
+pv_evaluation_input_parameters,gender,varchar,yes,no,no,Gender,List of sexes included in the model
+pv_evaluation_input_parameters,race,varchar,yes,no,no,Race,List of races included in the model
+pv_evaluation_input_parameters,ethnicity,varchar,yes,no,no,Ethnicity,List of ethnicites included in the model
+pv_evaluation_input_parameters,minimum_offset_from_start,int,yes,no,no,Minimum Offset From Start,Minimum number of days to offset for the analysis visit from the start of the observation period
+pv_evaluation_input_parameters,minimum_offset_from_end ,int,yes,no,no,Minimum Offset From End ,Minimum number of days to offset for the analysis visit from the end of the observation period
+pv_evaluation_input_parameters,start_date,varchar,yes,no,no,Start Date,Start date for evaluation subjects
+pv_evaluation_input_parameters,end_date,varchar,yes,no,no,End Date,End date for evaluation subjects
+pv_evaluation_input_parameters,exclude_model_from_evaluation,varchar,yes,no,no,Exclude Model From Evaluation,True/false of whether subjects in the xSpec cohort should be excluded from the evaluation subjects
+pv_model_performance,database_id,varchar,yes,yes,no,Database Id,Database name
+pv_model_performance,phenotype,varchar,yes,yes,no,Phenotype,Phenotype name
+pv_model_performance,analysis_name,varchar,yes,yes,no,Analysis Name,Analysis name
+pv_model_performance,run_date_time,varchar,yes,no,no,Run Datetime,Analysis run date/time
+pv_model_performance,evaluation,varchar,yes,yes,no,Evaluation,"Type of evaluation - Train, test, or CV"
+pv_model_performance,metric,varchar,yes,yes,no,Metric,Performance parameter name
+pv_model_performance,value,float,yes,no,no,Value,Value of the performance parameter
+pv_test_subjects,database_id,varchar,yes,yes,no,Database Id,Database name
+pv_test_subjects,phenotype,varchar,yes,yes,no,Phenotype,Phenotype name
+pv_test_subjects,analysis_name,varchar,yes,yes,no,Analysis Name,Analysis name
+pv_test_subjects,run_date_time,varchar,yes,no,no,Run Datetime,Analysis run date/time
+pv_test_subjects,subject_id,bigint,yes,yes,no,Subject Id,Subject Id
+pv_test_subjects,cohort_start_date,date,yes,no,no,Cohort Start Date,Visit start date for analysis
+pv_test_subjects,days_from_obs_start,int,yes,no,no,Days From Obs Start,Days visit from observation start date
+pv_test_subjects,days_to_obs_end,int,yes,no,no,Days To Obs End,Days visit from observation end date
+pv_test_subjects,age_year,int,yes,no,no,Age Year,Age at time of visit
+pv_test_subjects,gender,int,yes,no,no,Gender,Sex of subject
+pv_test_subjects,type,varchar,yes,no,no,Type,Type of subject - TP: true positive; FP: false positive; TN: true negative; FN: false negative
+pv_test_subjects,value,float,yes,no,no,Value,Predicted probability of subject having condition
+pv_test_subjects,comparison_cohort_start_date,date,yes,no,no,Comparison Cohort Start Date,Cohort start date for comparison to Prevalence cohort
+pv_test_subjects_covariates,database_id,varchar,yes,yes,no,Database Id,Database name
+pv_test_subjects_covariates,phenotype,varchar,yes,yes,no,Phenotype,Phenotype name
+pv_test_subjects_covariates,analysis_name,varchar,yes,yes,no,Analysis Name,Analysis name
+pv_test_subjects_covariates,run_date_time,varchar,yes,no,no,Run Datetime,Analysis run date/time
+pv_test_subjects_covariates,subject_id,bigint,yes,yes,no,Subject Id,Subject Id
+pv_test_subjects_covariates,type,varchar,yes,no,no,Type,Type of subject - TP: true positive; FP: false positive; TN: true negative; FN: false negative
+pv_test_subjects_covariates,concept_id,bigint,yes,yes,no,Concept Id,Concept id of the covariate
+pv_test_subjects_covariates,coeff_value,float,yes,no,no,Coefficient Value,Predicted probability of subject having condition
+pv_test_subjects_covariates,covariate_name,varchar,yes,yes,no,Covariate Name,Name of the covariate
+pv_diagnostics,database_id,varchar,yes,yes,no,Database Id,Database name
+pv_diagnostics,phenotype,varchar,yes,yes,no,Phenotype,Phenotype name
+pv_diagnostics,analysis_name,varchar,yes,yes,no,Analysis Name,Analysis name
+pv_diagnostics,run_date_time,varchar,yes,no,no,Run Datetime,Analysis run date/time
+pv_diagnostics,_noncases,int,yes,no,no,Noncases,Number of non-cases in the evaluation cohort
+pv_diagnostics,cases,int,yes,no,no,Cases,Number of cases in the evaluation cohort
+pv_diagnostics,count_30_and_70pct,int,yes,no,no,Count 30 And 70%,Sum of the prediction value for predictions between 30-70%
+pv_diagnostics,prop_30_and_70pct,float,yes,no,no,Prop 30 And 70%,Proportion of sum of 30-70% subjects to total sum of predicted values
+pv_diagnostics,count_0_and_1pct,int,yes,no,no,Count 0 And 1%,Sum of the prediction value for predictions between 0-1%
+pv_diagnostics,prop_0_and_1pct,float,yes,no,no,Prop 0 And 1%,Proportion of sum of 0-1% subjects to total sum of predicted values
+pv_diagnostics,count_g_t_80pct,int,yes,no,no,Count GT 80%,Sum of the prediction value for predictions greater than or equal to 80%
+pv_diagnostics,prop_g_t_80pct,float,yes,no,no,Prop GT 80%,Proportion of sum of greater than 80% subjects to total sum of predicted values
+pv_cohort_definition_set,phenotype,varchar,yes,yes,no,Phenotype,Database name
+pv_cohort_definition_set,analysis_name,varchar,yes,yes,no,Analysis Name,Analysis name
+pv_cohort_definition_set,run_date_time,varchar,yes,no,no,Run Datetime,Analysis run date/time
+pv_cohort_definition_set,atlas_id,int,yes,no,no,Atlas Id,Atlas Id
+pv_cohort_definition_set,cohort_id,int,yes,yes,no,Cohort Id,Cohort Id
+pv_cohort_definition_set,cohort_name,varchar,yes,no,no,Cohort Name,Cohort Name
+pv_cohort_definition_set,sql,varchar,yes,no,no,Sql,sql code for cvohort
+pv_cohort_definition_set,json,varchar,yes,no,no,Json,json code for cohort
+pv_cohort_definition_set,logic_description,varchar,yes,no,no,Logic Description,logic description
+pv_cohort_definition_set,generate_stats,varchar,yes,no,no,Generate Stats,generate stats?
