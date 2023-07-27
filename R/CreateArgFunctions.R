@@ -16,6 +16,7 @@
 #'                                         the disease prevalence.
 #' @param caseCohortId                     The number of the cohort definition id to determine cases in the evaluation cohort
 #' @param caseFirstOccurrenceOnly          Set to true if only the first occurrence per subject in the case cohort is to be used
+#' @param xSpecCohortSize                  Maximum xSpec sample size to use in the analysis
 #' @param covariateSettings                A covariateSettings object as generated
 #'                                         using createCovariateSettings().
 #' @param modelPopulationCohortId          The number of the cohort to be used as a base population for

@@ -63,6 +63,8 @@ the disease prevalence.}
 
 \item{caseFirstOccurrenceOnly}{Set to true if only the first occurrence per subject in the case cohort is to be used}
 
+\item{xSpecCohortSize}{Maximum xSpec sample size to use in the analysis}
+
 \item{covariateSettings}{A covariateSettings object as generated
 using createCovariateSettings().}
 
