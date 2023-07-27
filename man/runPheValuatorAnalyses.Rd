@@ -6,6 +6,7 @@
 \usage{
 runPheValuatorAnalyses(
   phenotype,
+  cohortDefinitionSet = data.frame(),
   analysisName = "Main",
   runDateTime = format(Sys.time(), "\%b \%d \%Y \%X"),
   connectionDetails,
@@ -24,6 +25,9 @@ runPheValuatorAnalyses(
 }
 \arguments{
 \item{phenotype}{Name of the phenotype for analysis}
+
+\item{cohortDefinitionSet}{Data.frame of cohorts must include columns cohortId, cohortName, json, sql - should include all
+cohort definitions needed to replicate PheValuator analysis}
 
 \item{analysisName}{Name of the analysis}
 

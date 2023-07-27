@@ -474,7 +474,7 @@
             df$runDateTime <- runDateTime
             df$evaluation <- unlist(lrResults$performanceEvaluation$evaluationStatistics$evaluation)
             df$metric <- unlist(lrResults$performanceEvaluation$evaluationStatistics$metric)
-            df$value <- unlist(lrResults$performanceEvaluation$evaluationStatistics$value)
+            df$valuePerformance <- unlist(lrResults$performanceEvaluation$evaluationStatistics$value)
             df <- data.frame(df)
             colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_performance.csv"),

@@ -26,8 +26,8 @@ from (select co.*, p.*,
 	join @cdm_database_schema.observation_period o
 	  on co.subject_id = o.person_id
 	    and co.COHORT_START_DATE >= o.observation_period_start_date
-		and co.COHORT_START_DATE <= o.observation_period_end_date
-	    and datediff(day, o.observation_period_start_date, co.COHORT_START_DATE) >= 365
+		  and co.COHORT_START_DATE <= o.observation_period_end_date
+	    and datediff(day, o.observation_period_start_date, co.COHORT_START_DATE) >= 30
 	{@daysFromxSpec != 0} ? {
 	join @cdm_database_schema.visit_occurrence v
     	 on co.subject_id = v.person_id

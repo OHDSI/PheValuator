@@ -16,6 +16,8 @@ createEvaluationCohort(
   daysFromxSpec = 0,
   xSensCohortId,
   prevalenceCohortId,
+  caseCohortId,
+  caseFirstOccurrenceOnly,
   xSpecCohortSize = 5000,
   cdmDatabaseSchema,
   cohortDatabaseSchema,
@@ -86,6 +88,10 @@ definition id in the cohort table (for noisy negatives).}
 
 \item{prevalenceCohortId}{The number of the cohort definition id to determine the
 disease prevalence.}
+
+\item{caseCohortId}{The number of the cohort definition id to determine cases in the evaluation cohort}
+
+\item{caseFirstOccurrenceOnly}{Set to true if only the first occurrence per subject in the case cohort is to be used}
 
 \item{xSpecCohortSize}{The recommended xSpec sample size to use in model (default = NULL)}
 
@@ -180,7 +186,7 @@ to end ineligible included visits}
 
 \item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the evaluation cohort?}
 
-\item{randomVisitTable}{Table stored in work directory with pre-selected random visits}
+\item{randomVisitTable}{Table stored in work directory with pre-selected random visits in format of visit_occurrence table}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects with
 dates in the future?}

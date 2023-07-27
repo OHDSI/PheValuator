@@ -40,6 +40,9 @@
 #'                                         definition id in the cohort table (for noisy negatives).
 #' @param prevalenceCohortId               The number of the cohort definition id to determine the
 #'                                         disease prevalence.
+#' @param caseCohortId                     The number of the cohort definition id to determine cases in the evaluation cohort
+#' @param caseFirstOccurrenceOnly          Set to true if only the first occurrence per subject in the case cohort is to be used
+#' @param xSpecCohortSize                  The recommended xSpec sample size to use in model (default = 5000)
 #' @param xSpecCohortSize                  The recommended xSpec sample size to use in model (default = NULL)
 #' @param cdmDatabaseSchema                The name of the database schema that contains the OMOP CDM
 #'                                         instance. Requires read permissions to this database. On SQL
@@ -115,6 +118,8 @@ createEvaluationCohort <- function(connectionDetails,
                                    daysFromxSpec = 0,
                                    xSensCohortId,
                                    prevalenceCohortId,
+                                   caseCohortId,
+                                   caseFirstOccurrenceOnly,
                                    xSpecCohortSize = 5000,
                                    cdmDatabaseSchema,
                                    cohortDatabaseSchema,
@@ -239,6 +244,8 @@ createEvaluationCohort <- function(connectionDetails,
     xSpecCohortId = xSpecCohortId,
     xSensCohortId = xSensCohortId,
     prevalenceCohortId = prevalenceCohortId,
+    caseCohortId = caseCohortId,
+    caseFirstOccurrenceOnly = caseFirstOccurrenceOnly,
     cdmDatabaseSchema = cdmDatabaseSchema,
     cohortDatabaseSchema = cohortDatabaseSchema,
     cohortTable = cohortTable,

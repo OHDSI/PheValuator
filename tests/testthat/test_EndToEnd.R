@@ -17,6 +17,7 @@ test_that("TestPhenotype - test PheValuator end to end", {
   excludedCovariateConceptIds <- c()
   xSensCohort <- 2
   prevalenceCohort <- 2
+  condition <- "any condition"
 
   #connectionDetails <- Eunomia::getEunomiaConnectionDetails()
   connection <- connect(connectionDetails)
@@ -83,12 +84,13 @@ test_that("TestPhenotype - test PheValuator end to end", {
   pheValuatorAnalysisList <- loadPheValuatorAnalysisList(file.path(folder, "pheValuatorAnalysisSettings.json"))
 
   referenceTable <- runPheValuatorAnalyses(
-    phenotype = "any condition",
+    phenotype = condition,
     connectionDetails = connectionDetails,
     cdmDatabaseSchema = cdmDatabaseSchema,
     cohortDatabaseSchema = cohortDatabaseSchema,
     cohortTable = cohortTable,
     workDatabaseSchema = workDatabaseSchema,
+    databaseId = cdmDatabaseSchema,
     outputFolder = folder,
     pheValuatorAnalysisList = pheValuatorAnalysisList
   )

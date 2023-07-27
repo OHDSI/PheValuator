@@ -3,7 +3,8 @@
 {DEFAULT @cohort_database_table = 'cohort'
 {DEFAULT @work_database_schema = 'CDM_SIM' }
 {DEFAULT @x_spec_cohort = 0 }
-{DEFAULT @prevalenceCohortId = 0 }
+{DEFAULT @caseCohortId = 0 }
+{DEFAULT @caseFirstOccurrenceOnly}
 {DEFAULT @tempDB = "scratch.dbo" }
 {DEFAULT @test_cohort = "test_cohort" }
 {DEFAULT @ageLimit = 0}
@@ -30,18 +31,36 @@
 
 DROP TABLE IF EXISTS #finalCohort;
 
+--if using first occurrence only, subset the cohort to the first occurrence per subject
+{@caseFirstOccurrenceOnly == TRUE} ?
+{select cohort_definition_id, subject_id, cohort_start_date, cohort_end_date
+ into #adjustedCaseCohort
+ from (
+    select *, row_number() over (PARTITION BY subject_id order by cohort_start_date) rn
+    from @cohort_database_schema.@cohort_database_table
+    where cohort_definition_id = @caseCohortId) a
+    where rn = 1;}
+
+--else allow all occurrences to go through to main sql
+{@caseFirstOccurrenceOnly == FALSE} ?
+{select *
+ into #adjustedCaseCohort
+ from @cohort_database_schema.@cohort_database_table
+ where cohort_definition_id = @caseCohortId;}
+
+
+
 -- create cohort using prevalence cohort and visit table
 with persons as ( --subset a random set of subjects
-  select *
+  select top 20000000 *
   from (
     select person_id, row_number() over (order by NewId()) rn
     from @cdm_database_schema.person p
-{@inclusionEvaluationCohortId != 0} ? { --subjects must be from base evaluation cohort if specified
+{@inclusionEvaluationCohortId != 0} ? { --subjects must be from inclusion evaluation cohort if specified
     join @cohort_database_schema.@cohort_database_table co
       on co.cohort_definition_id = @inclusionEvaluationCohortId
         and co.subject_id = p.person_id}) a
-  order by rn
-  limit 10 * @baseSampleSize),
+  order by rn),
 
 visits as ( --and a random visit from each subject selected
 select distinct v.person_id, first_value(visit_start_date)
@@ -83,17 +102,17 @@ where v.person_id in (
 select *
 into #finalCohort
 from (
-  select @prevalenceCohortId as cohort_definition_id, person_id as subject_id, visit_start_date as cohort_start_date,
+  select @caseCohortId as cohort_definition_id, person_id as subject_id, visit_start_date as cohort_start_date,
     dateadd(day, 1, visit_start_date) as cohort_end_date
   from visits
-  where person_id not in ( --noncases from those not in prevalence cohort
+  where person_id not in ( --noncases from those not in case cohort
     select subject_id
     from @cohort_database_schema.@cohort_database_table
-    where cohort_definition_id = @prevalenceCohortId)
+    where cohort_definition_id = @caseCohortId)
   union
-  select c.* --cases from those also in prevalence cohort
+  select c.* --cases from those also in case cohort - use adjusted case cohort, i.e., only using first occurrence if specified
   from visits v
-  join @cohort_database_schema.@cohort_database_table c
+  join #adjustedCaseCohort c
     on v.person_id = c.subject_id
 {@inclusionEvaluationCohortId != 0} ? { --cases must be within designated period from inclusion evaluation cohort if specified
   join @cohort_database_schema.@cohort_database_table co
@@ -101,7 +120,6 @@ from (
       and co.subject_id = c.subject_id
       and c.cohort_start_date >= dateadd(day, @inclusionEvaluationDaysFromStart, co.cohort_start_date)
       and c.cohort_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_end_date)}
-  where c.cohort_definition_id = @prevalenceCohortId
 ) a
 ;
 DROP TABLE IF EXISTS #cohort_person;
@@ -171,7 +189,7 @@ from (select co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (P
 		on v.person_id = excl.subject_id
 		  and v.visit_start_date = excl.COHORT_START_DATE
 	  }
-				where co.cohort_definition_id = @prevalenceCohortId
+				where co.cohort_definition_id = @caseCohortId
 {@exclCohort != 0} ? {
 					and excl.subject_id is NULL
 }

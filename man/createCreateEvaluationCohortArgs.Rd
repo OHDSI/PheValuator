@@ -9,6 +9,8 @@ createCreateEvaluationCohortArgs(
   daysFromxSpec = 0,
   xSensCohortId = prevalenceCohortId,
   prevalenceCohortId,
+  caseCohortId = prevalenceCohortId,
+  caseFirstOccurrenceOnly = TRUE,
   xSpecCohortSize = 5000,
   covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
     addDescendantsToExclude = TRUE),
@@ -21,8 +23,8 @@ createCreateEvaluationCohortArgs(
   exclusionEvaluationCohortId = 0,
   exclusionEvaluationDaysFromStart = 0,
   exclusionEvaluationDaysFromEnd = 0,
-  minimumOffsetFromStart = 365,
-  minimumOffsetFromEnd = 365,
+  minimumOffsetFromStart = 0,
+  minimumOffsetFromEnd = 30,
   modelBaseSampleSize = 25000,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
@@ -57,7 +59,9 @@ negatives).}
 \item{prevalenceCohortId}{The number of the cohort definition id to determine
 the disease prevalence.}
 
-\item{xSpecCohortSize}{The recommended xSpec sample size to use in model (default = 5000)}
+\item{caseCohortId}{The number of the cohort definition id to determine cases in the evaluation cohort}
+
+\item{caseFirstOccurrenceOnly}{Set to true if only the first occurrence per subject in the case cohort is to be used}
 
 \item{covariateSettings}{A covariateSettings object as generated
 using createCovariateSettings().}
@@ -122,7 +126,7 @@ to end ineligible included visits}
 
 \item{evaluationCohortId}{A string used to generate the file names for this evaluation cohort.}
 
-\item{randomVisitTable}{Table stored in work directory with pre-selected random visits}
+\item{randomVisitTable}{Table stored in work directory with pre-selected random visits in format of visit_occurrence table}
 
 \item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the
 evaluation cohort?}

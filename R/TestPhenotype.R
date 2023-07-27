@@ -146,7 +146,12 @@ testPhenotypeAlgorithm <- function(phenotype,
     modelAll <- evaluationCohort$prediction[evaluationCohort$prediction$outcomeCount == 0 &
                                               evaluationCohort$prediction$daysFromObsStart >= washoutPeriod, ]
 
-    modelAll <- modelAll[order(modelAll$value), ]
+    modelAll <- modelAll[order(modelAll$value),]
+
+    if(nrow(modelAll == 0)) {
+      return(NULL)
+    }
+
     modelAll$rownum <- 1:nrow(modelAll)
     phenoPop$inPhenotype <- rep(TRUE, nrow(phenoPop))
 
@@ -193,6 +198,7 @@ testPhenotypeAlgorithm <- function(phenotype,
         cutPt <- as.numeric(cutPoints[cpUp])
         fullTable$value <- fullTable$value > cutPt
       }
+
       fullTable$tp <- 0
       fullTable$tn <- 0
       fullTable$fp <- 0
@@ -201,6 +207,8 @@ testPhenotypeAlgorithm <- function(phenotype,
       fullTable$tn[!fullTable$inPhenotype] <- 1 - fullTable$value[!fullTable$inPhenotype]
       fullTable$fp[fullTable$inPhenotype] <- 1 - fullTable$value[fullTable$inPhenotype]
       fullTable$fn[!fullTable$inPhenotype] <- fullTable$value[!fullTable$inPhenotype]
+
+      fullTable <- fullTable[!is.na(fullTable$subjectId),] #remove null rows
 
       ######
       # write.csv(fullTable, paste0("p:/shared/",  phenotypeCohortId, splayPrior, ".csv"))
@@ -236,10 +244,10 @@ testPhenotypeAlgorithm <- function(phenotype,
         }
       }
       newRow <- tibble::tibble(
-        truePositives = sum(fullTable$tp),
-        trueNegatives = sum(fullTable$tn),
-        falsePositives = sum(fullTable$fp),
-        falseNegatives = sum(fullTable$fn)
+        truePositives = sum(fullTable$tp, na.rm = TRUE),
+        trueNegatives = sum(fullTable$tn, na.rm = TRUE),
+        falsePositives = sum(fullTable$fp, na.rm = TRUE),
+        falseNegatives = sum(fullTable$fn, na.rm = TRUE)
       )
 
       if (cutPoints[cpUp] == xSpecP) {
@@ -259,8 +267,20 @@ testPhenotypeAlgorithm <- function(phenotype,
     if(nrow(countsTable) > 0) {
       countsTable <- computePerformanceMetricsFromCounts(countsTable)
 
-      # Make pretty results table
+      totalSubjects <- nrow(fullTable)
+      rawCases <- nrow(fullTable[!is.na(fullTable$comparisonCohortStartDate),])
+      estimatedCases <- countsTable$truePositives + countsTable$falseNegatives
 
+      rawTar <-  sum(fullTable$rawTar/365, na.rm = TRUE) #tar in years
+      estimatedTar <- sum(fullTable$estimatedTar/365, na.rm = TRUE) #tar in years
+
+      rawPrevalence <- rawCases/totalSubjects
+      estimatedPrevalence <- countsTable$estimatedPrevalence
+
+      rawPrevalenceRate <- rawCases*100/rawTar
+      estimatedPrevalenceRate <- estimatedCases*100/estimatedTar
+
+      # Make pretty results table
       results <- tibble::tibble(
         phenotype = phenotype,
         databaseId = databaseId,
@@ -269,8 +289,21 @@ testPhenotypeAlgorithm <- function(phenotype,
         ppv95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$ppv, countsTable$ppvCi95Lb, countsTable$ppvCi95Ub),
         specificity95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$spec, countsTable$specCi95Lb, countsTable$specCi95Ub),
         npv95Ci = sprintf("%0.3f (%0.3f - %0.3f)", countsTable$npv, countsTable$npvCi95Lb, countsTable$npvCi95Ub),
-        estimatedPrevalence = sprintf("%0.3f", 100 * countsTable$estimatedPrevalence),
         f1Score = sprintf("%0.3f", countsTable$f1Score),
+
+        totalSubjects = totalSubjects ,
+        rawCases = rawCases,
+        estimatedCases = round(estimatedCases, 0),
+
+        rawTar = sprintf("%0.1f", rawTar),
+        estimatedTar = sprintf("%0.1f", estimatedTar),
+
+        rawPrevalence = sprintf("%0.3f", 100 * rawPrevalence),
+        estimatedPrevalence = sprintf("%0.3f", 100 * estimatedPrevalence),
+
+        rawPrevalenceRate = sprintf("%0.3f", rawPrevalenceRate),
+        estimatedPrevalenceRate = sprintf("%0.3f", estimatedPrevalenceRate),
+
         truePositives = round(countsTable$truePositives, 0),
         trueNegatives = round(countsTable$trueNegatives, 0),
         falsePositives = round(countsTable$falsePositives, 0),

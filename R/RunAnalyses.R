@@ -20,6 +20,8 @@
 #' Run a list of analyses.
 #'
 #' @param phenotype                      Name of the phenotype for analysis
+#' @param cohortDefinitionSet            Data.frame of cohorts must include columns cohortId, cohortName, json, sql - should include all
+#'                                       cohort definitions needed to replicate PheValuator analysis
 #' @param analysisName                   Name of the analysis
 #' @param runDateTime                    Starting date and time of the PheValuator run
 #' @param connectionDetails              An R object of type \code{connectionDetails} created using the
@@ -56,6 +58,7 @@
 #'
 #' @export
 runPheValuatorAnalyses <- function(phenotype,
+                                   cohortDefinitionSet = data.frame(),
                                    analysisName = "Main",
                                    runDateTime = format(Sys.time(), "%b %d %Y %X"),
                                    connectionDetails,
@@ -78,12 +81,36 @@ runPheValuatorAnalyses <- function(phenotype,
     dir.create(outputFolder, recursive = TRUE)
   }
 
+  ParallelLogger::logInfo("\nBeginning PheValuator analysis for phenotype: ", phenotype, "\n")
+
   #create export folder for csv output
   exportFolder <- file.path(outputFolder, "exportFolder")
   dir.create(exportFolder, showWarnings = FALSE)
 
   referenceTable <- createReferenceTable(pheValuatorAnalysisList)
   saveRDS(referenceTable, file.path(outputFolder, "reference.rds"))
+
+  df <- NULL
+  df$phenotype <- phenotype
+  df$analysisName <- analysisName
+  df$databaseId <- databaseId
+  df$runDateTime <- runDateTime
+
+  if(nrow(cohortDefinitionSet) != 0) {
+    df <- cbind(df, data.frame(cohortDefinitionSet[,c(1:3)]))
+  }
+
+  if(!is.null(colnames(df))) {
+    colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
+  }
+
+  cohortFile <- file.path(exportFolder, "pv_cohort_definition_set.csv")
+  if(!file.exists(cohortFile)) {
+    ParallelLogger::logInfo("\nsaving ", cohortFile, "\n")
+    write.csv(df, cohortFile, row.names = FALSE)
+  } else {
+    ParallelLogger::logInfo("\n", cohortFile, " exists...not overwriting.\n")
+  }
 
   ParallelLogger::logInfo("Generating evaluation cohorts")
   evaluationCohortFolders <- unique(referenceTable$evaluationCohortFolder)
@@ -158,6 +185,7 @@ runPheValuatorAnalyses <- function(phenotype,
 
 
   output <- data.frame(summarizePheValuatorAnalyses(referenceTable, outputFolder))
+  names(output)[names(output)=="analysisId"] <- "analysisIdResults"
   colnames(output) <- SqlRender::camelCaseToSnakeCase(colnames(output))
 
   if(ncol(output) > 10) {

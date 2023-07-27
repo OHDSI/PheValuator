@@ -1,3 +1,14 @@
+PheValuator 2.2.9
+=================
+
+Changes:
+1. Allow for a designated Case cohort to use for comparisons between cases and non-cases when viewing false postives and negatives
+2. Allow for use of evaluation saved PLP data when flag for data save is TRUE
+3. Replace duplicate names for shiny output
+4. Create the cohort definition set within the tool for shiny use
+5. Correct bug when there are NA's in test phenotype
+6. Reduce constraints on xSpec cohort allowing for more subjects to be included within the cohort
+
 PheValuator 2.2.8
 =================
 
