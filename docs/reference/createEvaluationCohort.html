@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.9</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
 </li>
 <li>
   <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
@@ -78,6 +78,8 @@
 <span>  daysFromxSpec <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  <span class="va">xSensCohortId</span>,</span>
 <span>  <span class="va">prevalenceCohortId</span>,</span>
+<span>  <span class="va">caseCohortId</span>,</span>
+<span>  <span class="va">caseFirstOccurrenceOnly</span>,</span>
 <span>  xSpecCohortSize <span class="op">=</span> <span class="fl">5000</span>,</span>
 <span>  <span class="va">cdmDatabaseSchema</span>,</span>
 <span>  <span class="va">cohortDatabaseSchema</span>,</span>
@@ -171,6 +173,14 @@ definition id in the cohort table (for noisy negatives).</p></dd>
 <dt>prevalenceCohortId</dt>
 <dd><p>The number of the cohort definition id to determine the
 disease prevalence.</p></dd>
+
+
+<dt>caseCohortId</dt>
+<dd><p>The number of the cohort definition id to determine cases in the evaluation cohort</p></dd>
+
+
+<dt>caseFirstOccurrenceOnly</dt>
+<dd><p>Set to true if only the first occurrence per subject in the case cohort is to be used</p></dd>
 
 
 <dt>xSpecCohortSize</dt>
@@ -339,7 +349,7 @@ to end ineligible included visits</p></dd>
 
 
 <dt>randomVisitTable</dt>
-<dd><p>Table stored in work directory with pre-selected random visits</p></dd>
+<dd><p>Table stored in work directory with pre-selected random visits in format of visit_occurrence table</p></dd>
 
 
 <dt>removeSubjectsWithFutureDates</dt>

@@ -151,7 +151,7 @@ testPhenotypeAlgorithm <- function(phenotype,
     modelAll <- modelAll[order(modelAll$value),]
 
     if(nrow(modelAll) == 0) {
-     return(NULL)
+      return(NULL)
     }
 
     modelAll$rownum <- 1:nrow(modelAll)
