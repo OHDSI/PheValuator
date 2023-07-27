@@ -74,6 +74,8 @@ testPhenotypeAlgorithm <- function(phenotype,
                                    washoutPeriod = 0,
                                    splayPrior = 7,
                                    splayPost = 7) {
+
+
   if (length(connectionDetails) == 0) {
     stop("Must supply a connection string")
   }
@@ -148,8 +150,8 @@ testPhenotypeAlgorithm <- function(phenotype,
 
     modelAll <- modelAll[order(modelAll$value),]
 
-    if(nrow(modelAll == 0)) {
-      return(NULL)
+    if(nrow(modelAll) == 0) {
+     return(NULL)
     }
 
     modelAll$rownum <- 1:nrow(modelAll)
