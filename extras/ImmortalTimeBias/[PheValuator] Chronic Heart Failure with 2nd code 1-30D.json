@@ -1,0 +1,333 @@
+{
+ "cdmVersionRange": ">=5.0.0",
+"PrimaryCriteria": {
+ "CriteriaList": [
+ {
+ "ConditionOccurrence": {
+ "CorrelatedCriteria": {
+ "Type": "ALL",
+"CriteriaList": [
+ {
+ "Criteria": {
+ "ConditionOccurrence": {
+ "CodesetId":        0,
+"ConditionTypeExclude": false 
+} 
+},
+"StartWindow": {
+ "Start": {
+ "Days":        1,
+"Coeff":        1 
+},
+"End": {
+ "Days":       30,
+"Coeff":        1 
+},
+"UseIndexEnd": false,
+"UseEventEnd": false 
+},
+"RestrictVisit": false,
+"IgnoreObservationPeriod": false,
+"Occurrence": {
+ "Type":        2,
+"Count":        1,
+"IsDistinct": false 
+} 
+} 
+],
+"DemographicCriteriaList": [],
+"Groups": [] 
+},
+"CodesetId":        0,
+"First": true,
+"ConditionTypeExclude": false 
+} 
+} 
+],
+"ObservationWindow": {
+ "PriorDays":        0,
+"PostDays":        0 
+},
+"PrimaryCriteriaLimit": {
+ "Type": "First" 
+} 
+},
+"ConceptSets": [
+ {
+ "id":        0,
+"name": "[PheValuator] Chronic Heart Failure",
+"expression": {
+ "items": [
+ {
+ "concept": {
+ "CONCEPT_ID":  4229440,
+"CONCEPT_NAME": "Chronic congestive heart failure",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "88805009",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID":   314378,
+"CONCEPT_NAME": "Hypertensive heart disease with congestive heart failure",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "5148006",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID":   439698,
+"CONCEPT_NAME": "Benign hypertensive heart disease with congestive cardiac failure",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "194767001",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID":   439696,
+"CONCEPT_NAME": "Hypertensive heart and renal disease with (congestive) heart failure",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "194779001",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID":   444101,
+"CONCEPT_NAME": "Hypertensive heart failure",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "46113002",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID": 4.302184e+07,
+"CONCEPT_NAME": "Diastolic heart failure stage D",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "120881000119106",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID": 4.302184e+07,
+"CONCEPT_NAME": "Diastolic heart failure stage C",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "120891000119109",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID": 4.353064e+07,
+"CONCEPT_NAME": "Diastolic heart failure stage B",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "120901000119108",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID": 4.047958e+07,
+"CONCEPT_NAME": "Chronic diastolic heart failure",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "441530006",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID": 4.302184e+07,
+"CONCEPT_NAME": "Systolic heart failure stage D",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "120851000119104",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID": 4.353064e+07,
+"CONCEPT_NAME": "Systolic heart failure stage B",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "120871000119108",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID": 4.302042e+07,
+"CONCEPT_NAME": "Systolic heart failure stage C",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "120861000119102",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID": 4.047919e+07,
+"CONCEPT_NAME": "Chronic systolic heart failure",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "441481004",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID":   444031,
+"CONCEPT_NAME": "Chronic heart failure",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "48447003",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+},
+{
+ "concept": {
+ "CONCEPT_ID":  4242669,
+"CONCEPT_NAME": "Biventricular congestive heart failure",
+"STANDARD_CONCEPT": "S",
+"STANDARD_CONCEPT_CAPTION": "Standard",
+"INVALID_REASON": "V",
+"INVALID_REASON_CAPTION": "Valid",
+"CONCEPT_CODE": "92506005",
+"DOMAIN_ID": "Condition",
+"VOCABULARY_ID": "SNOMED",
+"CONCEPT_CLASS_ID": "Clinical Finding" 
+},
+"isExcluded": false,
+"includeDescendants": true,
+"includeMapped": false 
+} 
+] 
+} 
+} 
+],
+"QualifiedLimit": {
+ "Type": "All" 
+},
+"ExpressionLimit": {
+ "Type": "First" 
+},
+"InclusionRules": [],
+"CensoringCriteria": [],
+"CollapseSettings": {
+ "CollapseType": "ERA",
+"EraPad":        0 
+},
+"CensorWindow": {} 
+}
