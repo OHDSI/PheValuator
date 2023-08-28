@@ -9,6 +9,7 @@
 {DEFAULT @inclusionEvaluationCohortId = 0 }
 {DEFAULT @inclusionEvaluationDaysFromStart = 0 }
 {DEFAULT @inclusionEvaluationDaysFromEnd = 0 }
+{DEFAULT @duringInclusionEvaluationOnly}
 {DEFAULT @caseFirstOccurrenceOnly = TRUE}
 
 --if using first occurrence only subset the cohort to the first occurrence per subject
@@ -38,7 +39,17 @@ SELECT subject_id, cohort_start_date comparison_cohort_start_date, cohort_end_da
    {join @cohort_database_schema.@cohort_table c2
       on c1.subject_id = c2.subject_id
       and c1.cohort_start_date >= dateadd(day, @inclusionEvaluationDaysFromStart, c2.cohort_start_date)
-      and c1.cohort_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, c2.cohort_end_date)
+
+      {@duringInclusionEvaluationOnly == FALSE} ? {--no limit to the ending date designated by inclusionEvaluationDaysFromEnd
+      and c1.cohort_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, c2.cohort_start_date)}
+
+      {@duringInclusionEvaluationOnly == TRUE} ? {--limit ending date to min value of days offset and end of cohort
+      and c1.cohort_start_date <=
+        CASE
+          WHEN dateadd(day, @inclusionEvaluationDaysFromEnd, c2.cohort_start_date) > c2.cohort_end_date THEN c2.cohort_end_date
+          ELSE dateadd(day, @inclusionEvaluationDaysFromEnd, c2.cohort_start_date)
+        END}
+
       and c2.cohort_definition_id = @inclusionEvaluationCohortId}
     ) a
 where rn = 1;

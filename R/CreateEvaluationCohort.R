@@ -71,13 +71,14 @@
 #'                                         are eligible to be in the evaluation cohort
 #' @param inclusionEvaluationDaysFromStart The number of days from the cohort start date of the inclusionEvaluationCohortId
 #'                                         to start eligible included visits
-#' @param inclusionEvaluationDaysFromEnd   The number of days from the cohort end date of the inclusionEvaluationCohortId
+#' @param inclusionEvaluationDaysFromEnd   The number of days from the cohort start date of the inclusionEvaluationCohortId
 #'                                         to end eligible included visits
+#' @param duringInclusionEvaluationOnly    Only include visits that are within the cohort start and end dates
 #' @param exclusionEvaluationCohortId      The number of the cohort of the population to be used to designate which visits
 #'                                         are NOT eligible to be in the evaluation cohort
 #' @param exclusionEvaluationDaysFromStart The number of days from the cohort start date of the exclusionEvaluationCohortId
 #'                                         to start ineligible included visits
-#' @param exclusionEvaluationDaysFromEnd   The number of days from the cohort end date of the exclusionEvaluationCohortId
+#' @param exclusionEvaluationDaysFromEnd   The number of days from the cohort start date of the exclusionEvaluationCohortId
 #'                                         to end ineligible included visits
 #' @param priorModelToUse                  folder where a previously developed model to use in analysis will be found
 #' @param minimumOffsetFromStart           Minimum number of days to offset for the analysis visit from the start of the observation period
@@ -135,6 +136,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    inclusionEvaluationCohortId = 0,
                                    inclusionEvaluationDaysFromStart = 0,
                                    inclusionEvaluationDaysFromEnd = 0,
+                                   duringInclusionEvaluationOnly = FALSE,
                                    exclusionEvaluationCohortId = 0,
                                    exclusionEvaluationDaysFromStart = 0,
                                    exclusionEvaluationDaysFromEnd = 0,
@@ -255,6 +257,7 @@ createEvaluationCohort <- function(connectionDetails,
     inclusionEvaluationCohortId = inclusionEvaluationCohortId,
     inclusionEvaluationDaysFromStart = inclusionEvaluationDaysFromStart,
     inclusionEvaluationDaysFromEnd = inclusionEvaluationDaysFromEnd,
+    duringInclusionEvaluationOnly = duringInclusionEvaluationOnly,
     exclusionEvaluationCohortId = exclusionEvaluationCohortId,
     exclusionEvaluationDaysFromStart = exclusionEvaluationDaysFromStart,
     exclusionEvaluationDaysFromEnd = exclusionEvaluationDaysFromEnd,

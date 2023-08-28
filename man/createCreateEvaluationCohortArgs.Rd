@@ -20,6 +20,7 @@ createCreateEvaluationCohortArgs(
   inclusionEvaluationCohortId = 0,
   inclusionEvaluationDaysFromStart = 0,
   inclusionEvaluationDaysFromEnd = 0,
+  duringInclusionEvaluationOnly = FALSE,
   exclusionEvaluationCohortId = 0,
   exclusionEvaluationDaysFromStart = 0,
   exclusionEvaluationDaysFromEnd = 0,
@@ -84,8 +85,10 @@ are are eligible to be in the evaluation cohort}
 \item{inclusionEvaluationDaysFromStart}{The number of days from the cohort start date of the inclusionEvaluationCohortId
 to start eligible included visits}
 
-\item{inclusionEvaluationDaysFromEnd}{The number of days from the cohort end date of the inclusionEvaluationCohortId
+\item{inclusionEvaluationDaysFromEnd}{The number of days from the cohort start date of the inclusionEvaluationCohortId
 to end eligible included visits}
+
+\item{duringInclusionEvaluationOnly}{Only include visits that are within the cohort start and end dates}
 
 \item{exclusionEvaluationCohortId}{The number of the cohort of the population to be used to designate which visits
 are NOT eligible to be in the evaluation cohort}
@@ -93,7 +96,7 @@ are NOT eligible to be in the evaluation cohort}
 \item{exclusionEvaluationDaysFromStart}{The number of days from the cohort start date of the exclusionEvaluationCohortId
 to start ineligible included visits}
 
-\item{exclusionEvaluationDaysFromEnd}{The number of days from the cohort end date of the exclusionEvaluationCohortId
+\item{exclusionEvaluationDaysFromEnd}{The number of days from the cohort start date of the exclusionEvaluationCohortId
 to end ineligible included visits}
 
 \item{minimumOffsetFromStart}{Minimum number of days to offset for the analysis visit from the start of the observation period}

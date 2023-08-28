@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.10</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
 </li>
 <li>
   <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
@@ -93,6 +93,7 @@
 <span>  inclusionEvaluationCohortId <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  inclusionEvaluationDaysFromStart <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  inclusionEvaluationDaysFromEnd <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  duringInclusionEvaluationOnly <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  exclusionEvaluationCohortId <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  exclusionEvaluationDaysFromStart <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  exclusionEvaluationDaysFromEnd <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -245,8 +246,12 @@ to start eligible included visits</p></dd>
 
 
 <dt>inclusionEvaluationDaysFromEnd</dt>
-<dd><p>The number of days from the cohort end date of the inclusionEvaluationCohortId
+<dd><p>The number of days from the cohort start date of the inclusionEvaluationCohortId
 to end eligible included visits</p></dd>
+
+
+<dt>duringInclusionEvaluationOnly</dt>
+<dd><p>Only include visits that are within the cohort start and end dates</p></dd>
 
 
 <dt>exclusionEvaluationCohortId</dt>
@@ -260,7 +265,7 @@ to start ineligible included visits</p></dd>
 
 
 <dt>exclusionEvaluationDaysFromEnd</dt>
-<dd><p>The number of days from the cohort end date of the exclusionEvaluationCohortId
+<dd><p>The number of days from the cohort start date of the exclusionEvaluationCohortId
 to end ineligible included visits</p></dd>
 
 

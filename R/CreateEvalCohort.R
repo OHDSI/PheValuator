@@ -33,6 +33,7 @@
                                     inclusionEvaluationCohortId = 0,
                                     inclusionEvaluationDaysFromStart = 0,
                                     inclusionEvaluationDaysFromEnd = 0,
+                                    duringInclusionEvaluationOnly = FALSE,
                                     exclusionEvaluationCohortId = 0,
                                     exclusionEvaluationDaysFromStart = 0,
                                     exclusionEvaluationDaysFromEnd = 0,
@@ -60,6 +61,13 @@
 
   tempTableCreated <- FALSE
   evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))
+
+  if(inclusionEvaluationCohortId == 0) { #if no inclusion cohort id ensure that these were also set to 0
+    inclusionEvaluationDaysFromStart <- 0
+    inclusionEvaluationDaysFromEnd <- 0
+    duringInclusionEvaluationOnly <- FALSE
+  }
+
 
   # if (savePlpData == TRUE) {
   #   evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))
@@ -184,6 +192,7 @@
           inclusionEvaluationCohortId = inclusionEvaluationCohortId,
           inclusionEvaluationDaysFromStart = inclusionEvaluationDaysFromStart,
           inclusionEvaluationDaysFromEnd = inclusionEvaluationDaysFromEnd,
+          duringInclusionEvaluationOnly = duringInclusionEvaluationOnly,
           exclusionEvaluationCohortId = exclusionEvaluationCohortId,
           exclusionEvaluationDaysFromStart = exclusionEvaluationDaysFromStart,
           exclusionEvaluationDaysFromEnd = exclusionEvaluationDaysFromEnd,
@@ -356,7 +365,8 @@
                                              caseFirstOccurrenceOnly = caseFirstOccurrenceOnly,
                                              inclusionEvaluationCohortId = inclusionEvaluationCohortId,
                                              inclusionEvaluationDaysFromStart = inclusionEvaluationDaysFromStart,
-                                             inclusionEvaluationDaysFromEnd = inclusionEvaluationDaysFromEnd)
+                                             inclusionEvaluationDaysFromEnd = inclusionEvaluationDaysFromEnd,
+                                             duringInclusionEvaluationOnly = duringInclusionEvaluationOnly)
 
     sql <- SqlRender::translate(sql, connectionDetails$dbms)
     comparisonPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
@@ -376,12 +386,46 @@
       finalPopn <- merge(finalPopn, inclusionCohort, all.x = TRUE)
       #remove those where cohort_start_date is not between inclusion start and end
       finalPopn <- finalPopn[finalPopn$cohortStartDate >= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromStart) &
-                               finalPopn$cohortStartDate <= (finalPopn$inclusionCohortEndDate + inclusionEvaluationDaysFromEnd), ]
+                               finalPopn$cohortStartDate <= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd), ]
     } else {
       #set inclusion start to be cohort_start_date - days from obs start
       finalPopn$inclusionCohortStartDate <- as.Date(finalPopn$cohortStartDate) - finalPopn$daysFromObsStart
       #set inclusion end to be cohort_start_date + days to obs end
       finalPopn$inclusionCohortEndDate <- as.Date(finalPopn$cohortStartDate) + finalPopn$daysToObsEnd
+    }
+    finalPopn <- finalPopn[!is.na(finalPopn$subjectId),]
+
+    #calculate end date for raw TAR
+    finalPopn$cohortStartDate <- as.Date(finalPopn$cohortStartDate)
+    finalPopn$finalDate <- as.Date("2100-01-01")
+    if(inclusionEvaluationCohortId != 0) {
+      # type 1 - case must be within inclusion cohort start and end dates - use minimum of (A)inclusion end date / (B)inclusion start date + inclusion days from end
+      if(duringInclusionEvaluationOnly == TRUE) {
+        # (A)
+        finalPopn$finalDate[finalPopn$inclusionCohortEndDate <= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] <-
+          finalPopn$inclusionCohortEndDate[finalPopn$inclusionCohortEndDate <= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)]
+
+        # (B)
+        finalPopn$finalDate[finalPopn$inclusionCohortEndDate > (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] <-
+          finalPopn$inclusionCohortStartDate[finalPopn$inclusionCohortEndDate > (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] +
+          inclusionEvaluationDaysFromEnd
+
+      } else {
+        # type 2 - case no restriction - use minimum of (A) cohort inclusion start date + days to obs end / (B) inclusion cohort start date + inc days to end
+        # (A)
+        finalPopn$finalDate[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) <= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] <-
+          finalPopn$cohortStartDate[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) <= (finalPopn$inclusionCohortStartDate +
+                                                                                               inclusionEvaluationDaysFromEnd)] +
+          finalPopn$daysToObsEnd[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) < (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)]
+
+        # (B)
+        finalPopn$finalDate[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) > (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] <-
+          finalPopn$inclusionCohortStartDate[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) >
+                                               (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] +
+          inclusionEvaluationDaysFromEnd
+      }
+    } else { #no inclusion cohort - final date is the subject's end of observation period
+      finalPopn$finalDate <- as.Date(finalPopn$cohortStartDate) + finalPopn$daysToObsEnd
     }
 
     #calculate raw time at risk
@@ -389,20 +433,42 @@
     #time from the start of subject's in inclusion cohort to time to event
     finalPopn$rawTar <- 0
     finalPopn$rawTar[!is.na(finalPopn$comparisonCohortStartDate)] <-
-      as.numeric(difftime(finalPopn$cohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)],
-                          finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)], units = "days"))
+      as.numeric(difftime(finalPopn$comparisonCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)],
+                          finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)] +
+                            inclusionEvaluationDaysFromStart, units = "days"))
 
     #then the non-cases based on non-inclusion in the comparison cohort
-    #time from the start of subject's in inclusion cohort to time to end of subject's in inclusion cohort
+    #time from the start of subjects in inclusion cohort to time to end of subject's in inclusion cohort
+
     finalPopn$rawTar[is.na(finalPopn$comparisonCohortStartDate)] <-
-      as.numeric(difftime((finalPopn$inclusionCohortEndDate[is.na(finalPopn$comparisonCohortStartDate)] + inclusionEvaluationDaysFromEnd),
-                          (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] + inclusionEvaluationDaysFromStart), units = "days"))
+      as.numeric(difftime(finalPopn$finalDate[is.na(finalPopn$comparisonCohortStartDate)],
+                          (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] +
+                             inclusionEvaluationDaysFromStart), units = "days"))
 
     #estimated tar = (P(case) * time to event) + (P(not a case) * tar)
-    finalPopn$estimatedTar <- as.numeric((finalPopn$value * difftime(finalPopn$cohortStartDate,
-                                                                     (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromStart), units = "days")) +
-      ((1 - finalPopn$value) * difftime((finalPopn$inclusionCohortEndDate + inclusionEvaluationDaysFromEnd),
-                                        (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromStart), units = "days")))
+    # cases (matched comparison)
+    # use comparison start date as time to event and final date as maximum end date
+    finalPopn$estimatedTar[!is.na(finalPopn$comparisonCohortStartDate)] <-
+      as.numeric((finalPopn$value[!is.na(finalPopn$comparisonCohortStartDate)] *
+                    difftime(finalPopn$comparisonCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)],
+                             (finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)] +
+                                inclusionEvaluationDaysFromStart), units = "days")) +
+                   ((1 - finalPopn$value[!is.na(finalPopn$comparisonCohortStartDate)]) *
+                      difftime((finalPopn$finalDate[!is.na(finalPopn$comparisonCohortStartDate)]),
+                               (finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)] +
+                                  inclusionEvaluationDaysFromStart), units = "days")))
+
+    # non-cases (did not match)
+    # use cohort start date as time to event and final date as maximum end date
+    finalPopn$estimatedTar[is.na(finalPopn$comparisonCohortStartDate)] <-
+      as.numeric((finalPopn$value[is.na(finalPopn$comparisonCohortStartDate)] *
+                    difftime(finalPopn$cohortStartDate[is.na(finalPopn$comparisonCohortStartDate)],
+                             (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] +
+                                inclusionEvaluationDaysFromStart), units = "days")) +
+                   ((1 - finalPopn$value[is.na(finalPopn$comparisonCohortStartDate)]) *
+                      difftime((finalPopn$finalDate[is.na(finalPopn$comparisonCohortStartDate)]),
+                               (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] +
+                                  inclusionEvaluationDaysFromStart), units = "days")))
 
     #determine TP, FP, TN, FN
     fullTestCases <- NULL
@@ -425,7 +491,17 @@
 
     testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value < 0.1,]
     testCases <- testCases[order(testCases[,14]),][1:falsePositiveNegativeSubjects,]
-    testCases$type <- "FP"
+    testCases$type <- "FP_Lo"
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
+
+    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.2,]
+    testCases <- testCases[order(testCases[,14]),][1:falsePositiveNegativeSubjects,]
+    testCases$type <- "FP_Med"
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
+
+    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.4,]
+    testCases <- testCases[order(testCases[,14]),][1:falsePositiveNegativeSubjects,]
+    testCases$type <- "FP_Hi"
     fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
     testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.8,]
@@ -504,6 +580,7 @@
     appResults$PheValuator$inputSetting$inclusionEvaluationCohortId <- inclusionEvaluationCohortId
     appResults$PheValuator$inputSetting$inclusionEvaluationDaysFromStart <- inclusionEvaluationDaysFromStart
     appResults$PheValuator$inputSetting$inclusionEvaluationDaysFromEnd <- inclusionEvaluationDaysFromEnd
+    appResults$PheValuator$inputSetting$duringInclusionEvaluationOnly <- duringInclusionEvaluationOnly
     appResults$PheValuator$inputSetting$exclusionEvaluationCohortId <- exclusionEvaluationCohortId
     appResults$PheValuator$inputSetting$exclusionEvaluationDaysFromStart <- exclusionEvaluationDaysFromStart
     appResults$PheValuator$inputSetting$exclusionEvaluationDaysFromEnd <- exclusionEvaluationDaysFromEnd

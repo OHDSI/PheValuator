@@ -19,6 +19,7 @@
 {DEFAULT @inclusionEvaluationCohortId = 0 }
 {DEFAULT @inclusionEvaluationDaysFromStart = 0 }
 {DEFAULT @inclusionEvaluationDaysFromEnd = 0 }
+{DEFAULT @duringInclusionEvaluationOnly}
 {DEFAULT @exclusionEvaluationCohortId = 0 }
 {DEFAULT @exclusionEvaluationDaysFromStart = 0 }
 {DEFAULT @exclusionEvaluationDaysFromEnd = 0 }
@@ -76,7 +77,19 @@ join @cohort_database_schema.@cohort_database_table co
   on co.cohort_definition_id = @inclusionEvaluationCohortId
     and co.subject_id = v.person_id
     and v.visit_start_date >= dateadd(day, @inclusionEvaluationDaysFromStart, co.cohort_start_date)
-    and v.visit_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_end_date)}
+
+    {@duringInclusionEvaluationOnly == FALSE} ? {--no limit to the ending date designated by inclusionEvaluationDaysFromEnd
+    and v.visit_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_start_date)}
+
+    {@duringInclusionEvaluationOnly == TRUE} ? {--limit ending date to min value of days offset and end of cohort
+    and v.visit_start_date <=
+      CASE
+        WHEN dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_start_date) > co.cohort_end_date THEN co.cohort_end_date
+        ELSE dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_start_date)
+      END
+      }
+
+    }
 where v.person_id in (
   select person_id
   from persons)
@@ -92,7 +105,7 @@ join @cohort_database_schema.@cohort_database_table coExcl
   on coExcl.cohort_definition_id = @exclusionEvaluationCohortId
     and coExcl.subject_id = v.person_id
     and v.visit_start_date >= dateadd(day, @exclusionEvaluationDaysFromStart, coExcl.cohort_start_date)
-    and v.visit_start_date <= dateadd(day, @exclusionEvaluationDaysFromEnd, coExcl.cohort_end_date)
+    and v.visit_start_date <= dateadd(day, @exclusionEvaluationDaysFromEnd, coExcl.cohort_start_date)
 where v.person_id in (
   select person_id
   from persons)
@@ -119,7 +132,15 @@ from (
     on co.cohort_definition_id = @inclusionEvaluationCohortId
       and co.subject_id = c.subject_id
       and c.cohort_start_date >= dateadd(day, @inclusionEvaluationDaysFromStart, co.cohort_start_date)
-      and c.cohort_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_end_date)}
+    {@duringInclusionEvaluationOnly == FALSE} ? {--no limit to the ending date designated by inclusionEvaluationDaysFromEnd
+    and c.cohort_start_date <= dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_start_date)}
+    {@duringInclusionEvaluationOnly == TRUE} ? {--limit ending date to min value of days offset and end of cohort
+    and c.cohort_start_date <=
+      CASE
+        WHEN dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_start_date) > co.cohort_end_date THEN co.cohort_end_date
+        ELSE dateadd(day, @inclusionEvaluationDaysFromEnd, co.cohort_start_date)
+      END }
+      }
 ) a
 ;
 DROP TABLE IF EXISTS #cohort_person;
