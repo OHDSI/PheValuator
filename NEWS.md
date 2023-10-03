@@ -1,3 +1,10 @@
+PheValuator 2.2.10
+=================
+
+Changes:
+1. Add parameter to force evaluation visits to be only within the start and end dates of the cohort
+2. Bug fix within time-at-risk calculation
+
 PheValuator 2.2.9
 =================
 

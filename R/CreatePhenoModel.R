@@ -472,6 +472,19 @@
             df$analysisName <- analysisName
             df$databaseId <- databaseId
             df$runDateTime <- runDateTime
+            df <- cbind(df, lrResults$covariateSummary[lrResults$covariateSummary$covariateValue != 0 &
+                                                         !(is.na(lrResults$covariateSummary$covariateValue)),c(2,4,27,11,12,8,9,14)])
+            #change first character of each column name to lower case
+            for(colNum in 1:ncol(df)) {names(df)[colNum] <- paste0(tolower(substr(names(df)[colNum],1,1)),
+                                                                   substr(names(df)[colNum],2,nchar(names(df)[colNum])))}
+            colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
+            write.csv(df, file.path(exportFolder, "pv_model_covariate_summary.csv"), row.names = FALSE)
+
+            df <- NULL
+            df$phenotype <- phenotype
+            df$analysisName <- analysisName
+            df$databaseId <- databaseId
+            df$runDateTime <- runDateTime
             df$evaluation <- unlist(lrResults$performanceEvaluation$evaluationStatistics$evaluation)
             df$metric <- unlist(lrResults$performanceEvaluation$evaluationStatistics$metric)
             df$valuePerformance <- unlist(lrResults$performanceEvaluation$evaluationStatistics$value)

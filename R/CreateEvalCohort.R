@@ -307,6 +307,7 @@
     )
 
     ParallelLogger::logInfo("Time to apply model was ", round(difftime(Sys.time(), startTime, units = c("mins")), digits = 3), " min.")
+
     allCovData <- as.data.frame(plpData$covariateData$covariates)
 
     ####################
