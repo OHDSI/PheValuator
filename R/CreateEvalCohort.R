@@ -373,7 +373,17 @@
     comparisonPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
     # add the start/end dates from the comparison cohort to the evaluation cohort to be able to create
     # dataframe of TP, FP, TN, FN
-    finalPopn <- merge(pred, comparisonPopn, all.x = TRUE)
+    ParallelLogger::logInfo("Matching to comparison cohort")
+
+    #create a window +/- 7 days for comparions matching
+    comparisonPopn$lowDate <- comparisonPopn$comparisonCohortStartDate - 7
+    comparisonPopn$highDate <- comparisonPopn$comparisonCohortStartDate + 7
+
+    #create the by criteria - joining by subjectIds and the startDates
+    by <- join_by(subjectId, cohortStartDate >= lowDate, cohortStartDate <= highDate)
+
+    #finalPopn <- merge(pred, comparisonPopn, by, all.x = TRUE)
+    finalPopn <- left_join(pred, comparisonPopn, by)
 
     if(inclusionEvaluationCohortId != 0) {
       #get inclusion cohort

@@ -51,7 +51,8 @@ SELECT subject_id, cohort_start_date comparison_cohort_start_date, cohort_end_da
         END}
 
       and c2.cohort_definition_id = @inclusionEvaluationCohortId}
-    ) a
-where rn = 1;
+    ) a;
+
+--where rn = 1;
 
 
