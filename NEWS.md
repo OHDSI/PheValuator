@@ -1,3 +1,9 @@
+PheValuator 2.2.11
+=================
+
+Changes:
+1. Update evaluation cohort processing to allow multiple matches with comparative phenotype algorithm
+
 PheValuator 2.2.10
 =================
 
