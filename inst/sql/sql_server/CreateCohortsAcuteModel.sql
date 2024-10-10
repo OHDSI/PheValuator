@@ -32,16 +32,16 @@ into #new_xspec
 FROM (select distinct cohort_definition_id, subject_id, cohort_start_date, minVisit
     from (
       SELECT co.cohort_definition_id, co.subject_id, co.cohort_start_date,
-        min(v.visit_start_date) OVER (partition by co.subject_id, co.cohort_start_date) minVisit
+        min(v.condition_start_date) OVER (partition by co.subject_id, co.cohort_start_date) minVisit
     	FROM @cohort_database_schema.@cohort_database_table co
     	JOIN @cdm_database_schema.observation_period o
     	  on co.subject_id = o.person_id
     		AND COHORT_START_DATE >= dateadd(d, @minimumOffsetFromStart, o.observation_period_start_date)
 		    AND COHORT_START_DATE <= dateadd(d, -@minimumOffsetFromEnd, o.observation_period_end_date)
-    	join @cdm_database_schema.visit_occurrence v
+    	join @cdm_database_schema.condition_occurrence v
     	 on co.subject_id = v.person_id
-        and v.visit_start_date >= dateadd(day, 1, co.cohort_start_date)
-        and v.visit_start_date <= dateadd(day, @daysFromxSpec, co.cohort_start_date)
+        and v.condition_start_date >= dateadd(day, 1, co.cohort_start_date)
+        and v.condition_start_date <= dateadd(day, @daysFromxSpec, co.cohort_start_date)
     	WHERE cohort_definition_id = @x_spec_cohort) pos) a;
 }
 

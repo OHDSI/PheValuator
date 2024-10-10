@@ -1,3 +1,9 @@
+PheValuator 2.2.12
+=================
+
+Changes:
+1. Update model and evaluation cohort sql files to remove temporary files
+
 PheValuator 2.2.11
 =================
 

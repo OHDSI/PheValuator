@@ -1,96 +1,33 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/articles/EvaluatingPhenotypeAlgorithms.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/pull_request_template.html</loc>
-  </url>
-  <url>
-    <loc>/reference/computePerformanceMetricsFromCounts.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createAcutePhenotypeModel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createChronicPhenotypeModel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createCreateEvaluationCohortArgs.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createDefaultAcuteCovariateSettings.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createDefaultChronicCovariateSettings.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createDefaultCovariateSettings.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createEvaluationCohort.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createPhenotypeModel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createPheValuatorAnalysis.html</loc>
-  </url>
-  <url>
-    <loc>/reference/createTestPhenotypeAlgorithmArgs.html</loc>
-  </url>
-  <url>
-    <loc>/reference/exportPheValuatorResults.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/launchPheValuatorExplorer.html</loc>
-  </url>
-  <url>
-    <loc>/reference/loadPheValuatorAnalysisList.html</loc>
-  </url>
-  <url>
-    <loc>/reference/PheValuator-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/PheValuator.html</loc>
-  </url>
-  <url>
-    <loc>/reference/prepareForShiny.html</loc>
-  </url>
-  <url>
-    <loc>/reference/prettyPhenotypeOutput.html</loc>
-  </url>
-  <url>
-    <loc>/reference/recalibrateModel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runPheValuatorAnalyses.html</loc>
-  </url>
-  <url>
-    <loc>/reference/savePheValuatorAnalysisList.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summarizePheValuatorAnalyses.html</loc>
-  </url>
-  <url>
-    <loc>/reference/testPhenotypeAlgorithm.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/articles/EvaluatingPhenotypeAlgorithms.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/pull_request_template.html</loc></url>
+<url><loc>/reference/computePerformanceMetricsFromCounts.html</loc></url>
+<url><loc>/reference/createAcutePhenotypeModel.html</loc></url>
+<url><loc>/reference/createChronicPhenotypeModel.html</loc></url>
+<url><loc>/reference/createCreateEvaluationCohortArgs.html</loc></url>
+<url><loc>/reference/createDefaultAcuteCovariateSettings.html</loc></url>
+<url><loc>/reference/createDefaultChronicCovariateSettings.html</loc></url>
+<url><loc>/reference/createDefaultCovariateSettings.html</loc></url>
+<url><loc>/reference/createEvaluationCohort.html</loc></url>
+<url><loc>/reference/createPhenotypeModel.html</loc></url>
+<url><loc>/reference/createPheValuatorAnalysis.html</loc></url>
+<url><loc>/reference/createTestPhenotypeAlgorithmArgs.html</loc></url>
+<url><loc>/reference/exportPheValuatorResults.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/launchPheValuatorExplorer.html</loc></url>
+<url><loc>/reference/loadPheValuatorAnalysisList.html</loc></url>
+<url><loc>/reference/PheValuator-package.html</loc></url>
+<url><loc>/reference/prepareForShiny.html</loc></url>
+<url><loc>/reference/prettyPhenotypeOutput.html</loc></url>
+<url><loc>/reference/recalibrateModel.html</loc></url>
+<url><loc>/reference/runPheValuatorAnalyses.html</loc></url>
+<url><loc>/reference/savePheValuatorAnalysisList.html</loc></url>
+<url><loc>/reference/summarizePheValuatorAnalyses.html</loc></url>
+<url><loc>/reference/testPhenotypeAlgorithm.html</loc></url>
 </urlset>
+

@@ -31,6 +31,7 @@
 {DEFAULT @randomVisitTable = ''}
 
 DROP TABLE IF EXISTS #finalCohort;
+DROP TABLE IF EXISTS #adjustedCaseCohort;
 
 --if using first occurrence only, subset the cohort to the first occurrence per subject
 {@caseFirstOccurrenceOnly == TRUE} ?
@@ -238,4 +239,10 @@ union --add in some xSpec subjects due to PLP constraint - will be ignored in an
 
 TRUNCATE TABLE #cohort_person;
 DROP TABLE #cohort_person;
+
+TRUNCATE TABLE #finalCohort;
+DROP TABLE #finalCohort;
+
+TRUNCATE TABLE #adjustedCaseCohort;
+DROP TABLE #adjustedCaseCohort;
 
