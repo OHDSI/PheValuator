@@ -353,7 +353,7 @@
             executeSettings <- PatientLevelPrediction::createExecuteSettings(
               runSplitData = TRUE,
               runSampleData = F,
-              runfeatureEngineering = F,
+              runFeatureEngineering = F,
               runPreprocessData = TRUE,
               runModelDevelopment = TRUE,
               runCovariateSummary = TRUE

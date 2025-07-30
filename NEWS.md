@@ -1,3 +1,10 @@
+
+PheValuator 2.2.13
+=================
+
+Changes:
+1. Bug fix in PLP parameters
+
 PheValuator 2.2.12
 =================
 
