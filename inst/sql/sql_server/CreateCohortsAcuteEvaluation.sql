@@ -54,7 +54,7 @@ DROP TABLE IF EXISTS #adjustedCaseCohort;
 
 -- create cohort using prevalence cohort and visit table
 with persons as ( --subset a random set of subjects
-  select top 20000000 *
+  select *
   from (
     select person_id, row_number() over (order by NewId()) rn
     from @cdm_database_schema.person p
@@ -62,6 +62,7 @@ with persons as ( --subset a random set of subjects
     join @cohort_database_schema.@cohort_database_table co
       on co.cohort_definition_id = @inclusionEvaluationCohortId
         and co.subject_id = p.person_id}) a
+  where rn <= 20000000
   order by rn),
 
 visits as ( --and a random visit from each subject selected
@@ -119,10 +120,11 @@ from (
   select @caseCohortId as cohort_definition_id, person_id as subject_id, visit_start_date as cohort_start_date,
     dateadd(day, 1, visit_start_date) as cohort_end_date
   from visits
-  where person_id not in ( --noncases from those not in case cohort
+  where not exists ( --noncases from those not in case cohort
     select subject_id
     from @cohort_database_schema.@cohort_database_table
-    where cohort_definition_id = @caseCohortId)
+    where cohort_definition_id = @caseCohortId
+		and subject_id = person_id)
   union
   select c.* --cases from those also in case cohort - use adjusted case cohort, i.e., only using first occurrence if specified
   from visits v
@@ -170,13 +172,7 @@ FROM (
 
 DROP TABLE IF EXISTS @work_database_schema.@test_cohort;
 
-
-select distinct CAST(0 AS BIGINT) as COHORT_DEFINITION_ID, person_id as SUBJECT_ID,
-	dateadd(day, 0, visit_start_date) COHORT_START_DATE,
-	dateadd(day, 1, visit_start_date) COHORT_END_DATE
-INTO @work_database_schema.@test_cohort
-from (select co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (PARTITION BY v.person_id ORDER BY NewId()) visit_start_date,
-					row_number() over (order by NewId()) rn
+with negs as (select top @baseSampleSize co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (PARTITION BY v.person_id ORDER BY NewId()) visit_start_date
     	from #finalCohort co
 			join @cdm_database_schema.visit_occurrence v
 				  on v.person_id = co.subject_id
@@ -215,8 +211,13 @@ from (select co.subject_id as person_id, FIRST_VALUE(v.visit_start_date) OVER (P
 {@exclCohort != 0} ? {
 					and excl.subject_id is NULL
 }
-) negs
-  where rn <= cast('@baseSampleSize' as bigint)
+  order by NewId())
+select distinct CAST(0 AS BIGINT) as COHORT_DEFINITION_ID, person_id as SUBJECT_ID,
+	dateadd(day, 0, visit_start_date) COHORT_START_DATE,
+	dateadd(day, 1, visit_start_date) COHORT_END_DATE
+INTO @work_database_schema.@test_cohort
+from (SELECT *
+	  from negs) negs
 union --add in some xSpec subjects due to PLP constraint - will be ignored in analysis
   select 0 as COHORT_DEFINITION_ID, SUBJECT_ID, cp.COHORT_START_DATE COHORT_START_DATE,
 	dateadd(day, 1, cp.COHORT_START_DATE) COHORT_END_DATE
