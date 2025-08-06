@@ -120,11 +120,10 @@ from (
   select @caseCohortId as cohort_definition_id, person_id as subject_id, visit_start_date as cohort_start_date,
     dateadd(day, 1, visit_start_date) as cohort_end_date
   from visits
-  where not exists ( --noncases from those not in case cohort
+  where person_id not in ( --noncases from those not in case cohort
     select subject_id
     from @cohort_database_schema.@cohort_database_table
-    where cohort_definition_id = @caseCohortId
-		and subject_id = person_id)
+    where cohort_definition_id = @caseCohortId)
   union
   select c.* --cases from those also in case cohort - use adjusted case cohort, i.e., only using first occurrence if specified
   from visits v
