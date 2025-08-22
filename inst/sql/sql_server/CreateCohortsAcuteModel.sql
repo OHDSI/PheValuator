@@ -67,15 +67,10 @@ FROM (SELECT co.*, p.*,
 
 DROP TABLE IF EXISTS @work_database_schema.@test_cohort;
 
-SELECT CAST(0 AS BIGINT) as COHORT_DEFINITION_ID,
-	person_id as SUBJECT_ID,
-	dateadd(day, 0, visit_start_date) COHORT_START_DATE,
-	dateadd(day, 1, visit_start_date) COHORT_END_DATE
-INTO @work_database_schema.@test_cohort
-      FROM (SELECT
+with negs as (
+SELECT top @baseSampleSize
 				{@mainPopnCohort == 0} ? {
-					v.person_id, visit_start_date,
-						row_number() over (order by NewId()) rn
+					v.person_id, visit_start_date
 					{@randomVisitTable == ''} ? {FROM @cdm_database_schema.visit_occurrence v}
 					{@randomVisitTable != ''} ? {FROM @work_database_schema.@randomVisitTable v}
 	        JOIN @cdm_database_schema.observation_period obs
@@ -111,7 +106,7 @@ INTO @work_database_schema.@test_cohort
 													SELECT subject_id
 													FROM @cohort_database_schema.@cohort_database_table
 													WHERE COHORT_DEFINITION_ID = @exclCohort)}
-					)}
+					}
 				{@mainPopnCohort != 0} ? {
 					co.subject_id as person_id, v.visit_start_date,
 						row_number() over (order by NewId()) rn
@@ -149,8 +144,15 @@ INTO @work_database_schema.@test_cohort
 													SELECT subject_id
 													FROM @cohort_database_schema.@cohort_database_table
 													WHERE COHORT_DEFINITION_ID = @exclCohort)}
-						)} negs
-      WHERE rn <= cast('@baseSampleSize' as bigint)
+						}
+      order by NewId())
+SELECT CAST(0 AS BIGINT) as COHORT_DEFINITION_ID,
+	person_id as SUBJECT_ID,
+	dateadd(day, 0, visit_start_date) COHORT_START_DATE,
+	dateadd(day, 1, visit_start_date) COHORT_END_DATE
+INTO @work_database_schema.@test_cohort
+      FROM (SELECT *
+	  from negs) negs
     UNION
       SELECT 0 as COHORT_DEFINITION_ID, SUBJECT_ID, cp.COHORT_START_DATE COHORT_START_DATE,
         dateadd(day, 1, cp.COHORT_START_DATE) COHORT_END_DATE

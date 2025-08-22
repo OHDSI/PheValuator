@@ -1,3 +1,9 @@
+PheValuator 2.2.15
+=================
+
+Changes:
+1. Update model cohort build for faster performance
+
 PheValuator 2.2.14
 =================
 
