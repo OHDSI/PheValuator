@@ -463,7 +463,9 @@
             df$analysisName <- analysisName
             df$databaseId <- databaseId
             df$runDateTime <- runDateTime
-            df <- cbind(df, lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,c(4,5,2,1,3)])
+            df <- cbind(df, lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,
+                                                                c("conceptId","covariateValue","covariateName","covariateId",
+                                                                  "analysisId")])
             colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_covariates.csv"), row.names = FALSE)
 
@@ -473,7 +475,11 @@
             df$databaseId <- databaseId
             df$runDateTime <- runDateTime
             df <- cbind(df, lrResults$covariateSummary[lrResults$covariateSummary$covariateValue != 0 &
-                                                         !(is.na(lrResults$covariateSummary$covariateValue)),c(2,4,27,11,12,8,9,14)])
+                                                         !(is.na(lrResults$covariateSummary$covariateValue)),
+                                                       c("covariateName","conceptId","covariateValue",
+                                                         "WithOutcome_CovariateCount","WithOutcome_CovariateMean",
+                                                         "WithNoOutcome_CovariateCount","WithNoOutcome_CovariateMean",
+                                                         "StandardizedMeanDiff")])
             #change first character of each column name to lower case
             for(colNum in 1:ncol(df)) {names(df)[colNum] <- paste0(tolower(substr(names(df)[colNum],1,1)),
                                                                    substr(names(df)[colNum],2,nchar(names(df)[colNum])))}

@@ -1,0 +1,74 @@
+DBMS:
+sqlite
+
+Error:
+near "SELECT": syntax error
+
+SQL:
+CREATE TEMP TABLE finalCohort
+AS
+WITH persons  AS ( --subset a random set of subjects
+  select *
+  from (
+    select person_id, row_number() over (order by RANDOM()) rn
+    from main.person p
+) a
+  where rn <= 20000000
+  order by rn),
+visits as ( --and a random visit from each subject selected
+select distinct v.person_id, first_value(visit_start_date)
+  over (partition by v.person_id ORDER BY RANDOM()) visit_start_date
+FROM main.visit_occurrence v
+join main.observation_period o
+  on v.person_id = o.person_id
+    AND v.visit_start_date >= CAST(STRFTIME('%s', DATETIME(o.observation_period_start_date, 'unixepoch', (0)||' days')) AS REAL)
+    and CAST(STRFTIME('%s', DATETIME(v.visit_start_date, 'unixepoch', (0)||' days')) AS REAL) <= o.observation_period_end_date
+where v.person_id in (
+  select person_id
+  from persons)
+  and v.visit_concept_id in (9201,9202,9203,581477,262)
+  and v.visit_start_date >= CAST(STRFTIME('%s', SUBSTR(CAST('19000101'  AS TEXT), 1, 4) || '-' || SUBSTR(CAST('19000101'  AS TEXT), 5, 2) || '-' || SUBSTR(CAST('19000101'  AS TEXT), 7)) AS REAL)
+	and v.visit_start_date <= CAST(STRFTIME('%s', SUBSTR(CAST('21000101'  AS TEXT), 1, 4) || '-' || SUBSTR(CAST('21000101'  AS TEXT), 5, 2) || '-' || SUBSTR(CAST('21000101'  AS TEXT), 7)) AS REAL)
+	)
+ SELECT
+*
+FROM
+(
+  select 2 as cohort_definition_id, person_id as subject_id, visit_start_date as cohort_start_date,
+    CAST(STRFTIME('%s', DATETIME(visit_start_date, 'unixepoch', (1)||' days')) AS REAL) as cohort_end_date
+  from visits
+  where not exists SELECT subject_id
+    from main.cohort
+    where cohort_definition_id = 2
+		and subject_id = person_id UNION
+  select c.* --cases from those also in case cohort - use adjusted case cohort, i.e., only using first occurrence if specified
+  from visits v
+  join temp.adjustedCaseCohort c
+    on v.person_id = c.subject_id
+) a
+
+
+R version:
+R version 4.4.3 (2025-02-28 ucrt)
+
+Platform:
+x86_64-w64-mingw32
+
+Attached base packages:
+- stats
+- graphics
+- grDevices
+- utils
+- datasets
+- methods
+- base
+
+Other attached packages:
+- Eunomia (2.0.0)
+- PheValuator (2.2.14)
+- FeatureExtraction (3.7.1)
+- Andromeda (0.6.7)
+- dplyr (1.1.4)
+- PatientLevelPrediction (6.5.0)
+- DatabaseConnector (6.4.0)
+- testthat (3.2.2)
