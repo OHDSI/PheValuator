@@ -24,5 +24,4 @@
 #' @import DatabaseConnector
 #' @import FeatureExtraction
 #' @import PatientLevelPrediction
-#' @import dplyr
 NULL
