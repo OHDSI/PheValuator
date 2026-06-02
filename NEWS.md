@@ -1,3 +1,9 @@
+PheValuator 2.2.17
+=================
+
+Changes:
+1. Explicit call to dplyr in CreateEvalCohort
+
 PheValuator 2.2.16
 =================
 

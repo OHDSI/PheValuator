@@ -32,6 +32,7 @@
 
 DROP TABLE IF EXISTS #finalCohort;
 DROP TABLE IF EXISTS #adjustedCaseCohort;
+DROP TABLE IF EXISTS #persons;
 
 --if using first occurrence only, subset the cohort to the first occurrence per subject
 {@caseFirstOccurrenceOnly == TRUE} ?
@@ -51,10 +52,9 @@ DROP TABLE IF EXISTS #adjustedCaseCohort;
  where cohort_definition_id = @caseCohortId;}
 
 
-
--- create cohort using prevalence cohort and visit table
-with persons as ( --subset a random set of subjects
+--subset a random set of subjects
   select *
+  into #persons
   from (
     select person_id, row_number() over (order by NewId()) rn
     from @cdm_database_schema.person p
@@ -63,9 +63,10 @@ with persons as ( --subset a random set of subjects
       on co.cohort_definition_id = @inclusionEvaluationCohortId
         and co.subject_id = p.person_id}) a
   where rn <= 20000000
-  order by rn),
+  order by rn;
 
-visits as ( --and a random visit from each subject selected
+-- create cohort using prevalence cohort and visit table
+with visits as ( --and a random visit from each subject selected
 select distinct v.person_id, first_value(visit_start_date)
   over (partition by v.person_id ORDER BY NewId()) visit_start_date
 {@randomVisitTable == ''} ? {FROM @cdm_database_schema.visit_occurrence v}
@@ -94,7 +95,7 @@ join @cohort_database_schema.@cohort_database_table co
     }
 where v.person_id in (
   select person_id
-  from persons)
+  from #persons)
   and v.visit_concept_id in (@visitType)
   and v.visit_start_date >= cast('@startDate' AS DATE)
 	and v.visit_start_date <= cast('@endDate' AS DATE)
@@ -110,7 +111,7 @@ join @cohort_database_schema.@cohort_database_table coExcl
     and v.visit_start_date <= dateadd(day, @exclusionEvaluationDaysFromEnd, coExcl.cohort_start_date)
 where v.person_id in (
   select person_id
-  from persons)
+  from #persons)
   }
 
 	)
@@ -247,3 +248,5 @@ DROP TABLE #finalCohort;
 TRUNCATE TABLE #adjustedCaseCohort;
 DROP TABLE #adjustedCaseCohort;
 
+TRUNCATE TABLE #persons;
+DROP TABLE #persons;

@@ -12,21 +12,21 @@ output:
   word_document:
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{Evaluating Phenotype Algorithms Using Phevaluator}
+  %\VignetteIndexEntry{Creating a concept set using LLM}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-library(PheValuator)
+library(Phenelope)
 ```
 \newpage
 # Introduction
 
-The `PheValuator` package enables evaluating the performance characteristics of phenotype algorithms (PAs) using data from databases that are translated into the Observational Medical Outcomes Partnership Common Data Model (OMOP CDM).
+The `Phenelope` package enables the creation of a concept set for a health condition that is translated into a JSON file that may be used directly or imported into ATLAS.
 
-This vignette describes how to run the PheValuator process from start to end in the `PheValuator` package. 
+This vignette describes how to run the Phenelope process from start to end in the `Phenelope` package. 
 
 # Overview of Process 
 

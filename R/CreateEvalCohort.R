@@ -380,10 +380,10 @@
     comparisonPopn$highDate <- comparisonPopn$comparisonCohortStartDate + 7
 
     #create the by criteria - joining by subjectIds and the startDates
-    by <- join_by(subjectId, cohortStartDate >= lowDate, cohortStartDate <= highDate)
+    by <- dplyr::join_by(subjectId, cohortStartDate >= lowDate, cohortStartDate <= highDate)
 
     #finalPopn <- merge(pred, comparisonPopn, by, all.x = TRUE)
-    finalPopn <- left_join(pred, comparisonPopn, by)
+    finalPopn <- dplyr::left_join(pred, comparisonPopn, by)
 
     if(inclusionEvaluationCohortId != 0) {
       #get inclusion cohort
