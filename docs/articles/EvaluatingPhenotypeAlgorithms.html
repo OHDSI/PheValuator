@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.16</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.17</span>
       </span>
     </div>
 
@@ -84,7 +84,7 @@
                         <h4 data-toc-skip class="author">Joel N.
 Swerdel</h4>
             
-            <h4 data-toc-skip class="date">2025-11-20</h4>
+            <h4 data-toc-skip class="date">2026-06-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/PheValuator/blob/HEAD/vignettes/EvaluatingPhenotypeAlgorithms.rmd" class="external-link"><code>vignettes/EvaluatingPhenotypeAlgorithms.rmd</code></a></small>
       <div class="hidden name"><code>EvaluatingPhenotypeAlgorithms.rmd</code></div>
@@ -93,18 +93,15 @@ Swerdel</h4>
 
     
     
-<pre><code><span><span class="co">## Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
-<span><span class="co">##   object 'type_sum.accel' not found</span></span></code></pre>
 <div style="page-break-after: always;"></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <code>PheValuator</code> package enables evaluating the
-performance characteristics of phenotype algorithms (PAs) using data
-from databases that are translated into the Observational Medical
-Outcomes Partnership Common Data Model (OMOP CDM).</p>
-<p>This vignette describes how to run the PheValuator process from start
-to end in the <code>PheValuator</code> package.</p>
+<p>The <code>Phenelope</code> package enables the creation of a concept
+set for a health condition that is translated into a JSON file that may
+be used directly or imported into ATLAS.</p>
+<p>This vignette describes how to run the Phenelope process from start
+to end in the <code>Phenelope</code> package.</p>
 </div>
 <div class="section level2">
 <h2 id="overview-of-process">Overview of Process<a class="anchor" aria-label="anchor" href="#overview-of-process"></a>
@@ -213,7 +210,7 @@ window</li>
 window</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>andromedaTempFolder <span class="op">=</span> <span class="st">"c:/temp2/ff"</span><span class="op">)</span> <span class="co">#place to store large temporary files</span></span>
 <span></span>
 <span><span class="va">CovSettings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span>excludedCovariateConceptIds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">201254</span><span class="op">)</span>,</span>
@@ -227,7 +224,7 @@ window</li>
 <p><strong>Quick Tip:</strong> The feature extraction windows above are
 useful for chronic conditions. For acute conditions, such as myocardial
 infarction, you should use:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>andromedaTempFolder <span class="op">=</span> <span class="st">"c:/temp2/ff"</span><span class="op">)</span> <span class="co">#place to store large temporary files</span></span>
 <span></span>
 <span><span class="va">CovSettings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span>startDayWindow1 <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -249,7 +246,7 @@ building and evaluation parameters</li>
 createDefaultCovariateSettings() function above</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">CohortArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs</a></span><span class="op">(</span>xSpecCohortId <span class="op">=</span> <span class="fl">1769699</span>,</span>
 <span>                                               xSensCohortId <span class="op">=</span> <span class="fl">1770120</span>,</span>
 <span>                                               prevalenceCohortId <span class="op">=</span> <span class="fl">1770119</span>,</span>
@@ -264,7 +261,7 @@ parameters for evaluating phenotype algorithms</li>
 evaluate</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#First phenotype algorithm to test</span></span>
 <span><span class="va">conditionAlg1TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span>  <span class="fl">1778259</span><span class="op">)</span> </span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
@@ -280,7 +277,7 @@ createCreateEvaluationCohortArgs() settings created above</li>
 createTestPhenotypeAlgorithmArgs() settings created above</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analysis1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                                       description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 Diabetes Mellitus </span></span>
 <span><span class="st">                                                    (prevalent)"</span>,</span>
@@ -288,7 +285,7 @@ createTestPhenotypeAlgorithmArgs() settings created above</li>
 <span>                                       testPhenotypeAlgorithmArgs <span class="op">=</span> <span class="va">conditionAlg1TestArgs</span><span class="op">)</span></span></code></pre></div>
 <p>Create as many analyses as needed:</p>
 <p>For example:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Second phenotype algorithm to test</span></span>
 <span><span class="va">conditionAlg2TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span> <span class="fl">1778260</span>,</span>
 <span>                                                          washoutPeriod <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
@@ -320,7 +317,7 @@ results</li>
 using the createPheValuatorAnalysis() function above</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#create database connection details</span></span>
 <span><span class="va">connectionDetails</span> <span class="op">&lt;-</span> <span class="fu">createConnectionDetails</span><span class="op">(</span>dbms <span class="op">=</span> <span class="st">"postgresql"</span>,</span>
 <span>                                             server <span class="op">=</span> <span class="st">"localhost/ohdsi"</span>,</span>
@@ -341,7 +338,7 @@ summarizePheValuatorAnalyses() function providing the results from the
 runPheValuatorAnalyses() function above</li>
 </ol>
 <p>For example:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#view the results of the phenotype evaluation</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="fu"><a href="../reference/summarizePheValuatorAnalyses.html">summarizePheValuatorAnalyses</a></span><span class="op">(</span><span class="va">referenceTable</span>, <span class="st">"yourOutputFolderSchema"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">phenotypeResults</span>, <span class="st">"c:/phenotyping/diabetes_results.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
@@ -384,7 +381,7 @@ format)</li>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
