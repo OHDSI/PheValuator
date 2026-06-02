@@ -19,14 +19,14 @@ vignette: >
 
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-library(Phenelope)
+library(PheValuator)
 ```
 \newpage
 # Introduction
 
-The `Phenelope` package enables the creation of a concept set for a health condition that is translated into a JSON file that may be used directly or imported into ATLAS.
+The `PheValuator` package enables the evaluation of phenotype algorithms.
 
-This vignette describes how to run the Phenelope process from start to end in the `Phenelope` package. 
+This vignette describes how to run the PheValuator process from start to end in the `PheValuator` package. 
 
 # Overview of Process 
 
