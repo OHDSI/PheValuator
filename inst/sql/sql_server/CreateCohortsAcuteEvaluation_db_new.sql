@@ -248,3 +248,4 @@ DROP TABLE #adjustedCaseCohort;
 
 TRUNCATE TABLE #persons;
 DROP TABLE #persons;
+

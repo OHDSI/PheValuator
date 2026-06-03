@@ -359,7 +359,6 @@
               runCovariateSummary = TRUE
             )
 
-
             lrResults <- PatientLevelPrediction::runPlp(
               plpData = plpData,
               outcomeId = xSpecCohortId,
@@ -393,7 +392,10 @@
             lrResults$PheValuator$inputSetting$runDateTime <- runDateTime
             lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
             lrResults$PheValuator$inputSetting$daysFromxSpec <- daysFromxSpec
-            lrResults$PheValuator$inputSetting$excludedCovariateConceptIds <- covariateSettings[[1]]$excludedCovariateConceptIds
+
+            excludedCovariates <- paste(covariateSettings[[1]]$excludedCovariateConceptIds, " ", collapse = ", ")
+
+            lrResults$PheValuator$inputSetting$excludedCovariateConceptIds <- excludedCovariates
             lrResults$PheValuator$inputSetting$xSpecCohortId <- xSpecCohortId
 
             lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
