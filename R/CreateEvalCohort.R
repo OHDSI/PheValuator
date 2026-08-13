@@ -14,6 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+utils::globalVariables(c(
+  "subjectId",
+  "cohortStartDate",
+  "lowDate",
+  "highDate"
+))
+
 .createEvaluationCohort <- function(connectionDetails,
                                     phenotype,
                                     analysisName,
