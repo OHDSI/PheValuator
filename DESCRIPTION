@@ -36,14 +36,8 @@ Suggests:
     qpdf,
     testthat,
     Eunomia,
-    CohortGenerator,
-    withr
-Remotes:
-    ohdsi/PatientLevelPrediction,
-    ohdsi/FeatureExtraction,
-    ohdsi/ROhdsiWebApi,
-    ohdsi/Eunomia,
-    ohdsi/CohortGenerator
+    withr,
+    CohortGenerator
 URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
 Encoding: UTF-8
