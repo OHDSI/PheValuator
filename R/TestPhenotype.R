@@ -57,6 +57,30 @@
 #' If 0.5 is included as a cutpoint, the data frame will have an attribute called 'misses', a dataframe
 #' with a sample of subject ids for TPs, FPs, TNs, and FNs for the 50 percent and over prediction threshold.
 #'
+#' @examples
+#' \dontrun{
+#' connectionDetails <- DatabaseConnector::createConnectionDetails(
+#'   dbms = "postgresql",
+#'   server = "myserver",
+#'   user = "user",
+#'   password = "password"
+#' )
+#' results <- testPhenotypeAlgorithm(
+#'   phenotype = "Diabetes",
+#'   analysisName = "Main",
+#'   runDateTime = format(Sys.time(), "%b %d %Y %X"),
+#'   connectionDetails = connectionDetails,
+#'   cutPoints = c("EV", "0.5"),
+#'   outFolder = tempdir(),
+#'   exportFolder = file.path(tempdir(), "export"),
+#'   phenotypeCohortId = 10,
+#'   cdmDatabaseSchema = "cdm.dbo",
+#'   databaseId = "myDB",
+#'   cohortDatabaseSchema = "results.dbo",
+#'   cohortTable = "cohort"
+#' )
+#' }
+#'
 #' @export
 testPhenotypeAlgorithm <- function(phenotype,
                                    analysisName,
@@ -348,6 +372,16 @@ testPhenotypeAlgorithm <- function(phenotype,
 #'
 #' @return
 #' A tibble with the statistics metrics added to the counts table.
+#'
+#' @examples
+#' counts <- tibble::tibble(
+#'   truePositives = 120,
+#'   trueNegatives = 800,
+#'   falsePositives = 30,
+#'   falseNegatives = 50,
+#'   cutPoint = "EV"
+#' )
+#' computePerformanceMetricsFromCounts(counts)
 #'
 #' @export
 computePerformanceMetricsFromCounts <- function(counts) {

@@ -27,6 +27,24 @@
 #' @param testPhenotypeAlgorithmArgs      Should the \code{\link{createTestPhenotypeAlgorithmArgs}} function be used in this
 #'                                        analysis?
 #'
+#' @examples
+#' \dontrun{
+#' evalCohortArgs <- createCreateEvaluationCohortArgs(
+#'   xSpecCohortId = 1,
+#'   xSensCohortId = 2,
+#'   prevalenceCohortId = 3
+#' )
+#' testArgs <- createTestPhenotypeAlgorithmArgs(
+#'   phenotypeCohortId = 10
+#' )
+#' analysis <- createPheValuatorAnalysis(
+#'   analysisId = 1,
+#'   description = "Main analysis",
+#'   createEvaluationCohortArgs = evalCohortArgs,
+#'   testPhenotypeAlgorithmArgs = testArgs
+#' )
+#' }
+#'
 #' @export
 createPheValuatorAnalysis <- function(analysisId,
                                       description,
@@ -50,6 +68,12 @@ createPheValuatorAnalysis <- function(analysisId,
 #' @param pheValuatorAnalysisList   The pheValuatorAnalysis list to be written to file
 #' @param file                      The name of the file where the results will be written
 #'
+#' @examples
+#' \dontrun{
+#' savePheValuatorAnalysisList(pheValuatorAnalysisList = myAnalysisList,
+#'                             file = "analysisList.json")
+#' }
+#'
 #' @export
 savePheValuatorAnalysisList <- function(pheValuatorAnalysisList, file) {
   stopifnot(is.list(pheValuatorAnalysisList))
@@ -70,6 +94,11 @@ savePheValuatorAnalysisList <- function(pheValuatorAnalysisList, file) {
 #'
 #' @return
 #' A list of objects of type \code{pheValuatorAnalysis}.
+#'
+#' @examples
+#' \dontrun{
+#' analysisList <- loadPheValuatorAnalysisList(file = "analysisList.json")
+#' }
 #'
 #' @export
 loadPheValuatorAnalysisList <- function(file) {

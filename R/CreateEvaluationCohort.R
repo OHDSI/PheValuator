@@ -107,6 +107,34 @@
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be saved? To be
 #'                                         used for debugging purposes.
 #'
+#' @examples
+#' \dontrun{
+#' connectionDetails <- DatabaseConnector::createConnectionDetails(
+#'   dbms = "postgresql",
+#'   server = "myserver",
+#'   user = "user",
+#'   password = "password"
+#' )
+#' createEvaluationCohort(
+#'   connectionDetails = connectionDetails,
+#'   phenotype = "Diabetes",
+#'   analysisName = "Main",
+#'   runDateTime = format(Sys.time(), "%b %d %Y %X"),
+#'   databaseId = "myDB",
+#'   xSpecCohortId = 1,
+#'   xSensCohortId = 2,
+#'   prevalenceCohortId = 3,
+#'   caseCohortId = 3,
+#'   caseFirstOccurrenceOnly = TRUE,
+#'   cdmDatabaseSchema = "cdm.dbo",
+#'   cohortDatabaseSchema = "results.dbo",
+#'   cohortTable = "cohort",
+#'   workDatabaseSchema = "scratch.dbo",
+#'   outFolder = tempdir(),
+#'   exportFolder = file.path(tempdir(), "export")
+#' )
+#' }
+#'
 #' @export
 createEvaluationCohort <- function(connectionDetails,
                                    oracleTempSchema = NULL,

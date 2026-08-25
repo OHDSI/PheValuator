@@ -36,6 +36,12 @@
 #' @param startDayWindow3              The day to start time window 3 for feature extraction
 #' @param endDayWindow3                The day to end time window 3 for feature extraction #'
 #'
+#' @examples
+#' covSettings <- createDefaultCovariateSettings(
+#'   excludedCovariateConceptIds = c(201826, 44786627),
+#'   addDescendantsToExclude = TRUE
+#' )
+#'
 #' @export
 createDefaultCovariateSettings <- function(excludedCovariateConceptIds = c(),
                                            includedCovariateIds = c(),

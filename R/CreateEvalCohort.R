@@ -248,7 +248,7 @@ utils::globalVariables(c(
       restrictPlpDataSettings <- PatientLevelPrediction::createRestrictPlpDataSettings(
         studyStartDate = startDate,
         studyEndDate = endDate,
-        firstExposureOnly = F,
+        firstExposureOnly = FALSE,
         washoutPeriod = 0,
         sampleSize = NULL
       )
@@ -276,8 +276,8 @@ utils::globalVariables(c(
     }
 
     populationSettings <- PatientLevelPrediction::createStudyPopulationSettings(
-      binary = T,
-      includeAllOutcomes = T,
+      binary = TRUE,
+      includeAllOutcomes = TRUE,
       firstExposureOnly = FALSE,
       washoutPeriod = 0,
       removeSubjectsWithPriorOutcome = TRUE,
@@ -288,7 +288,7 @@ utils::globalVariables(c(
       startAnchor = "cohort start",
       riskWindowEnd = 365,
       endAnchor = "cohort start",
-      restrictTarToCohortEnd = F
+      restrictTarToCohortEnd = FALSE
     )
 
     population <- PatientLevelPrediction::createStudyPopulation(
@@ -333,11 +333,11 @@ utils::globalVariables(c(
           covariateId = covs$covariateId)
 
         norm <- as.data.frame(lrResults$model$preprocessing$tidyCovariates$normFactors)
-        covNorm <- merge(covariate, norm, by = 'covariateId', all.x = T)
+        covNorm <- merge(covariate, norm, by = 'covariateId', all.x = TRUE)
 
         allCovData <- as.data.frame(plpData$covariateData$covariates)
 
-        #allCovData <- merge(allCovData, covNorm, by = 'covariateId', all.x = T)
+        #allCovData <- merge(allCovData, covNorm, by = 'covariateId', all.x = TRUE)
 
         allCovData <- dplyr::left_join(allCovData, covNorm, by = 'covariateId')
 

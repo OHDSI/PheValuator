@@ -17,4 +17,8 @@ Useful links:
 }
 
 }
+\author{
+\strong{Maintainer}: Joel N. Swerdel \email{joel.swerdel@gmail.com} (\href{https://orcid.org/0000-0001-9491-2737}{ORCID})
+
+}
 \keyword{internal}
