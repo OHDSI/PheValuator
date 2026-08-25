@@ -11,11 +11,11 @@ Description: A package for evaluating phenotype algorithms.  The package
     health outcome of interest.  This cohort can then be used to evaluate
     phenotype algorithms through the calculation of the necessary performance
     characteristics - sensitivity, specificity, and positive and negative
-    preditive value.
+    predictive value.
 License: Apache License 2.0
 VignetteBuilder: knitr
 Depends:
-    R (>= 3.2.2),
+    R (>= 4.1.1),
     DatabaseConnector,
     PatientLevelPrediction (>= 6.0.4),
     FeatureExtraction (>= 2.1.5)
@@ -28,7 +28,6 @@ Imports:
 Suggests:
     knitr,
     rmarkdown,
-    ROhdsiWebApi,
     shiny,
     shinydashboard,
     DT,
