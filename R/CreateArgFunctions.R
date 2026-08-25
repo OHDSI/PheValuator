@@ -120,4 +120,54 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
   }
   # Second: overwrite defaults with actual values:
   values <- lapply(as.list(match.call())[-1], function(x) eval(x, envir = sys.frame(-3)))
-  for (name in names(values)
+  for (name in names(values)) {
+    if (name %in% names(analysis)) {
+      analysis[[name]] <- values[[name]]
+    }
+  }
+  class(analysis) <- "args"
+  return(analysis)
+}
+
+#' Create a parameter object for the function testPhenotypeAlgorithm
+#'
+#' @details
+#' Create an object defining the parameter values.
+#'
+#' @param cutPoints           A list of threshold predictions for the evaluations.  Include "EV" for the
+#'                            expected value
+#' @param phenotypeCohortId   The ID of the cohort to evaluate in the specified cohort table.
+#' @param washoutPeriod       The mininum required continuous observation time prior to index date for
+#'                            subjects within the cohort to test (Default = 0).
+#' @param splayPrior          The number of days to allow for test phenotype visit date prior to evaluation date
+#' @param splayPost           The number of days to allow for test phenotype visit date after evaluation date
+#'
+#' @examples
+#' \dontrun{
+#' testArgs <- createTestPhenotypeAlgorithmArgs(
+#'   phenotypeCohortId = 10,
+#'   cutPoints = c("EV", "0.5")
+#' )
+#' }
+#'
+#' @export
+createTestPhenotypeAlgorithmArgs <- function(cutPoints = c("EV"),
+                                             phenotypeCohortId,
+                                             washoutPeriod = 0,
+                                             splayPrior = 7,
+                                             splayPost = 7) {
+  # First: get default values:
+  analysis <- list()
+  for (name in names(formals(createTestPhenotypeAlgorithmArgs))) {
+    analysis[[name]] <- get(name)
+  }
+  # Second: overwrite defaults with actual values:
+  values <- lapply(as.list(match.call())[-1], function(x) eval(x, envir = sys.frame(-3)))
+  for (name in names(values)) {
+    if (name %in% names(analysis)) {
+      analysis[[name]] <- values[[name]]
+    }
+  }
+  class(analysis) <- "args"
+  return(analysis)
+}
