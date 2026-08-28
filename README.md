@@ -1,7 +1,7 @@
 PheValuator
 ===========
 
-[![Build Status](https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check) [![codecov](https://codecov.io/gh/OHDSI/PheValuator/branch/main/graph/badge.svg?token=BVneSqi2IO)](https://codecov.io/gh/OHDSI/PheValuator)
+[![Build Status](https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check) [![codecov](https://app.codecov.io/gh/OHDSI/PheValuator/branch/main/graph/badge.svg?token=BVneSqi2IO)](https://app.codecov.io/gh/OHDSI/PheValuator)
 
 PheValuator is part of [HADES](https://ohdsi.github.io/Hades/).
 
