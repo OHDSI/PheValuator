@@ -18,7 +18,7 @@ expected value}
 
 \item{phenotypeCohortId}{The ID of the cohort to evaluate in the specified cohort table.}
 
-\item{washoutPeriod}{The mininum required continuous observation time prior to index date for
+\item{washoutPeriod}{The minimum required continuous observation time prior to index date for
 subjects within the cohort to test (Default = 0).}
 
 \item{splayPrior}{The number of days to allow for test phenotype visit date prior to evaluation date}
