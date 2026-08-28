@@ -98,7 +98,7 @@ disease prevalence.}
 
 \item{cdmDatabaseSchema}{The name of the database schema that contains the OMOP CDM
 instance. Requires read permissions to this database. On SQL
-Server, this should specify both the database and the
+Server, this should specifiy both the database and the
 schema, so for example 'cdm_instance.dbo'.}
 
 \item{cohortDatabaseSchema}{The name of the database schema that is the location where

@@ -41,7 +41,7 @@ Suggests:
     Eunomia,
     withr,
     CohortGenerator
-URL: https://ohdsi.github.io/PheValuator, https://github.com/OHDSI/PheValuator
+URL: https://ohdsi.github.io/PheValuator/, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
 Encoding: UTF-8
 Config/roxygen2/version: 8.0.0

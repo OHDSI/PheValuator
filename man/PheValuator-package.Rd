@@ -11,7 +11,7 @@ A package for evaluating phenotype algorithms. The package develops a diagnostic
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://ohdsi.github.io/PheValuator}
+  \item \url{https://ohdsi.github.io/PheValuator/}
   \item \url{https://github.com/OHDSI/PheValuator}
   \item Report bugs at \url{https://github.com/OHDSI/PheValuator/issues}
 }
