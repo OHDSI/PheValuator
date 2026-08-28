@@ -50,7 +50,7 @@ Installation
 
 User Documentation
 ==================
-Documentation can be found on the [package website](https://ohdsi.github.io/PheValuator).
+Documentation can be found on the [package website](https://ohdsi.github.io/PheValuator/).
 
 PDF versions of the documentation are also available:
 * Vignette: [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/main/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)
