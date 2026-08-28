@@ -181,7 +181,7 @@
 
           tryCatch(
             {
-              insertTable(
+              DatabaseConnector::insertTable(
                 connection = connection,
                 databaseSchema = workDatabaseSchema,
                 tableName = testCohort,
@@ -197,7 +197,7 @@
             error = function(cond) {
               if (grepl("Bulk load credentials", cond, fixed = TRUE)) {
                 message(paste0("...bulk load failed...trying without bulk load...this may be slow"))
-                insertTable(
+                DatabaseConnector::insertTable(
                   connection = connection,
                   databaseSchema = workDatabaseSchema,
                   tableName = testCohort,

@@ -122,7 +122,7 @@ utils::globalVariables(c(
       tryCatch(
         {
           tempTableCreated <- TRUE
-          insertTable(
+          DatabaseConnector::insertTable(
             connection = connection,
             databaseSchema = workDatabaseSchema,
             tableName = testCohort,
@@ -138,7 +138,7 @@ utils::globalVariables(c(
         error = function(cond) {
           if (grepl("Bulk load credentials", cond, fixed = TRUE)) {
             message(paste0("...bulk load failed...trying without bulk load...this may be slow"))
-            insertTable(
+            DatabaseConnector::insertTable(
               connection = connection,
               databaseSchema = workDatabaseSchema,
               tableName = testCohort,
@@ -398,7 +398,7 @@ utils::globalVariables(c(
                     cohortDatabaseSchema, ".", cohortTable, " co ",
                     " where cohort_definition_id = ", inclusionEvaluationCohortId)
 
-      inclusionCohort <- renderTranslateQuerySql(connection = connect(connectionDetails), sql, snakeCaseToCamelCase = TRUE)
+      inclusionCohort <- DatabaseConnector::renderTranslateQuerySql(connection = DatabaseConnector::connect(connectionDetails), sql, snakeCaseToCamelCase = TRUE)
       inclusionCohort <-  inclusionCohort[inclusionCohort$subjectId %in% c(finalPopn$subjectId),]
       #merge with finalPopn
       finalPopn <- merge(finalPopn, inclusionCohort, all.x = TRUE)
