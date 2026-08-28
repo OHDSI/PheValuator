@@ -18,8 +18,9 @@ Description: A package for evaluating phenotype algorithms.  The package
     predictive value.
 License: Apache License 2.0
 VignetteBuilder: knitr
+Depends:
+    R (>= 4.1.1)
 Imports:
-    R (>= 4.1.1),
     DatabaseConnector,
     PatientLevelPrediction (>= 6.0.4),
     FeatureExtraction (>= 2.1.5),
