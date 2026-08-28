@@ -8,3 +8,4 @@ man-roxygen
 compare_versions
 _pkgdown.yml
 docs
+^cran-comments\.md$

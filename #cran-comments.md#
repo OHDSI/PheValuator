@@ -1,17 +1,17 @@
 ## R CMD check results
 
-0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+0 errors | 0 warnings | 0 notes
 
 ## Test environments
 
-* Local Windows 11, R 4.4.1
-* win-builder (R-devel)
-* R-hub: Ubuntu 22.04, R 4.4.1
-* R-hub: macOS, R 4.4.1
+* local: R 4.4.1 
+* win-builder: TODO: add R version/result
 
 ## Submission notes
 
 This is the initial CRAN submission.
+
+TODO: Before submitting, replace this template with actual check results from:
 
 ```r
 rcmdcheck::rcmdcheck(args = "--as-cran", error_on = "warning")

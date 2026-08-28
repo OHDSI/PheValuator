@@ -50,7 +50,6 @@ createPheValuatorAnalysis <- function(analysisId,
                                       description,
                                       createEvaluationCohortArgs,
                                       testPhenotypeAlgorithmArgs) {
-  # TODO: add input checks
   analysis <- list()
   for (name in names(formals(createPheValuatorAnalysis))) {
     analysis[[name]] <- get(name)

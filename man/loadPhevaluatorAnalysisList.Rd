@@ -15,3 +15,9 @@ A list of objects of type \code{pheValuatorAnalysis}.
 \description{
 Load a list of objects of type \code{pheValuatorAnalysis} from file. The file is in JSON format.
 }
+\examples{
+\dontrun{
+analysisList <- loadPheValuatorAnalysisList(file = "analysisList.json")
+}
+
+}

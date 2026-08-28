@@ -15,3 +15,14 @@ A tibble with the statistics metrics added to the counts table.
 \description{
 Compute performance metrics based on a 2-by-2 counts table
 }
+\examples{
+counts <- tibble::tibble(
+  truePositives = 120,
+  trueNegatives = 800,
+  falsePositives = 30,
+  falseNegatives = 50,
+  cutPoint = "EV"
+)
+computePerformanceMetricsFromCounts(counts)
+
+}
