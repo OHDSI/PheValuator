@@ -8,9 +8,9 @@ Authors@R: c(
            role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9491-2737"))
   )
-Description: A package for evaluating phenotype algorithms.  The package
-    develops a diagnostic prediction model using a set of noisy positives
-    and noisy negatives.  It can then apply the model to a large cohort
+Description: Evaluates phenotype algorithms by developing a diagnostic
+    prediction model using a set of noisy positives and noisy negatives.
+    It can then apply the model to a large cohort
     to create a set of subjects each with a predicted probability for the
     health outcome of interest.  This cohort can then be used to evaluate
     phenotype algorithms through the calculation of the necessary performance
