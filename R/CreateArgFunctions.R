@@ -63,6 +63,14 @@
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be
 #'                                         saved? To be used for debugging purposes.
 #'
+#' @examples
+#' \dontrun{
+#' evalCohortArgs <- createCreateEvaluationCohortArgs(
+#'   xSpecCohortId = 1,
+#'   prevalenceCohortId = 3
+#' )
+#' }
+#'
 #' @export
 createCreateEvaluationCohortArgs <- function(xSpecCohortId,
                                              daysFromxSpec = 0,
@@ -126,13 +134,21 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
 #' @details
 #' Create an object defining the parameter values.
 #'
-#' @param cutPoints           A list of threshold predictions for the evaluations.  Include "EV"for the
+#' @param cutPoints           A list of threshold predictions for the evaluations.  Include "EV" for the
 #'                            expected value
 #' @param phenotypeCohortId   The ID of the cohort to evaluate in the specified cohort table.
-#' @param washoutPeriod       The mininum required continuous observation time prior to indexdate for
+#' @param washoutPeriod       The mininum required continuous observation time prior to index date for
 #'                            subjects within the cohort to test (Default = 0).
 #' @param splayPrior          The number of days to allow for test phenotype visit date prior to evaluation date
 #' @param splayPost           The number of days to allow for test phenotype visit date after evaluation date
+#'
+#' @examples
+#' \dontrun{
+#' testArgs <- createTestPhenotypeAlgorithmArgs(
+#'   phenotypeCohortId = 10,
+#'   cutPoints = c("EV", "0.5")
+#' )
+#' }
 #'
 #' @export
 createTestPhenotypeAlgorithmArgs <- function(cutPoints = c("EV"),

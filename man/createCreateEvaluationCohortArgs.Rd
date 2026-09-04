@@ -148,3 +148,12 @@ Create a parameter object for the function createEvaluationCohort
 \details{
 Create an object defining the parameter values.
 }
+\examples{
+\dontrun{
+evalCohortArgs <- createCreateEvaluationCohortArgs(
+  xSpecCohortId = 1,
+  prevalenceCohortId = 3
+)
+}
+
+}

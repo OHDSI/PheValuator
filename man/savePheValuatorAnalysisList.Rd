@@ -14,3 +14,10 @@ savePheValuatorAnalysisList(pheValuatorAnalysisList, file)
 \description{
 Write a list of objects of type \code{pheValuatorAnalysis} to file. The file is in JSON format.
 }
+\examples{
+\dontrun{
+savePheValuatorAnalysisList(pheValuatorAnalysisList = myAnalysisList,
+                            file = "analysisList.json")
+}
+
+}

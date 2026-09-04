@@ -47,3 +47,10 @@ Create the default covariate settings for acute or chronic diseases
 \details{
 Function to create the default covariate settings for acute or chronic diseases
 }
+\examples{
+covSettings <- createDefaultCovariateSettings(
+  excludedCovariateConceptIds = c(201826, 44786627),
+  addDescendantsToExclude = TRUE
+)
+
+}

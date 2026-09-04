@@ -1,4 +1,4 @@
-# Copyright 2022 Observational Health Data Sciences and Informatics
+# Copyright 2026 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -181,7 +181,7 @@
 
           tryCatch(
             {
-              insertTable(
+              DatabaseConnector::insertTable(
                 connection = connection,
                 databaseSchema = workDatabaseSchema,
                 tableName = testCohort,
@@ -197,7 +197,7 @@
             error = function(cond) {
               if (grepl("Bulk load credentials", cond, fixed = TRUE)) {
                 message(paste0("...bulk load failed...trying without bulk load...this may be slow"))
-                insertTable(
+                DatabaseConnector::insertTable(
                   connection = connection,
                   databaseSchema = workDatabaseSchema,
                   tableName = testCohort,
@@ -277,7 +277,7 @@
         restrictPlpDataSettings <- PatientLevelPrediction::createRestrictPlpDataSettings(
           studyStartDate = startDate,
           studyEndDate = endDate,
-          firstExposureOnly = F,
+          firstExposureOnly = FALSE,
           washoutPeriod = 0,
           sampleSize = NULL
         )
@@ -309,8 +309,8 @@
 
       ParallelLogger::logInfo("Fitting predictive model")
       populationSettings <- PatientLevelPrediction::createStudyPopulationSettings(
-        binary = T,
-        includeAllOutcomes = T,
+        binary = TRUE,
+        includeAllOutcomes = TRUE,
         firstExposureOnly = FALSE,
         washoutPeriod = 0,
         removeSubjectsWithPriorOutcome = TRUE,
@@ -321,7 +321,7 @@
         startAnchor = "cohort start",
         riskWindowEnd = 365,
         endAnchor = "cohort start",
-        restrictTarToCohortEnd = F
+        restrictTarToCohortEnd = FALSE
       )
 
       population <- PatientLevelPrediction::createStudyPopulation(
@@ -347,13 +347,13 @@
             )
             sampleSettings <- PatientLevelPrediction::createSampleSettings(type = "none")
             featureEngineeringSettings <- PatientLevelPrediction::createFeatureEngineeringSettings(type = "none")
-            preprocessSettings <- PatientLevelPrediction::createPreprocessSettings(minFraction = 0.001, normalize = T)
+            preprocessSettings <- PatientLevelPrediction::createPreprocessSettings(minFraction = 0.001, normalize = TRUE)
             modelSettings <- PatientLevelPrediction::setLassoLogisticRegression(variance = 0.01, seed = 5)
-            logSettings <- PatientLevelPrediction::createLogSettings(verbosity = "INFO", timeStamp = T, logName = "runPlp Log")
+            logSettings <- PatientLevelPrediction::createLogSettings(verbosity = "INFO", timeStamp = TRUE, logName = "runPlp Log")
             executeSettings <- PatientLevelPrediction::createExecuteSettings(
               runSplitData = TRUE,
-              runSampleData = F,
-              runFeatureEngineering = F,
+              runSampleData = FALSE,
+              runFeatureEngineering = FALSE,
               runPreprocessData = TRUE,
               runModelDevelopment = TRUE,
               runCovariateSummary = TRUE

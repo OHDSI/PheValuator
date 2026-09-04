@@ -1,4 +1,4 @@
-# Copyright 2022 Observational Health Data Sciences and Informatics
+# Copyright 2026 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -27,12 +27,29 @@
 #' @param testPhenotypeAlgorithmArgs      Should the \code{\link{createTestPhenotypeAlgorithmArgs}} function be used in this
 #'                                        analysis?
 #'
+#' @examples
+#' \dontrun{
+#' evalCohortArgs <- createCreateEvaluationCohortArgs(
+#'   xSpecCohortId = 1,
+#'   xSensCohortId = 2,
+#'   prevalenceCohortId = 3
+#' )
+#' testArgs <- createTestPhenotypeAlgorithmArgs(
+#'   phenotypeCohortId = 10
+#' )
+#' analysis <- createPheValuatorAnalysis(
+#'   analysisId = 1,
+#'   description = "Main analysis",
+#'   createEvaluationCohortArgs = evalCohortArgs,
+#'   testPhenotypeAlgorithmArgs = testArgs
+#' )
+#' }
+#'
 #' @export
 createPheValuatorAnalysis <- function(analysisId,
                                       description,
                                       createEvaluationCohortArgs,
                                       testPhenotypeAlgorithmArgs) {
-  # TODO: add input checks
   analysis <- list()
   for (name in names(formals(createPheValuatorAnalysis))) {
     analysis[[name]] <- get(name)
@@ -49,6 +66,12 @@ createPheValuatorAnalysis <- function(analysisId,
 #'
 #' @param pheValuatorAnalysisList   The pheValuatorAnalysis list to be written to file
 #' @param file                      The name of the file where the results will be written
+#'
+#' @examples
+#' \dontrun{
+#' savePheValuatorAnalysisList(pheValuatorAnalysisList = myAnalysisList,
+#'                             file = "analysisList.json")
+#' }
 #'
 #' @export
 savePheValuatorAnalysisList <- function(pheValuatorAnalysisList, file) {
@@ -70,6 +93,11 @@ savePheValuatorAnalysisList <- function(pheValuatorAnalysisList, file) {
 #'
 #' @return
 #' A list of objects of type \code{pheValuatorAnalysis}.
+#'
+#' @examples
+#' \dontrun{
+#' analysisList <- loadPheValuatorAnalysisList(file = "analysisList.json")
+#' }
 #'
 #' @export
 loadPheValuatorAnalysisList <- function(file) {

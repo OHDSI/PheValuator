@@ -6,14 +6,24 @@
 \alias{PheValuator-package}
 \title{PheValuator: Rapid Phenotype Evaluation}
 \description{
-A package for evaluating phenotype algorithms. The package develops a diagnostic prediction model using a set of noisy positives and noisy negatives. It can then apply the model to a large cohort to create a set of subjects each with a predicted probability for the health outcome of interest. This cohort can then be used to evaluate phenotype algorithms through the calculation of the necessary performance characteristics - sensitivity, specificity, and positive and negative preditive value.
+Evaluates phenotype algorithms by developing a diagnostic prediction model using a set of noisy positives and noisy negatives. It can then apply the model to a large cohort to create a set of subjects each with a predicted probability for the health outcome of interest. This cohort can then be used to evaluate phenotype algorithms through the calculation of the necessary performance characteristics - sensitivity, specificity, and positive and negative predictive value.
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://ohdsi.github.io/PheValuator}
+  \item \url{https://ohdsi.github.io/PheValuator/}
   \item \url{https://github.com/OHDSI/PheValuator}
   \item Report bugs at \url{https://github.com/OHDSI/PheValuator/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: William J. O'Brien \email{wobrien8@its.jnj.com}
+
+Authors:
+\itemize{
+  \item Joel Swerdel \email{jswerdel@its.jnj.com}
+  \item Martijn Schuemie \email{schuemie@ohdsi.org}
 }
 
 }
