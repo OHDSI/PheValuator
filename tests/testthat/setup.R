@@ -1,14 +1,6 @@
-onCran <- function() {
-  notCran <- Sys.getenv("NOT_CRAN")
-  if (identical(notCran, "")) {
-    !interactive()
-  } else {
-    !isTRUE(as.logical(notCran))
-  }
-}
 
-runIntegrationTests <- !onCran() &&
-  identical(tolower(Sys.getenv("PHEVALUATOR_RUN_INTEGRATION_TESTS")), "true")
+
+runIntegrationTests <- identical(tolower(Sys.getenv("PHEVALUATOR_RUN_INTEGRATION_TESTS")), "true")
 
 if (runIntegrationTests) {
   connectionDetails <- Eunomia::getEunomiaConnectionDetails()

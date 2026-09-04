@@ -3,7 +3,6 @@ library(testthat)
 #library(Eunomia)
 
 test_that("TestPhenotype - test PheValuator end to end", {
-  skip_on_cran()
   skip_if_not(runIntegrationTests, "Integration tests disabled; set PHEVALUATOR_RUN_INTEGRATION_TESTS=true to run.")
 
   folder <- tempfile("Phevaluator")
