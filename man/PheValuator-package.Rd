@@ -18,7 +18,13 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Joel N. Swerdel \email{joel.swerdel@gmail.com} (\href{https://orcid.org/0000-0001-9491-2737}{ORCID})
+\strong{Maintainer}: William J. O'Brien \email{wobrien8@its.jnj.com}
+
+Authors:
+\itemize{
+  \item Joel Swerdel \email{jswerdel@its.jnj.com}
+  \item Martijn Schuemie \email{schuemie@ohdsi.org}
+}
 
 }
 \keyword{internal}

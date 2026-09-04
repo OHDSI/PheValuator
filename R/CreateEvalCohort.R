@@ -14,13 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-utils::globalVariables(c(
-  "subjectId",
-  "cohortStartDate",
-  "lowDate",
-  "highDate"
-))
-
 .createEvaluationCohort <- function(connectionDetails,
                                     phenotype,
                                     analysisName,
@@ -339,7 +332,11 @@ utils::globalVariables(c(
 
         #allCovData <- merge(allCovData, covNorm, by = 'covariateId', all.x = TRUE)
 
-        allCovData <- dplyr::left_join(allCovData, covNorm, by = 'covariateId')
+        allCovData <- dplyr::left_join(
+          allCovData,
+          covNorm,
+          by = dplyr::join_by(covariateId)
+        )
 
         allCovData$coeffValue <- allCovData$covariateValue*allCovData$coefficient/allCovData$maxValue
         allCovData$coeffValue[is.na(allCovData$coeffValue)] <- 0

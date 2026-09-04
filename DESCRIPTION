@@ -5,7 +5,7 @@ Version: 2.3.0
 Authors@R: c(
     person("William J.", "O'Brien", email = "wobrien8@its.jnj.com", role = c("aut", "cre")),
     person("Joel", "Swerdel", email = "jswerdel@its.jnj.com", role = c("aut")),
-    person("Martijn", "Schuemie", email = "schuemie@ohdsi.org", role = c("aut")),
+    person("Martijn", "Schuemie", email = "schuemie@ohdsi.org", role = c("aut"))
   )
 Description: Evaluates phenotype algorithms by developing a diagnostic
     prediction model using a set of noisy positives and noisy negatives.
