@@ -3,10 +3,10 @@ Type: Package
 Title: Rapid Phenotype Evaluation
 Version: 2.3.0
 Authors@R: c(
-    person("Joel N.", "Swerdel",
-           email = "joel.swerdel@gmail.com",
+    person("William J.", "O'Brien",
+           email = "wobrien8@its.jnj.com",
            role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0001-9491-2737"))
+           comment = c(ORCID = "0000-0003-3332-926X"))
   )
 Description: Evaluates phenotype algorithms by developing a diagnostic
     prediction model using a set of noisy positives and noisy negatives.
