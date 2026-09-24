@@ -1,7 +1,7 @@
 PheValuator
 ===========
 
-[![Build Status](https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check) [![codecov](https://codecov.io/gh/OHDSI/PheValuator/branch/main/graph/badge.svg?token=BVneSqi2IO)](https://codecov.io/gh/OHDSI/PheValuator)
+[![Build Status](https://github.com/OHDSI/PheValuator/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/PheValuator/actions?query=workflow%3AR-CMD-check) [![codecov](https://app.codecov.io/gh/OHDSI/PheValuator/branch/main/graph/badge.svg?token=BVneSqi2IO)](https://app.codecov.io/gh/OHDSI/PheValuator)
 
 PheValuator is part of [HADES](https://ohdsi.github.io/Hades/).
 
@@ -41,16 +41,21 @@ Requires R (version 3.3.0 or higher). Installation on Windows requires [RTools](
 Installation
 =============
 1. See the instructions [here](https://ohdsi.github.io/Hades/rSetup.html) for configuring your R environment, including Java.
+
 2. In R, use the following commands to download and install PheValuator:
 
-    ```r
-    install.packages("remotes")
-    remotes::install_github("ohdsi/PheValuator")
-    ```
+  ```r
+  # CRAN
+  install.packages('PheValuator')
+  
+  # GitHub
+  install.packages("remotes")
+  remotes::install_github("ohdsi/PheValuator")
+  ```
 
 User Documentation
 ==================
-Documentation can be found on the [package website](https://ohdsi.github.io/PheValuator).
+Documentation can be found on the [package website](https://ohdsi.github.io/PheValuator/).
 
 PDF versions of the documentation are also available:
 * Vignette: [Performing a Phenotype Algorithm Evaluation using Phevaluator](https://github.com/OHDSI/PheValuator/blob/main/inst/doc/EvaluatingPhenotypeAlgorithms.pdf)

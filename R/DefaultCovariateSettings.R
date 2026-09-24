@@ -1,4 +1,4 @@
-# Copyright 2022 Observational Health Data Sciences and Informatics
+# Copyright 2026 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -35,6 +35,12 @@
 #' @param endDayWindow2                The day to end time window 2 for feature extraction
 #' @param startDayWindow3              The day to start time window 3 for feature extraction
 #' @param endDayWindow3                The day to end time window 3 for feature extraction #'
+#'
+#' @examples
+#' covSettings <- createDefaultCovariateSettings(
+#'   excludedCovariateConceptIds = c(201826, 44786627),
+#'   addDescendantsToExclude = TRUE
+#' )
 #'
 #' @export
 createDefaultCovariateSettings <- function(excludedCovariateConceptIds = c(),

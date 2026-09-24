@@ -29,3 +29,22 @@ Create a PheValuator analysis specification
 \details{
 Create a set of analysis choices, to be used with the \code{\link{runPheValuatorAnalyses}} function.
 }
+\examples{
+\dontrun{
+evalCohortArgs <- createCreateEvaluationCohortArgs(
+  xSpecCohortId = 1,
+  xSensCohortId = 2,
+  prevalenceCohortId = 3
+)
+testArgs <- createTestPhenotypeAlgorithmArgs(
+  phenotypeCohortId = 10
+)
+analysis <- createPheValuatorAnalysis(
+  analysisId = 1,
+  description = "Main analysis",
+  createEvaluationCohortArgs = evalCohortArgs,
+  testPhenotypeAlgorithmArgs = testArgs
+)
+}
+
+}

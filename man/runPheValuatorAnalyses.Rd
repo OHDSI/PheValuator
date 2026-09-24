@@ -82,3 +82,34 @@ Run a list of analyses
 \details{
 Run a list of analyses.
 }
+\examples{
+\dontrun{
+connectionDetails <- DatabaseConnector::createConnectionDetails(
+  dbms = "postgresql",
+  server = "myserver",
+  user = "user",
+  password = "password"
+)
+analysisList <- list(
+  createPheValuatorAnalysis(
+    analysisId = 1,
+    description = "Main analysis",
+    createEvaluationCohortArgs = createCreateEvaluationCohortArgs(
+      xSpecCohortId = 1,
+      prevalenceCohortId = 3
+    ),
+    testPhenotypeAlgorithmArgs = createTestPhenotypeAlgorithmArgs(
+      phenotypeCohortId = 10
+    )
+  )
+)
+runPheValuatorAnalyses(
+  phenotype = "Diabetes",
+  connectionDetails = connectionDetails,
+  cdmDatabaseSchema = "cdm.dbo",
+  outputFolder = tempdir(),
+  pheValuatorAnalysisList = analysisList
+)
+}
+
+}

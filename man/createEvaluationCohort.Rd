@@ -204,3 +204,32 @@ Create the evaluation cohort
 Fits a diagnostic prediction model, and uses it to create an evaluation cohort with
 probabilities for the health outcome of interest.
 }
+\examples{
+\dontrun{
+connectionDetails <- DatabaseConnector::createConnectionDetails(
+  dbms = "postgresql",
+  server = "myserver",
+  user = "user",
+  password = "password"
+)
+createEvaluationCohort(
+  connectionDetails = connectionDetails,
+  phenotype = "Diabetes",
+  analysisName = "Main",
+  runDateTime = format(Sys.time(), "\%b \%d \%Y \%X"),
+  databaseId = "myDB",
+  xSpecCohortId = 1,
+  xSensCohortId = 2,
+  prevalenceCohortId = 3,
+  caseCohortId = 3,
+  caseFirstOccurrenceOnly = TRUE,
+  cdmDatabaseSchema = "cdm.dbo",
+  cohortDatabaseSchema = "results.dbo",
+  cohortTable = "cohort",
+  workDatabaseSchema = "scratch.dbo",
+  outFolder = tempdir(),
+  exportFolder = file.path(tempdir(), "export")
+)
+}
+
+}

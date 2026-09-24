@@ -3,6 +3,8 @@ library(testthat)
 #library(Eunomia)
 
 test_that("TestPhenotype - test PheValuator end to end", {
+  skip_if_not(runIntegrationTests, "Integration tests disabled; set PHEVALUATOR_RUN_INTEGRATION_TESTS=true to run.")
+
   folder <- tempfile("Phevaluator")
   dir.create(folder)
   on.exit(unlink(folder, recursive = TRUE))

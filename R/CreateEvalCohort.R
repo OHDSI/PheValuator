@@ -1,4 +1,4 @@
-# Copyright 2022 Observational Health Data Sciences and Informatics
+# Copyright 2026 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -115,7 +115,7 @@
       tryCatch(
         {
           tempTableCreated <- TRUE
-          insertTable(
+          DatabaseConnector::insertTable(
             connection = connection,
             databaseSchema = workDatabaseSchema,
             tableName = testCohort,
@@ -131,7 +131,7 @@
         error = function(cond) {
           if (grepl("Bulk load credentials", cond, fixed = TRUE)) {
             message(paste0("...bulk load failed...trying without bulk load...this may be slow"))
-            insertTable(
+            DatabaseConnector::insertTable(
               connection = connection,
               databaseSchema = workDatabaseSchema,
               tableName = testCohort,
@@ -241,7 +241,7 @@
       restrictPlpDataSettings <- PatientLevelPrediction::createRestrictPlpDataSettings(
         studyStartDate = startDate,
         studyEndDate = endDate,
-        firstExposureOnly = F,
+        firstExposureOnly = FALSE,
         washoutPeriod = 0,
         sampleSize = NULL
       )
@@ -269,8 +269,8 @@
     }
 
     populationSettings <- PatientLevelPrediction::createStudyPopulationSettings(
-      binary = T,
-      includeAllOutcomes = T,
+      binary = TRUE,
+      includeAllOutcomes = TRUE,
       firstExposureOnly = FALSE,
       washoutPeriod = 0,
       removeSubjectsWithPriorOutcome = TRUE,
@@ -281,7 +281,7 @@
       startAnchor = "cohort start",
       riskWindowEnd = 365,
       endAnchor = "cohort start",
-      restrictTarToCohortEnd = F
+      restrictTarToCohortEnd = FALSE
     )
 
     population <- PatientLevelPrediction::createStudyPopulation(
@@ -326,13 +326,17 @@
           covariateId = covs$covariateId)
 
         norm <- as.data.frame(lrResults$model$preprocessing$tidyCovariates$normFactors)
-        covNorm <- merge(covariate, norm, by = 'covariateId', all.x = T)
+        covNorm <- merge(covariate, norm, by = 'covariateId', all.x = TRUE)
 
         allCovData <- as.data.frame(plpData$covariateData$covariates)
 
-        #allCovData <- merge(allCovData, covNorm, by = 'covariateId', all.x = T)
+        #allCovData <- merge(allCovData, covNorm, by = 'covariateId', all.x = TRUE)
 
-        allCovData <- dplyr::left_join(allCovData, covNorm, by = 'covariateId')
+        allCovData <- dplyr::left_join(
+          allCovData,
+          covNorm,
+          by = dplyr::join_by(covariateId)
+        )
 
         allCovData$coeffValue <- allCovData$covariateValue*allCovData$coefficient/allCovData$maxValue
         allCovData$coeffValue[is.na(allCovData$coeffValue)] <- 0
@@ -391,7 +395,7 @@
                     cohortDatabaseSchema, ".", cohortTable, " co ",
                     " where cohort_definition_id = ", inclusionEvaluationCohortId)
 
-      inclusionCohort <- renderTranslateQuerySql(connection = connect(connectionDetails), sql, snakeCaseToCamelCase = TRUE)
+      inclusionCohort <- DatabaseConnector::renderTranslateQuerySql(connection = DatabaseConnector::connect(connectionDetails), sql, snakeCaseToCamelCase = TRUE)
       inclusionCohort <-  inclusionCohort[inclusionCohort$subjectId %in% c(finalPopn$subjectId),]
       #merge with finalPopn
       finalPopn <- merge(finalPopn, inclusionCohort, all.x = TRUE)

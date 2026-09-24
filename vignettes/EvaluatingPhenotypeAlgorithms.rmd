@@ -12,7 +12,7 @@ output:
   word_document:
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{Creating a concept set using LLM}
+  %\VignetteIndexEntry{Evaluating Phenotype Algorithms}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
