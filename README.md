@@ -50,7 +50,7 @@ Installation
   
   # GitHub
   install.packages("remotes")
-  remotes::install_github("ohdsi/Phevaluator")
+  remotes::install_github("ohdsi/PheValuator")
   ```
 
 User Documentation
