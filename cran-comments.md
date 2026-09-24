@@ -1,6 +1,6 @@
 ## R CMD check results
 
-0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+0 errors ✔ | 0 warnings ✔ | 2 notes ✔
 
 ## Test environments
 
@@ -14,10 +14,13 @@
 This is the initial CRAN submission.
 
 ```r
-rcmdcheck::rcmdcheck(args = "--as-cran", error_on = "warning")
+devtools::check(cran=TRUE)
 devtools::check_win_devel()
-devtools::check_win_release()
 ```
+
+2 notes are generated. 
+These are caused by dplyr nonstandard eval (createEvalCohort.R line 387). 
+dplyr::join_by does not allow the .data pronoun that would suppress the note.
 
 ## Reverse dependencies
 

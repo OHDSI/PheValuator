@@ -41,12 +41,17 @@ Requires R (version 3.3.0 or higher). Installation on Windows requires [RTools](
 Installation
 =============
 1. See the instructions [here](https://ohdsi.github.io/Hades/rSetup.html) for configuring your R environment, including Java.
+
 2. In R, use the following commands to download and install PheValuator:
 
-    ```r
-    install.packages("remotes")
-    remotes::install_github("ohdsi/PheValuator")
-    ```
+  ```r
+  # CRAN
+  install.packages('PheValuator')
+  
+  # GitHub
+  install.packages("remotes")
+  remotes::install_github("ohdsi/Phevaluator")
+  ```
 
 User Documentation
 ==================
