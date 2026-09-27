@@ -25,3 +25,5 @@
 #' @import FeatureExtraction
 #' @import PatientLevelPrediction
 NULL
+
+utils::globalVariables(c("covariateId", "subjectId", "cohortStartDate", "lowDate", "highDate"))
