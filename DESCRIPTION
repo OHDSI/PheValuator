@@ -2,7 +2,7 @@ Package: PheValuator
 Type: Package
 Title: Rapid Phenotype Evaluation
 Version: 2.2.18
-Date: 2026-09-24 
+Date: 2026-10-7 
 Authors@R: c(
     person("William J.", "O'Brien", email = "wobrien8@its.jnj.com", role = c("aut", "cre")),
     person("Joel", "Swerdel", email = "jswerdel@its.jnj.com", role = c("aut")),
@@ -15,7 +15,8 @@ Description: Evaluates phenotype algorithms by developing a diagnostic
     health outcome of interest.  This cohort can then be used to evaluate
     phenotype algorithms through the calculation of the necessary performance
     characteristics - sensitivity, specificity, and positive and negative
-    predictive value.
+    predictive value. Based on work by Swerdel (2022) <doi:10.1016/j.jbi.2022.104177>
+    and Swerdel (2019) <doi:10.1016/j.jbi.2019.103258>. 
 License: Apache License 2.0
 VignetteBuilder: knitr
 Depends:
@@ -44,5 +45,4 @@ Suggests:
 URL: https://ohdsi.github.io/PheValuator/, https://github.com/OHDSI/PheValuator
 BugReports: https://github.com/OHDSI/PheValuator/issues
 Encoding: UTF-8
-Config/roxygen2/version: 8.0.0
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.1.0

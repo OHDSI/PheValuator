@@ -63,13 +63,14 @@
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be
 #'                                         saved? To be used for debugging purposes.
 #'
+#' @return A list of class \code{"args"} containing all the provided parameters.
+#'   This object is used as an argument to the \code{\link{createEvaluationCohort}} function.
+#'
 #' @examples
-#' \dontrun{
 #' evalCohortArgs <- createCreateEvaluationCohortArgs(
 #'   xSpecCohortId = 1,
 #'   prevalenceCohortId = 3
 #' )
-#' }
 #'
 #' @export
 createCreateEvaluationCohortArgs <- function(xSpecCohortId,
@@ -142,13 +143,14 @@ createCreateEvaluationCohortArgs <- function(xSpecCohortId,
 #' @param splayPrior          The number of days to allow for test phenotype visit date prior to evaluation date
 #' @param splayPost           The number of days to allow for test phenotype visit date after evaluation date
 #'
+#' @return A list object of class \code{"args"} containing all the provided parameters.
+#'   This object is used as an argument to the \code{\link{testPhenotypeAlgorithm}} function.
+#'
 #' @examples
-#' \dontrun{
 #' testArgs <- createTestPhenotypeAlgorithmArgs(
 #'   phenotypeCohortId = 10,
 #'   cutPoints = c("EV", "0.5")
 #' )
-#' }
 #'
 #' @export
 createTestPhenotypeAlgorithmArgs <- function(cutPoints = c("EV"),

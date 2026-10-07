@@ -107,6 +107,9 @@
 #' @param saveEvaluationCohortPlpData      Should the large PLP file for the evaluation cohort be saved? To be
 #'                                         used for debugging purposes.
 #'
+#' @return No return value, called for side effects. Creates database tables and output files containing
+#'   the predictive model and evaluation cohort data with predicted probabilities for the health outcome.
+#'
 #' @examples
 #' \dontrun{
 #' connectionDetails <- DatabaseConnector::createConnectionDetails(
@@ -184,7 +187,7 @@ createEvaluationCohort <- function(connectionDetails,
                                    endDate = "21000101",
                                    falsePositiveNegativeSubjects = 10,
                                    cdmVersion = "5",
-                                   outFolder = getwd(),
+                                   outFolder,
                                    exportFolder,
                                    modelId = "main",
                                    evaluationCohortId = "main",

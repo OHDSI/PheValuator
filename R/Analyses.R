@@ -27,8 +27,11 @@
 #' @param testPhenotypeAlgorithmArgs      Should the \code{\link{createTestPhenotypeAlgorithmArgs}} function be used in this
 #'                                        analysis?
 #'
+#' @return A list object of class \code{"pheValuatorAnalysis"} containing the analysis specification.
+#'   Includes the analysis ID, description, and argument specifications for creating the evaluation cohort
+#'   and testing the phenotype algorithm.
+#'
 #' @examples
-#' \dontrun{
 #' evalCohortArgs <- createCreateEvaluationCohortArgs(
 #'   xSpecCohortId = 1,
 #'   xSensCohortId = 2,
@@ -43,7 +46,6 @@
 #'   createEvaluationCohortArgs = evalCohortArgs,
 #'   testPhenotypeAlgorithmArgs = testArgs
 #' )
-#' }
 #'
 #' @export
 createPheValuatorAnalysis <- function(analysisId,
@@ -67,10 +69,14 @@ createPheValuatorAnalysis <- function(analysisId,
 #' @param pheValuatorAnalysisList   The pheValuatorAnalysis list to be written to file
 #' @param file                      The name of the file where the results will be written
 #'
+#' @return No return value, called for side effects. Writes a JSON file containing the analysis list
+#'   to the specified file path.
+#'
 #' @examples
 #' \dontrun{
-#' savePheValuatorAnalysisList(pheValuatorAnalysisList = myAnalysisList,
-#'                             file = "analysisList.json")
+#' # Requires pre-existing analysis list object; example usage:
+#' # savePheValuatorAnalysisList(pheValuatorAnalysisList = myAnalysisList,
+#' #                             file = file.path(tempdir(), "analysisList.json"))
 #' }
 #'
 #' @export

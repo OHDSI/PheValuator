@@ -36,6 +36,10 @@
 #' @param startDayWindow3              The day to start time window 3 for feature extraction
 #' @param endDayWindow3                The day to end time window 3 for feature extraction #'
 #'
+#' @return A list containing one or more covariate settings objects from the FeatureExtraction package.
+#'   If only the first time window is specified, returns a list with one element.
+#'   If additional time windows are specified, returns a list with multiple elements.
+#'
 #' @examples
 #' covSettings <- createDefaultCovariateSettings(
 #'   excludedCovariateConceptIds = c(201826, 44786627),

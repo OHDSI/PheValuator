@@ -11,13 +11,18 @@ savePheValuatorAnalysisList(pheValuatorAnalysisList, file)
 
 \item{file}{The name of the file where the results will be written}
 }
+\value{
+No return value, called for side effects. Writes a JSON file containing the analysis list
+  to the specified file path.
+}
 \description{
 Write a list of objects of type \code{pheValuatorAnalysis} to file. The file is in JSON format.
 }
 \examples{
 \dontrun{
-savePheValuatorAnalysisList(pheValuatorAnalysisList = myAnalysisList,
-                            file = "analysisList.json")
+# Requires pre-existing analysis list object; example usage:
+# savePheValuatorAnalysisList(pheValuatorAnalysisList = myAnalysisList,
+#                             file = file.path(tempdir(), "analysisList.json"))
 }
 
 }

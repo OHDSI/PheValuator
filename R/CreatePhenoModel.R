@@ -48,7 +48,7 @@
                                   endDate = "21000101",
                                   removeSubjectsWithFutureDates = TRUE,
                                   cdmVersion = "5",
-                                  outFolder = getwd(),
+                                  outFolder,
                                   exportFolder,
                                   randomVisitTable = "",
                                   modelId = "main") {

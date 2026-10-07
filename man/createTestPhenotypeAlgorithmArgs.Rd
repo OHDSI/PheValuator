@@ -25,6 +25,10 @@ subjects within the cohort to test (Default = 0).}
 
 \item{splayPost}{The number of days to allow for test phenotype visit date after evaluation date}
 }
+\value{
+A list object of class \code{"args"} containing all the provided parameters.
+  This object is used as an argument to the \code{\link{testPhenotypeAlgorithm}} function.
+}
 \description{
 Create a parameter object for the function testPhenotypeAlgorithm
 }
@@ -32,11 +36,9 @@ Create a parameter object for the function testPhenotypeAlgorithm
 Create an object defining the parameter values.
 }
 \examples{
-\dontrun{
 testArgs <- createTestPhenotypeAlgorithmArgs(
   phenotypeCohortId = 10,
   cutPoints = c("EV", "0.5")
 )
-}
 
 }

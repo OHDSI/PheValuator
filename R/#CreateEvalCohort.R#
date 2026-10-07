@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+utils::globalVariables(
+
 .createEvaluationCohort <- function(connectionDetails,
                                     phenotype,
                                     analysisName,
@@ -51,7 +53,7 @@
                                     endDate = "21000101",
                                     falsePositiveNegativeSubjects = 10,
                                     cdmVersion = "5",
-                                    outFolder,
+                                    outFolder = getwd(),
                                     exportFolder,
                                     modelId = "main",
                                     evaluationCohortId = "main",
