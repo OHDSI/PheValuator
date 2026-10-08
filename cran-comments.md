@@ -26,8 +26,8 @@ quotes: "Title")
 
 *Response* Added two DOI references (Swerdel 2022 and 2019) to the Description field in DESCRIPTION file with proper formatting.
 
-
 -----
+
 ### Reviewer comment 2
 Please add \value to .Rd files regarding exported methods and explain
 the functions results in the documentation. Please write about the
@@ -36,6 +36,7 @@ function does not return a value, please document that too, e.g.
 \value{No return value, called for side effects} or similar)
 
 *Response* Added @return roxygen2 tags to all 6 functions in source files documenting return types and structures. Documentation was rebuilt.
+
 -----
 
 ### Reviewer comment 3
@@ -60,6 +61,7 @@ dontrun{} with \donttest{}.
 
 
 -----
+
 ### Reviewer comment 4 
 
 Please ensure that your functions do not write by default or in your
@@ -69,6 +71,7 @@ Please omit any default path in writing functions. In your
 examples/vignettes/tests you can write to tempdir().
 
 *Response* Removed default getwd() value from outFolder parameter in createPhenoModel, createEvaluationCohort, and CreateEvaluationCohort functions, making outFolder a required parameter.
+
 -----
 
 
