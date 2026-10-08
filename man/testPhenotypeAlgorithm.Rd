@@ -80,3 +80,28 @@ Test phenotype algorithms
 This function will perform the phenotype algorithm evaluation using the evaluation cohort returned
 from createEvalCohort and the phenotype algorithm cohort specified
 }
+\examples{
+\dontrun{
+connectionDetails <- DatabaseConnector::createConnectionDetails(
+  dbms = "postgresql",
+  server = "myserver",
+  user = "user",
+  password = "password"
+)
+results <- testPhenotypeAlgorithm(
+  phenotype = "Diabetes",
+  analysisName = "Main",
+  runDateTime = format(Sys.time(), "\%b \%d \%Y \%X"),
+  connectionDetails = connectionDetails,
+  cutPoints = c("EV", "0.5"),
+  outFolder = tempdir(),
+  exportFolder = file.path(tempdir(), "export"),
+  phenotypeCohortId = 10,
+  cdmDatabaseSchema = "cdm.dbo",
+  databaseId = "myDB",
+  cohortDatabaseSchema = "results.dbo",
+  cohortTable = "cohort"
+)
+}
+
+}
