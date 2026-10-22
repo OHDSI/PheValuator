@@ -23,9 +23,31 @@ the \code{\link{createCreateEvaluationCohortArgs}} function.}
 \item{testPhenotypeAlgorithmArgs}{Should the \code{\link{createTestPhenotypeAlgorithmArgs}} function be used in this
 analysis?}
 }
+\value{
+A list object of class \code{"pheValuatorAnalysis"} containing the analysis specification.
+  Includes the analysis ID, description, and argument specifications for creating the evaluation cohort
+  and testing the phenotype algorithm.
+}
 \description{
 Create a PheValuator analysis specification
 }
 \details{
 Create a set of analysis choices, to be used with the \code{\link{runPheValuatorAnalyses}} function.
+}
+\examples{
+evalCohortArgs <- createCreateEvaluationCohortArgs(
+  xSpecCohortId = 1,
+  xSensCohortId = 2,
+  prevalenceCohortId = 3
+)
+testArgs <- createTestPhenotypeAlgorithmArgs(
+  phenotypeCohortId = 10
+)
+analysis <- createPheValuatorAnalysis(
+  analysisId = 1,
+  description = "Main analysis",
+  createEvaluationCohortArgs = evalCohortArgs,
+  testPhenotypeAlgorithmArgs = testArgs
+)
+
 }

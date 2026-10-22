@@ -1,4 +1,4 @@
-# Copyright 2022 Observational Health Data Sciences and Informatics
+# Copyright 2026 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -55,6 +55,36 @@
 #' @return
 #' A data frame specifying where the constructed evaluation cohort and phenotype evaluation results can be found
 #' in the local file system.
+#'
+#' @examples
+#' \dontrun{
+#' connectionDetails <- DatabaseConnector::createConnectionDetails(
+#'   dbms = "postgresql",
+#'   server = "myserver",
+#'   user = "user",
+#'   password = "password"
+#' )
+#' analysisList <- list(
+#'   createPheValuatorAnalysis(
+#'     analysisId = 1,
+#'     description = "Main analysis",
+#'     createEvaluationCohortArgs = createCreateEvaluationCohortArgs(
+#'       xSpecCohortId = 1,
+#'       prevalenceCohortId = 3
+#'     ),
+#'     testPhenotypeAlgorithmArgs = createTestPhenotypeAlgorithmArgs(
+#'       phenotypeCohortId = 10
+#'     )
+#'   )
+#' )
+#' runPheValuatorAnalyses(
+#'   phenotype = "Diabetes",
+#'   connectionDetails = connectionDetails,
+#'   cdmDatabaseSchema = "cdm.dbo",
+#'   outputFolder = tempdir(),
+#'   pheValuatorAnalysisList = analysisList
+#' )
+#' }
 #'
 #' @export
 runPheValuatorAnalyses <- function(phenotype,
@@ -233,6 +263,18 @@ createReferenceTable <- function(pheValuatorAnalysisList) {
 #'
 #' @return
 #' A data frame of results.
+#'
+#' @examples
+#' \dontrun{
+#' refTable <- runPheValuatorAnalyses(
+#'   phenotype = "Diabetes",
+#'   connectionDetails = connectionDetails,
+#'   cdmDatabaseSchema = "cdm.dbo",
+#'   outputFolder = tempdir(),
+#'   pheValuatorAnalysisList = analysisList
+#' )
+#' results <- summarizePheValuatorAnalyses(refTable, outputFolder = tempdir())
+#' }
 #'
 #' @export
 summarizePheValuatorAnalyses <- function(referenceTable, outputFolder) {

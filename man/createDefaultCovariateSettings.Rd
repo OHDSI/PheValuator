@@ -41,9 +41,21 @@ xSpec model (default=NULL)}
 
 \item{endDayWindow3}{The day to end time window 3 for feature extraction #'}
 }
+\value{
+A list containing one or more covariate settings objects from the FeatureExtraction package.
+  If only the first time window is specified, returns a list with one element.
+  If additional time windows are specified, returns a list with multiple elements.
+}
 \description{
 Create the default covariate settings for acute or chronic diseases
 }
 \details{
 Function to create the default covariate settings for acute or chronic diseases
+}
+\examples{
+covSettings <- createDefaultCovariateSettings(
+  excludedCovariateConceptIds = c(201826, 44786627),
+  addDescendantsToExclude = TRUE
+)
+
 }

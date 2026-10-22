@@ -142,9 +142,20 @@ with dates in the future?}
 \item{saveEvaluationCohortPlpData}{Should the large PLP file for the evaluation cohort be
 saved? To be used for debugging purposes.}
 }
+\value{
+A list of class \code{"args"} containing all the provided parameters.
+  This object is used as an argument to the \code{\link{createEvaluationCohort}} function.
+}
 \description{
 Create a parameter object for the function createEvaluationCohort
 }
 \details{
 Create an object defining the parameter values.
+}
+\examples{
+evalCohortArgs <- createCreateEvaluationCohortArgs(
+  xSpecCohortId = 1,
+  prevalenceCohortId = 3
+)
+
 }

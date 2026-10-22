@@ -13,21 +13,32 @@ createTestPhenotypeAlgorithmArgs(
 )
 }
 \arguments{
-\item{cutPoints}{A list of threshold predictions for the evaluations.  Include "EV"for the
+\item{cutPoints}{A list of threshold predictions for the evaluations.  Include "EV" for the
 expected value}
 
 \item{phenotypeCohortId}{The ID of the cohort to evaluate in the specified cohort table.}
 
-\item{washoutPeriod}{The mininum required continuous observation time prior to indexdate for
+\item{washoutPeriod}{The mininum required continuous observation time prior to index date for
 subjects within the cohort to test (Default = 0).}
 
 \item{splayPrior}{The number of days to allow for test phenotype visit date prior to evaluation date}
 
 \item{splayPost}{The number of days to allow for test phenotype visit date after evaluation date}
 }
+\value{
+A list object of class \code{"args"} containing all the provided parameters.
+  This object is used as an argument to the \code{\link{testPhenotypeAlgorithm}} function.
+}
 \description{
 Create a parameter object for the function testPhenotypeAlgorithm
 }
 \details{
 Create an object defining the parameter values.
+}
+\examples{
+testArgs <- createTestPhenotypeAlgorithmArgs(
+  phenotypeCohortId = 10,
+  cutPoints = c("EV", "0.5")
+)
+
 }

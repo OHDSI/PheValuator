@@ -1,3 +1,9 @@
+PheValuator 2.2.18
+=================
+
+Changes:
+1. CRAN submission 
+
 PheValuator 2.2.17
 =================
 
