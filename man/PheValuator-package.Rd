@@ -6,7 +6,7 @@
 \alias{PheValuator-package}
 \title{PheValuator: Rapid Phenotype Evaluation}
 \description{
-Evaluates phenotype algorithms by developing a diagnostic prediction model using a set of noisy positives and noisy negatives. It can then apply the model to a large cohort to create a set of subjects each with a predicted probability for the health outcome of interest. This cohort can then be used to evaluate phenotype algorithms through the calculation of the necessary performance characteristics - sensitivity, specificity, and positive and negative predictive value. Swerdel (2022) \doi{10.1016/j.jbi.2022.104177} Swerdel (2019) \doi{10.1016/j.jbi.2019.103258}
+Evaluates phenotype algorithms by developing a diagnostic prediction model using a set of noisy positives and noisy negatives. It can then apply the model to a large cohort to create a set of subjects each with a predicted probability for the health outcome of interest. This cohort can then be used to evaluate phenotype algorithms through the calculation of the necessary performance characteristics - sensitivity, specificity, and positive and negative predictive value. Based on work by Swerdel (2022) \doi{10.1016/j.jbi.2022.104177} and Swerdel (2019) \doi{10.1016/j.jbi.2019.103258}.
 }
 \seealso{
 Useful links:
