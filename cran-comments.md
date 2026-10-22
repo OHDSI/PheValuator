@@ -11,6 +11,8 @@
 
 ## Submission notes
 
+Submission on Oct 22 2026 updates version to 2.2.19.
+
 This is the second CRAN submission. Responses to the first review are as follows:
 
 
