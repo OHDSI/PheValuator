@@ -95,23 +95,10 @@ analysisList <- list(
     analysisId = 1,
     description = "Main analysis",
     createEvaluationCohortArgs = createCreateEvaluationCohortArgs(
-      phenotype = "Phenotype A",
-      analysisName = "main",
-      runDateTime = format(Sys.time(), "\%b \%d \%Y \%X"),
-      databaseId = "main",
       xSpecCohortId = 1,
-      xSensCohortId = 2,
-      prevalenceCohortId = 3,
-      caseCohortId = 0,
-      caseFirstOccurrenceOnly = FALSE,
-      exportFolder = tempdir()
+      prevalenceCohortId = 3
     ),
     testPhenotypeAlgorithmArgs = createTestPhenotypeAlgorithmArgs(
-      phenotype = "Phenotype A",
-      analysisName = "main",
-      runDateTime = format(Sys.time(), "\%b \%d \%Y \%X"),
-      databaseId = "main",
-      exportFolder = tempdir(),
       phenotypeCohortId = 10
     )
   )
