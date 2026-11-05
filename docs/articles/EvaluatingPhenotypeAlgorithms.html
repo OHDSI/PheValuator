@@ -250,7 +250,7 @@ createDefaultCovariateSettings() function above</li>
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">CohortArgs</span> <span class="op">&lt;-</span> <span class="fu">createCreateEvaluationCohortArgs</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">CohortArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs</a></span><span class="op">(</span></span>
 <span>  xSpecCohortId <span class="op">=</span> <span class="fl">1769699</span>,</span>
 <span>  xSensCohortId <span class="op">=</span> <span class="fl">1770120</span>,</span>
 <span>  prevalenceCohortId <span class="op">=</span> <span class="fl">1770119</span>,</span>
@@ -268,7 +268,7 @@ evaluate</li>
 <p>For example:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># First phenotype algorithm to test</span></span>
-<span><span class="va">conditionAlg1TestArgs</span> <span class="op">&lt;-</span> <span class="fu">createTestPhenotypeAlgorithmArgs</span><span class="op">(</span>phenotypeCohortId <span class="op">=</span> <span class="fl">1778259</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">conditionAlg1TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span> <span class="fl">1778259</span><span class="op">)</span></span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>Use the createPheValuatorAnalysis() function to set up the phenotype
 algorithm analyses to run</li>
@@ -294,7 +294,7 @@ createTestPhenotypeAlgorithmArgs() settings created above</li>
 <p>For example:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Second phenotype algorithm to test</span></span>
-<span><span class="va">conditionAlg2TestArgs</span> <span class="op">&lt;-</span> <span class="fu">createTestPhenotypeAlgorithmArgs</span><span class="op">(</span></span>
+<span><span class="va">conditionAlg2TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span></span>
 <span>  phenotypeCohortId <span class="op">=</span> <span class="fl">1778260</span>,</span>
 <span>  washoutPeriod <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
