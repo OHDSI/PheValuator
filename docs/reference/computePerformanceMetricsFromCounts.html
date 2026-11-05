@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.17</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.19</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
 </li>
 <li>
   <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
@@ -82,6 +82,27 @@
     <p>A tibble with the statistics metrics added to the counts table.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  truePositives <span class="op">=</span> <span class="fl">120</span>,</span></span>
+<span class="r-in"><span>  trueNegatives <span class="op">=</span> <span class="fl">800</span>,</span></span>
+<span class="r-in"><span>  falsePositives <span class="op">=</span> <span class="fl">30</span>,</span></span>
+<span class="r-in"><span>  falseNegatives <span class="op">=</span> <span class="fl">50</span>,</span></span>
+<span class="r-in"><span>  cutPoint <span class="op">=</span> <span class="st">"EV"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">computePerformanceMetricsFromCounts</span><span class="op">(</span><span class="va">counts</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 19</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   truePositives trueNegatives falsePositives falseNegatives cutPoint  sens</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>           120           800             30             50 EV       0.706</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more variables: sensCi95Lb &lt;dbl&gt;, sensCi95Ub &lt;dbl&gt;, ppv &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ppvCi95Lb &lt;dbl&gt;, ppvCi95Ub &lt;dbl&gt;, spec &lt;dbl&gt;, specCi95Lb &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   specCi95Ub &lt;dbl&gt;, npv &lt;dbl&gt;, npvCi95Lb &lt;dbl&gt;, npvCi95Ub &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   estimatedPrevalence &lt;dbl&gt;, f1Score &lt;dbl&gt;</span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
@@ -90,11 +111,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Joel N. Swerdel.</p>
+  <p></p><p>Developed by William J. O’Brien, Joel Swerdel, Martijn Schuemie.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

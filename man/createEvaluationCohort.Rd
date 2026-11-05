@@ -51,7 +51,7 @@ createEvaluationCohort(
   endDate = "21000101",
   falsePositiveNegativeSubjects = 10,
   cdmVersion = "5",
-  outFolder = getwd(),
+  outFolder,
   exportFolder,
   modelId = "main",
   evaluationCohortId = "main",
@@ -197,10 +197,43 @@ dates in the future?}
 \item{saveEvaluationCohortPlpData}{Should the large PLP file for the evaluation cohort be saved? To be
 used for debugging purposes.}
 }
+\value{
+No return value, called for side effects. Creates database tables and output files containing
+  the predictive model and evaluation cohort data with predicted probabilities for the health outcome.
+}
 \description{
 Create the evaluation cohort
 }
 \details{
 Fits a diagnostic prediction model, and uses it to create an evaluation cohort with
 probabilities for the health outcome of interest.
+}
+\examples{
+\dontrun{
+connectionDetails <- DatabaseConnector::createConnectionDetails(
+  dbms = "postgresql",
+  server = "myserver",
+  user = "user",
+  password = "password"
+)
+createEvaluationCohort(
+  connectionDetails = connectionDetails,
+  phenotype = "Diabetes",
+  analysisName = "Main",
+  runDateTime = format(Sys.time(), "\%b \%d \%Y \%X"),
+  databaseId = "myDB",
+  xSpecCohortId = 1,
+  xSensCohortId = 2,
+  prevalenceCohortId = 3,
+  caseCohortId = 3,
+  caseFirstOccurrenceOnly = TRUE,
+  cdmDatabaseSchema = "cdm.dbo",
+  cohortDatabaseSchema = "results.dbo",
+  cohortTable = "cohort",
+  workDatabaseSchema = "scratch.dbo",
+  outFolder = tempdir(),
+  exportFolder = file.path(tempdir(), "export")
+)
+}
+
 }
