@@ -1,0 +1,1057 @@
+\nonstopmode{}
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\makeatletter\@ifl@t@r\fmtversion{2018/04/01}{}{\usepackage[utf8]{inputenc}}\makeatother
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `PheValuator'}}
+\par\bigskip{\large \today}
+\end{center}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdftitle = {PheValuator: Rapid Phenotype Evaluation}}}{}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdfauthor = {William J. O'Brien; Joel Swerdel; Martijn Schuemie}}}{}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Rapid Phenotype Evaluation}
+\item[Version]\AsIs{2.2.19}
+\item[Date]\AsIs{2026-10-7}
+\item[Description]\AsIs{Evaluates phenotype algorithms by developing a diagnostic
+prediction model using a set of noisy positives and noisy negatives.
+It can then apply the model to a large cohort
+to create a set of subjects each with a predicted probability for the
+health outcome of interest.  This cohort can then be used to evaluate
+phenotype algorithms through the calculation of the necessary performance
+characteristics - sensitivity, specificity, and positive and negative
+predictive value. Based on work by Swerdel (2022) <}\Rhref{https://doi.org/10.1016/j.jbi.2022.104177}{doi:10.1016/j.jbi.2022.104177}\AsIs{>
+and Swerdel (2019) <}\Rhref{https://doi.org/10.1016/j.jbi.2019.103258}{doi:10.1016/j.jbi.2019.103258}\AsIs{>. }
+\item[License]\AsIs{Apache License 2.0}
+\item[VignetteBuilder]\AsIs{knitr}
+\item[Depends]\AsIs{R (>= 4.1.1)}
+\item[Imports]\AsIs{DatabaseConnector,
+PatientLevelPrediction (>= 6.0.4),
+FeatureExtraction (>= 2.1.5),
+SqlRender (>= 1.5.2),
+dplyr (>= 0.7.8),
+methods,
+ParallelLogger,
+tibble}
+\item[Suggests]\AsIs{knitr,
+rmarkdown,
+shiny,
+shinydashboard,
+DT,
+htmltools,
+qpdf,
+testthat,
+Eunomia,
+withr,
+CohortGenerator}
+\item[URL]\AsIs{}\url{https://ohdsi.github.io/PheValuator/}\AsIs{, }\url{https://github.com/OHDSI/PheValuator}\AsIs{}
+\item[BugReports]\AsIs{}\url{https://github.com/OHDSI/PheValuator/issues}\AsIs{}
+\item[Encoding]\AsIs{UTF-8}
+\item[Config/roxygen2/version]\AsIs{8.1.1}
+\end{description}
+\Rdcontents{Contents}
+\HeaderA{computePerformanceMetricsFromCounts}{Compute performance metrics based on a 2-by-2 counts table}{computePerformanceMetricsFromCounts}
+%
+\begin{Description}
+Compute performance metrics based on a 2-by-2 counts table
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+computePerformanceMetricsFromCounts(counts)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{counts}] Counts as created by the \code{\LinkA{testPhenotypeAlgorithm}{testPhenotypeAlgorithm}} function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A tibble with the statistics metrics added to the counts table.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+counts <- tibble::tibble(
+  truePositives = 120,
+  trueNegatives = 800,
+  falsePositives = 30,
+  falseNegatives = 50,
+  cutPoint = "EV"
+)
+computePerformanceMetricsFromCounts(counts)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{createCreateEvaluationCohortArgs}{Create a parameter object for the function createEvaluationCohort}{createCreateEvaluationCohortArgs}
+%
+\begin{Description}
+Create a parameter object for the function createEvaluationCohort
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+createCreateEvaluationCohortArgs(
+  phenotype,
+  analysisName,
+  runDateTime,
+  databaseId,
+  xSpecCohortId,
+  daysFromxSpec = 0,
+  xSensCohortId,
+  prevalenceCohortId,
+  caseCohortId,
+  caseFirstOccurrenceOnly,
+  xSpecCohortSize = 5000,
+  covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
+    addDescendantsToExclude = TRUE),
+  modelPopulationCohortId = 0,
+  modelPopulationCohortIdStartDay = 0,
+  modelPopulationCohortIdEndDay = 0,
+  inclusionEvaluationCohortId = 0,
+  inclusionEvaluationDaysFromStart = 0,
+  inclusionEvaluationDaysFromEnd = 0,
+  duringInclusionEvaluationOnly = FALSE,
+  exclusionEvaluationCohortId = 0,
+  exclusionEvaluationDaysFromStart = 0,
+  exclusionEvaluationDaysFromEnd = 0,
+  priorModelToUse = NULL,
+  minimumOffsetFromStart = 365,
+  minimumOffsetFromEnd = 365,
+  modelBaseSampleSize = 25000,
+  baseSampleSize = 2e+06,
+  lowerAgeLimit = 0,
+  upperAgeLimit = 120,
+  visitLength = 0,
+  visitType = c(9201, 9202, 9203, 262, 581477),
+  gender = c(8507, 8532),
+  race = 0,
+  ethnicity = 0,
+  startDate = "19001010",
+  endDate = "21000101",
+  falsePositiveNegativeSubjects = 10,
+  exportFolder,
+  modelId = "main",
+  excludeModelFromEvaluation = FALSE,
+  randomVisitTable = "",
+  removeSubjectsWithFutureDates = TRUE,
+  saveEvaluationCohortPlpData = FALSE
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{phenotype}] Name of the phenotype for analysis
+
+\item[\code{analysisName}] Name of the analysis
+
+\item[\code{runDateTime}] Starting date and time of the PheValuator run
+
+\item[\code{databaseId}] Name of the database in the analysis
+
+\item[\code{xSpecCohortId}] The number of the "extremely specific (xSpec)" cohort
+definition id in the cohort table (for noisy positives).
+
+\item[\code{daysFromxSpec}] Number of days allowed from xSpec condition until analyzed
+visit
+
+\item[\code{xSensCohortId}] The number of the "extremely sensitive (xSens)" cohort
+definition id in the cohort table (for noisy negatives).
+
+\item[\code{prevalenceCohortId}] The number of the cohort definition id to determine the
+disease prevalence.
+
+\item[\code{caseCohortId}] The number of the cohort definition id to determine cases
+in the evaluation cohort
+
+\item[\code{caseFirstOccurrenceOnly}] Set to true if only the first occurrence per subject in
+the case cohort is to be used
+
+\item[\code{xSpecCohortSize}] The recommended xSpec sample size to use in model (default
+= NULL)
+
+\item[\code{covariateSettings}] A covariateSettings object as generated using
+createCovariateSettings().
+
+\item[\code{modelPopulationCohortId}] The number of the cohort to be used as a base population
+for the model. If set to 0, the entire database population
+will be used.
+
+\item[\code{modelPopulationCohortIdStartDay}] The number of days relative to the mainPopulationCohortId
+cohort start date to begin including visits.
+
+\item[\code{modelPopulationCohortIdEndDay}] The number of days relative to the mainPopulationCohortId
+cohort start date to end including visits.
+
+\item[\code{inclusionEvaluationCohortId}] The number of the cohort of the population to be used to
+designate which visits are eligible to be in the
+evaluation cohort
+
+\item[\code{inclusionEvaluationDaysFromStart}] The number of days from the cohort start date of the
+inclusionEvaluationCohortId to start eligible included
+visits
+
+\item[\code{inclusionEvaluationDaysFromEnd}] The number of days from the cohort start date of the
+inclusionEvaluationCohortId to end eligible included
+visits
+
+\item[\code{duringInclusionEvaluationOnly}] Only include visits that are within the cohort start and
+end dates
+
+\item[\code{exclusionEvaluationCohortId}] The number of the cohort of the population to be used to
+designate which visits are NOT eligible to be in the
+evaluation cohort
+
+\item[\code{exclusionEvaluationDaysFromStart}] The number of days from the cohort start date of the
+exclusionEvaluationCohortId to start ineligible included
+visits
+
+\item[\code{exclusionEvaluationDaysFromEnd}] The number of days from the cohort start date of the
+exclusionEvaluationCohortId to end ineligible included
+visits
+
+\item[\code{priorModelToUse}] folder where a previously developed model to use in
+analysis will be found
+
+\item[\code{minimumOffsetFromStart}] Minimum number of days to offset for the analysis visit
+from the start of the observation period
+
+\item[\code{minimumOffsetFromEnd}] Minimum number of days to offset for the analysis visit
+from the end of the observation period
+
+\item[\code{modelBaseSampleSize}] The number of non-xSpec subjects to include in the model
+
+\item[\code{baseSampleSize}] The maximum number of subjects in the evaluation cohort.
+
+\item[\code{lowerAgeLimit}] The lower age for subjects in the model.
+
+\item[\code{upperAgeLimit}] The upper age for subjects in the model.
+
+\item[\code{visitLength}] The minimum length of index visit for acute outcomes.
+
+\item[\code{visitType}] The concept\_id for the visit type.
+
+\item[\code{gender}] The gender(s) to be included.
+
+\item[\code{race}] The race(s) to be included.
+
+\item[\code{ethnicity}] The ethnicity(s) to be included.
+
+\item[\code{startDate}] The starting date for including subjects in the model.
+
+\item[\code{endDate}] The ending date for including subjects in the model.
+
+\item[\code{falsePositiveNegativeSubjects}] Number of subjects to include for evaluating false
+positives and negatives
+
+\item[\code{exportFolder}] The folder where the csv output files will be written.
+
+\item[\code{modelId}] A string used to generate the file names for this model.
+
+\item[\code{excludeModelFromEvaluation}] Should subjects used in the model be excluded from the
+evaluation cohort?
+
+\item[\code{randomVisitTable}] Table stored in work directory with pre-selected random
+visits in format of visit\_occurrence table
+
+\item[\code{removeSubjectsWithFutureDates}] For buggy data with data in the future: ignore subjects
+with dates in the future?
+
+\item[\code{saveEvaluationCohortPlpData}] Should the large PLP file for the evaluation cohort be
+saved? To be used for debugging purposes.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+Create an object defining the parameter values.
+\end{Details}
+\HeaderA{createDefaultCovariateSettings}{Create the default covariate settings}{createDefaultCovariateSettings}
+%
+\begin{Description}
+Create the default covariate settings for acute or chronic diseases
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+createDefaultCovariateSettings(
+  excludedCovariateConceptIds = c(),
+  includedCovariateIds = c(),
+  includedCovariateConceptIds = c(),
+  addDescendantsToExclude = FALSE,
+  startDayWindow1 = 0,
+  endDayWindow1 = 9999,
+  startDayWindow2 = NULL,
+  endDayWindow2 = NULL,
+  startDayWindow3 = NULL,
+  endDayWindow3 = NULL
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{excludedCovariateConceptIds}] A list of conceptIds to exclude from featureExtraction.  These
+should include all concept\_ids that were used to define the
+xSpec model (default=NULL)
+
+\item[\code{includedCovariateIds}] A list of covariate IDs that should be restricted to.
+
+\item[\code{includedCovariateConceptIds}] A list of covariate concept IDs that should be restricted to.
+
+\item[\code{addDescendantsToExclude}] Should descendants of excluded concepts also be excluded?
+(default=FALSE)
+
+\item[\code{startDayWindow1}] The day to start time window 1 for feature extraction
+
+\item[\code{endDayWindow1}] The day to end time window 1 for feature extraction
+
+\item[\code{startDayWindow2}] The day to start time window 2 for feature extraction
+
+\item[\code{endDayWindow2}] The day to end time window 2 for feature extraction
+
+\item[\code{startDayWindow3}] The day to start time window 3 for feature extraction
+
+\item[\code{endDayWindow3}] The day to end time window 3 for feature extraction \#'
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+Function to create the default covariate settings for acute or chronic diseases
+\end{Details}
+%
+\begin{Value}
+A list containing one or more covariate settings objects from the FeatureExtraction package.
+If only the first time window is specified, returns a list with one element.
+If additional time windows are specified, returns a list with multiple elements.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+covSettings <- createDefaultCovariateSettings(
+  excludedCovariateConceptIds = c(201826, 44786627),
+  addDescendantsToExclude = TRUE
+)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{createEvaluationCohort}{Create the evaluation cohort}{createEvaluationCohort}
+%
+\begin{Description}
+Create the evaluation cohort
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+createEvaluationCohort(
+  connectionDetails,
+  oracleTempSchema = NULL,
+  tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
+  phenotype,
+  analysisName,
+  runDateTime,
+  databaseId,
+  xSpecCohortId,
+  daysFromxSpec = 0,
+  xSensCohortId,
+  prevalenceCohortId,
+  caseCohortId,
+  caseFirstOccurrenceOnly,
+  xSpecCohortSize = 5000,
+  cdmDatabaseSchema,
+  cohortDatabaseSchema,
+  cohortTable,
+  workDatabaseSchema,
+  covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
+    addDescendantsToExclude = TRUE),
+  modelPopulationCohortId = 0,
+  modelPopulationCohortIdStartDay = 0,
+  modelPopulationCohortIdEndDay = 0,
+  inclusionEvaluationCohortId = 0,
+  inclusionEvaluationDaysFromStart = 0,
+  inclusionEvaluationDaysFromEnd = 0,
+  duringInclusionEvaluationOnly = FALSE,
+  exclusionEvaluationCohortId = 0,
+  exclusionEvaluationDaysFromStart = 0,
+  exclusionEvaluationDaysFromEnd = 0,
+  priorModelToUse = NULL,
+  minimumOffsetFromStart = 365,
+  minimumOffsetFromEnd = 365,
+  modelBaseSampleSize = 25000,
+  baseSampleSize = 2e+06,
+  lowerAgeLimit = 0,
+  upperAgeLimit = 120,
+  visitLength = 0,
+  visitType = c(9201, 9202, 9203, 262, 581477),
+  gender = c(8507, 8532),
+  race = 0,
+  ethnicity = 0,
+  startDate = "19001010",
+  endDate = "21000101",
+  falsePositiveNegativeSubjects = 10,
+  cdmVersion = "5",
+  outFolder,
+  exportFolder,
+  modelId = "main",
+  evaluationCohortId = "main",
+  excludeModelFromEvaluation = FALSE,
+  randomVisitTable = "",
+  removeSubjectsWithFutureDates = TRUE,
+  saveEvaluationCohortPlpData = FALSE
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{connectionDetails}] connectionDetails created using the function
+createConnectionDetails in the DatabaseConnector package.
+
+\item[\code{oracleTempSchema}] DEPRECATED: use \code{tempEmulationSchema} instead.
+
+\item[\code{tempEmulationSchema}] Some database platforms like Oracle and Impala do not truly support temp tables. To
+emulate temp tables, provide a schema with write privileges where temp tables
+can be created.
+
+\item[\code{phenotype}] Name of the phenotype for analysis
+
+\item[\code{analysisName}] Name of the analysis
+
+\item[\code{runDateTime}] Starting date and time of the PheValuator run
+
+\item[\code{databaseId}] Name of the database in the analysis
+
+\item[\code{xSpecCohortId}] The number of the "extremely specific (xSpec)" cohort
+definition id in the cohort table (for noisy positives).
+
+\item[\code{daysFromxSpec}] Number of days allowed from xSpec condition until analyzed visit
+
+\item[\code{xSensCohortId}] The number of the "extremely sensitive (xSens)" cohort
+definition id in the cohort table (for noisy negatives).
+
+\item[\code{prevalenceCohortId}] The number of the cohort definition id to determine the
+disease prevalence.
+
+\item[\code{caseCohortId}] The number of the cohort definition id to determine cases in the evaluation cohort
+
+\item[\code{caseFirstOccurrenceOnly}] Set to true if only the first occurrence per subject in the case cohort is to be used
+
+\item[\code{xSpecCohortSize}] The recommended xSpec sample size to use in model (default = NULL)
+
+\item[\code{cdmDatabaseSchema}] The name of the database schema that contains the OMOP CDM
+instance. Requires read permissions to this database. On SQL
+Server, this should specifiy both the database and the
+schema, so for example 'cdm\_instance.dbo'.
+
+\item[\code{cohortDatabaseSchema}] The name of the database schema that is the location where
+the cohort data used to define the at risk cohort is
+available. Requires read permissions to this database.
+
+\item[\code{cohortTable}] The tablename that contains the at risk cohort. The
+expectation is cohortTable has format of COHORT table:
+cohort\_concept\_id, SUBJECT\_ID, COHORT\_START\_DATE,
+COHORT\_END\_DATE.
+
+\item[\code{workDatabaseSchema}] The name of the database schema that is the location where
+a table can be created and afterwards removed.
+Requires write permissions to this database.
+
+\item[\code{covariateSettings}] A covariateSettings object as generated using
+createCovariateSettings().
+
+\item[\code{modelPopulationCohortId}] The number of the cohort to be used as a base population for
+the model. If set to 0, the entire database population will be
+used.
+
+\item[\code{modelPopulationCohortIdStartDay}] The number of days relative to the mainPopulationCohortId
+cohort start date to begin including visits.
+
+\item[\code{modelPopulationCohortIdEndDay}] The number of days relative to the mainPopulationCohortId
+cohort start date to end including visits.
+
+\item[\code{inclusionEvaluationCohortId}] The number of the cohort of the population to be used to designate which visits
+are eligible to be in the evaluation cohort
+
+\item[\code{inclusionEvaluationDaysFromStart}] The number of days from the cohort start date of the inclusionEvaluationCohortId
+to start eligible included visits
+
+\item[\code{inclusionEvaluationDaysFromEnd}] The number of days from the cohort start date of the inclusionEvaluationCohortId
+to end eligible included visits
+
+\item[\code{duringInclusionEvaluationOnly}] Only include visits that are within the cohort start and end dates
+
+\item[\code{exclusionEvaluationCohortId}] The number of the cohort of the population to be used to designate which visits
+are NOT eligible to be in the evaluation cohort
+
+\item[\code{exclusionEvaluationDaysFromStart}] The number of days from the cohort start date of the exclusionEvaluationCohortId
+to start ineligible included visits
+
+\item[\code{exclusionEvaluationDaysFromEnd}] The number of days from the cohort start date of the exclusionEvaluationCohortId
+to end ineligible included visits
+
+\item[\code{priorModelToUse}] folder where a previously developed model to use in analysis will be found
+
+\item[\code{minimumOffsetFromStart}] Minimum number of days to offset for the analysis visit from the start of the observation period
+
+\item[\code{minimumOffsetFromEnd}] Minimum number of days to offset for the analysis visit from the end of the observation period
+
+\item[\code{modelBaseSampleSize}] The number of non-xSpec subjects to include in the model
+
+\item[\code{baseSampleSize}] The maximum number of subjects in the evaluation cohort.
+
+\item[\code{lowerAgeLimit}] The lower age for subjects in the model.
+
+\item[\code{upperAgeLimit}] The upper age for subjects in the model.
+
+\item[\code{visitLength}] The minimum length of index visit for acute outcomes.
+
+\item[\code{visitType}] The concept\_id for the visit type.
+
+\item[\code{gender}] The gender(s) to be included.
+
+\item[\code{race}] The race(s) to be included.
+
+\item[\code{ethnicity}] The ethnicity(s) to be included.
+
+\item[\code{startDate}] The starting date for including subjects in the model.
+
+\item[\code{endDate}] The ending date for including subjects in the model.
+
+\item[\code{falsePositiveNegativeSubjects}] Number of subjects to include for evaluating false positives and negatives
+
+\item[\code{cdmVersion}] The CDM version of the database.
+
+\item[\code{outFolder}] The folder where the output files will be written.
+
+\item[\code{exportFolder}] The folder where the csv output files will be written.
+
+\item[\code{modelId}] A string used to generate the file names for this model.
+
+\item[\code{evaluationCohortId}] A string used to generate the file names for this evaluation cohort.
+
+\item[\code{excludeModelFromEvaluation}] Should subjects used in the model be excluded from the evaluation cohort?
+
+\item[\code{randomVisitTable}] Table stored in work directory with pre-selected random visits in format of visit\_occurrence table
+
+\item[\code{removeSubjectsWithFutureDates}] For buggy data with data in the future: ignore subjects with
+dates in the future?
+
+\item[\code{saveEvaluationCohortPlpData}] Should the large PLP file for the evaluation cohort be saved? To be
+used for debugging purposes.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+Fits a diagnostic prediction model, and uses it to create an evaluation cohort with
+probabilities for the health outcome of interest.
+\end{Details}
+%
+\begin{Value}
+No return value, called for side effects. Creates database tables and output files containing
+the predictive model and evaluation cohort data with predicted probabilities for the health outcome.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+connectionDetails <- DatabaseConnector::createConnectionDetails(
+  dbms = "postgresql",
+  server = "myserver",
+  user = "user",
+  password = "password"
+)
+createEvaluationCohort(
+  connectionDetails = connectionDetails,
+  phenotype = "Diabetes",
+  analysisName = "Main",
+  runDateTime = format(Sys.time(), "%b %d %Y %X"),
+  databaseId = "myDB",
+  xSpecCohortId = 1,
+  xSensCohortId = 2,
+  prevalenceCohortId = 3,
+  caseCohortId = 3,
+  caseFirstOccurrenceOnly = TRUE,
+  cdmDatabaseSchema = "cdm.dbo",
+  cohortDatabaseSchema = "results.dbo",
+  cohortTable = "cohort",
+  workDatabaseSchema = "scratch.dbo",
+  outFolder = tempdir(),
+  exportFolder = file.path(tempdir(), "export")
+)
+
+## End(Not run)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{createPheValuatorAnalysis}{Create a PheValuator analysis specification}{createPheValuatorAnalysis}
+%
+\begin{Description}
+Create a PheValuator analysis specification
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+createPheValuatorAnalysis(
+  analysisId,
+  description,
+  createEvaluationCohortArgs,
+  testPhenotypeAlgorithmArgs
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{analysisId}] An integer that will be used later to refer to this specific
+set of analysis choices.
+
+\item[\code{description}] A short description of the analysis.
+
+\item[\code{createEvaluationCohortArgs}] An object representing the arguments to be used when calling
+the \code{\LinkA{createCreateEvaluationCohortArgs}{createCreateEvaluationCohortArgs}} function.
+
+\item[\code{testPhenotypeAlgorithmArgs}] Should the \code{\LinkA{createTestPhenotypeAlgorithmArgs}{createTestPhenotypeAlgorithmArgs}} function be used in this
+analysis?
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+Create a set of analysis choices, to be used with the \code{\LinkA{runPheValuatorAnalyses}{runPheValuatorAnalyses}} function.
+\end{Details}
+%
+\begin{Value}
+A list object of class \code{"pheValuatorAnalysis"} containing the analysis specification.
+Includes the analysis ID, description, and argument specifications for creating the evaluation cohort
+and testing the phenotype algorithm.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+evalCohortArgs <- createCreateEvaluationCohortArgs(
+  xSpecCohortId = 1,
+  xSensCohortId = 2,
+  prevalenceCohortId = 3
+)
+testArgs <- createTestPhenotypeAlgorithmArgs(
+  phenotypeCohortId = 10
+)
+analysis <- createPheValuatorAnalysis(
+  analysisId = 1,
+  description = "Main analysis",
+  createEvaluationCohortArgs = evalCohortArgs,
+  testPhenotypeAlgorithmArgs = testArgs
+)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{createTestPhenotypeAlgorithmArgs}{Create a parameter object for the function testPhenotypeAlgorithm}{createTestPhenotypeAlgorithmArgs}
+%
+\begin{Description}
+Create a parameter object for the function testPhenotypeAlgorithm
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+createTestPhenotypeAlgorithmArgs(
+  phenotype,
+  analysisName,
+  runDateTime,
+  cutPoints = c("EV"),
+  exportFolder,
+  phenotypeCohortId,
+  databaseId,
+  washoutPeriod = 0,
+  splayPrior = 7,
+  splayPost = 7
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{phenotype}] Name of the phenotype for analysis
+
+\item[\code{analysisName}] Name of the analysis
+
+\item[\code{runDateTime}] Starting date and time of the PheValuator run
+
+\item[\code{cutPoints}] A list of threshold predictions for the evaluations.  Include "EV" for
+the expected value
+
+\item[\code{exportFolder}] The folder where the csv output files will be written.
+
+\item[\code{phenotypeCohortId}] The ID of the cohort to evaluate in the specified cohort table.
+
+\item[\code{databaseId}] Name of the database in the analysis
+
+\item[\code{washoutPeriod}] The mininum required continuous observation time prior to index date for
+subjects within the cohort to test (Default = 0).
+
+\item[\code{splayPrior}] The number of days to allow for test phenotype visit date prior to
+evaluation date
+
+\item[\code{splayPost}] The number of days to allow for test phenotype visit date after
+evaluation date
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+Create an object defining the parameter values.
+\end{Details}
+\HeaderA{loadPheValuatorAnalysisList}{Load a list of phevaluatorAnalysis from file}{loadPheValuatorAnalysisList}
+%
+\begin{Description}
+Load a list of objects of type \code{pheValuatorAnalysis} from file. The file is in JSON format.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+loadPheValuatorAnalysisList(file)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{file}] The name of the file
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list of objects of type \code{pheValuatorAnalysis}.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+analysisList <- loadPheValuatorAnalysisList(file = "analysisList.json")
+
+## End(Not run)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{runPheValuatorAnalyses}{Run a list of analyses}{runPheValuatorAnalyses}
+%
+\begin{Description}
+Run a list of analyses
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+runPheValuatorAnalyses(
+  phenotype,
+  cohortDefinitionSet = data.frame(),
+  analysisName = "Main",
+  runDateTime = format(Sys.time(), "%b %d %Y %X"),
+  connectionDetails,
+  oracleTempSchema = NULL,
+  tempEmulationSchema = getOption("sqlRenderTempEmulationSchema"),
+  cdmDatabaseSchema,
+  cohortDatabaseSchema = cdmDatabaseSchema,
+  cohortTable = "cohort",
+  workDatabaseSchema = cdmDatabaseSchema,
+  databaseId = cdmDatabaseSchema,
+  cdmVersion = 5,
+  outputFolder,
+  priorModelToUse = NULL,
+  pheValuatorAnalysisList
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{phenotype}] Name of the phenotype for analysis
+
+\item[\code{cohortDefinitionSet}] Data.frame of cohorts must include columns cohortId, cohortName, json, sql - should include all
+cohort definitions needed to replicate PheValuator analysis
+
+\item[\code{analysisName}] Name of the analysis
+
+\item[\code{runDateTime}] Starting date and time of the PheValuator run
+
+\item[\code{connectionDetails}] An R object of type \code{connectionDetails} created using the
+function \code{createConnectionDetails} in the
+\code{DatabaseConnector} package.
+
+\item[\code{oracleTempSchema}] DEPRECATED: use \code{tempEmulationSchema} instead.
+
+\item[\code{tempEmulationSchema}] Some database platforms like Oracle and Impala do not truly support temp tables. To
+emulate temp tables, provide a schema with write privileges where temp tables
+can be created.
+
+\item[\code{cdmDatabaseSchema}] The name of the database schema that contains the OMOP CDM
+instance. Requires read permissions to this database. On SQL
+Server, this should specifiy both the database and the
+schema, so for example 'cdm\_instance.dbo'.
+
+\item[\code{cohortDatabaseSchema}] The name of the database schema that is the location where
+the cohort data used to define the at risk cohort is
+available. Requires read permissions to this database.
+
+\item[\code{cohortTable}] The tablename that contains the at risk cohort. The
+expectation is cohortTable has format of COHORT table:
+cohort\_concept\_id, SUBJECT\_ID, COHORT\_START\_DATE,
+COHORT\_END\_DATE.
+
+\item[\code{workDatabaseSchema}] The name of the database schema that is the location where
+a table can be created and afterwards removed.
+Requires write permissions to this database.
+
+\item[\code{databaseId}] Name of the database in the analysis
+
+\item[\code{cdmVersion}] Define the OMOP CDM version used: currently supports "5".
+
+\item[\code{outputFolder}] Name of the folder where all the outputs will be written to.
+
+\item[\code{priorModelToUse}] folder where a previously developed model to use in analysis will be found
+
+\item[\code{pheValuatorAnalysisList}] A list of objects of type \code{pheValuatorAnalysis} as created using
+the \code{\LinkA{createPheValuatorAnalysis}{createPheValuatorAnalysis}} function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+Run a list of analyses.
+\end{Details}
+%
+\begin{Value}
+A data frame specifying where the constructed evaluation cohort and phenotype evaluation results can be found
+in the local file system.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+connectionDetails <- DatabaseConnector::createConnectionDetails(
+  dbms = "postgresql",
+  server = "myserver",
+  user = "user",
+  password = "password"
+)
+analysisList <- list(
+  createPheValuatorAnalysis(
+    analysisId = 1,
+    description = "Main analysis",
+    createEvaluationCohortArgs = createCreateEvaluationCohortArgs(
+      xSpecCohortId = 1,
+      prevalenceCohortId = 3
+    ),
+    testPhenotypeAlgorithmArgs = createTestPhenotypeAlgorithmArgs(
+      phenotypeCohortId = 10
+    )
+  )
+)
+runPheValuatorAnalyses(
+  phenotype = "Diabetes",
+  connectionDetails = connectionDetails,
+  cdmDatabaseSchema = "cdm.dbo",
+  outputFolder = tempdir(),
+  pheValuatorAnalysisList = analysisList
+)
+
+## End(Not run)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{savePheValuatorAnalysisList}{Save a list of phevaluatorAnalysis to file}{savePheValuatorAnalysisList}
+%
+\begin{Description}
+Write a list of objects of type \code{pheValuatorAnalysis} to file. The file is in JSON format.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+savePheValuatorAnalysisList(pheValuatorAnalysisList, file)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{pheValuatorAnalysisList}] The pheValuatorAnalysis list to be written to file
+
+\item[\code{file}] The name of the file where the results will be written
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+No return value, called for side effects. Writes a JSON file containing the analysis list
+to the specified file path.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+# Requires pre-existing analysis list object; example usage:
+# savePheValuatorAnalysisList(pheValuatorAnalysisList = myAnalysisList,
+#                             file = file.path(tempdir(), "analysisList.json"))
+
+## End(Not run)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{summarizePheValuatorAnalyses}{Summarize results of PheValuator analyses}{summarizePheValuatorAnalyses}
+%
+\begin{Description}
+Summarize results of PheValuator analyses
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+summarizePheValuatorAnalyses(referenceTable, outputFolder)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{referenceTable}] A reference table as created using \code{\LinkA{runPheValuatorAnalyses}{runPheValuatorAnalyses}}.
+
+\item[\code{outputFolder}] The output folder used when calling \code{\LinkA{runPheValuatorAnalyses}{runPheValuatorAnalyses}}.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A data frame of results.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+refTable <- runPheValuatorAnalyses(
+  phenotype = "Diabetes",
+  connectionDetails = connectionDetails,
+  cdmDatabaseSchema = "cdm.dbo",
+  outputFolder = tempdir(),
+  pheValuatorAnalysisList = analysisList
+)
+results <- summarizePheValuatorAnalyses(refTable, outputFolder = tempdir())
+
+## End(Not run)
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{testPhenotypeAlgorithm}{Test phenotype algorithms}{testPhenotypeAlgorithm}
+%
+\begin{Description}
+Test phenotype algorithms
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+testPhenotypeAlgorithm(
+  phenotype,
+  analysisName,
+  runDateTime,
+  connectionDetails,
+  cutPoints = c("EV"),
+  outFolder,
+  exportFolder,
+  evaluationCohortId = "main",
+  phenotypeCohortId,
+  cdmDatabaseSchema,
+  databaseId,
+  cohortDatabaseSchema,
+  cohortTable,
+  washoutPeriod = 0,
+  splayPrior = 7,
+  splayPost = 7
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{phenotype}] Name of the phenotype for analysis
+
+\item[\code{analysisName}] Name of the analysis
+
+\item[\code{runDateTime}] Starting date and time of the PheValuator run
+
+\item[\code{connectionDetails}] ConnectionDetails created using the function
+createConnectionDetails in the DatabaseConnector package.
+
+\item[\code{cutPoints}] A list of threshold predictions for the evaluations.  Include "EV"
+for the expected value
+
+\item[\code{outFolder}] The folder where the cohort evaluation output files are written
+
+\item[\code{exportFolder}] The folder where the csv output files will be written.
+
+\item[\code{evaluationCohortId}] A string used to generate the file names for the evaluation cohort.
+
+\item[\code{phenotypeCohortId}] The ID of the cohort to evaluate in the specified cohort table.
+
+\item[\code{cdmDatabaseSchema}] The name of the database schema that contains the OMOP CDM
+instance. Requires read permissions to this database. On SQL
+Server, this should specifiy both the database and the
+schema, so for example 'cdm\_instance.dbo'.
+
+\item[\code{databaseId}] Name of the database in the analysis
+
+\item[\code{cohortDatabaseSchema}] The name of the database schema that is the location where the
+cohort data used to define the at risk cohort is available.
+Requires read permissions to this database.
+
+\item[\code{cohortTable}] The tablename that contains the at risk cohort. The expectation is
+cohortTable has format of COHORT table: cohort\_concept\_id,
+SUBJECT\_ID, COHORT\_START\_DATE, COHORT\_END\_DATE.
+
+\item[\code{washoutPeriod}] The mininum required continuous observation time prior to index
+date for subjects within the cohort to test (Default = 0).
+
+\item[\code{splayPrior}] The number of days to allow for test phenotype visit date prior to evaluation date
+
+\item[\code{splayPost}] The number of days to allow for test phenotype visit date after evaluation date
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+This function will perform the phenotype algorithm evaluation using the evaluation cohort returned
+from createEvalCohort and the phenotype algorithm cohort specified
+\end{Details}
+%
+\begin{Value}
+A dataframe with the results from the phenotype
+algorithm evaluation.
+
+If 0.5 is included as a cutpoint, the data frame will have an attribute called 'misses', a dataframe
+with a sample of subject ids for TPs, FPs, TNs, and FNs for the 50 percent and over prediction threshold.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run: 
+connectionDetails <- DatabaseConnector::createConnectionDetails(
+  dbms = "postgresql",
+  server = "myserver",
+  user = "user",
+  password = "password"
+)
+results <- testPhenotypeAlgorithm(
+  phenotype = "Diabetes",
+  analysisName = "Main",
+  runDateTime = format(Sys.time(), "%b %d %Y %X"),
+  connectionDetails = connectionDetails,
+  cutPoints = c("EV", "0.5"),
+  outFolder = tempdir(),
+  exportFolder = file.path(tempdir(), "export"),
+  phenotypeCohortId = 10,
+  cdmDatabaseSchema = "cdm.dbo",
+  databaseId = "myDB",
+  cohortDatabaseSchema = "results.dbo",
+  cohortTable = "cohort"
+)
+
+## End(Not run)
+
+\end{ExampleCode}
+\end{Examples}
+\printindex{}
+\end{document}

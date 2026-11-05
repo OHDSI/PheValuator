@@ -22,8 +22,14 @@ createPheValuatorAnalysisSettings <- function(outputFileName) {
   pneumoniaCovSettingsAcute[[3]]$endDays <- 30
   
   #########################
-  pneumoniaLevel1xSpecCohortArgsAcute <- PheValuator::createCreateEvaluationCohortArgs(xSpecCohortId = 14599,
+  pneumoniaLevel1xSpecCohortArgsAcute <- PheValuator::createCreateEvaluationCohortArgs(phenotype = "Phenotype A",
+                                                                                       analysisName = "main",
+                                                                                       runDateTime = format(Sys.time(), "%b %d %Y %X"),
+                                                                                       databaseId = "main",
+                                                                                       xSpecCohortId = 14599,
                                                                                        xSensCohortId = 15198,
+                                                                                       caseCohortId = 0,
+                                                                                       caseFirstOccurrenceOnly = FALSE,
                                                                                        covariateSettings = pneumoniaCovSettingsAcute,
                                                                                        baseSampleSize = 2000000,
                                                                                        lowerAgeLimit = 18,
@@ -31,10 +37,16 @@ createPheValuatorAnalysisSettings <- function(outputFileName) {
                                                                                        visitLength = 0,
                                                                                        startDate = "20100101",
                                                                                        endDate = "21100101",
-                                                                                       modelType = "acute")
+                                                                                       exportFolder = tempdir())
   
-  pneumoniaLevel2xSpecCohortArgsAcute <- PheValuator::createCreateEvaluationCohortArgs(xSpecCohortId = 15215,
+  pneumoniaLevel2xSpecCohortArgsAcute <- PheValuator::createCreateEvaluationCohortArgs(phenotype = "Phenotype A",
+                                                                                       analysisName = "main",
+                                                                                       runDateTime = format(Sys.time(), "%b %d %Y %X"),
+                                                                                       databaseId = "main",
+                                                                                       xSpecCohortId = 15215,
                                                                                        xSensCohortId = 15198,
+                                                                                       caseCohortId = 0,
+                                                                                       caseFirstOccurrenceOnly = FALSE,
                                                                                        covariateSettings = pneumoniaCovSettingsAcute,
                                                                                        baseSampleSize = 2000000,
                                                                                        lowerAgeLimit = 18,
@@ -42,10 +54,16 @@ createPheValuatorAnalysisSettings <- function(outputFileName) {
                                                                                        visitLength = 0,
                                                                                        startDate = "20100101",
                                                                                        endDate = "21100101",
-                                                                                       modelType = "acute")
+                                                                                       exportFolder = tempdir())
   
-  pneumoniaLevel3xSpecCohortArgsAcute <- PheValuator::createCreateEvaluationCohortArgs(xSpecCohortId = 15179,
+  pneumoniaLevel3xSpecCohortArgsAcute <- PheValuator::createCreateEvaluationCohortArgs(phenotype = "Phenotype A",
+                                                                                       analysisName = "main",
+                                                                                       runDateTime = format(Sys.time(), "%b %d %Y %X"),
+                                                                                       databaseId = "main",
+                                                                                       xSpecCohortId = 15179,
                                                                                        xSensCohortId = 15198,
+                                                                                       caseCohortId = 0,
+                                                                                       caseFirstOccurrenceOnly = FALSE,
                                                                                        covariateSettings = pneumoniaCovSettingsAcute,
                                                                                        baseSampleSize = 2000000,
                                                                                        lowerAgeLimit = 18,
@@ -53,7 +71,7 @@ createPheValuatorAnalysisSettings <- function(outputFileName) {
                                                                                        visitLength = 0,
                                                                                        startDate = "20100101",
                                                                                        endDate = "21100101",
-                                                                                       modelType = "acute")
+                                                                                       exportFolder = tempdir())
   
   #############################
   pneumoniaLevel1xSpecTestArgs <- PheValuator::createTestPhenotypeAlgorithmArgs(cutPoints = "EV",

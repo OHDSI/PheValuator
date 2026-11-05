@@ -104,17 +104,24 @@ CovSettings <- createDefaultCovariateSettings(
 * xSpecCohortId - set the xSpec cohort ID
 * xSensCohortId - set the xSens cohort ID
 * prevalenceCohortId - set the prevalence cohort ID
-* evaluationPopulationCohortId - set the evaluation cohort ID
+* inclusionEvaluationCohortId - set the evaluation cohort ID
 * covariateSettings - use the covariate settings created with the createDefaultCovariateSettings() function above
 
 
 For example:
 ```{r tidy=FALSE,eval=FALSE}
 CohortArgs <- createCreateEvaluationCohortArgs(
+  phenotype = "Phenotype A",
+  analysisName = "main",
+  runDateTime = format(Sys.time(), "%b %d %Y %X"),
+  databaseId = "main",
   xSpecCohortId = 1769699,
   xSensCohortId = 1770120,
   prevalenceCohortId = 1770119,
-  evaluationPopulationCohortId = 1778258,
+  caseCohortId = 0,
+  caseFirstOccurrenceOnly = FALSE,
+  inclusionEvaluationCohortId = 1778258,
+  exportFolder = tempdir(),
   covariateSettings = CovSettings
 )
 ```
@@ -216,8 +223,6 @@ The runPheValuatorAnalyses() function will produce the following artifacts:
 1) A Patient Level Prediction file (in .rds format) containing the information from the model building process   
 2) A Patient Level Prediction file (in .rds format) containing the information from applying the model to the evaluation cohort
 3) All the results from the phenotype algorithm analyses (in .rds format)
-
-
 
 
 

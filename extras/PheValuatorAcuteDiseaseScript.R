@@ -16,15 +16,22 @@ CovSettings <- createDefaultAcuteCovariateSettings(excludedCovariateConceptIds =
                                                         startDayWindow3 = 21,
                                                         endDayWindow3 = 30)
 
-CohortArgs <- createCreateEvaluationCohortArgs(xSpecCohortId = xSpecCohort,
+CohortArgs <- createCreateEvaluationCohortArgs(phenotype = "Phenotype A",
+                                                    analysisName = "main",
+                                                    runDateTime = format(Sys.time(), "%b %d %Y %X"),
+                                                    databaseId = "main",
+                                                    xSpecCohortId = xSpecCohort,
                                                     xSensCohortId = xSensCohort,
                                                     prevalenceCohortId = prevalenceCohort,
-                                                    evaluationPopulationCohortId = evaluationPopulationCohortId,
+                                                    caseCohortId = 0,
+                                                    caseFirstOccurrenceOnly = FALSE,
+                                                    inclusionEvaluationCohortId = evaluationPopulationCohortId,
                                                     covariateSettings = CovSettings,
                                                     lowerAgeLimit = 18,
                                                     upperAgeLimit = 120,
                                                     startDate = "20100101",
-                                                    endDate = "21000101")
+                                                    endDate = "21000101",
+                                                    exportFolder = tempdir())
 
 #################################
 AlgTestArgs <- createTestPhenotypeAlgorithmArgs(phenotypeCohortId = xSpecCohort)
@@ -84,4 +91,3 @@ referenceTable <- runPheValuatorAnalyses(connectionDetails = CCAE_OHDA_RSSpec$co
 savePheValuatorAnalysisList(pheValuatorAnalysisList, file.path(outFolder, "pheValuatorAnalysisSettings.json"))
 
 View(summarizePheValuatorAnalyses(referenceTable, outFolder), paste0("Results", CCAE_OHDA_RSSpec$databaseId))
-

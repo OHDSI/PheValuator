@@ -3,11 +3,17 @@ library(PheValuator)
 pneumoniaCovSettingsChronic <- createDefaultChronicCovariateSettings(excludedCovariateConceptIds = c(255848),
                                                                      addDescendantsToExclude = TRUE)
 
-pneunomoniaCohortArgsChronic <- createCreateEvaluationCohortArgs(xSpecCohortId = 14584,
+pneunomoniaCohortArgsChronic <- createCreateEvaluationCohortArgs(phenotype = "Phenotype A",
+                                                                 analysisName = "main",
+                                                                 runDateTime = format(Sys.time(), "%b %d %Y %X"),
+                                                                 databaseId = "main",
+                                                                 xSpecCohortId = 14584,
                                                                  xSensCohortId = 8893,
                                                                  covariateSettings = pneumoniaCovSettingsChronic,
                                                                  baseSampleSize = 10000,
-                                                                 modelType = "chronic")
+                                                                 caseCohortId = 0,
+                                                                 caseFirstOccurrenceOnly = FALSE,
+                                                                 exportFolder = tempdir())
 
 pneumoniaAlg1TestArgs <- createTestPhenotypeAlgorithmArgs(cutPoints = "EV",
                                                           phenotypeCohortId = 14713)
@@ -20,11 +26,17 @@ analysis1 <- createPheValuatorAnalysis(analysisId = 1,
 pneumoniaCovSettingsAcute <- createDefaultAcuteCovariateSettings(excludedCovariateConceptIds = c(255848),
                                                                  addDescendantsToExclude = TRUE)
 
-pneunomoniaCohortArgsAcute <- createCreateEvaluationCohortArgs(xSpecCohortId = 14584,
+pneunomoniaCohortArgsAcute <- createCreateEvaluationCohortArgs(phenotype = "Phenotype A",
+                                                               analysisName = "main",
+                                                               runDateTime = format(Sys.time(), "%b %d %Y %X"),
+                                                               databaseId = "main",
+                                                               xSpecCohortId = 14584,
                                                                xSensCohortId = 8893,
                                                                covariateSettings = pneumoniaCovSettingsAcute,
                                                                baseSampleSize = 10000,
-                                                               modelType = "acute")
+                                                               caseCohortId = 0,
+                                                               caseFirstOccurrenceOnly = FALSE,
+                                                               exportFolder = tempdir())
 
 analysis2 <- createPheValuatorAnalysis(analysisId = 2,
                                        description = "Pneumonia alg 1 as acute outcome",
