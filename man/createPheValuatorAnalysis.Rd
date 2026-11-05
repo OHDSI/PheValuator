@@ -36,11 +36,23 @@ Create a set of analysis choices, to be used with the \code{\link{runPheValuator
 }
 \examples{
 evalCohortArgs <- createCreateEvaluationCohortArgs(
+  phenotype = "Phenotype A",
+  analysisName = "main",
+  runDateTime = format(Sys.time(), "\%b \%d \%Y \%X"),
+  databaseId = "main",
   xSpecCohortId = 1,
   xSensCohortId = 2,
-  prevalenceCohortId = 3
+  prevalenceCohortId = 3,
+  caseCohortId = 0,
+  caseFirstOccurrenceOnly = FALSE,
+  exportFolder = tempdir()
 )
 testArgs <- createTestPhenotypeAlgorithmArgs(
+  phenotype = "Phenotype A",
+  analysisName = "main",
+  runDateTime = format(Sys.time(), "\%b \%d \%Y \%X"),
+  databaseId = "main",
+  exportFolder = tempdir(),
   phenotypeCohortId = 10
 )
 analysis <- createPheValuatorAnalysis(

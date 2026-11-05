@@ -81,6 +81,11 @@
 #'       exportFolder = tempdir()
 #'     ),
 #'     testPhenotypeAlgorithmArgs = createTestPhenotypeAlgorithmArgs(
+#'       phenotype = "Phenotype A",
+#'       analysisName = "main",
+#'       runDateTime = format(Sys.time(), "%b %d %Y %X"),
+#'       databaseId = "main",
+#'       exportFolder = tempdir(),
 #'       phenotypeCohortId = 10
 #'     )
 #'   )
