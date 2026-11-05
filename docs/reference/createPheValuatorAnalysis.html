@@ -89,11 +89,11 @@ set of analysis choices.</p></dd>
 
 <dt id="arg-createevaluationcohortargs">createEvaluationCohortArgs<a class="anchor" aria-label="anchor" href="#arg-createevaluationcohortargs"></a></dt>
 <dd><p>An object representing the arguments to be used when calling
-the <code><a href="createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs</a></code> function.</p></dd>
+the <code>createCreateEvaluationCohortArgs</code> function.</p></dd>
 
 
 <dt id="arg-testphenotypealgorithmargs">testPhenotypeAlgorithmArgs<a class="anchor" aria-label="anchor" href="#arg-testphenotypealgorithmargs"></a></dt>
-<dd><p>Should the <code><a href="createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></code> function be used in this
+<dd><p>Should the <code>createTestPhenotypeAlgorithmArgs</code> function be used in this
 analysis?</p></dd>
 
 </dl></div>
@@ -110,12 +110,12 @@ analysis?</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">evalCohortArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs</a></span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">evalCohortArgs</span> <span class="op">&lt;-</span> <span class="fu">createCreateEvaluationCohortArgs</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  xSpecCohortId <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>  xSensCohortId <span class="op">=</span> <span class="fl">2</span>,</span></span>
 <span class="r-in"><span>  prevalenceCohortId <span class="op">=</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">testArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="va">testArgs</span> <span class="op">&lt;-</span> <span class="fu">createTestPhenotypeAlgorithmArgs</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  phenotypeCohortId <span class="op">=</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu">createPheValuatorAnalysis</span><span class="op">(</span></span></span>
