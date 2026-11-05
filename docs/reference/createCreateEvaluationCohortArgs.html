@@ -67,16 +67,12 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">createCreateEvaluationCohortArgs</span><span class="op">(</span></span>
-<span>  <span class="va">phenotype</span>,</span>
-<span>  <span class="va">analysisName</span>,</span>
-<span>  <span class="va">runDateTime</span>,</span>
-<span>  <span class="va">databaseId</span>,</span>
 <span>  <span class="va">xSpecCohortId</span>,</span>
 <span>  daysFromxSpec <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  <span class="va">xSensCohortId</span>,</span>
+<span>  xSensCohortId <span class="op">=</span> <span class="va">prevalenceCohortId</span>,</span>
 <span>  <span class="va">prevalenceCohortId</span>,</span>
-<span>  <span class="va">caseCohortId</span>,</span>
-<span>  <span class="va">caseFirstOccurrenceOnly</span>,</span>
+<span>  caseCohortId <span class="op">=</span> <span class="va">prevalenceCohortId</span>,</span>
+<span>  caseFirstOccurrenceOnly <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  xSpecCohortSize <span class="op">=</span> <span class="fl">5000</span>,</span>
 <span>  covariateSettings <span class="op">=</span> <span class="fu"><a href="createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span>excludedCovariateConceptIds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    addDescendantsToExclude <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
@@ -90,25 +86,24 @@
 <span>  exclusionEvaluationCohortId <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  exclusionEvaluationDaysFromStart <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  exclusionEvaluationDaysFromEnd <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  priorModelToUse <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  minimumOffsetFromStart <span class="op">=</span> <span class="fl">365</span>,</span>
-<span>  minimumOffsetFromEnd <span class="op">=</span> <span class="fl">365</span>,</span>
+<span>  minimumOffsetFromStart <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  minimumOffsetFromEnd <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  modelBaseSampleSize <span class="op">=</span> <span class="fl">25000</span>,</span>
 <span>  baseSampleSize <span class="op">=</span> <span class="fl">2e+06</span>,</span>
 <span>  lowerAgeLimit <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  upperAgeLimit <span class="op">=</span> <span class="fl">120</span>,</span>
 <span>  visitLength <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  visitType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">9201</span>, <span class="fl">9202</span>, <span class="fl">9203</span>, <span class="fl">262</span>, <span class="fl">581477</span><span class="op">)</span>,</span>
+<span>  visitType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">9201</span>, <span class="fl">9202</span>, <span class="fl">9203</span>, <span class="fl">581477</span>, <span class="fl">262</span><span class="op">)</span>,</span>
 <span>  gender <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8507</span>, <span class="fl">8532</span><span class="op">)</span>,</span>
 <span>  race <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  ethnicity <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  startDate <span class="op">=</span> <span class="st">"19001010"</span>,</span>
 <span>  endDate <span class="op">=</span> <span class="st">"21000101"</span>,</span>
 <span>  falsePositiveNegativeSubjects <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  <span class="va">exportFolder</span>,</span>
 <span>  modelId <span class="op">=</span> <span class="st">"main"</span>,</span>
-<span>  excludeModelFromEvaluation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  evaluationCohortId <span class="op">=</span> <span class="st">"main"</span>,</span>
 <span>  randomVisitTable <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  excludeModelFromEvaluation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  removeSubjectsWithFutureDates <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  saveEvaluationCohortPlpData <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -118,66 +113,48 @@
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-phenotype">phenotype<a class="anchor" aria-label="anchor" href="#arg-phenotype"></a></dt>
-<dd><p>Name of the phenotype for analysis</p></dd>
-
-
-<dt id="arg-analysisname">analysisName<a class="anchor" aria-label="anchor" href="#arg-analysisname"></a></dt>
-<dd><p>Name of the analysis</p></dd>
-
-
-<dt id="arg-rundatetime">runDateTime<a class="anchor" aria-label="anchor" href="#arg-rundatetime"></a></dt>
-<dd><p>Starting date and time of the PheValuator run</p></dd>
-
-
-<dt id="arg-databaseid">databaseId<a class="anchor" aria-label="anchor" href="#arg-databaseid"></a></dt>
-<dd><p>Name of the database in the analysis</p></dd>
-
-
-<dt id="arg-xspeccohortid">xSpecCohortId<a class="anchor" aria-label="anchor" href="#arg-xspeccohortid"></a></dt>
-<dd><p>The number of the "extremely specific (xSpec)" cohort
-definition id in the cohort table (for noisy positives).</p></dd>
+<dl><dt id="arg-xspeccohortid">xSpecCohortId<a class="anchor" aria-label="anchor" href="#arg-xspeccohortid"></a></dt>
+<dd><p>The number of the "extremely specific (xSpec)"
+cohortdefinition id in the cohort table (for noisy
+positives).</p></dd>
 
 
 <dt id="arg-daysfromxspec">daysFromxSpec<a class="anchor" aria-label="anchor" href="#arg-daysfromxspec"></a></dt>
-<dd><p>Number of days allowed from xSpec condition until analyzed
-visit</p></dd>
+<dd><p>Number of days from xSpec condition until analyzed visit</p></dd>
 
 
 <dt id="arg-xsenscohortid">xSensCohortId<a class="anchor" aria-label="anchor" href="#arg-xsenscohortid"></a></dt>
-<dd><p>The number of the "extremely sensitive (xSens)" cohort
-definition id in the cohort table (for noisy negatives).</p></dd>
+<dd><p>The number of the "extremely sensitive (xSens)"
+cohortdefinition id in the cohort table (for noisy
+negatives).</p></dd>
 
 
 <dt id="arg-prevalencecohortid">prevalenceCohortId<a class="anchor" aria-label="anchor" href="#arg-prevalencecohortid"></a></dt>
-<dd><p>The number of the cohort definition id to determine the
-disease prevalence.</p></dd>
+<dd><p>The number of the cohort definition id to determine
+the disease prevalence.</p></dd>
 
 
 <dt id="arg-casecohortid">caseCohortId<a class="anchor" aria-label="anchor" href="#arg-casecohortid"></a></dt>
-<dd><p>The number of the cohort definition id to determine cases
-in the evaluation cohort</p></dd>
+<dd><p>The number of the cohort definition id to determine cases in the evaluation cohort</p></dd>
 
 
 <dt id="arg-casefirstoccurrenceonly">caseFirstOccurrenceOnly<a class="anchor" aria-label="anchor" href="#arg-casefirstoccurrenceonly"></a></dt>
-<dd><p>Set to true if only the first occurrence per subject in
-the case cohort is to be used</p></dd>
+<dd><p>Set to true if only the first occurrence per subject in the case cohort is to be used</p></dd>
 
 
 <dt id="arg-xspeccohortsize">xSpecCohortSize<a class="anchor" aria-label="anchor" href="#arg-xspeccohortsize"></a></dt>
-<dd><p>The recommended xSpec sample size to use in model (default
-= NULL)</p></dd>
+<dd><p>Maximum xSpec sample size to use in the analysis</p></dd>
 
 
 <dt id="arg-covariatesettings">covariateSettings<a class="anchor" aria-label="anchor" href="#arg-covariatesettings"></a></dt>
-<dd><p>A covariateSettings object as generated using
-createCovariateSettings().</p></dd>
+<dd><p>A covariateSettings object as generated
+using createCovariateSettings().</p></dd>
 
 
 <dt id="arg-modelpopulationcohortid">modelPopulationCohortId<a class="anchor" aria-label="anchor" href="#arg-modelpopulationcohortid"></a></dt>
-<dd><p>The number of the cohort to be used as a base population
-for the model. If set to 0, the entire database population
-will be used.</p></dd>
+<dd><p>The number of the cohort to be used as a base population for
+the model. If set to 0, the entire database population will be
+used.</p></dd>
 
 
 <dt id="arg-modelpopulationcohortidstartday">modelPopulationCohortIdStartDay<a class="anchor" aria-label="anchor" href="#arg-modelpopulationcohortidstartday"></a></dt>
@@ -191,59 +168,45 @@ cohort start date to end including visits.</p></dd>
 
 
 <dt id="arg-inclusionevaluationcohortid">inclusionEvaluationCohortId<a class="anchor" aria-label="anchor" href="#arg-inclusionevaluationcohortid"></a></dt>
-<dd><p>The number of the cohort of the population to be used to
-designate which visits are eligible to be in the
-evaluation cohort</p></dd>
+<dd><p>The number of the cohort of the population to be used to designate which visits
+are are eligible to be in the evaluation cohort</p></dd>
 
 
 <dt id="arg-inclusionevaluationdaysfromstart">inclusionEvaluationDaysFromStart<a class="anchor" aria-label="anchor" href="#arg-inclusionevaluationdaysfromstart"></a></dt>
-<dd><p>The number of days from the cohort start date of the
-inclusionEvaluationCohortId to start eligible included
-visits</p></dd>
+<dd><p>The number of days from the cohort start date of the inclusionEvaluationCohortId
+to start eligible included visits</p></dd>
 
 
 <dt id="arg-inclusionevaluationdaysfromend">inclusionEvaluationDaysFromEnd<a class="anchor" aria-label="anchor" href="#arg-inclusionevaluationdaysfromend"></a></dt>
-<dd><p>The number of days from the cohort start date of the
-inclusionEvaluationCohortId to end eligible included
-visits</p></dd>
+<dd><p>The number of days from the cohort start date of the inclusionEvaluationCohortId
+to end eligible included visits</p></dd>
 
 
 <dt id="arg-duringinclusionevaluationonly">duringInclusionEvaluationOnly<a class="anchor" aria-label="anchor" href="#arg-duringinclusionevaluationonly"></a></dt>
-<dd><p>Only include visits that are within the cohort start and
-end dates</p></dd>
+<dd><p>Only include visits that are within the cohort start and end dates</p></dd>
 
 
 <dt id="arg-exclusionevaluationcohortid">exclusionEvaluationCohortId<a class="anchor" aria-label="anchor" href="#arg-exclusionevaluationcohortid"></a></dt>
-<dd><p>The number of the cohort of the population to be used to
-designate which visits are NOT eligible to be in the
-evaluation cohort</p></dd>
+<dd><p>The number of the cohort of the population to be used to designate which visits
+are NOT eligible to be in the evaluation cohort</p></dd>
 
 
 <dt id="arg-exclusionevaluationdaysfromstart">exclusionEvaluationDaysFromStart<a class="anchor" aria-label="anchor" href="#arg-exclusionevaluationdaysfromstart"></a></dt>
-<dd><p>The number of days from the cohort start date of the
-exclusionEvaluationCohortId to start ineligible included
-visits</p></dd>
+<dd><p>The number of days from the cohort start date of the exclusionEvaluationCohortId
+to start ineligible included visits</p></dd>
 
 
 <dt id="arg-exclusionevaluationdaysfromend">exclusionEvaluationDaysFromEnd<a class="anchor" aria-label="anchor" href="#arg-exclusionevaluationdaysfromend"></a></dt>
-<dd><p>The number of days from the cohort start date of the
-exclusionEvaluationCohortId to end ineligible included
-visits</p></dd>
-
-
-<dt id="arg-priormodeltouse">priorModelToUse<a class="anchor" aria-label="anchor" href="#arg-priormodeltouse"></a></dt>
-<dd><p>folder where a previously developed model to use in
-analysis will be found</p></dd>
+<dd><p>The number of days from the cohort start date of the exclusionEvaluationCohortId
+to end ineligible included visits</p></dd>
 
 
 <dt id="arg-minimumoffsetfromstart">minimumOffsetFromStart<a class="anchor" aria-label="anchor" href="#arg-minimumoffsetfromstart"></a></dt>
-<dd><p>Minimum number of days to offset for the analysis visit
-from the start of the observation period</p></dd>
+<dd><p>Minimum number of days to offset for the analysis visit from the start of the observation period</p></dd>
 
 
 <dt id="arg-minimumoffsetfromend">minimumOffsetFromEnd<a class="anchor" aria-label="anchor" href="#arg-minimumoffsetfromend"></a></dt>
-<dd><p>Minimum number of days to offset for the analysis visit
-from the end of the observation period</p></dd>
+<dd><p>Minimum number of days to offset for the analysis visit from the end of the observation period</p></dd>
 
 
 <dt id="arg-modelbasesamplesize">modelBaseSampleSize<a class="anchor" aria-label="anchor" href="#arg-modelbasesamplesize"></a></dt>
@@ -291,26 +254,24 @@ from the end of the observation period</p></dd>
 
 
 <dt id="arg-falsepositivenegativesubjects">falsePositiveNegativeSubjects<a class="anchor" aria-label="anchor" href="#arg-falsepositivenegativesubjects"></a></dt>
-<dd><p>Number of subjects to include for evaluating false
-positives and negatives</p></dd>
-
-
-<dt id="arg-exportfolder">exportFolder<a class="anchor" aria-label="anchor" href="#arg-exportfolder"></a></dt>
-<dd><p>The folder where the csv output files will be written.</p></dd>
+<dd><p>Number of subjects to include for evaluating false positives and negatives</p></dd>
 
 
 <dt id="arg-modelid">modelId<a class="anchor" aria-label="anchor" href="#arg-modelid"></a></dt>
 <dd><p>A string used to generate the file names for this model.</p></dd>
 
 
-<dt id="arg-excludemodelfromevaluation">excludeModelFromEvaluation<a class="anchor" aria-label="anchor" href="#arg-excludemodelfromevaluation"></a></dt>
-<dd><p>Should subjects used in the model be excluded from the
-evaluation cohort?</p></dd>
+<dt id="arg-evaluationcohortid">evaluationCohortId<a class="anchor" aria-label="anchor" href="#arg-evaluationcohortid"></a></dt>
+<dd><p>A string used to generate the file names for this evaluation cohort.</p></dd>
 
 
 <dt id="arg-randomvisittable">randomVisitTable<a class="anchor" aria-label="anchor" href="#arg-randomvisittable"></a></dt>
-<dd><p>Table stored in work directory with pre-selected random
-visits in format of visit_occurrence table</p></dd>
+<dd><p>Table stored in work directory with pre-selected random visits in format of visit_occurrence table</p></dd>
+
+
+<dt id="arg-excludemodelfromevaluation">excludeModelFromEvaluation<a class="anchor" aria-label="anchor" href="#arg-excludemodelfromevaluation"></a></dt>
+<dd><p>Should subjects used in the model be excluded from the
+evaluation cohort?</p></dd>
 
 
 <dt id="arg-removesubjectswithfuturedates">removeSubjectsWithFutureDates<a class="anchor" aria-label="anchor" href="#arg-removesubjectswithfuturedates"></a></dt>
@@ -323,11 +284,25 @@ with dates in the future?</p></dd>
 saved? To be used for debugging purposes.</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    <p>A list of class <code>"args"</code> containing all the provided parameters.
+  This object is used as an argument to the <code><a href="createEvaluationCohort.html">createEvaluationCohort</a></code> function.</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>Create an object defining the parameter values.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">evalCohortArgs</span> <span class="op">&lt;-</span> <span class="fu">createCreateEvaluationCohortArgs</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  xSpecCohortId <span class="op">=</span> <span class="fl">1</span>,</span></span>
+<span class="r-in"><span>  prevalenceCohortId <span class="op">=</span> <span class="fl">3</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

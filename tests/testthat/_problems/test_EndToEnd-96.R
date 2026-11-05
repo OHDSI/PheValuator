@@ -49,16 +49,10 @@ CovSettingsAcute <- createDefaultCovariateSettings(
   endDayWindow3 = 9999
 )
 CohortArgsAcute <- createCreateEvaluationCohortArgs(
-  phenotype = "Phenotype A",
-  analysisName = "main",
-  runDateTime = format(Sys.time(), "%b %d %Y %X"),
-  databaseId = "main",
   xSpecCohortId = xSpecCohort,
   daysFromxSpec = daysFromxSpec,
   xSensCohortId = xSensCohort,
   prevalenceCohortId = prevalenceCohort,
-  caseCohortId = 0,
-  caseFirstOccurrenceOnly = FALSE,
   modelBaseSampleSize = 15000,
   xSpecCohortSize = 5000,
   covariateSettings = CovSettingsAcute,
@@ -68,8 +62,7 @@ CohortArgsAcute <- createCreateEvaluationCohortArgs(
   minimumOffsetFromStart = 0,
   minimumOffsetFromEnd = 0,
   saveEvaluationCohortPlpData = FALSE,
-  excludeModelFromEvaluation = TRUE,
-  exportFolder = tempdir()
+  excludeModelFromEvaluation = TRUE
 )
 conditionAlgTestArgs <- createTestPhenotypeAlgorithmArgs(
   cutPoints = c("EV"),
