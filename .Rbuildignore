@@ -1,6 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.Rd2pdf
 .github
 examplePackage
 deploy.sh
