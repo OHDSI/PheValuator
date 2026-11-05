@@ -4,6 +4,8 @@
 *-Ex.R
 # R data files from past sessions
 .Rdata
+# Temporary directories from building the PDF manual
+.Rd2pdf*/
 # RStudio files
 .Rproj.user/
   .Rproj.user
