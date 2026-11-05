@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">PheValuator</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.19</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.17</span>
       </span>
     </div>
 
@@ -59,7 +59,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
 </li>
 <li>
   <a href="https://github.com/OHDSI/PheValuator/" class="external-link">
@@ -84,7 +84,7 @@
                         <h4 data-toc-skip class="author">Joel N.
 Swerdel</h4>
             
-            <h4 data-toc-skip class="date">2026-11-05</h4>
+            <h4 data-toc-skip class="date">2026-06-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/PheValuator/blob/HEAD/vignettes/EvaluatingPhenotypeAlgorithms.rmd" class="external-link"><code>vignettes/EvaluatingPhenotypeAlgorithms.rmd</code></a></small>
       <div class="hidden name"><code>EvaluatingPhenotypeAlgorithms.rmd</code></div>
@@ -210,32 +210,28 @@ window</li>
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>andromedaTempFolder <span class="op">=</span> <span class="st">"c:/temp2/ff"</span><span class="op">)</span> <span class="co"># place to store large temporary files</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>andromedaTempFolder <span class="op">=</span> <span class="st">"c:/temp2/ff"</span><span class="op">)</span> <span class="co">#place to store large temporary files</span></span>
 <span></span>
-<span><span class="va">CovSettings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span></span>
-<span>  excludedCovariateConceptIds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">201254</span><span class="op">)</span>,</span>
-<span>  addDescendantsToExclude <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  startDayWindow1 <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  endDayWindow1 <span class="op">=</span> <span class="fl">30</span>,</span>
-<span>  startDayWindow2 <span class="op">=</span> <span class="fl">31</span>,</span>
-<span>  endDayWindow2 <span class="op">=</span> <span class="fl">180</span>,</span>
-<span>  startDayWindow3 <span class="op">=</span> <span class="fl">181</span>,</span>
-<span>  endDayWindow3 <span class="op">=</span> <span class="fl">365</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">CovSettings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span>excludedCovariateConceptIds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">201254</span><span class="op">)</span>,</span>
+<span>                                              addDescendantsToExclude <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                                              startDayWindow1 <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                                              endDayWindow1 <span class="op">=</span> <span class="fl">30</span>,</span>
+<span>                                              startDayWindow2 <span class="op">=</span> <span class="fl">31</span>,</span>
+<span>                                              endDayWindow2 <span class="op">=</span> <span class="fl">180</span>,</span>
+<span>                                              startDayWindow3 <span class="op">=</span> <span class="fl">181</span>,</span>
+<span>                                              endDayWindow3 <span class="op">=</span> <span class="fl">365</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Quick Tip:</strong> The feature extraction windows above are
 useful for chronic conditions. For acute conditions, such as myocardial
 infarction, you should use:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>andromedaTempFolder <span class="op">=</span> <span class="st">"c:/temp2/ff"</span><span class="op">)</span> <span class="co"># place to store large temporary files</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>andromedaTempFolder <span class="op">=</span> <span class="st">"c:/temp2/ff"</span><span class="op">)</span> <span class="co">#place to store large temporary files</span></span>
 <span></span>
-<span><span class="va">CovSettings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span></span>
-<span>  startDayWindow1 <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  endDayWindow1 <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  startDayWindow2 <span class="op">=</span> <span class="fl">11</span>,</span>
-<span>  endDayWindow2 <span class="op">=</span> <span class="fl">20</span>,</span>
-<span>  startDayWindow3 <span class="op">=</span> <span class="fl">21</span>,</span>
-<span>  endDayWindow3 <span class="op">=</span> <span class="fl">30</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">CovSettings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createDefaultCovariateSettings.html">createDefaultCovariateSettings</a></span><span class="op">(</span>startDayWindow1 <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                                              endDayWindow1 <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>                                              startDayWindow2 <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>                                              endDayWindow2 <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>                                              startDayWindow3 <span class="op">=</span> <span class="fl">21</span>,</span>
+<span>                                              endDayWindow3 <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Use the createCreateEvaluationCohortArgs() function to set the model
 building and evaluation parameters</li>
@@ -250,13 +246,11 @@ createDefaultCovariateSettings() function above</li>
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">CohortArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs</a></span><span class="op">(</span></span>
-<span>  xSpecCohortId <span class="op">=</span> <span class="fl">1769699</span>,</span>
-<span>  xSensCohortId <span class="op">=</span> <span class="fl">1770120</span>,</span>
-<span>  prevalenceCohortId <span class="op">=</span> <span class="fl">1770119</span>,</span>
-<span>  evaluationPopulationCohortId <span class="op">=</span> <span class="fl">1778258</span>,</span>
-<span>  covariateSettings <span class="op">=</span> <span class="va">CovSettings</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">CohortArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createCreateEvaluationCohortArgs.html">createCreateEvaluationCohortArgs</a></span><span class="op">(</span>xSpecCohortId <span class="op">=</span> <span class="fl">1769699</span>,</span>
+<span>                                               xSensCohortId <span class="op">=</span> <span class="fl">1770120</span>,</span>
+<span>                                               prevalenceCohortId <span class="op">=</span> <span class="fl">1770119</span>,</span>
+<span>                                               evaluationPopulationCohortId <span class="op">=</span> <span class="fl">1778258</span>,</span>
+<span>                                               covariateSettings <span class="op">=</span> <span class="va">CovSettings</span><span class="op">)</span></span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Use the createTestPhenotypeAlgorithmArgs() function to set the
 parameters for evaluating phenotype algorithms</li>
@@ -267,8 +261,8 @@ evaluate</li>
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># First phenotype algorithm to test</span></span>
-<span><span class="va">conditionAlg1TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span> <span class="fl">1778259</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">#First phenotype algorithm to test</span></span>
+<span><span class="va">conditionAlg1TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span>  <span class="fl">1778259</span><span class="op">)</span> </span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>Use the createPheValuatorAnalysis() function to set up the phenotype
 algorithm analyses to run</li>
@@ -283,31 +277,25 @@ createTestPhenotypeAlgorithmArgs() settings created above</li>
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">analysis1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span></span>
-<span>  analysisId <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 Diabetes Mellitus</span></span>
+<code class="sourceCode R"><span><span class="va">analysis1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                                       description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 Diabetes Mellitus </span></span>
 <span><span class="st">                                                    (prevalent)"</span>,</span>
-<span>  createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
-<span>  testPhenotypeAlgorithmArgs <span class="op">=</span> <span class="va">conditionAlg1TestArgs</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span>                                       createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
+<span>                                       testPhenotypeAlgorithmArgs <span class="op">=</span> <span class="va">conditionAlg1TestArgs</span><span class="op">)</span></span></code></pre></div>
 <p>Create as many analyses as needed:</p>
 <p>For example:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Second phenotype algorithm to test</span></span>
-<span><span class="va">conditionAlg2TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span></span>
-<span>  phenotypeCohortId <span class="op">=</span> <span class="fl">1778260</span>,</span>
-<span>  washoutPeriod <span class="op">=</span> <span class="fl">0</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co">#Second phenotype algorithm to test</span></span>
+<span><span class="va">conditionAlg2TestArgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createTestPhenotypeAlgorithmArgs.html">createTestPhenotypeAlgorithmArgs</a></span><span class="op">(</span>phenotypeCohortId <span class="op">=</span> <span class="fl">1778260</span>,</span>
+<span>                                                          washoutPeriod <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">analysis2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span></span>
-<span>  analysisId <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 diabetes mellitus</span></span>
+<span><span class="va">analysis2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createPheValuatorAnalysis.html">createPheValuatorAnalysis</a></span><span class="op">(</span>analysisId <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>                                       description <span class="op">=</span> <span class="st">"[PheValuator] Type 2 diabetes mellitus </span></span>
 <span><span class="st">                                                    with second code 31-365 days after index"</span>,</span>
-<span>  createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
-<span>  testPhenotypeAlgorithmArgs <span class="op">=</span> <span class="va">conditionAlg2TestArgs</span></span>
-<span><span class="op">)</span></span>
+<span>                                       createEvaluationCohortArgs <span class="op">=</span> <span class="va">CohortArgs</span>,</span>
+<span>                                       testPhenotypeAlgorithmArgs <span class="op">=</span> <span class="va">conditionAlg2TestArgs</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># save the analyses</span></span>
+<span><span class="co">#save the analyses</span></span>
 <span><span class="va">pheValuatorAnalysisList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">analysis1</span>, <span class="va">analysis2</span><span class="op">)</span></span></code></pre></div>
 <ol start="5" style="list-style-type: decimal">
 <li>Use the runPheValuatorAnalyses() function to start the analysis
@@ -329,24 +317,20 @@ using the createPheValuatorAnalysis() function above</li>
 </ul>
 <p>For example:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># create database connection details</span></span>
-<span><span class="va">connectionDetails</span> <span class="op">&lt;-</span> <span class="fu">createConnectionDetails</span><span class="op">(</span></span>
-<span>  dbms <span class="op">=</span> <span class="st">"postgresql"</span>,</span>
-<span>  server <span class="op">=</span> <span class="st">"localhost/ohdsi"</span>,</span>
-<span>  user <span class="op">=</span> <span class="st">"joe"</span>,</span>
-<span>  password <span class="op">=</span> <span class="st">"supersecret"</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co">#create database connection details</span></span>
+<span><span class="va">connectionDetails</span> <span class="op">&lt;-</span> <span class="fu">createConnectionDetails</span><span class="op">(</span>dbms <span class="op">=</span> <span class="st">"postgresql"</span>,</span>
+<span>                                             server <span class="op">=</span> <span class="st">"localhost/ohdsi"</span>,</span>
+<span>                                             user <span class="op">=</span> <span class="st">"joe"</span>,</span>
+<span>                                             password <span class="op">=</span> <span class="st">"supersecret"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># run the PheValuator process</span></span>
-<span><span class="va">referenceTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/runPheValuatorAnalyses.html">runPheValuatorAnalyses</a></span><span class="op">(</span></span>
-<span>  connectionDetails <span class="op">=</span> <span class="va">connectionDetails</span>,</span>
-<span>  cdmDatabaseSchema <span class="op">=</span> <span class="st">"yourCDMSchema"</span>,</span>
-<span>  cohortDatabaseSchema <span class="op">=</span> <span class="st">"yourCohortSchema"</span>,</span>
-<span>  cohortTable <span class="op">=</span> <span class="st">"yourCohortTableSchema"</span>,</span>
-<span>  workDatabaseSchema <span class="op">=</span> <span class="st">"yourWritableSchema"</span>,</span>
-<span>  outputFolder <span class="op">=</span> <span class="st">"yourOutputFolderSchema"</span>,</span>
-<span>  pheValuatorAnalysisList <span class="op">=</span> <span class="va">pheValuatorAnalysisList</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#run the PheValuator process</span></span>
+<span><span class="va">referenceTable</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/runPheValuatorAnalyses.html">runPheValuatorAnalyses</a></span><span class="op">(</span>connectionDetails <span class="op">=</span> <span class="va">connectionDetails</span>,</span>
+<span>                                         cdmDatabaseSchema <span class="op">=</span> <span class="st">"yourCDMSchema"</span>,</span>
+<span>                                         cohortDatabaseSchema <span class="op">=</span> <span class="st">"yourCohortSchema"</span>,</span>
+<span>                                         cohortTable <span class="op">=</span> <span class="st">"yourCohortTableSchema"</span>,</span>
+<span>                                         workDatabaseSchema <span class="op">=</span> <span class="st">"yourWritableSchema"</span>,</span>
+<span>                                         outputFolder <span class="op">=</span> <span class="st">"yourOutputFolderSchema"</span>,</span>
+<span>                                         pheValuatorAnalysisList <span class="op">=</span> <span class="va">pheValuatorAnalysisList</span><span class="op">)</span></span></code></pre></div>
 <ol start="6" style="list-style-type: decimal">
 <li>You can view the results from the analyses using the
 summarizePheValuatorAnalyses() function providing the results from the
@@ -354,7 +338,7 @@ runPheValuatorAnalyses() function above</li>
 </ol>
 <p>For example:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># view the results of the phenotype evaluation</span></span>
+<code class="sourceCode R"><span><span class="co">#view the results of the phenotype evaluation</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="fu"><a href="../reference/summarizePheValuatorAnalyses.html">summarizePheValuatorAnalyses</a></span><span class="op">(</span><span class="va">referenceTable</span>, <span class="st">"yourOutputFolderSchema"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">phenotypeResults</span>, <span class="st">"c:/phenotyping/diabetes_results.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>The results from above will look like:</p>
@@ -391,12 +375,12 @@ format)</li>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by William J. O’Brien, Joel Swerdel, Martijn Schuemie.</p>
+<p>Developed by Joel N. Swerdel.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

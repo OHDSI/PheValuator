@@ -58,10 +58,11 @@
                                     excludeModelFromEvaluation = FALSE,
                                     randomVisitTable = "",
                                     savePlpData = FALSE) {
+
   tempTableCreated <- FALSE
   evaluationCohortPlpDataFileName <- file.path(outFolder, sprintf("evaluationCohortPlpData_%s", evaluationCohortId))
 
-  if (inclusionEvaluationCohortId == 0) { # if no inclusion cohort id ensure that these were also set to 0
+  if(inclusionEvaluationCohortId == 0) { #if no inclusion cohort id ensure that these were also set to 0
     inclusionEvaluationDaysFromStart <- 0
     inclusionEvaluationDaysFromEnd <- 0
     duringInclusionEvaluationOnly <- FALSE
@@ -98,9 +99,9 @@
     exclSubjectList <- c(lrResults$prediction$subjectId)
 
     testCohort <- gsub(".",
-      "",
-      (paste0("test_eval_", xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))),
-      fixed = TRUE
+                       "",
+                       (paste0("test_eval_", xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))),
+                       fixed = TRUE
     ) # unique new cohort name to use
 
     connection <- DatabaseConnector::connect(connectionDetails)
@@ -149,7 +150,7 @@
       )
     } else { # otherwise create the evaluation cohort from an sql query
 
-      if (!file.exists(evaluationCohortPlpDataFileName)) { # only create evaluation cohort if data file does not exist
+      if (!file.exists(evaluationCohortPlpDataFileName)) { #only create evaluation cohort if data file does not exist
         ParallelLogger::logInfo("Using Cohort Id ", caseCohortId, " to designate cases.")
         sqlFilename <- "CreateCohortsAcuteEvaluation.sql"
 
@@ -161,10 +162,8 @@
         }
 
         if (randomVisitTable != "") {
-          ParallelLogger::logInfo(
-            "Creating evaluation cohort subjects using supplied random visit table: ",
-            paste0(workDatabaseSchema, ".", randomVisitTable)
-          )
+          ParallelLogger::logInfo("Creating evaluation cohort subjects using supplied random visit table: ",
+                                  paste0(workDatabaseSchema, ".", randomVisitTable))
         }
 
         sql <- SqlRender::loadRenderTranslateSql(
@@ -177,7 +176,7 @@
           tempEmulationSchema = tempEmulationSchema,
           x_spec_cohort = xSpecCohortId,
           caseCohortId = caseCohortId,
-          caseFirstOccurrenceOnly = caseFirstOccurrenceOnly,
+          caseFirstOccurrenceOnly= caseFirstOccurrenceOnly,
           work_database_schema = workDatabaseSchema,
           test_cohort = testCohort,
           exclCohort = 0,
@@ -313,49 +312,48 @@
 
     ####################
 
-    ParallelLogger::logInfo("Applying predictive model to evaluation cohort using rapid method")
+        ParallelLogger::logInfo("Applying predictive model to evaluation cohort using rapid method")
 
-    startTime <- Sys.time()
+        startTime <- Sys.time()
 
-    # extract the normalization and stuff
-    covs <- lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0, ]
+        #extract the normalization and stuff
+        covs <- lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue !=0,]
 
-    intercept <- lrResults$model$model$coefficients$betas[1]
+        intercept <- lrResults$model$model$coefficients$betas[1]
 
-    covariate <- data.frame(
-      coefficient = covs$covariateValue,
-      covariateId = covs$covariateId
-    )
+        covariate <- data.frame(
+          coefficient = covs$covariateValue,
+          covariateId = covs$covariateId)
 
-    norm <- as.data.frame(lrResults$model$preprocessing$tidyCovariates$normFactors)
-    covNorm <- merge(covariate, norm, by = "covariateId", all.x = TRUE)
+        norm <- as.data.frame(lrResults$model$preprocessing$tidyCovariates$normFactors)
+        covNorm <- merge(covariate, norm, by = 'covariateId', all.x = TRUE)
 
-    allCovData <- as.data.frame(plpData$covariateData$covariates)
+        allCovData <- as.data.frame(plpData$covariateData$covariates)
 
-    # allCovData <- merge(allCovData, covNorm, by = 'covariateId', all.x = TRUE)
+        #allCovData <- merge(allCovData, covNorm, by = 'covariateId', all.x = TRUE)
 
-    allCovData <- dplyr::left_join(
-      allCovData,
-      covNorm,
-      by = dplyr::join_by(covariateId)
-    )
+        allCovData <- dplyr::left_join(
+          allCovData,
+          covNorm,
+          by = dplyr::join_by(covariateId)
+        )
 
-    allCovData$coeffValue <- allCovData$covariateValue * allCovData$coefficient / allCovData$maxValue
-    allCovData$coeffValue[is.na(allCovData$coeffValue)] <- 0
+        allCovData$coeffValue <- allCovData$covariateValue*allCovData$coefficient/allCovData$maxValue
+        allCovData$coeffValue[is.na(allCovData$coeffValue)] <- 0
 
-    sumData <- aggregate(allCovData$coeffValue, by = list(Category = allCovData$rowId), FUN = sum)
+        sumData <- aggregate(allCovData$coeffValue, by=list(Category=allCovData$rowId), FUN=sum)
 
-    sumData$x[is.na(sumData$x)] <- 0
-    sumData$x <- sumData$x + intercept
-    sumData$probability <- 1 / (1 + exp(-1 * sumData$x))
-    sumData$probability <- round(sumData$probability, digits = 3)
-    names(sumData)[1] <- "rowId"
-    names(sumData)[3] <- "value"
+        sumData$x[is.na(sumData$x)] <- 0
+        sumData$x <- sumData$x + intercept
+        sumData$probability <- 1/(1+exp(-1*sumData$x))
+        sumData$probability <- round(sumData$probability, digits = 3)
+        names(sumData)[1] <- "rowId"
+        names(sumData)[3] <- "value"
 
-    sumData <- sumData[, c(1, 3)]
-    appResults$prediction <- merge(population, sumData, by = "rowId")
+        sumData <- sumData[,c(1,3)]
+        appResults$prediction <- merge(population, sumData, by = 'rowId')
 
-    ParallelLogger::logInfo("Time to apply model was ", round(difftime(Sys.time(), startTime, units = c("mins")), digits = 3), " min.")
+        ParallelLogger::logInfo("Time to apply model was ", round(difftime(Sys.time(), startTime, units = c("mins")), digits = 3), " min.")
     ##################
 
     appResults$prediction$value <- round(appResults$prediction$value, digits = 2)
@@ -364,17 +362,16 @@
 
     # pull in the designated case cohort to mark the cases
     sql <- SqlRender::loadRenderTranslateSql("GetComparisonCohort.sql",
-      packageName = "PheValuator",
-      dbms = connectionDetails$dbms,
-      cohort_database_schema = cohortDatabaseSchema,
-      cohort_table = cohortTable,
-      cohort_id = caseCohortId,
-      caseFirstOccurrenceOnly = caseFirstOccurrenceOnly,
-      inclusionEvaluationCohortId = inclusionEvaluationCohortId,
-      inclusionEvaluationDaysFromStart = inclusionEvaluationDaysFromStart,
-      inclusionEvaluationDaysFromEnd = inclusionEvaluationDaysFromEnd,
-      duringInclusionEvaluationOnly = duringInclusionEvaluationOnly
-    )
+                                             packageName = "PheValuator",
+                                             dbms = connectionDetails$dbms,
+                                             cohort_database_schema = cohortDatabaseSchema,
+                                             cohort_table = cohortTable,
+                                             cohort_id = caseCohortId,
+                                             caseFirstOccurrenceOnly = caseFirstOccurrenceOnly,
+                                             inclusionEvaluationCohortId = inclusionEvaluationCohortId,
+                                             inclusionEvaluationDaysFromStart = inclusionEvaluationDaysFromStart,
+                                             inclusionEvaluationDaysFromEnd = inclusionEvaluationDaysFromEnd,
+                                             duringInclusionEvaluationOnly = duringInclusionEvaluationOnly)
 
     sql <- SqlRender::translate(sql, connectionDetails$dbms)
     comparisonPopn <- DatabaseConnector::querySql(connection = connection, sql = sql, snakeCaseToCamelCase = TRUE)
@@ -382,45 +379,43 @@
     # dataframe of TP, FP, TN, FN
     ParallelLogger::logInfo("Matching to comparison cohort")
 
-    # create a window +/- 7 days for comparisons matching
+    #create a window +/- 7 days for comparisons matching
     comparisonPopn$lowDate <- comparisonPopn$comparisonCohortStartDate - 7
     comparisonPopn$highDate <- comparisonPopn$comparisonCohortStartDate + 7
 
-    # create the by criteria - joining by subjectIds and the startDates
+    #create the by criteria - joining by subjectIds and the startDates
     by <- dplyr::join_by(subjectId, cohortStartDate >= lowDate, cohortStartDate <= highDate)
 
-    # finalPopn <- merge(pred, comparisonPopn, by, all.x = TRUE)
+    #finalPopn <- merge(pred, comparisonPopn, by, all.x = TRUE)
     finalPopn <- dplyr::left_join(pred, comparisonPopn, by)
 
-    if (inclusionEvaluationCohortId != 0) {
-      # get inclusion cohort
-      sql <- paste0(
-        "select co.subject_id, co.cohort_start_date inclusion_cohort_start_date, co.cohort_end_date inclusion_cohort_end_date from ",
-        cohortDatabaseSchema, ".", cohortTable, " co ",
-        " where cohort_definition_id = ", inclusionEvaluationCohortId
-      )
+    if(inclusionEvaluationCohortId != 0) {
+      #get inclusion cohort
+      sql <- paste0("select co.subject_id, co.cohort_start_date inclusion_cohort_start_date, co.cohort_end_date inclusion_cohort_end_date from ",
+                    cohortDatabaseSchema, ".", cohortTable, " co ",
+                    " where cohort_definition_id = ", inclusionEvaluationCohortId)
 
       inclusionCohort <- DatabaseConnector::renderTranslateQuerySql(connection = DatabaseConnector::connect(connectionDetails), sql, snakeCaseToCamelCase = TRUE)
-      inclusionCohort <- inclusionCohort[inclusionCohort$subjectId %in% c(finalPopn$subjectId), ]
-      # merge with finalPopn
+      inclusionCohort <-  inclusionCohort[inclusionCohort$subjectId %in% c(finalPopn$subjectId),]
+      #merge with finalPopn
       finalPopn <- merge(finalPopn, inclusionCohort, all.x = TRUE)
-      # remove those where cohort_start_date is not between inclusion start and end
+      #remove those where cohort_start_date is not between inclusion start and end
       finalPopn <- finalPopn[finalPopn$cohortStartDate >= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromStart) &
-        finalPopn$cohortStartDate <= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd), ]
+                               finalPopn$cohortStartDate <= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd), ]
     } else {
-      # set inclusion start to be cohort_start_date - days from obs start
+      #set inclusion start to be cohort_start_date - days from obs start
       finalPopn$inclusionCohortStartDate <- as.Date(finalPopn$cohortStartDate) - finalPopn$daysFromObsStart
-      # set inclusion end to be cohort_start_date + days to obs end
+      #set inclusion end to be cohort_start_date + days to obs end
       finalPopn$inclusionCohortEndDate <- as.Date(finalPopn$cohortStartDate) + finalPopn$daysToObsEnd
     }
-    finalPopn <- finalPopn[!is.na(finalPopn$subjectId), ]
+    finalPopn <- finalPopn[!is.na(finalPopn$subjectId),]
 
-    # calculate end date for raw TAR
+    #calculate end date for raw TAR
     finalPopn$cohortStartDate <- as.Date(finalPopn$cohortStartDate)
     finalPopn$finalDate <- as.Date("2100-01-01")
-    if (inclusionEvaluationCohortId != 0) {
+    if(inclusionEvaluationCohortId != 0) {
       # type 1 - case must be within inclusion cohort start and end dates - use minimum of (A)inclusion end date / (B)inclusion start date + inclusion days from end
-      if (duringInclusionEvaluationOnly == TRUE) {
+      if(duringInclusionEvaluationOnly == TRUE) {
         # (A)
         finalPopn$finalDate[finalPopn$inclusionCohortEndDate <= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] <-
           finalPopn$inclusionCohortEndDate[finalPopn$inclusionCohortEndDate <= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)]
@@ -429,140 +424,129 @@
         finalPopn$finalDate[finalPopn$inclusionCohortEndDate > (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] <-
           finalPopn$inclusionCohortStartDate[finalPopn$inclusionCohortEndDate > (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] +
           inclusionEvaluationDaysFromEnd
+
       } else {
         # type 2 - case no restriction - use minimum of (A) cohort inclusion start date + days to obs end / (B) inclusion cohort start date + inc days to end
         # (A)
         finalPopn$finalDate[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) <= (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] <-
           finalPopn$cohortStartDate[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) <= (finalPopn$inclusionCohortStartDate +
-            inclusionEvaluationDaysFromEnd)] +
+                                                                                               inclusionEvaluationDaysFromEnd)] +
           finalPopn$daysToObsEnd[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) < (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)]
 
         # (B)
         finalPopn$finalDate[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) > (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] <-
           finalPopn$inclusionCohortStartDate[(finalPopn$cohortStartDate + finalPopn$daysToObsEnd) >
-            (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] +
+                                               (finalPopn$inclusionCohortStartDate + inclusionEvaluationDaysFromEnd)] +
           inclusionEvaluationDaysFromEnd
       }
-    } else { # no inclusion cohort - final date is the subject's end of observation period
+    } else { #no inclusion cohort - final date is the subject's end of observation period
       finalPopn$finalDate <- as.Date(finalPopn$cohortStartDate) + finalPopn$daysToObsEnd
     }
 
-    # calculate raw time at risk
-    # first for the cases based on inclusion in the comparison cohort
-    # time from the start of subject's in inclusion cohort to time to event
+    #calculate raw time at risk
+    #first for the cases based on inclusion in the comparison cohort
+    #time from the start of subject's in inclusion cohort to time to event
     finalPopn$rawTar <- 0
     finalPopn$rawTar[!is.na(finalPopn$comparisonCohortStartDate)] <-
       as.numeric(difftime(finalPopn$comparisonCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)],
-        finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)] +
-          inclusionEvaluationDaysFromStart,
-        units = "days"
-      ))
+                          finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)] +
+                            inclusionEvaluationDaysFromStart, units = "days"))
 
-    # then the non-cases based on non-inclusion in the comparison cohort
-    # time from the start of subjects in inclusion cohort to time to end of subject's in inclusion cohort
+    #then the non-cases based on non-inclusion in the comparison cohort
+    #time from the start of subjects in inclusion cohort to time to end of subject's in inclusion cohort
 
     finalPopn$rawTar[is.na(finalPopn$comparisonCohortStartDate)] <-
       as.numeric(difftime(finalPopn$finalDate[is.na(finalPopn$comparisonCohortStartDate)],
-        (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] +
-          inclusionEvaluationDaysFromStart),
-        units = "days"
-      ))
+                          (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] +
+                             inclusionEvaluationDaysFromStart), units = "days"))
 
-    # estimated tar = (P(case) * time to event) + (P(not a case) * tar)
+    #estimated tar = (P(case) * time to event) + (P(not a case) * tar)
     # cases (matched comparison)
     # use comparison start date as time to event and final date as maximum end date
     finalPopn$estimatedTar[!is.na(finalPopn$comparisonCohortStartDate)] <-
       as.numeric((finalPopn$value[!is.na(finalPopn$comparisonCohortStartDate)] *
-        difftime(finalPopn$comparisonCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)],
-          (finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)] +
-            inclusionEvaluationDaysFromStart),
-          units = "days"
-        )) +
-        ((1 - finalPopn$value[!is.na(finalPopn$comparisonCohortStartDate)]) *
-          difftime((finalPopn$finalDate[!is.na(finalPopn$comparisonCohortStartDate)]),
-            (finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)] +
-              inclusionEvaluationDaysFromStart),
-            units = "days"
-          )))
+                    difftime(finalPopn$comparisonCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)],
+                             (finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)] +
+                                inclusionEvaluationDaysFromStart), units = "days")) +
+                   ((1 - finalPopn$value[!is.na(finalPopn$comparisonCohortStartDate)]) *
+                      difftime((finalPopn$finalDate[!is.na(finalPopn$comparisonCohortStartDate)]),
+                               (finalPopn$inclusionCohortStartDate[!is.na(finalPopn$comparisonCohortStartDate)] +
+                                  inclusionEvaluationDaysFromStart), units = "days")))
 
     # non-cases (did not match)
     # use cohort start date as time to event and final date as maximum end date
     finalPopn$estimatedTar[is.na(finalPopn$comparisonCohortStartDate)] <-
       as.numeric((finalPopn$value[is.na(finalPopn$comparisonCohortStartDate)] *
-        difftime(finalPopn$cohortStartDate[is.na(finalPopn$comparisonCohortStartDate)],
-          (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] +
-            inclusionEvaluationDaysFromStart),
-          units = "days"
-        )) +
-        ((1 - finalPopn$value[is.na(finalPopn$comparisonCohortStartDate)]) *
-          difftime((finalPopn$finalDate[is.na(finalPopn$comparisonCohortStartDate)]),
-            (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] +
-              inclusionEvaluationDaysFromStart),
-            units = "days"
-          )))
+                    difftime(finalPopn$cohortStartDate[is.na(finalPopn$comparisonCohortStartDate)],
+                             (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] +
+                                inclusionEvaluationDaysFromStart), units = "days")) +
+                   ((1 - finalPopn$value[is.na(finalPopn$comparisonCohortStartDate)]) *
+                      difftime((finalPopn$finalDate[is.na(finalPopn$comparisonCohortStartDate)]),
+                               (finalPopn$inclusionCohortStartDate[is.na(finalPopn$comparisonCohortStartDate)] +
+                                  inclusionEvaluationDaysFromStart), units = "days")))
 
-    # determine TP, FP, TN, FN
+    #determine TP, FP, TN, FN
     fullTestCases <- NULL
-    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.8, ]
-    testCases <- testCases[order(-testCases[, 14]), ][1:falsePositiveNegativeSubjects, ]
+    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.8,]
+    testCases <- testCases[order(-testCases[,14]),][1:falsePositiveNegativeSubjects,]
     testCases$type <- "FN_Hi"
-    fullTestCases <- testCases[!is.na(testCases$subjectId), ]
+    fullTestCases <- testCases[!is.na(testCases$subjectId),]
 
-    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.5 &
-      finalPopn$value < 0.6, ]
-    testCases <- testCases[order(-testCases[, 14]), ][1:falsePositiveNegativeSubjects, ]
+    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.5
+                           & finalPopn$value < 0.6,]
+    testCases <- testCases[order(-testCases[,14]),][1:falsePositiveNegativeSubjects,]
     testCases$type <- "FN_Med"
-    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId), ])
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
-    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.2 &
-      finalPopn$value < 0.3, ]
-    testCases <- testCases[order(-testCases[, 14]), ][1:falsePositiveNegativeSubjects, ]
+    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.2
+                           & finalPopn$value < 0.3,]
+    testCases <- testCases[order(-testCases[,14]),][1:falsePositiveNegativeSubjects,]
     testCases$type <- "FN_Lo"
-    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId), ])
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
-    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value < 0.1, ]
-    testCases <- testCases[order(testCases[, 14]), ][1:falsePositiveNegativeSubjects, ]
+    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value < 0.1,]
+    testCases <- testCases[order(testCases[,14]),][1:falsePositiveNegativeSubjects,]
     testCases$type <- "FP_Lo"
-    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId), ])
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
-    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.2, ]
-    testCases <- testCases[order(testCases[, 14]), ][1:falsePositiveNegativeSubjects, ]
+    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.2,]
+    testCases <- testCases[order(testCases[,14]),][1:falsePositiveNegativeSubjects,]
     testCases$type <- "FP_Med"
-    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId), ])
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
-    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.4, ]
-    testCases <- testCases[order(testCases[, 14]), ][1:falsePositiveNegativeSubjects, ]
+    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.4,]
+    testCases <- testCases[order(testCases[,14]),][1:falsePositiveNegativeSubjects,]
     testCases$type <- "FP_Hi"
-    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId), ])
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
-    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.8, ]
-    testCases <- testCases[order(-testCases[, 14]), ][1:10, ]
+    testCases <- finalPopn[!is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value > 0.8,]
+    testCases <- testCases[order(-testCases[,14]),][1:10,]
     testCases$type <- "TP"
-    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId), ])
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
-    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value < 0.1, ]
-    testCases <- testCases[order(testCases[, 14]), ][1:10, ]
+    testCases <- finalPopn[is.na(finalPopn$comparisonCohortStartDate) & finalPopn$outcomeCount == 0 & finalPopn$value < 0.1,]
+    testCases <- testCases[order(testCases[,14]),][1:10,]
     testCases$type <- "TN"
-    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId), ])
+    fullTestCases <- rbind(fullTestCases, testCases[!is.na(testCases$subjectId),])
 
     fullSubjectList <- tibble::tibble(fullTestCases)
-    if (nrow(fullTestCases) > 0) { # test cases found
+    if(nrow(fullTestCases) > 0) { #test cases found
       subjectCovariates <- data.frame()
-      for (subjectUp in 1:nrow(fullTestCases)) {
+      for(subjectUp in 1:nrow(fullTestCases)) {
         rowId <- fullTestCases$rowId[[subjectUp]]
-        covs <- allCovData[allCovData$rowId == rowId, ]
-        modelCovs <- lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0, ]
-        covs <- merge(covs, modelCovs, by = "covariateId", all.x = TRUE)
-        covs <- covs[!(is.na(covs$analysisId)), ]
+        covs <- allCovData[allCovData$rowId == rowId,]
+        modelCovs <- lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,]
+        covs <- merge(covs, modelCovs, by="covariateId", all.x = TRUE)
+        covs <- covs[!(is.na(covs$analysisId)),]
 
-        if (nrow(covs) > 0) {
+        if(nrow(covs) > 0) {
           covs$subjectId <- fullTestCases$subjectId[[subjectUp]]
           covs$type <- fullTestCases$type[[subjectUp]]
 
-          if (nrow(subjectCovariates) == 0) {
-            subjectCovariates <- covs[!is.na(covs$subjectId), ]
+          if(nrow(subjectCovariates) == 0) {
+            subjectCovariates <- covs[!is.na(covs$subjectId),]
           } else {
-            subjectCovariates <- rbind(subjectCovariates, covs[!is.na(covs$subjectId), ])
+            subjectCovariates <- rbind(subjectCovariates, covs[!is.na(covs$subjectId),])
           }
         }
       }
@@ -573,21 +557,21 @@
     # save the full data set to the model
     appResults$prediction <- finalPopn
 
-    # create diagnostics to later assess analysis performance
+    #create diagnostics to later assess analysis performance
     count30And70pct <- round(sum(appResults$prediction$value[appResults$prediction$value >= 0.3 & appResults$prediction$value <= 0.7 &
-      appResults$prediction$outcomeCount == 0], na.rm = TRUE), 0)
-    prop30And70pct <- round(count30And70pct / sum(appResults$prediction$value, na.rm = TRUE), 3)
+                                                               appResults$prediction$outcomeCount == 0], na.rm = TRUE), 0)
+    prop30And70pct <- round(count30And70pct/sum(appResults$prediction$value, na.rm = TRUE), 3)
 
     count0And1pct <- round(sum(appResults$prediction$value[appResults$prediction$value >= 0 & appResults$prediction$value <= 0.01 &
-      appResults$prediction$outcomeCount == 0], na.rm = TRUE), 0)
-    prop0And1pct <- round(count0And1pct / sum(appResults$prediction$value, na.rm = TRUE), 3)
+                                                             appResults$prediction$outcomeCount == 0], na.rm = TRUE), 0)
+    prop0And1pct <- round(count0And1pct/sum(appResults$prediction$value, na.rm = TRUE), 3)
 
     countGT80pct <- round(sum(appResults$prediction$value[appResults$prediction$value >= 0.8 &
-      appResults$prediction$outcomeCount == 0], na.rm = TRUE), 0)
-    propGT80pct <- round(countGT80pct / sum(appResults$prediction$value, na.rm = TRUE), 3)
+                                                            appResults$prediction$outcomeCount == 0], na.rm = TRUE), 0)
+    propGT80pct <- round(countGT80pct/sum(appResults$prediction$value, na.rm = TRUE), 3)
 
-    predictionCases <- appResults$prediction[appResults$prediction$outcomeCount == 0 & !(is.na(appResults$prediction$comparisonCohortStartDate)), ]
-    predictionNonCases <- appResults$prediction[appResults$prediction$outcomeCount == 0 & (is.na(appResults$prediction$comparisonCohortStartDate)), ]
+    predictionCases <- appResults$prediction[appResults$prediction$outcomeCount == 0 & !(is.na(appResults$prediction$comparisonCohortStartDate)),]
+    predictionNonCases <- appResults$prediction[appResults$prediction$outcomeCount == 0 & (is.na(appResults$prediction$comparisonCohortStartDate)),]
 
     nonCases <- round(sum(predictionNonCases$value, na.rm = TRUE), 0)
     cases <- round(sum(predictionCases$value, na.rm = TRUE), 0)
@@ -633,12 +617,12 @@
 
     appResults$PheValuator$modelperformanceEvaluation <- lrResults$performanceEvaluation
 
-    if (nrow(fullTestCases) > 0) { # no test cases found
+    if(nrow(fullTestCases) > 0) { #no test cases found
       appResults$PheValuator$testCases <- as.data.frame(fullTestCases)
-      if (ncol(subjectCovariates) == 12) { # rapid method
-        appResults$PheValuator$testCaseCovariates <- subjectCovariates[, c(11, 12, 9, 6, 7)]
-      } else { # predictPlp method
-        appResults$PheValuator$testCaseCovariates <- subjectCovariates[, c(8, 9, 6, 7, 4)]
+      if(ncol(subjectCovariates) == 12) { #rapid method
+        appResults$PheValuator$testCaseCovariates <- subjectCovariates[,c(11,12,9,6,7)]
+      } else { #predictPlp method
+        appResults$PheValuator$testCaseCovariates <- subjectCovariates[,c(8,9,6,7,4)]
         names(appResults$PheValuator$testCaseCovariates)[4] <- "coeffValue"
       }
     } else {
@@ -662,9 +646,9 @@
     df$databaseId <- databaseId
     df$runDateTime <- runDateTime
 
-    if (nrow(data.frame(appResults$PheValuator$testCases)) > 0) {
-      df <- cbind(df, data.frame(appResults$PheValuator$testCases[, c(1, 4, 5, 7:9, 14:16)]))
-      names(df)[names(df) == "gender"] <- "genderSubject"
+    if(nrow(data.frame(appResults$PheValuator$testCases)) > 0) {
+      df <- cbind(df, data.frame(appResults$PheValuator$testCases[,c(1,4,5,7:9,14:16)]))
+      names(df)[names(df)=="gender"] <- "genderSubject"
       colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
       write.csv(df, file.path(exportFolder, "pv_test_subjects.csv"), row.names = FALSE)
 
@@ -689,7 +673,7 @@
 
 
     # remove temp cohort table
-    if (tempTableCreated) {
+    if(tempTableCreated) {
       sql <- SqlRender::loadRenderTranslateSql(
         sqlFilename = "DropTempTable.sql",
         packageName = "PheValuator",
