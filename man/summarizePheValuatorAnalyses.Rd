@@ -17,16 +17,3 @@ A data frame of results.
 \description{
 Summarize results of PheValuator analyses
 }
-\examples{
-\dontrun{
-refTable <- runPheValuatorAnalyses(
-  phenotype = "Diabetes",
-  connectionDetails = connectionDetails,
-  cdmDatabaseSchema = "cdm.dbo",
-  outputFolder = tempdir(),
-  pheValuatorAnalysisList = analysisList
-)
-results <- summarizePheValuatorAnalyses(refTable, outputFolder = tempdir())
-}
-
-}
