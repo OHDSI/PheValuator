@@ -1,4 +1,4 @@
-# Copyright 2022 Observational Health Data Sciences and Informatics
+# Copyright 2026 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -48,11 +48,10 @@
                                   endDate = "21000101",
                                   removeSubjectsWithFutureDates = TRUE,
                                   cdmVersion = "5",
-                                  outFolder = getwd(),
+                                  outFolder,
                                   exportFolder,
                                   randomVisitTable = "",
                                   modelId = "main") {
-
   connection <- DatabaseConnector::connect(connectionDetails)
   on.exit(DatabaseConnector::disconnect(connection))
 
@@ -60,7 +59,7 @@
   modelFileName <- file.path(outFolder, sprintf("model_%s.rds", modelId))
   plpResultsFileName <- file.path(outFolder, sprintf("plpResults_%s", modelId))
 
-  if(!is.null(priorModelToUse)) {
+  if (!is.null(priorModelToUse)) {
     priorModelToUse <- file.path(priorModelToUse, sprintf("model_%s.rds", modelId))
   }
 
@@ -88,7 +87,7 @@
 
     xSpecCount <- as.numeric(DatabaseConnector::querySql(connection = connection, sql = sql))
 
-    if (xSpecCount < 100) { #set to 100 as minimum
+    if (xSpecCount < 100) { # set to 100 as minimum
       ParallelLogger::logInfo("Too few subjects in xSpec to produce model. (Outcome count = ", xSpecCount, ")")
       ParallelLogger::logInfo("Saving null model summary to ", modelFileName)
       lrResults <- NULL
@@ -121,7 +120,9 @@
         popPrev <- prevalenceCohortId
       }
 
-      if (is.na(popPrev)) {popPrev <- 0.01} #set default for eunomia data
+      if (is.na(popPrev)) {
+        popPrev <- 0.01
+      } # set default for eunomia data
 
       if (popPrev == 0) {
         stop("Unable to calculate the expected prevalence, possibly an error with prevalence cohort id")
@@ -141,29 +142,31 @@
         testCohort <- paste0("test_model_", xSpecCohortId, "_", paste(sample(c(letters, 0:9), 8), collapse = ""))
 
         if (randomVisitTable != "") {
-          ParallelLogger::logInfo("Creating model cohort subjects using supplied random visit table: ",
-                                  paste0(workDatabaseSchema, ".", randomVisitTable))
+          ParallelLogger::logInfo(
+            "Creating model cohort subjects using supplied random visit table: ",
+            paste0(workDatabaseSchema, ".", randomVisitTable)
+          )
         }
 
-        #first check number of eligible visits in db
+        # first check number of eligible visits in db
         sql <- SqlRender::loadRenderTranslateSql("GetNumberOfEligibleVisits.sql",
-                                                 packageName = "PheValuator",
-                                                 dbms = connectionDetails$dbms,
-                                                 cdm_database_schema = cdmDatabaseSchema,
-                                                 cohort_database_schema = cohortDatabaseSchema,
-                                                 cohort_database_table = cohortTable,
-                                                 work_database_schema = workDatabaseSchema,
-                                                 ageLimit = lowerAgeLimit,
-                                                 upperAgeLimit = upperAgeLimit,
-                                                 gender = gender,
-                                                 race = race,
-                                                 ethnicity = ethnicity,
-                                                 startDate = startDate,
-                                                 endDate = endDate,
-                                                 visitType = visitType,
-                                                 visitLength = visitLength,
-                                                 randomVisitTable = randomVisitTable,
-                                                 exclCohort = xSensCohortId
+          packageName = "PheValuator",
+          dbms = connectionDetails$dbms,
+          cdm_database_schema = cdmDatabaseSchema,
+          cohort_database_schema = cohortDatabaseSchema,
+          cohort_database_table = cohortTable,
+          work_database_schema = workDatabaseSchema,
+          ageLimit = lowerAgeLimit,
+          upperAgeLimit = upperAgeLimit,
+          gender = gender,
+          race = race,
+          ethnicity = ethnicity,
+          startDate = startDate,
+          endDate = endDate,
+          visitType = visitType,
+          visitLength = visitLength,
+          randomVisitTable = randomVisitTable,
+          exclCohort = xSensCohortId
         )
         cntVisits <- DatabaseConnector::querySql(connection = connection, sql)
 
@@ -181,7 +184,7 @@
 
           tryCatch(
             {
-              insertTable(
+              DatabaseConnector::insertTable(
                 connection = connection,
                 databaseSchema = workDatabaseSchema,
                 tableName = testCohort,
@@ -197,7 +200,7 @@
             error = function(cond) {
               if (grepl("Bulk load credentials", cond, fixed = TRUE)) {
                 message(paste0("...bulk load failed...trying without bulk load...this may be slow"))
-                insertTable(
+                DatabaseConnector::insertTable(
                   connection = connection,
                   databaseSchema = workDatabaseSchema,
                   tableName = testCohort,
@@ -218,7 +221,7 @@
 
           sqlFileName <- "CreateCohortsAcuteModel.sql"
 
-          if(daysFromxSpec != 0) {
+          if (daysFromxSpec != 0) {
             ParallelLogger::logInfo("Transforming xSpec cohort using daysFromxSpec parameter")
           } else {
             ParallelLogger::logInfo("Using xSpec cohort verbatim (daysFromxSpec = 0)")
@@ -277,7 +280,7 @@
         restrictPlpDataSettings <- PatientLevelPrediction::createRestrictPlpDataSettings(
           studyStartDate = startDate,
           studyEndDate = endDate,
-          firstExposureOnly = F,
+          firstExposureOnly = FALSE,
           washoutPeriod = 0,
           sampleSize = NULL
         )
@@ -309,8 +312,8 @@
 
       ParallelLogger::logInfo("Fitting predictive model")
       populationSettings <- PatientLevelPrediction::createStudyPopulationSettings(
-        binary = T,
-        includeAllOutcomes = T,
+        binary = TRUE,
+        includeAllOutcomes = TRUE,
         firstExposureOnly = FALSE,
         washoutPeriod = 0,
         removeSubjectsWithPriorOutcome = TRUE,
@@ -321,7 +324,7 @@
         startAnchor = "cohort start",
         riskWindowEnd = 365,
         endAnchor = "cohort start",
-        restrictTarToCohortEnd = F
+        restrictTarToCohortEnd = FALSE
       )
 
       population <- PatientLevelPrediction::createStudyPopulation(
@@ -347,13 +350,13 @@
             )
             sampleSettings <- PatientLevelPrediction::createSampleSettings(type = "none")
             featureEngineeringSettings <- PatientLevelPrediction::createFeatureEngineeringSettings(type = "none")
-            preprocessSettings <- PatientLevelPrediction::createPreprocessSettings(minFraction = 0.001, normalize = T)
+            preprocessSettings <- PatientLevelPrediction::createPreprocessSettings(minFraction = 0.001, normalize = TRUE)
             modelSettings <- PatientLevelPrediction::setLassoLogisticRegression(variance = 0.01, seed = 5)
-            logSettings <- PatientLevelPrediction::createLogSettings(verbosity = "INFO", timeStamp = T, logName = "runPlp Log")
+            logSettings <- PatientLevelPrediction::createLogSettings(verbosity = "INFO", timeStamp = TRUE, logName = "runPlp Log")
             executeSettings <- PatientLevelPrediction::createExecuteSettings(
               runSplitData = TRUE,
-              runSampleData = F,
-              runFeatureEngineering = F,
+              runSampleData = FALSE,
+              runFeatureEngineering = FALSE,
               runPreprocessData = TRUE,
               runModelDevelopment = TRUE,
               runCovariateSummary = TRUE
@@ -383,7 +386,7 @@
             delta <- log(prevToUseOdds) - log(popPrevOdds)
             yIntercept <- as.numeric(lrResults$model$model$coefficients$betas[1])
 
-            #save analysis parameters
+            # save analysis parameters
             lrResults$model$model$coefficients$betas[1] <- as.numeric(yIntercept - delta) # Equation (7) in King and Zeng (2001)
 
             lrResults$PheValuator$inputSetting$phenotype <- phenotype
@@ -401,17 +404,17 @@
             lrResults$PheValuator$inputSetting$xSensCohortId <- xSensCohortId
             lrResults$PheValuator$inputSetting$prevalenceCohortId <- prevalenceCohortId
             lrResults$PheValuator$inputSetting$modelPopulationCohortId <- modelPopulationCohortId
-            lrResults$PheValuator$inputSetting$modelPopulationCohortIdStartDay = modelPopulationCohortIdStartDay
-            lrResults$PheValuator$inputSetting$modelPopulationCohortIdEndDay = modelPopulationCohortIdEndDay
-            lrResults$PheValuator$inputSetting$minimumOffsetFromStart = minimumOffsetFromStart
-            lrResults$PheValuator$inputSetting$minimumOffsetFromEnd = minimumOffsetFromEnd
+            lrResults$PheValuator$inputSetting$modelPopulationCohortIdStartDay <- modelPopulationCohortIdStartDay
+            lrResults$PheValuator$inputSetting$modelPopulationCohortIdEndDay <- modelPopulationCohortIdEndDay
+            lrResults$PheValuator$inputSetting$minimumOffsetFromStart <- minimumOffsetFromStart
+            lrResults$PheValuator$inputSetting$minimumOffsetFromEnd <- minimumOffsetFromEnd
             lrResults$PheValuator$inputSetting$lowerAgeLimit <- lowerAgeLimit
             lrResults$PheValuator$inputSetting$upperAgeLimit <- upperAgeLimit
 
             lrResults$PheValuator$inputSetting$startDayWindow1 <- covariateSettings[[1]]$longTermStartDays
             lrResults$PheValuator$inputSetting$endDayWindow1 <- covariateSettings[[1]]$endDays
 
-            if(length(covariateSettings) > 1) {
+            if (length(covariateSettings) > 1) {
               lrResults$PheValuator$inputSetting$startDayWindow2 <- covariateSettings[[2]]$shortTermStartDays
               lrResults$PheValuator$inputSetting$endDayWindow2 <- covariateSettings[[2]]$endDays
             } else {
@@ -419,7 +422,7 @@
               lrResults$PheValuator$inputSetting$endDayWindow2 <- NULL
             }
 
-            if(length(covariateSettings) > 2) {
+            if (length(covariateSettings) > 2) {
               lrResults$PheValuator$inputSetting$startDayWindow3 <- covariateSettings[[3]]$mediumTermStartDays
               lrResults$PheValuator$inputSetting$endDayWindow3 <- covariateSettings[[3]]$endDays
             } else {
@@ -438,7 +441,7 @@
             lrResults$PheValuator$runTimeValues$truePrevalencePopulation <- popPrev
             lrResults$PheValuator$runTimeValues$prevalenceModel <- prevToUse
             lrResults$PheValuator$runTimeValues$modelYIntercept <- modelYIntercept
-            lrResults$PheValuator$runTimeValues$recalibratedYIntercept <- lrResults$model$model$coefficients[1,1]
+            lrResults$PheValuator$runTimeValues$recalibratedYIntercept <- lrResults$model$model$coefficients[1, 1]
 
             ParallelLogger::logInfo("Saving model summary to ", modelFileName)
             saveRDS(lrResults, modelFileName)
@@ -466,9 +469,13 @@
             df$analysisName <- analysisName
             df$databaseId <- databaseId
             df$runDateTime <- runDateTime
-            df <- cbind(df, lrResults$model$covariateImportance[lrResults$model$covariateImportance$covariateValue != 0,
-                                                                c("conceptId","covariateValue","covariateName","covariateId",
-                                                                  "analysisId")])
+            df <- cbind(df, lrResults$model$covariateImportance[
+              lrResults$model$covariateImportance$covariateValue != 0,
+              c(
+                "conceptId", "covariateValue", "covariateName", "covariateId",
+                "analysisId"
+              )
+            ])
             colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_covariates.csv"), row.names = FALSE)
 
@@ -477,15 +484,23 @@
             df$analysisName <- analysisName
             df$databaseId <- databaseId
             df$runDateTime <- runDateTime
-            df <- cbind(df, lrResults$covariateSummary[lrResults$covariateSummary$covariateValue != 0 &
-                                                         !(is.na(lrResults$covariateSummary$covariateValue)),
-                                                       c("covariateName","conceptId","covariateValue",
-                                                         "WithOutcome_CovariateCount","WithOutcome_CovariateMean",
-                                                         "WithNoOutcome_CovariateCount","WithNoOutcome_CovariateMean",
-                                                         "StandardizedMeanDiff")])
-            #change first character of each column name to lower case
-            for(colNum in 1:ncol(df)) {names(df)[colNum] <- paste0(tolower(substr(names(df)[colNum],1,1)),
-                                                                   substr(names(df)[colNum],2,nchar(names(df)[colNum])))}
+            df <- cbind(df, lrResults$covariateSummary[
+              lrResults$covariateSummary$covariateValue != 0 &
+                !(is.na(lrResults$covariateSummary$covariateValue)),
+              c(
+                "covariateName", "conceptId", "covariateValue",
+                "WithOutcome_CovariateCount", "WithOutcome_CovariateMean",
+                "WithNoOutcome_CovariateCount", "WithNoOutcome_CovariateMean",
+                "StandardizedMeanDiff"
+              )
+            ])
+            # change first character of each column name to lower case
+            for (colNum in 1:ncol(df)) {
+              names(df)[colNum] <- paste0(
+                tolower(substr(names(df)[colNum], 1, 1)),
+                substr(names(df)[colNum], 2, nchar(names(df)[colNum]))
+              )
+            }
             colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_covariate_summary.csv"), row.names = FALSE)
 
@@ -500,7 +515,8 @@
             df <- data.frame(df)
             colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
             write.csv(df, file.path(exportFolder, "pv_model_performance.csv"),
-                      row.names = FALSE)
+              row.names = FALSE
+            )
           },
           error = function(e) {
             message("error found: ")
@@ -514,14 +530,15 @@
       }
     }
   } else {
-    if(!is.null(priorModelToUse)) {
-      if(!file.exists(priorModelToUse)){
+    if (!is.null(priorModelToUse)) {
+      if (!file.exists(priorModelToUse)) {
         stop("Error: priorModelToUse does not exist")
       } else {
         ParallelLogger::logInfo("Using previously created model file ", priorModelToUse)
         fileCopy <- file.copy(file.path(priorModelToUse),
-                              file.path(outFolder, sprintf("model_%s.rds", modelId)),
-                              copy.date = TRUE, overwrite = TRUE)
+          file.path(outFolder, sprintf("model_%s.rds", modelId)),
+          copy.date = TRUE, overwrite = TRUE
+        )
       }
     } else {
       ParallelLogger::logInfo("Skipping creation of ", modelFileName, " because it already exists")

@@ -1,4 +1,4 @@
-# Copyright 2022 Observational Health Data Sciences and Informatics
+# Copyright 2026 Observational Health Data Sciences and Informatics
 #
 # This file is part of PheValuator
 #
@@ -56,6 +56,39 @@
 #' A data frame specifying where the constructed evaluation cohort and phenotype evaluation results can be found
 #' in the local file system.
 #'
+#' @examples
+#' \dontrun{
+#' connectionDetails <- DatabaseConnector::createConnectionDetails(
+#'   dbms = "postgresql",
+#'   server = "myserver",
+#'   user = "user",
+#'   password = "password"
+#' )
+#' analysisList <- list(
+#'   createPheValuatorAnalysis(
+#'     analysisId = 1,
+#'     description = "Main analysis",
+#'     createEvaluationCohortArgs = createCreateEvaluationCohortArgs(
+#'       xSpecCohortId = 1,
+#'       xSensCohortId = 2,
+#'       prevalenceCohortId = 3,
+#'       caseCohortId = 0,
+#'       caseFirstOccurrenceOnly = FALSE
+#'     ),
+#'     testPhenotypeAlgorithmArgs = createTestPhenotypeAlgorithmArgs(
+#'       phenotypeCohortId = 10
+#'     )
+#'   )
+#' )
+#' runPheValuatorAnalyses(
+#'   phenotype = "Diabetes",
+#'   connectionDetails = connectionDetails,
+#'   cdmDatabaseSchema = "cdm.dbo",
+#'   outputFolder = tempdir(),
+#'   pheValuatorAnalysisList = analysisList
+#' )
+#' }
+#'
 #' @export
 runPheValuatorAnalyses <- function(phenotype,
                                    cohortDefinitionSet = data.frame(),
@@ -83,7 +116,7 @@ runPheValuatorAnalyses <- function(phenotype,
 
   ParallelLogger::logInfo("\nBeginning PheValuator analysis for phenotype: ", phenotype, "\n")
 
-  #create export folder for csv output
+  # create export folder for csv output
   exportFolder <- file.path(outputFolder, "exportFolder")
   dir.create(exportFolder, showWarnings = FALSE)
 
@@ -96,16 +129,16 @@ runPheValuatorAnalyses <- function(phenotype,
   df$databaseId <- databaseId
   df$runDateTime <- runDateTime
 
-  if(nrow(cohortDefinitionSet) != 0) {
-    df <- cbind(df, data.frame(cohortDefinitionSet[,c(1:3)]))
+  if (nrow(cohortDefinitionSet) != 0) {
+    df <- cbind(df, data.frame(cohortDefinitionSet[, c(1:3)]))
   }
 
-  if(!is.null(colnames(df))) {
+  if (!is.null(colnames(df))) {
     colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
   }
 
   cohortFile <- file.path(exportFolder, "pv_cohort_definition_set.csv")
-  if(!file.exists(cohortFile)) {
+  if (!file.exists(cohortFile)) {
     ParallelLogger::logInfo("\nsaving ", cohortFile, "\n")
     write.csv(df, cohortFile, row.names = FALSE)
   } else {
@@ -132,13 +165,13 @@ runPheValuatorAnalyses <- function(phenotype,
     args$workDatabaseSchema <- workDatabaseSchema
     args$cdmVersion <- cdmVersion
     args$outFolder <- file.path(outputFolder, evaluationCohortFolder)
-    if(!is.null(priorModelToUse)) {
+    if (!is.null(priorModelToUse)) {
       args$priorModelToUse <- file.path(priorModelToUse, evaluationCohortFolder)
     } else {
       args$priorModelToUse <- NULL
     }
 
-    if(!is.null(priorModelToUse)) { #previously created model to use in the analysis
+    if (!is.null(priorModelToUse)) { # previously created model to use in the analysis
       args$priorModelToUse <- file.path(priorModelToUse, evaluationCohortFolder)
     } else {
       args$priorModelToUse <- NULL
@@ -185,10 +218,10 @@ runPheValuatorAnalyses <- function(phenotype,
 
 
   output <- data.frame(summarizePheValuatorAnalyses(referenceTable, outputFolder))
-  names(output)[names(output)=="analysisId"] <- "analysisIdResults"
+  names(output)[names(output) == "analysisId"] <- "analysisIdResults"
   colnames(output) <- SqlRender::camelCaseToSnakeCase(colnames(output))
 
-  if(ncol(output) > 10) {
+  if (ncol(output) > 10) {
     ParallelLogger::logInfo("Saving phenotype algorithm evaluation results to ", exportFolder)
     write.csv(output, file.path(exportFolder, "pv_algorithm_performance_results.csv"), row.names = FALSE)
   } else {
@@ -196,7 +229,6 @@ runPheValuatorAnalyses <- function(phenotype,
   }
 
   invisible(referenceTable)
-
 }
 
 doCreateEvaluationCohort <- function(task) {
@@ -233,6 +265,18 @@ createReferenceTable <- function(pheValuatorAnalysisList) {
 #'
 #' @return
 #' A data frame of results.
+#'
+#' @examples
+#' \dontrun{
+#' refTable <- runPheValuatorAnalyses(
+#'   phenotype = "Diabetes",
+#'   connectionDetails = connectionDetails,
+#'   cdmDatabaseSchema = "cdm.dbo",
+#'   outputFolder = tempdir(),
+#'   pheValuatorAnalysisList = analysisList
+#' )
+#' results <- summarizePheValuatorAnalyses(refTable, outputFolder = tempdir())
+#' }
 #'
 #' @export
 summarizePheValuatorAnalyses <- function(referenceTable, outputFolder) {
