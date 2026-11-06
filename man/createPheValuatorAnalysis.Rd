@@ -38,7 +38,9 @@ Create a set of analysis choices, to be used with the \code{\link{runPheValuator
 evalCohortArgs <- createCreateEvaluationCohortArgs(
   xSpecCohortId = 1,
   xSensCohortId = 2,
-  prevalenceCohortId = 3
+  prevalenceCohortId = 3,
+  caseCohortId = 0,
+  caseFirstOccurrenceOnly = FALSE
 )
 testArgs <- createTestPhenotypeAlgorithmArgs(
   phenotypeCohortId = 10

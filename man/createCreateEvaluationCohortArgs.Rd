@@ -7,10 +7,10 @@
 createCreateEvaluationCohortArgs(
   xSpecCohortId,
   daysFromxSpec = 0,
-  xSensCohortId = prevalenceCohortId,
+  xSensCohortId,
   prevalenceCohortId,
-  caseCohortId = prevalenceCohortId,
-  caseFirstOccurrenceOnly = TRUE,
+  caseCohortId,
+  caseFirstOccurrenceOnly,
   xSpecCohortSize = 5000,
   covariateSettings = createDefaultCovariateSettings(excludedCovariateConceptIds = c(),
     addDescendantsToExclude = TRUE),
@@ -24,14 +24,14 @@ createCreateEvaluationCohortArgs(
   exclusionEvaluationCohortId = 0,
   exclusionEvaluationDaysFromStart = 0,
   exclusionEvaluationDaysFromEnd = 0,
-  minimumOffsetFromStart = 0,
-  minimumOffsetFromEnd = 30,
+  minimumOffsetFromStart = 365,
+  minimumOffsetFromEnd = 365,
   modelBaseSampleSize = 25000,
   baseSampleSize = 2e+06,
   lowerAgeLimit = 0,
   upperAgeLimit = 120,
   visitLength = 0,
-  visitType = c(9201, 9202, 9203, 581477, 262),
+  visitType = c(9201, 9202, 9203, 262, 581477),
   gender = c(8507, 8532),
   race = 0,
   ethnicity = 0,
@@ -39,39 +39,40 @@ createCreateEvaluationCohortArgs(
   endDate = "21000101",
   falsePositiveNegativeSubjects = 10,
   modelId = "main",
-  evaluationCohortId = "main",
-  randomVisitTable = "",
   excludeModelFromEvaluation = FALSE,
+  randomVisitTable = "",
   removeSubjectsWithFutureDates = TRUE,
   saveEvaluationCohortPlpData = FALSE
 )
 }
 \arguments{
-\item{xSpecCohortId}{The number of the "extremely specific (xSpec)"
-cohortdefinition id in the cohort table (for noisy
-positives).}
+\item{xSpecCohortId}{The number of the "extremely specific (xSpec)" cohort
+definition id in the cohort table (for noisy positives).}
 
-\item{daysFromxSpec}{Number of days from xSpec condition until analyzed visit}
+\item{daysFromxSpec}{Number of days allowed from xSpec condition until analyzed
+visit}
 
-\item{xSensCohortId}{The number of the "extremely sensitive (xSens)"
-cohortdefinition id in the cohort table (for noisy
-negatives).}
+\item{xSensCohortId}{The number of the "extremely sensitive (xSens)" cohort
+definition id in the cohort table (for noisy negatives).}
 
-\item{prevalenceCohortId}{The number of the cohort definition id to determine
-the disease prevalence.}
+\item{prevalenceCohortId}{The number of the cohort definition id to determine the
+disease prevalence.}
 
-\item{caseCohortId}{The number of the cohort definition id to determine cases in the evaluation cohort}
+\item{caseCohortId}{The number of the cohort definition id to determine cases
+in the evaluation cohort}
 
-\item{caseFirstOccurrenceOnly}{Set to true if only the first occurrence per subject in the case cohort is to be used}
+\item{caseFirstOccurrenceOnly}{Set to true if only the first occurrence per subject in
+the case cohort is to be used}
 
-\item{xSpecCohortSize}{Maximum xSpec sample size to use in the analysis}
+\item{xSpecCohortSize}{The recommended xSpec sample size to use in model (default
+= NULL)}
 
-\item{covariateSettings}{A covariateSettings object as generated
-using createCovariateSettings().}
+\item{covariateSettings}{A covariateSettings object as generated using
+createCovariateSettings().}
 
-\item{modelPopulationCohortId}{The number of the cohort to be used as a base population for
-the model. If set to 0, the entire database population will be
-used.}
+\item{modelPopulationCohortId}{The number of the cohort to be used as a base population
+for the model. If set to 0, the entire database population
+will be used.}
 
 \item{modelPopulationCohortIdStartDay}{The number of days relative to the mainPopulationCohortId
 cohort start date to begin including visits.}
@@ -79,29 +80,38 @@ cohort start date to begin including visits.}
 \item{modelPopulationCohortIdEndDay}{The number of days relative to the mainPopulationCohortId
 cohort start date to end including visits.}
 
-\item{inclusionEvaluationCohortId}{The number of the cohort of the population to be used to designate which visits
-are are eligible to be in the evaluation cohort}
+\item{inclusionEvaluationCohortId}{The number of the cohort of the population to be used to
+designate which visits are eligible to be in the
+evaluation cohort}
 
-\item{inclusionEvaluationDaysFromStart}{The number of days from the cohort start date of the inclusionEvaluationCohortId
-to start eligible included visits}
+\item{inclusionEvaluationDaysFromStart}{The number of days from the cohort start date of the
+inclusionEvaluationCohortId to start eligible included
+visits}
 
-\item{inclusionEvaluationDaysFromEnd}{The number of days from the cohort start date of the inclusionEvaluationCohortId
-to end eligible included visits}
+\item{inclusionEvaluationDaysFromEnd}{The number of days from the cohort start date of the
+inclusionEvaluationCohortId to end eligible included
+visits}
 
-\item{duringInclusionEvaluationOnly}{Only include visits that are within the cohort start and end dates}
+\item{duringInclusionEvaluationOnly}{Only include visits that are within the cohort start and
+end dates}
 
-\item{exclusionEvaluationCohortId}{The number of the cohort of the population to be used to designate which visits
-are NOT eligible to be in the evaluation cohort}
+\item{exclusionEvaluationCohortId}{The number of the cohort of the population to be used to
+designate which visits are NOT eligible to be in the
+evaluation cohort}
 
-\item{exclusionEvaluationDaysFromStart}{The number of days from the cohort start date of the exclusionEvaluationCohortId
-to start ineligible included visits}
+\item{exclusionEvaluationDaysFromStart}{The number of days from the cohort start date of the
+exclusionEvaluationCohortId to start ineligible included
+visits}
 
-\item{exclusionEvaluationDaysFromEnd}{The number of days from the cohort start date of the exclusionEvaluationCohortId
-to end ineligible included visits}
+\item{exclusionEvaluationDaysFromEnd}{The number of days from the cohort start date of the
+exclusionEvaluationCohortId to end ineligible included
+visits}
 
-\item{minimumOffsetFromStart}{Minimum number of days to offset for the analysis visit from the start of the observation period}
+\item{minimumOffsetFromStart}{Minimum number of days to offset for the analysis visit
+from the start of the observation period}
 
-\item{minimumOffsetFromEnd}{Minimum number of days to offset for the analysis visit from the end of the observation period}
+\item{minimumOffsetFromEnd}{Minimum number of days to offset for the analysis visit
+from the end of the observation period}
 
 \item{modelBaseSampleSize}{The number of non-xSpec subjects to include in the model}
 
@@ -125,16 +135,16 @@ to end ineligible included visits}
 
 \item{endDate}{The ending date for including subjects in the model.}
 
-\item{falsePositiveNegativeSubjects}{Number of subjects to include for evaluating false positives and negatives}
+\item{falsePositiveNegativeSubjects}{Number of subjects to include for evaluating false
+positives and negatives}
 
 \item{modelId}{A string used to generate the file names for this model.}
 
-\item{evaluationCohortId}{A string used to generate the file names for this evaluation cohort.}
-
-\item{randomVisitTable}{Table stored in work directory with pre-selected random visits in format of visit_occurrence table}
-
 \item{excludeModelFromEvaluation}{Should subjects used in the model be excluded from the
 evaluation cohort?}
+
+\item{randomVisitTable}{Table stored in work directory with pre-selected random
+visits in format of visit_occurrence table}
 
 \item{removeSubjectsWithFutureDates}{For buggy data with data in the future: ignore subjects
 with dates in the future?}
@@ -142,20 +152,9 @@ with dates in the future?}
 \item{saveEvaluationCohortPlpData}{Should the large PLP file for the evaluation cohort be
 saved? To be used for debugging purposes.}
 }
-\value{
-A list of class \code{"args"} containing all the provided parameters.
-  This object is used as an argument to the \code{\link{createEvaluationCohort}} function.
-}
 \description{
 Create a parameter object for the function createEvaluationCohort
 }
 \details{
 Create an object defining the parameter values.
-}
-\examples{
-evalCohortArgs <- createCreateEvaluationCohortArgs(
-  xSpecCohortId = 1,
-  prevalenceCohortId = 3
-)
-
 }

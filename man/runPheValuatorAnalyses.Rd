@@ -96,7 +96,10 @@ analysisList <- list(
     description = "Main analysis",
     createEvaluationCohortArgs = createCreateEvaluationCohortArgs(
       xSpecCohortId = 1,
-      prevalenceCohortId = 3
+      xSensCohortId = 2,
+      prevalenceCohortId = 3,
+      caseCohortId = 0,
+      caseFirstOccurrenceOnly = FALSE
     ),
     testPhenotypeAlgorithmArgs = createTestPhenotypeAlgorithmArgs(
       phenotypeCohortId = 10

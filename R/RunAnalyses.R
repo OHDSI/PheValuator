@@ -70,7 +70,10 @@
 #'     description = "Main analysis",
 #'     createEvaluationCohortArgs = createCreateEvaluationCohortArgs(
 #'       xSpecCohortId = 1,
-#'       prevalenceCohortId = 3
+#'       xSensCohortId = 2,
+#'       prevalenceCohortId = 3,
+#'       caseCohortId = 0,
+#'       caseFirstOccurrenceOnly = FALSE
 #'     ),
 #'     testPhenotypeAlgorithmArgs = createTestPhenotypeAlgorithmArgs(
 #'       phenotypeCohortId = 10
@@ -113,7 +116,7 @@ runPheValuatorAnalyses <- function(phenotype,
 
   ParallelLogger::logInfo("\nBeginning PheValuator analysis for phenotype: ", phenotype, "\n")
 
-  #create export folder for csv output
+  # create export folder for csv output
   exportFolder <- file.path(outputFolder, "exportFolder")
   dir.create(exportFolder, showWarnings = FALSE)
 
@@ -126,16 +129,16 @@ runPheValuatorAnalyses <- function(phenotype,
   df$databaseId <- databaseId
   df$runDateTime <- runDateTime
 
-  if(nrow(cohortDefinitionSet) != 0) {
-    df <- cbind(df, data.frame(cohortDefinitionSet[,c(1:3)]))
+  if (nrow(cohortDefinitionSet) != 0) {
+    df <- cbind(df, data.frame(cohortDefinitionSet[, c(1:3)]))
   }
 
-  if(!is.null(colnames(df))) {
+  if (!is.null(colnames(df))) {
     colnames(df) <- SqlRender::camelCaseToSnakeCase(colnames(df))
   }
 
   cohortFile <- file.path(exportFolder, "pv_cohort_definition_set.csv")
-  if(!file.exists(cohortFile)) {
+  if (!file.exists(cohortFile)) {
     ParallelLogger::logInfo("\nsaving ", cohortFile, "\n")
     write.csv(df, cohortFile, row.names = FALSE)
   } else {
@@ -162,13 +165,13 @@ runPheValuatorAnalyses <- function(phenotype,
     args$workDatabaseSchema <- workDatabaseSchema
     args$cdmVersion <- cdmVersion
     args$outFolder <- file.path(outputFolder, evaluationCohortFolder)
-    if(!is.null(priorModelToUse)) {
+    if (!is.null(priorModelToUse)) {
       args$priorModelToUse <- file.path(priorModelToUse, evaluationCohortFolder)
     } else {
       args$priorModelToUse <- NULL
     }
 
-    if(!is.null(priorModelToUse)) { #previously created model to use in the analysis
+    if (!is.null(priorModelToUse)) { # previously created model to use in the analysis
       args$priorModelToUse <- file.path(priorModelToUse, evaluationCohortFolder)
     } else {
       args$priorModelToUse <- NULL
@@ -215,10 +218,10 @@ runPheValuatorAnalyses <- function(phenotype,
 
 
   output <- data.frame(summarizePheValuatorAnalyses(referenceTable, outputFolder))
-  names(output)[names(output)=="analysisId"] <- "analysisIdResults"
+  names(output)[names(output) == "analysisId"] <- "analysisIdResults"
   colnames(output) <- SqlRender::camelCaseToSnakeCase(colnames(output))
 
-  if(ncol(output) > 10) {
+  if (ncol(output) > 10) {
     ParallelLogger::logInfo("Saving phenotype algorithm evaluation results to ", exportFolder)
     write.csv(output, file.path(exportFolder, "pv_algorithm_performance_results.csv"), row.names = FALSE)
   } else {
@@ -226,7 +229,6 @@ runPheValuatorAnalyses <- function(phenotype,
   }
 
   invisible(referenceTable)
-
 }
 
 doCreateEvaluationCohort <- function(task) {
