@@ -1,3 +1,9 @@
+PheValuator 2.2.20
+=================
+
+Changes:
+1. Rebuild docs
+
 PheValuator 2.2.18
 =================
 
