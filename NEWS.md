@@ -1,14 +1,14 @@
-PheValuator 2.2.20
+PheValuator 2.2.19
 =================
 
 Changes:
-1. Rebuild docs
+1. Accepted CRAN submission
 
 PheValuator 2.2.18
 =================
 
 Changes:
-1. CRAN submission 
+1. First CRAN submission 
 
 PheValuator 2.2.17
 =================
