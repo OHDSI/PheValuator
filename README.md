@@ -86,4 +86,4 @@ Beta
 
 # Acknowledgements
 
-- The package is maintained by Joel Swerdel and has been developed with major contributions from Jenna Reps, Peter Rijnbeek, Martijn Schuemie, Patrick Ryan, and Marc Suchard.
+- The package is maintained by Bill O'Brien and has been developed with major contributions from Joel Swerdel, Jenna Reps, Peter Rijnbeek, Martijn Schuemie, Patrick Ryan, and Marc Suchard.
